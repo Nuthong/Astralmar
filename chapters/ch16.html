@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 16 · switch-case Construct — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="16">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 3 · Add Logic to Console Apps / บทที่ 16</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 3 · โมดูล 3/7</span>
+      <h1>แตกสาขาโค้ดด้วย switch-case</h1>
+      <div class="en">Branch the Flow of Code Using the switch-case Construct</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>40–60 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เขียน switch statement และแปลงจาก if-elseif-else ได้</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น–กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ใช้ construct <code>switch-case</code> จับคู่ตัวแปรหรือ expression กับผลลัพธ์ที่เป็นไปได้หลายแบบ</li>
+        <li>แปลงโค้ดที่ใช้ construct <code>if-elseif-else</code> ให้เป็น <code>switch-case</code> ได้</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">16.1 ทำไมต้องมี switch-case</h2>
+
+    <p>ภาษา C# ก็เหมือนภาษามนุษย์ที่พูดหรือเขียน — แต่ละภาษารองรับวิธีสื่อความหมายเดียวกันได้
+       หลายแบบ ในภาษาพูด บางคำ/วลีสื่อความหมาย แม่นยำ หรือกระชับกว่าคำอื่น ในภาษา C# ก็มีมากกว่า
+       หนึ่งวิธีสร้างตรรกะแตกสาขา เช่น การเลือกด้วย <code>if</code> statement กับการเลือกด้วย
+       <code>switch</code> statement ขึ้นกับบริบทของแอป วิธีหนึ่งอาจสื่อความหมายและกระชับกว่า
+       อีกวิธีหนึ่ง</p>
+
+    <p>สมมติคุณทำงานกับแอปที่ใช้ selection statement เยอะมาก บางกรณี
+       <code>if-elseif-else</code> ให้โค้ดที่กระชับ สื่อความหมาย อ่านและดูแลง่าย แต่บางกรณี
+       <code>if-elseif-else</code> ก็ให้ผลลัพธ์ที่ถูกต้อง แต่อ่านและดูแลยาก คุณถูกมอบหมายให้
+       ตรวจโค้ดและตัดสินว่าเมื่อไรควรใช้ <code>switch</code> statement แทน <code>if</code>
+       statement</p>
+
+    <p>ในบทนี้ คุณจะสำรวจการใช้ <code>switch</code> statement สร้างตรรกะแตกสาขา เป็นทางเลือกแทน
+       <code>if</code> statement คุณจะแปลง <code>if-elseif-else</code> construct เป็น
+       <code>switch-case</code> construct ระหว่างทางนี้ คุณจะเรียนรู้ข้อดีของการเลือกใช้
+       selection statement แบบหนึ่งเหนืออีกแบบหนึ่ง</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">16.2 ลงมือ: สร้าง switch Statement</h2>
+
+    <p>สมมติสถานการณ์: คุณทำงานกับแอปเกี่ยวกับข้อมูลโภชนาการอาหาร ส่วนหนึ่งของโค้ดเกี่ยวกับผลไม้
+       — มีตัวแปร <code>fruit</code> เก็บชื่อผลไม้ชนิดต่างๆ มีรายการผลไม้ที่แอปสนใจถึง 20 ชนิด
+       และต้องการแตกสาขาโค้ดตามค่าที่กำหนดให้ <code>fruit</code> — สถานการณ์แบบนี้ใช้
+       <code>switch</code> statement สร้างสาขาแยกสำหรับผลไม้แต่ละชนิดได้</p>
+
+    <h3 id="s02a">switch Statement ทำงานยังไง</h3>
+    <p><code>switch</code> statement เลือกโค้ดหนึ่งส่วนมารันจากรายการ <b>switch section</b>
+       ที่เป็นไปได้ — เลือกโดยจับคู่รูปแบบกับ <b>match expression</b> ของ statement นั้น</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">โครงสร้างพื้นฐาน</span></div>
+      <pre><code class="lang-cs">switch (fruit)
+{
+    case "apple":
+        Console.WriteLine($"App will display information for apple.");
+        break;
+
+    case "banana":
+        Console.WriteLine($"App will display information for banana.");
+        break;
+
+    case "cherry":
+        Console.WriteLine($"App will display information for cherry.");
+        break;
+}</code></pre>
+    </div>
+
+    <svg viewBox="0 0 720 210" role="img" aria-label="องค์ประกอบของ switch statement" style="margin:18px 0">
+      <g font-family="var(--font-th)" font-size="12">
+        <rect x="16"  y="14" width="330" height="88" rx="10" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="181" y="38" text-anchor="middle" font-weight="700" fill="var(--brand-text)">switch expression</text>
+        <text x="181" y="62" text-anchor="middle" font-family="var(--font-code)" fill="var(--text)">switch (fruit)</text>
+        <text x="181" y="84" text-anchor="middle" fill="var(--text-soft)">ค่าที่ต้องการจับคู่</text>
+
+        <rect x="374" y="14" width="330" height="88" rx="10" fill="var(--tip-soft)" stroke="var(--tip)"/>
+        <text x="539" y="38" text-anchor="middle" font-weight="700" fill="var(--tip)">case label</text>
+        <text x="539" y="62" text-anchor="middle" font-family="var(--font-code)" fill="var(--text)">case "apple":</text>
+        <text x="539" y="84" text-anchor="middle" fill="var(--text-soft)">รูปแบบที่ใช้เทียบ</text>
+
+        <rect x="16" y="112" width="330" height="88" rx="10" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text x="181" y="136" text-anchor="middle" font-weight="700" fill="var(--ok)">switch section</text>
+        <text x="181" y="158" text-anchor="middle" fill="var(--text-soft)">โค้ดที่รันถ้า label</text>
+        <text x="181" y="176" text-anchor="middle" fill="var(--text-soft)">ตรงกับ expression</text>
+
+        <rect x="374" y="112" width="330" height="88" rx="10" fill="var(--warn-soft)" stroke="var(--warn)"/>
+        <text x="539" y="136" text-anchor="middle" font-weight="700" fill="var(--warn)">break</text>
+        <text x="539" y="158" text-anchor="middle" fill="var(--text-soft)">จบ section นี้ บังคับ</text>
+        <text x="539" y="176" text-anchor="middle" fill="var(--text-soft)">ต้องมีเสมอ (หรือ return)</text>
+      </g>
+    </svg>
+
+    <p><b>match expression</b> (หรือเรียกว่า switch expression) คือค่าที่ตามหลังคีย์เวิร์ด
+       <code>switch</code> ในตัวอย่างนี้คือ <code>(fruit)</code> — แต่ละ <b>switch section</b>
+       ถูกนิยามด้วย <b>case pattern</b> สร้างจากคีย์เวิร์ด <code>case</code> ตามด้วยค่า
+       case pattern แรกในตัวอย่างนี้คือ <code>case "apple":</code> case pattern เป็น
+       Boolean expression ที่ประเมินได้เป็น true หรือ false แต่ละ switch section มีโค้ดไม่กี่
+       บรรทัดที่จะถูกรัน ถ้า case pattern นั้นตรงกับ match expression — ในตัวอย่างนี้ ถ้า
+       <code>fruit</code> ถูกกำหนดค่าเป็น "apple" case pattern แรกจะประเมินเป็น true และ
+       switch section นั้นจะถูกรัน</p>
+
+    <p><code>switch</code> statement ต้องมีอย่างน้อย 1 switch section แต่ปกติมักมีตั้งแต่ 3
+       section ขึ้นไป <code>switch</code> เหมาะที่สุดเมื่อ:</p>
+    <ul>
+      <li>มีค่าเดียว (ตัวแปรหรือ expression) ที่ต้องการจับคู่กับค่าที่เป็นไปได้หลายแบบ</li>
+      <li>สำหรับแต่ละคู่ที่ตรงกัน ต้องรันโค้ดแค่ไม่กี่บรรทัดเป็นอย่างมาก</li>
+    </ul>
+
+    <h3 id="s02b">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch16-switch</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <h3 id="s02c">สร้างและทดสอบ switch Statement</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int employeeLevel = 200;
+string employeeName = "John Smith";
+
+string title = "";
+
+switch (employeeLevel)
+{
+    case 100:
+        title = "Junior Associate";
+        break;
+    case 200:
+        title = "Senior Associate";
+        break;
+    case 300:
+        title = "Manager";
+        break;
+    case 400:
+        title = "Senior Manager";
+        break;
+    default:
+        title = "Associate";
+        break;
+}
+
+Console.WriteLine($"{employeeName}, {title}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+John Smith, Senior Associate</pre></div>
+
+    <p><code>switch</code> statement นิยาม code block เดียวที่มีรายการ switch section อยู่ข้างใน
+       ทางขวาของคีย์เวิร์ด <code>switch</code> คือ switch expression ที่ล้อมด้วยวงเล็บ
+       switch expression จะถูกประเมินเทียบกับ case label เรียงจากบนลงล่าง จนกว่าจะเจอค่าที่ตรงกับ
+       switch expression ถ้าไม่มี label ไหนตรงเลย statement list ของ <code>default</code>
+       จะถูกรัน ถ้าไม่มี default การทำงานจะข้ามไปจบที่ปลาย switch statement เลย แต่ละ label
+       ต้องให้ค่าชนิดข้อมูลที่ตรงกับชนิดที่ระบุใน switch expression</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ตำแหน่งของ default ไม่สำคัญ</span>
+      คีย์เวิร์ด <code>default</code> เป็นตัวเลือกเสริม วางไว้ตำแหน่งไหนในรายการ switch section
+      ก็ได้ แต่นักพัฒนาส่วนใหญ่เลือกวางไว้ท้ายสุด เพราะดูเป็นเหตุเป็นผล (สมเหตุสมผลว่าเป็น
+      ตัวเลือกสุดท้าย) ไม่ว่าจะวางตำแหน่งไหน <code>default</code> จะถูกประเมินเป็นลำดับสุดท้ายเสมอ
+    </div>
+
+    <p>ในตัวอย่างนี้: switch expression คือ <code>(employeeLevel)</code> · แต่ละ switch section
+       มี switch label เดียว (<code>case</code> หรือ <code>default</code>) · section ที่ตรงกัน
+       คือ <code>case 200:</code> เพราะ <code>employeeLevel = 200</code></p>
+
+    <p>สังเกตว่าแต่ละ switch section ถูกแยกจากกันด้วย <code>break</code> — มีแค่ 1 switch section
+       เท่านั้นที่ได้รับอนุญาตให้รัน หมายความว่าการทำงานของ section หนึ่ง<b>ไม่อนุญาตให้ "ไหลต่อ"
+       (fall through)</b> ไปยัง section ถัดไป คีย์เวิร์ด <code>break</code> เป็นหนึ่งในหลายวิธี
+       จบ switch section ก่อนที่จะไปถึง section ถัดไป</p>
+
+    <div class="note bad">
+      <span class="lbl">🛑 ลืม break = compile error ทันที (ต่างจากหลายภาษา!)</span>
+      ถ้าลืมคีย์เวิร์ด <code>break</code> (หรือทางเลือกอย่าง <code>return</code>)
+      คอมไพเลอร์จะสร้าง error ทันที — นี่ต่างจากภาษาอย่าง C, Java, หรือ JavaScript ที่ปล่อยให้
+      "fall through" ไปทำงานต่อ section ถัดไปแบบเงียบๆ โดยไม่แจ้งเตือน (ซึ่งเป็นสาเหตุบั๊กที่
+      มีชื่อเสียงในภาษาเหล่านั้น) C# ออกแบบมาให้ปลอดภัยกว่า — บังคับให้คุณต้องระบุชัดเจนเสมอว่า
+      section หนึ่งจบตรงไหน
+    </div>
+
+    <h3 id="s02d">เปลี่ยนค่าเพื่อดูว่า default ทำงานยังไง</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int employeeLevel = 201;</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+John Smith, Associate</pre></div>
+
+    <p>เพราะ <code>employeeLevel</code> ไม่ตรงกับ label ไหนเลย <code>default</code> จึงถูกจับคู่แทน</p>
+
+    <h3 id="s02e">ปรับ switch Section ให้มีหลาย Label</h3>
+    <p>สมมติบริษัทตัดสินใจให้พนักงานระดับ 100 ได้ตำแหน่ง "Senior Associate" เหมือนระดับ 200 —
+       ทำได้โดยลบ switch section ของ <code>case 100:</code> เดิม แล้วให้ทั้ง
+       <code>case 100:</code> และ <code>case 200:</code> ใช้ switch section เดียวกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int employeeLevel = 100;
+string employeeName = "John Smith";
+
+string title = "";
+
+switch (employeeLevel)
+{
+    case 100:
+    case 200:
+        title = "Senior Associate";
+        break;
+    case 300:
+        title = "Manager";
+        break;
+    case 400:
+        title = "Senior Manager";
+        break;
+    default:
+        title = "Associate";
+        break;
+}
+
+Console.WriteLine($"{employeeName}, {title}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+John Smith, Senior Associate</pre></div>
+
+    <p>ตอนนี้ case label ทั้ง <code>100</code> และ <code>200</code> จับคู่กับ switch section
+       เดียวกันที่กำหนด <code>title</code> เป็น <code>"Senior Associate"</code> แล้ว</p>
+
+    <div class="quiz" data-q="16-1">
+      <p class="q"><span class="num">Check ★</span> คีย์เวิร์ด <code>break</code> ใน switch-case มีหน้าที่อะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>บอกให้ runtime ประเมิน case อื่นต่อไป</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>บอกให้ runtime หยุดประเมิน case pattern และป้องกันไม่ให้ทำงานต่อ section อื่น</span></li>
+        <li class="opt"><span class="k">C</span><span>บอกให้ runtime ปิดโปรแกรมทันที</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> break จบการทำงานของ switch section ปัจจุบัน ป้องกัน
+        "fall through" ไปยัง section ถัดไป — ไม่เกี่ยวกับการปิดแอป</div>
+    </div>
+
+    <div class="quiz" data-q="16-2">
+      <p class="q"><span class="num">Check ★</span> คีย์เวิร์ด <code>default</code> ใน switch-case มีหน้าที่อะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>กำหนดค่าเริ่มต้นให้ตัวแปรถ้ายังไม่ initialize</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>ทำหน้าที่เป็นค่าที่จับคู่ เมื่อไม่มี case ไหนตรงเลย</span></li>
+        <li class="opt"><span class="k">C</span><span>เป็น code block ที่รันเสมอไม่ว่ากรณีใด</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> default ทำงานเฉพาะเมื่อไม่มี case label ไหนตรงกับ
+        switch expression เท่านั้น ไม่ใช่รันเสมอ (ข้อ C ผิด) และไม่เกี่ยวกับการ initialize
+        ตัวแปร (ข้อ A ผิด)</div>
+    </div>
+
+    <div class="quiz" data-q="16-3">
+      <p class="q"><span class="num">Check ★</span> ข้อใดเกี่ยวกับ switch-case construct ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>switch section เดียวมี case label ได้หลายอัน</span></li>
+        <li class="opt"><span class="k">B</span><span>switch construct ต้องมี default section เสมอ</span></li>
+        <li class="opt"><span class="k">C</span><span>เครื่องหมายโคลอนท้าย case label ใส่หรือไม่ใส่ก็ได้</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ตรงกับตัวอย่าง case 100: case 200: ที่ใช้ section
+        ร่วมกันในหัวข้อ 16.2 — default เป็นตัวเลือกเสริม ไม่บังคับ (ข้อ B ผิด) และโคลอนเป็นไวยากรณ์
+        บังคับของ case label เสมอ (ข้อ C ผิด)</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch16-a"><span>สร้าง switch statement ตัดตำแหน่งพนักงานสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch16-b"><span>ทดสอบ default case ด้วยค่าที่ไม่ตรงกับ label ไหนเลย</span></label></li>
+      <li><label><input type="checkbox" id="ch16-c"><span>รวม 2 case label ให้ใช้ switch section เดียวกันสำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">16.3 ท้าทาย: แปลง if-elseif-else เป็น switch-case</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl h">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>เริ่มจากโค้ดที่ใช้ <code>if-elseif-else</code> ถอดรหัส SKU (Stock Keeping Unit)
+           ของสินค้า รูปแบบ SKU คือ <code>&lt;รหัสสินค้า&gt;-&lt;รหัสสีตัวอักษร 2 ตัว&gt;-&lt;รหัสขนาด&gt;</code>
+           เช่น <code>01-MN-L</code> แปลว่า (เสื้อกันหนาว)-(สีเลือดหมู)-(ไซส์ L) และให้พิมพ์คำอธิบาย
+           แบบ "Product: Large Maroon Sweat shirt"</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs — บังคับใช้</span></div>
+        <pre><code class="lang-cs">// SKU = Stock Keeping Unit. 
+// SKU value format: &lt;product #&gt;-&lt;2-letter color code&gt;-&lt;size code&gt;
+string sku = "01-MN-L";
+
+string[] product = sku.Split('-');
+
+string type = "";
+string color = "";
+string size = "";
+
+if (product[0] == "01")
+{
+    type = "Sweat shirt";
+} else if (product[0] == "02")
+{
+    type = "T-Shirt";
+} else if (product[0] == "03")
+{
+    type = "Sweat pants";
+}
+else
+{
+    type = "Other";
+}
+
+if (product[1] == "BL")
+{
+    color = "Black";
+} else if (product[1] == "MN")
+{
+    color = "Maroon";
+} else
+{
+    color = "White";
+}
+
+if (product[2] == "S")
+{
+    size = "Small";
+} else if (product[2] == "M")
+{
+    size = "Medium";
+} else if (product[2] == "L")
+{
+    size = "Large";
+} else
+{
+    size = "One Size Fits All";
+}
+
+Console.WriteLine($"Product: {size} {color} {type}");</code></pre></div>
+        <p><b>โจทย์:</b> แปลงโค้ดชุดนี้ให้ใช้ <code>switch</code> statement แทน
+           <code>if-elseif-else</code> ทั้งหมด โดยผลลัพธ์ต้องเหมือนเดิมทุกประการ:</p>
+        <div class="out auto"><div class="out-bar">ผลลัพธ์ที่ต้องได้</div><pre>
+Product: Large Maroon Sweat shirt</pre></div>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ เมธอดใหม่: string.Split()</span>
+      <code>sku.Split('-')</code> ตัดสตริงออกเป็นชิ้นๆ ตามอักขระที่กำหนด (ในที่นี้คือ
+      <code>-</code>) แล้วคืนผลเป็น <b>array ของ string</b> เช่น <code>"01-MN-L".Split('-')</code>
+      จะได้ <code>{ "01", "MN", "L" }</code> เข้าถึงแต่ละชิ้นด้วย index ตามปกติ
+      (<code>product[0]</code>, <code>product[1]</code>, <code>product[2]</code>) — จะได้เรียน
+      เมธอดจัดการ string แบบเจาะลึกใน Part 4 ของเล่มนี้
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เฉลย</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">// SKU = Stock Keeping Unit
+string sku = "01-MN-L";
+
+string[] product = sku.Split('-');
+
+string type = "";
+string color = "";
+string size = "";
+
+switch (product[0])
+{
+    case "01":
+        type = "Sweat shirt";
+        break;
+    case "02":
+        type = "T-Shirt";
+        break;
+    case "03":
+        type = "Sweat pants";
+        break;
+    default:
+        type = "Other";
+        break;
+}
+
+switch (product[1])
+{
+    case "BL":
+        color = "Black";
+        break;
+    case "MN":
+        color = "Maroon";
+        break;
+    default:
+        color = "White";
+        break;
+}
+
+switch (product[2])
+{
+    case "S":
+        size = "Small";
+        break;
+    case "M":
+        size = "Medium";
+        break;
+    case "L":
+        size = "Large";
+        break;
+    default:
+        size = "One Size Fits All";
+        break;
+}
+
+Console.WriteLine($"Product: {size} {color} {type}");</code></pre>
+        </div>
+        <div class="out"><div class="out-bar">Output</div><pre>
+Product: Large Maroon Sweat shirt</pre></div>
+        <p>นี่เป็น<i>เพียงหนึ่ง</i>ในหลายวิธีที่แก้โจทย์นี้ได้ ตราบใดที่ผลลัพธ์ตรงกัน และใช้
+           switch-case แทน if-elseif-else สำเร็จ ก็ถือว่าทำโจทย์นี้ผ่านแล้ว</p>
+        <p>สังเกตว่าโค้ดชุดนี้ต้องใช้ <code>switch</code> ถึง 3 ชุดแยกกัน (คนละตัวแปร คนละ
+           match expression) — เพราะแต่ละ switch จับคู่ได้แค่ค่าเดียวต่อครั้ง นี่คือจุดต่างสำคัญ
+           จาก if ที่รวมเงื่อนไขหลายตัวแปรไว้ในนิพจน์เดียวได้ (ทบทวนตัวอย่าง permission/level
+           จาก <a href="ch14.html">บทที่ 14</a> ที่ if ทำได้ในโครงสร้างเดียว)</p>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch16-d"><span>แปลง if-elseif-else เป็น switch สำเร็จทั้ง 3 ชุด</span></label></li>
+      <li><label><input type="checkbox" id="ch16-e"><span>ผลลัพธ์ตรงกับต้นฉบับเป๊ะ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">16.4 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>ลืม <code>break</code> ท้าย switch section</td>
+          <td>compile error ทันที (ต่างจากหลายภาษาที่ปล่อยผ่านแบบ fall-through) — เพิ่ม
+              <code>break;</code> (หรือ <code>return;</code>) ท้ายทุก section เสมอ</td>
+        </tr>
+        <tr>
+          <td>คิดว่า <code>switch</code> เดียวเช็คได้หลายตัวแปรพร้อมกัน</td>
+          <td><code>switch</code> จับคู่ได้แค่ค่าเดียวต่อครั้ง — ถ้าต้องเช็คหลายตัวแปรร่วมกัน
+              (เช่น permission และ level พร้อมกัน) ต้องใช้ <code>if</code> หรือใช้
+              <code>switch</code> หลายชุดแยกกัน</td>
+        </tr>
+        <tr>
+          <td>คาดว่า <code>default</code> รันเสมอ</td>
+          <td><code>default</code> รันแค่ตอนไม่มี case ไหนตรงเท่านั้น ไม่ใช่รันคู่กับ case
+              ที่ตรงด้วย</td>
+        </tr>
+        <tr>
+          <td>ชนิดข้อมูลของ case label ไม่ตรงกับ switch expression</td>
+          <td>เช่น <code>switch (employeeLevel)</code> เป็น int แต่เขียน <code>case "200":</code>
+              (string) — ต้องให้ชนิดข้อมูลตรงกันเสมอ</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s05">16.5 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Microsoft Learn (3 ข้อฝังในเนื้อหา + 2 ข้อ Module Assessment)</p>
+
+    <div class="quiz" data-q="16-4">
+      <p class="q"><span class="num">1.</span> จุดประสงค์ของ <code>default</code> case ใน switch statement คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ใช้ระบุเงื่อนไขของ switch statement</span></li>
+        <li class="opt"><span class="k">B</span><span>ใช้จบ switch statement</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>ใช้รันโค้ดบล็อกหนึ่ง เมื่อไม่มี case ไหนตรงกับ expression</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> นิยามตรงตัว — default ไม่ใช่ตัวกำหนดเงื่อนไข (ข้อ A)
+        และไม่ใช่ตัวสั่งจบ statement โดยตรง (ข้อ B คือหน้าที่ของ break)</div>
+    </div>
+
+    <div class="quiz" data-q="16-5">
+      <p class="q"><span class="num">2.</span> ถ้าลืม break (หรือคีย์เวิร์ดทางเลือกที่ป้องกัน fall-through)
+        ใน switch case จะเกิดอะไรขึ้น?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>default case จะทำงานแทน</span></li>
+        <li class="opt"><span class="k">B</span><span>ส่วนของ case ที่ได้รับผลกระทบจะถูกคอมไพเลอร์ลบทิ้ง</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>คอมไพเลอร์จะสร้าง error</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> C# บังคับให้ทุก switch section ต้องจบอย่างชัดเจน
+        เสมอ ต่างจากภาษาที่ยอมให้ fall-through แบบเงียบๆ — ถ้าลืม break จะได้ compile error
+        ทันที ไม่ใช่ error ตอนรัน และไม่มีการ "ลบทิ้ง" หรือ "ใช้ default แทน" อัตโนมัติ</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">16.6 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียน switch statement รับตัวแปร <code>int day = 3;</code> (1=จันทร์ ... 7=อาทิตย์)
+           พิมพ์ชื่อวันเป็นภาษาไทย ถ้าไม่ตรง 1-7 ให้พิมพ์ "ไม่ถูกต้อง"</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int day = 3;
+string dayName;
+
+switch (day)
+{
+    case 1:
+        dayName = "จันทร์";
+        break;
+    case 2:
+        dayName = "อังคาร";
+        break;
+    case 3:
+        dayName = "พุธ";
+        break;
+    case 4:
+        dayName = "พฤหัสบดี";
+        break;
+    case 5:
+        dayName = "ศุกร์";
+        break;
+    case 6:
+        dayName = "เสาร์";
+        break;
+    case 7:
+        dayName = "อาทิตย์";
+        break;
+    default:
+        dayName = "ไม่ถูกต้อง";
+        break;
+}
+
+Console.WriteLine(dayName);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ต่อจากข้อ 1 ใช้เทคนิค "หลาย label ต่อ 1 section" รวมวันเสาร์-อาทิตย์ (6,7) ให้พิมพ์
+           "วันหยุดสุดสัปดาห์" แทนชื่อวันเดี่ยวๆ</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่แก้)</span></div>
+          <pre><code class="lang-cs">case 6:
+case 7:
+    dayName = "วันหยุดสุดสัปดาห์";
+    break;</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้ compile ไม่ผ่าน หาสาเหตุ:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">int grade = 90;
+string result;
+
+switch (grade)
+{
+    case 90:
+        result = "ผ่าน";
+    default:
+        result = "ไม่ผ่าน";
+        break;
+}
+
+Console.WriteLine(result);</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ขาด <code>break;</code> หลัง <code>case 90:</code> ทำให้เกิด compile error
+             (C# ไม่อนุญาตให้ fall-through แบบเงียบๆ) ต้องเพิ่ม <code>break;</code> ก่อนถึงบรรทัด
+             <code>default:</code></p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>แปลงโค้ดนี้จาก if-elseif-else เป็น switch statement:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ก่อนแก้)</span></div>
+        <pre><code class="lang-cs">string season = "summer";
+string activity;
+
+if (season == "summer")
+{
+    activity = "ว่ายน้ำ";
+}
+else if (season == "winter")
+{
+    activity = "เล่นสกี";
+}
+else
+{
+    activity = "เดินป่า";
+}
+
+Console.WriteLine(activity);</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (หลังแก้)</span></div>
+          <pre><code class="lang-cs">string season = "summer";
+string activity;
+
+switch (season)
+{
+    case "summer":
+        activity = "ว่ายน้ำ";
+        break;
+    case "winter":
+        activity = "เล่นสกี";
+        break;
+    default:
+        activity = "เดินป่า";
+        break;
+}
+
+Console.WriteLine(activity);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ใช้ <code>string.Split()</code> แยกวันที่รูปแบบ <code>"2026-09-04"</code>
+           (ปี-เดือน-วัน คั่นด้วย <code>-</code>) ออกเป็น array แล้วใช้ switch statement แปลง
+           เลขเดือน (index 1) เป็นชื่อเดือนภาษาไทยแบบย่อ (01=ม.ค., 02=ก.พ., ... อย่างน้อย 3
+           เดือนแรกพอ ที่เหลือ default เป็น "เดือนอื่น")</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string date = "2026-09-04";
+string[] parts = date.Split('-');
+string monthName;
+
+switch (parts[1])
+{
+    case "01":
+        monthName = "ม.ค.";
+        break;
+    case "02":
+        monthName = "ก.พ.";
+        break;
+    case "03":
+        monthName = "มี.ค.";
+        break;
+    default:
+        monthName = "เดือนอื่น";
+        break;
+}
+
+Console.WriteLine(monthName);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>ขยายโจทย์ SKU จากหัวข้อ 16.3 ให้รองรับรหัสสีเพิ่มอีก 2 สี: "RD" = Red, "BU" = Blue
+           (ยังคง default เป็น White เหมือนเดิม) แล้วทดสอบด้วย <code>sku = "02-RD-S";</code>
+           ควรได้ผลลัพธ์ <code>Product: Small Red T-Shirt</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (switch สีที่แก้)</span></div>
+          <pre><code class="lang-cs">switch (product[1])
+{
+    case "BL":
+        color = "Black";
+        break;
+    case "MN":
+        color = "Maroon";
+        break;
+    case "RD":
+        color = "Red";
+        break;
+    case "BU":
+        color = "Blue";
+        break;
+    default:
+        color = "White";
+        break;
+}</code></pre></div>
+          <p>เปลี่ยน <code>sku = "02-RD-S";</code> → product[0]="02"→T-Shirt, product[1]="RD"→Red,
+             product[2]="S"→Small → <code>Product: Small Red T-Shirt</code> ✓</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">📌 สรุปบทที่ 16</h2>
+
+    <p>เป้าหมายของบทนี้คือเพิ่มตรรกะแตกสาขาที่จับคู่ตัวแปรหรือ expression หนึ่งตัว กับค่าที่เป็นไปได้
+       หลายแบบ ด้วย <code>switch-case</code> construct คุณจับคู่ระดับตัวเลขของพนักงานกับตำแหน่ง
+       คุณใช้ <code>switch-case</code> แทน <code>if-elseif-else</code> เพื่อสื่อเจตนาของการแปลง
+       รหัส SKU (Stock Keeping Unit) ให้เป็นคำอธิบายแบบเต็มได้กระชับขึ้น</p>
+
+    <p>นักพัฒนา C# ใช้ selection statement ทั้ง <code>if</code> และ <code>switch</code> ร่วมกับ
+       conditional operator เพื่อแตกสาขาโค้ด ประสบการณ์ที่คุณได้จากการใช้ selection statement
+       เหล่านี้ ช่วยให้คุณเลือกเครื่องมือ C# ที่เหมาะสมที่สุดในการสื่อเจตนาผ่านโค้ดของคุณได้</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 16</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">ไวยากรณ์</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>switch (expr) { }</code></td><td>เริ่ม switch statement</td></tr>
+          <tr><td><code>case ค่า:</code></td><td>case label — จับคู่กับค่านั้น</td></tr>
+          <tr><td><code>break;</code></td><td>จบ switch section (บังคับ ไม่งั้น compile error)</td></tr>
+          <tr><td><code>default:</code></td><td>ทำงานเมื่อไม่มี case ไหนตรง (ตัวเลือกเสริม)</td></tr>
+          <tr><td><code>case a: case b:</code></td><td>หลาย label ใช้ section เดียวกัน</td></tr>
+          <tr><td><code>str.Split('ตัวคั่น')</code></td><td>แยกสตริงเป็น array ตามตัวคั่น</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s08">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>switch statement</td><td>คำสั่ง switch</td><td>เลือกโค้ดหนึ่งส่วนจากหลายทางเลือก จับคู่กับค่าเดียว</td></tr>
+        <tr><td>match / switch expression</td><td>นิพจน์ที่ใช้จับคู่</td><td>ค่าหลังคีย์เวิร์ด switch ที่ต้องการจับคู่</td></tr>
+        <tr><td>switch section</td><td>ส่วนของ switch</td><td>กลุ่มโค้ดที่รันเมื่อ case ตรงกัน</td></tr>
+        <tr><td>case label / case pattern</td><td>ป้ายกำกับ case</td><td>ค่าที่ใช้เทียบกับ switch expression</td></tr>
+        <tr><td>fall-through</td><td>การไหลต่อ</td><td>การทำงานไหลจาก section หนึ่งไปอีก section (C# ไม่อนุญาตแบบเงียบๆ)</td></tr>
+        <tr><td>default case</td><td>กรณีเริ่มต้น</td><td>ทำงานเมื่อไม่มี case label ไหนตรงเลย</td></tr>
+        <tr><td>Split()</td><td>เมธอดแยกสตริง</td><td>ตัดสตริงเป็น array ตามตัวคั่นที่กำหนด</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch15.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 15 · Control Variable Scope Using Code Blocks</span></a>
+      <a class="next" href="ch17.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 17 · Iterate Through a Code Block Using the for Statement</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

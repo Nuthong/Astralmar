@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 28 · Method แรกของคุณ — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="28">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 5 · Create Methods / บทที่ 28</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 5 · โมดูล 1/5</span>
+      <h1>เขียน Method แรกของคุณใน C#</h1>
+      <div class="en">Write Your First C# Method</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>55–70 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>สร้าง method ของตัวเอง จัดโครงสร้างโค้ดด้วย pseudo-code ได้</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น–กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="lbl">🎉 ยินดีต้อนรับสู่ Part 5</span>
+      คุณเพิ่งเรียนจบ<a href="ch27.html#trophy">Part 4</a>ครบทั้ง 7 โมดูลแล้ว! Part 5 นี้พาคุณเรียน
+      เรื่อง <b>method</b> อย่างจริงจัง — วิธีสร้าง method ของตัวเอง ใช้พารามิเตอร์ ใช้ return
+      value จบด้วย Guided + Challenge Project อีกชุด
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>สร้าง C# method แรกของคุณเองได้</li>
+        <li>ระบุส่วนของโค้ดที่ทำเป็นโมดูล (modularize) ได้</li>
+        <li>ใช้ method จัดระเบียบโค้ดให้เป็นงานย่อยที่ชัดเจนได้</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">28.1 ทำไมต้องมี Method</h2>
+
+    <p>ภาษา C# ให้คุณสร้างแอปพลิเคชันที่แข็งแกร่งได้หลากหลายรูปแบบ สมมติคุณต้องเขียนโค้ดที่ทำงานกับ
+       input ของผู้ใช้ซึ่งคาดเดาไม่ได้ คุณอาจต้องเพิ่มตรรกะจัดการ input ที่ผิดพลาด แปลง input ให้อยู่
+       ในรูปแบบที่ใช้งานได้ และทำการดำเนินการที่ถูกต้อง เมื่อแอปของคุณใหญ่ขึ้นเรื่อยๆ การติดตามโค้ด
+       ของคุณอาจกลายเป็นเรื่องท้าทายอย่างรวดเร็ว</p>
+
+    <p><b>method</b> (เรียกอีกอย่างว่า function) เป็นส่วนสำคัญที่ช่วยให้โค้ดมีโครงสร้าง มี
+       ประสิทธิภาพ และอ่านง่าย method คือหน่วยโค้ดแบบโมดูล (modular) และเป็นแนวคิดพื้นฐานของการเขียน
+       โปรแกรม method มักถูกออกแบบให้ทำงานเฉพาะอย่างหนึ่ง และมีโค้ดที่ทำงานนั้นอยู่ข้างใน ชื่อของ
+       method ควรสะท้อนงานของมันอย่างชัดเจน ซึ่งช่วยเพิ่มความอ่านง่ายของโค้ด การเรียนรู้วิธีใช้
+       method จะช่วยให้คุณสร้างแอปพลิเคชันที่มีฟีเจอร์มากมายได้เร็วขึ้น</p>
+
+    <p>ในบทนี้ คุณจะเรียนสร้าง method ของตัวเองเพื่อทำงานเฉพาะอย่าง คุณจะเรียนว่า method ช่วยลด
+       ความซับซ้อนและย่นย่อโค้ดได้ยังไง รวมถึงช่วยให้ทุกอย่างเป็นระเบียบและหาง่ายขึ้น</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">28.2 ไวยากรณ์ของ Method</h2>
+
+    <p>คุณอาจคุ้นเคยกับ method บางตัวอยู่แล้ว เช่น <code>Console.WriteLine()</code> หรือ
+       <code>random.Next()</code> คุณอาจเห็นแล้วว่า method เหล่านี้ช่วยลดความซับซ้อนของงาน และให้คุณ
+       สร้างโค้ดได้ง่ายขึ้น ในหัวข้อนี้ คุณจะเรียนวิธีสร้าง method ของตัวเอง</p>
+
+    <h3 id="s02a">Method ทำงานยังไง</h3>
+    <p>กระบวนการพัฒนา method เริ่มจากสร้าง <b>method signature</b> — method signature ประกาศ
+       return type, ชื่อ, และ input parameter ของ method ตัวอย่างเช่น พิจารณา method signature นี้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">syntax</span></div>
+      <pre><code class="lang-cs">void SayHello();</code></pre>
+    </div>
+
+    <p>ชื่อ method คือ <code>SayHello</code> return type ของมันคือ <code>void</code> หมายถึง
+       method ไม่คืนค่าข้อมูลใดๆ กลับมา อย่างไรก็ตาม method คืนค่าเป็น data type ไหนก็ได้ เช่น
+       <code>bool</code>, <code>int</code>, <code>double</code>, และ array ก็ได้เช่นกัน (จะเรียน
+       ละเอียดใน<a href="ch30.html">บทที่ 30</a>) parameter ของ method (ถ้ามี) ต้องอยู่ในวงเล็บ
+       <code>()</code> — method รับ parameter ได้หลายตัว data type ไหนก็ได้ ในตัวอย่างนี้ method
+       ไม่มี parameter เลย</p>
+
+    <p>ก่อนรัน method ได้ คุณต้องเพิ่ม <b>method definition</b> — method definition ใช้ปีกกา
+       <code>{}</code> ครอบโค้ดที่จะทำงานตอน method ถูกเรียก ตัวอย่างเช่น:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">syntax</span></div>
+      <pre><code class="lang-cs">void SayHello()
+{
+    Console.WriteLine("Hello World!");
+}</code></pre>
+    </div>
+
+    <p>ตอนนี้ method จะพิมพ์ <code>Hello World!</code> ทุกครั้งที่ถูกเรียก</p>
+
+    <h3 id="s02b">การเรียกใช้ Method</h3>
+    <p>เรียก method ด้วยการใช้ชื่อของมัน พร้อม argument ที่จำเป็น (ถ้ามี) พิจารณาโค้ดนี้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">syntax</span></div>
+      <pre><code class="lang-cs">Console.Write("Input!");</code></pre>
+    </div>
+
+    <p>string <code>"Input!"</code> คือ argument ที่ส่งให้เมธอด <code>Write</code></p>
+
+    <p>เรียก method ได้ทั้งก่อนหรือหลังนิยามของมัน ตัวอย่างเช่น <code>SayHello</code> นิยามและเรียก
+       ด้วย syntax นี้ได้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">SayHello();
+
+void SayHello()
+{
+    Console.WriteLine("Hello World!");
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Hello World!</pre></div>
+
+    <p>สังเกตว่าไม่จำเป็นต้องนิยาม method ก่อนเรียกใช้เลย ความยืดหยุ่นนี้ทำให้คุณจัดระเบียบโค้ดตามที่
+       ต้องการได้ โดยทั่วไปนิยมนิยาม method ทั้งหมดไว้ท้ายโปรแกรม ตัวอย่างเช่น:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int[] a = {1,2,3,4,5};
+
+Console.WriteLine("Contents of Array:");
+PrintArray();
+
+void PrintArray()
+{
+    foreach (int x in a)
+    {
+        Console.Write($"{x} ");
+    }
+    Console.WriteLine();
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Contents of Array:
+1 2 3 4 5 </pre></div>
+
+    <div class="note tip">
+      <span class="lbl">💡 นี่คือ local function ของ top-level program</span>
+      สังเกตว่าตลอดทั้งเล่มนี้ เราไม่เคยเขียน <code>class Program { static void Main() { ... } }</code>
+      ครอบโค้ดเลย เพราะใช้ฟีเจอร์ <b>top-level statements</b> ของ C# (มีมาตั้งแต่ C# 9) — method
+      อย่าง <code>SayHello()</code> หรือ <code>PrintArray()</code> ที่นิยามในไฟล์เดียวกับโค้ดหลัก
+      แบบนี้ เรียกว่า <b>local function</b> มันเข้าถึงตัวแปรที่ประกาศไว้ข้างนอกได้โดยตรง (เช่น
+      <code>PrintArray()</code> เข้าถึง <code>a</code> ได้) ซึ่งเป็นสิ่งที่คุณจะใช้ตลอดทั้ง Part นี้
+    </div>
+
+    <h3 id="s02c">การทำงานของ Method</h3>
+    <p>เมื่อคุณเรียก method โค้ดในตัว method จะถูกรัน หมายความว่า control การทำงานถูกส่งจากผู้เรียก
+       ไปยัง method control จะกลับมาที่ผู้เรียกหลัง method ทำงานเสร็จ ตัวอย่างเช่น พิจารณาโค้ดนี้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Before calling a method");
+SayHello();
+Console.WriteLine("After calling a method");
+
+void SayHello()
+{
+    Console.WriteLine("Hello World!");
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Before calling a method
+Hello World!
+After calling a method</pre></div>
+
+    <p>เมื่อ method ถูกนิยามแล้ว คุณเรียกใช้มันได้ทุกเมื่อ ซ้ำกี่ครั้งก็ได้ตามต้องการ คุณใช้ method
+       ข้างใน <code>if-else</code> statement, <code>for</code>-loop, <code>switch</code>
+       statement แม้แต่ตอน initialize ตัวแปร และอื่นๆ อีกมากมาย!</p>
+
+    <h3 id="s02d">แนวปฏิบัติที่ดี (Best Practices)</h3>
+    <p>ตอนเลือกชื่อ method สำคัญมากที่ต้องตั้งชื่อให้กระชับและสื่อความชัดเจนว่า method ทำงานอะไร
+       ชื่อ method ควรเป็น <b>Pascal case</b> (ทบทวนจาก <a href="ch03.html">บทที่ 3</a>) และโดยทั่วไป
+       ไม่ควรขึ้นต้นด้วยตัวเลข ชื่อของ parameter ควรอธิบายว่าข้อมูลชนิดไหนที่ parameter นั้นแทน
+       พิจารณา method signature เหล่านี้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">เทียบกัน</span></div>
+      <pre><code class="lang-cs">void ShowData(string a, int b, int c);
+void DisplayDate(string month, int day, int year);</code></pre>
+    </div>
+
+    <p>method ที่สองอธิบายชัดเจนว่าข้อมูลชนิดไหนถูกแสดง และตั้งชื่อ parameter ที่สื่อความหมายชัดเจน
+       — ต่างจากตัวแรกที่ใช้ชื่อพารามิเตอร์ <code>a</code>, <code>b</code>, <code>c</code> ซึ่งไม่
+       บอกอะไรเลยว่าแต่ละตัวคืออะไร</p>
+
+    <p>ตอนนี้คุณรู้พื้นฐานแล้ว พร้อมเริ่มเขียน method ของตัวเองได้เลย!</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch28-a"><span>เข้าใจโครงสร้าง method signature + method definition</span></label></li>
+      <li><label><input type="checkbox" id="ch28-b"><span>เรียก method ได้ทั้งก่อนและหลังนิยามของมัน เข้าใจว่าทำไม</span></label></li>
+      <li><label><input type="checkbox" id="ch28-c"><span>รู้หลักการตั้งชื่อ method และ parameter ที่ดี</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">28.3 ลงมือ: สร้าง Method แรกของคุณ</h2>
+
+    <p>โดยทั่วไป method ถูกสร้างขึ้นเพื่อทำงานเฉพาะอย่างหนึ่ง ในแบบฝึกหัดนี้ คุณจะสร้าง method ที่
+       สุ่มและแสดงตัวเลข 5 ตัว</p>
+
+    <h3 id="s03a">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch28-methods</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <h3 id="s03b">สร้าง Method แสดงตัวเลขสุ่ม</h3>
+    <p>ในการสร้าง method ก่อนอื่นสร้าง method signature แล้วเพิ่ม method body — สร้าง method
+       signature ด้วยการประกาศ return type, ชื่อ method, และพารามิเตอร์ สร้าง method body ด้วย
+       ปีกกา <code>{}</code> ที่มีโค้ดข้างใน</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void DisplayRandomNumbers();</code></pre>
+    </div>
+
+    <p>ในกรณีนี้ method แค่ต้อง generate และแสดงข้อมูล ดังนั้น return type จึงเป็น
+       <code>void</code> ตอนนี้ยังไม่ต้องมี parameter ก็ได้</p>
+
+    <p>ลบเซมิโคลอน <code>;</code> เพื่อสร้าง method body แล้วอัปเดตโค้ดเป็นแบบนี้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void DisplayRandomNumbers()
+{
+    Random random = new Random();
+}</code></pre>
+    </div>
+
+    <p>ตรงนี้คุณสร้าง <code>Random</code> object ที่ใช้สุ่มตัวเลข เพิ่ม <code>for</code> loop
+       แสดงตัวเลขจำนวนเต็มสุ่ม 5 ตัว:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void DisplayRandomNumbers()
+{
+    Random random = new Random();
+
+    for (int i = 0; i < 5; i++)
+    {
+        Console.Write($"{random.Next(1, 100)} ");
+    }
+}</code></pre>
+    </div>
+
+    <p>โค้ดนี้สุ่มตัวเลขระหว่าง 1 ถึง 99 (รวมทั้งสองค่า) พร้อมเติมช่องว่างหลังพิมพ์ตัวเลขแต่ละตัว
+       ต่อไปเพิ่มการขึ้นบรรทัดใหม่ก่อน method จบทำงาน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void DisplayRandomNumbers()
+{
+    Random random = new Random();
+
+    for (int i = 0; i < 5; i++)
+    {
+        Console.Write($"{random.Next(1, 100)} ");
+    }
+
+    Console.WriteLine();
+}</code></pre>
+    </div>
+
+    <h3 id="s03c">เรียกใช้ Method ของคุณ</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Generating random numbers:");
+DisplayRandomNumbers();
+
+void DisplayRandomNumbers()
+{
+    Random random = new Random();
+
+    for (int i = 0; i < 5; i++)
+    {
+        Console.Write($"{random.Next(1, 100)} ");
+    }
+
+    Console.WriteLine();
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output (ค่าสุ่ม — ตัวอย่าง)</div><pre>
+Generating random numbers:
+17 29 46 36 3 </pre></div>
+
+    <p>สังเกตว่าการใช้ method ทำให้โค้ดเข้าใจง่ายขึ้นมาก แทนที่จะเสียเวลาไขความหมายของ
+       <code>for</code> loop ด้วยตัวเอง คุณแค่อ่านชื่อ method ก็รู้ทันทีว่าโค้ดนี้แสดงตัวเลขสุ่ม</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch28-d"><span>สร้าง DisplayRandomNumbers() สำเร็จ และเรียกใช้ได้ถูกต้อง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">28.4 ลงมือ: สร้าง Method ที่ใช้ซ้ำได้</h2>
+
+    <p>เวลาพัฒนาแอปพลิเคชัน คุณอาจพบว่าตัวเองเขียนโค้ดทำสิ่งเดียวกันซ้ำไปซ้ำมา แทนที่จะเขียนโค้ดซ้ำ
+       การใช้ method ทำงานเดียวกันช่วยย่นย่อโค้ดและพัฒนาแอปได้เร็วขึ้น ในแบบฝึกหัดนี้ คุณจะระบุโค้ดที่
+       ซ้ำกันและแทนที่ด้วย method ที่ใช้ซ้ำได้</p>
+
+    <h3 id="s04a">ระบุโค้ดที่ซ้ำกัน</h3>
+    <p>มาดูแอปที่ติดตามเวลากินยาข้ามโซนเวลากัน ผู้ใช้กรอกโซนเวลาปัจจุบันและโซนเวลาปลายทาง
+       ตารางเวลากินยาจะแสดงออกมา แล้วปรับให้ตรงกับโซนเวลาใหม่</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int[] times = {800, 1200, 1600, 2000};
+int diff = 0;
+
+Console.WriteLine("Enter current GMT");
+int currentGMT = Convert.ToInt32(Console.ReadLine());
+
+Console.WriteLine("Current Medicine Schedule:");
+
+/* Format and display medicine times */
+foreach (int val in times)
+{
+    string time = val.ToString();
+    int len = time.Length;
+
+    if (len >= 3)
+    {
+        time = time.Insert(len - 2, ":");
+    }
+    else if (len == 2)
+    {
+        time = time.Insert(0, "0:");
+    }
+    else
+    {
+        time = time.Insert(0, "0:0");
+    }
+
+    Console.Write($"{time} ");
+}
+
+Console.WriteLine();
+
+Console.WriteLine("Enter new GMT");
+int newGMT = Convert.ToInt32(Console.ReadLine());
+
+if (Math.Abs(newGMT) > 12 || Math.Abs(currentGMT) > 12)
+{
+    Console.WriteLine("Invalid GMT");
+}
+else if (newGMT <= 0 && currentGMT <= 0 || newGMT >= 0 && currentGMT >= 0)
+{
+    diff = 100 * (Math.Abs(newGMT) - Math.Abs(currentGMT));
+
+    /* Adjust the times by adding the difference, keeping the value within 24 hours */
+    for (int i = 0; i < times.Length; i++)
+    {
+        times[i] = ((times[i] + diff)) % 2400;
+    }
+}
+else
+{
+    diff = 100 * (Math.Abs(newGMT) + Math.Abs(currentGMT));
+
+    /* Adjust the times by adding the difference, keeping the value within 24 hours */
+    for (int i = 0; i < times.Length; i++)
+    {
+        times[i] = ((times[i] + diff)) % 2400;
+    }
+}
+
+Console.WriteLine("New Medicine Schedule:");
+
+/* Format and display medicine times */
+foreach (int val in times)
+{
+    string time = val.ToString();
+    int len = time.Length;
+
+    if (len >= 3)
+    {
+        time = time.Insert(len - 2, ":");
+    }
+    else if (len == 2)
+    {
+        time = time.Insert(0, "0:");
+    }
+    else
+    {
+        time = time.Insert(0, "0:0");
+    }
+
+    Console.Write($"{time} ");
+}
+
+Console.WriteLine();</code></pre>
+    </div>
+
+    <p>สังเกตว่ามี <code>for</code>-loop หลายชุดที่ซ้ำกันด้วยโค้ดเหมือนเดิมเป๊ะ — มี
+       <code>foreach</code> loop 2 ชุดที่จัดรูปแบบและแสดงเวลากินยา และมี <code>for</code> loop
+       อีก 2 ชุดที่ปรับเวลาตามส่วนต่างของโซนเวลา</p>
+
+    <p>ตอนเขียนโค้ด คุณอาจพบว่าตัวเองเขียน code block ซ้ำเพื่อทำงานเดียวกัน นั่นคือโอกาสดีที่จะรวม
+       โค้ดเข้าด้วยกันโดยใช้ method ทำงานนั้นแทน มาลองฝึกกัน!</p>
+
+    <h3 id="s04b">สร้าง Method ทำงานที่ซ้ำกัน</h3>
+    <p>เพราะ <code>foreach</code> loop จัดรูปแบบและแสดงค่าเวลา คุณตั้งชื่อ method ให้สะท้อนงานนั้น
+       ได้ชัดเจน ทำแบบเดียวกันกับ <code>for</code> loop ที่ปรับเวลาด้วย</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (เพิ่มท้ายไฟล์)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void DisplayTimes()
+{
+    /* Format and display medicine times */
+    foreach (int val in times)
+    {
+        string time = val.ToString();
+        int len = time.Length;
+
+        if (len >= 3)
+        {
+            time = time.Insert(len - 2, ":");
+        }
+        else if (len == 2)
+        {
+            time = time.Insert(0, "0:");
+        }
+        else
+        {
+            time = time.Insert(0, "0:0");
+        }
+
+        Console.Write($"{time} ");
+    }
+
+    Console.WriteLine();
+}
+
+void AdjustTimes()
+{
+    /* Adjust the times by adding the difference, keeping the value within 24 hours */
+    for (int i = 0; i < times.Length; i++)
+    {
+        times[i] = ((times[i] + diff)) % 2400;
+    }
+}</code></pre>
+    </div>
+
+    <p>ใน <code>DisplayTimes()</code> คุณรวมการเรียก <code>Console.WriteLine()</code> ท้าย method
+       เพื่อขึ้นบรรทัดใหม่หลังแสดงเวลาเสร็จด้วย</p>
+
+    <h3 id="s04c">เรียกใช้ Method แทนโค้ดที่ซ้ำ</h3>
+    <p>ลบ code block ที่ซ้ำกัน แล้วแทนที่ด้วยการเรียก method ที่สร้างไว้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ฉบับสมบูรณ์)</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int[] times = {800, 1200, 1600, 2000};
+int diff = 0;
+
+Console.WriteLine("Enter current GMT");
+int currentGMT = Convert.ToInt32(Console.ReadLine());
+
+Console.WriteLine("Current Medicine Schedule:");
+DisplayTimes();
+
+Console.WriteLine("Enter new GMT");
+int newGMT = Convert.ToInt32(Console.ReadLine());
+
+if (Math.Abs(newGMT) > 12 || Math.Abs(currentGMT) > 12)
+{
+    Console.WriteLine("Invalid GMT");
+}
+else if (newGMT <= 0 && currentGMT <= 0 || newGMT >= 0 && currentGMT >= 0)
+{
+    diff = 100 * (Math.Abs(newGMT) - Math.Abs(currentGMT));
+    AdjustTimes();
+}
+else
+{
+    diff = 100 * (Math.Abs(newGMT) + Math.Abs(currentGMT));
+    AdjustTimes();
+}
+
+Console.WriteLine("New Medicine Schedule:");
+DisplayTimes();
+
+void DisplayTimes()
+{
+    /* Format and display medicine times */
+    foreach (int val in times)
+    {
+        string time = val.ToString();
+        int len = time.Length;
+
+        if (len >= 3)
+        {
+            time = time.Insert(len - 2, ":");
+        }
+        else if (len == 2)
+        {
+            time = time.Insert(0, "0:");
+        }
+        else
+        {
+            time = time.Insert(0, "0:0");
+        }
+
+        Console.Write($"{time} ");
+    }
+    Console.WriteLine();
+}
+
+void AdjustTimes()
+{
+    /* Adjust the times by adding the difference, keeping the value within 24 hours */
+    for (int i = 0; i < times.Length; i++)
+    {
+        times[i] = ((times[i] + diff)) % 2400;
+    }
+}</code></pre>
+    </div>
+
+    <div class="out"><div class="out-bar">Output (กรอก -6 แล้ว +6)</div><pre>
+Enter current GMT
+-6
+Current Medicine Schedule:
+8:00 12:00 16:00 20:00 
+Enter new GMT
++6
+New Medicine Schedule:
+20:00 0:00 4:00 8:00 </pre></div>
+
+    <p>สังเกตว่าการใช้ method แทนที่ code block ขนาดใหญ่ทำให้โค้ดชัดเจนและเข้าใจง่ายขึ้นมากแค่ไหน —
+       ทั้ง <code>DisplayTimes()</code> และ <code>AdjustTimes()</code> เข้าถึงตัวแปร
+       <code>times</code> และ <code>diff</code> ที่ประกาศไว้นอก method ได้โดยตรง เพราะเป็น local
+       function ในไฟล์เดียวกัน (ทบทวนจากหัวข้อ 28.2b)</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch28-e"><span>ระบุโค้ดที่ซ้ำกันในตัวอย่างได้</span></label></li>
+      <li><label><input type="checkbox" id="ch28-f"><span>สร้าง DisplayTimes() และ AdjustTimes() แทนที่โค้ดซ้ำสำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">28.5 ลงมือ: สร้างโค้ดด้วย Method และ Pseudo-code</h2>
+
+    <p>method มีประโยชน์สำหรับจัดระเบียบโค้ด ใช้ซ้ำโค้ด และแก้ปัญหาอย่างมีประสิทธิภาพ คุณคิดถึง
+       method เหมือนกล่องดำ (black box) ที่รับ input ทำงานตามชื่อที่ตั้งไว้ แล้วคืน output ได้ ด้วย
+       สมมติฐานนี้ คุณจัดโครงสร้างโปรแกรมได้อย่างรวดเร็ว แค่ตั้งชื่องานของคุณเป็น method แล้วเติม
+       ตรรกะทีหลัง หลังจากระบุงานที่จำเป็นทั้งหมดแล้ว</p>
+
+    <p>เมื่อคุณใช้ภาษาพูดธรรมดาอธิบายขั้นตอนในโค้ด โดยไม่ต้องยึดกฎ syntax เคร่งครัด คุณกำลังใช้
+       "<b>pseudo-code</b>" (รหัสจำลอง) การผสม method กับ pseudo-code เป็นวิธีที่ดีมากในการฝ่าฟัน
+       โจทย์การเขียนโปรแกรมที่ท้าทายได้อย่างรวดเร็ว</p>
+
+    <h3 id="s05a">ใช้ Method จัดโครงสร้างโค้ด</h3>
+    <p>สมมติคุณเป็นผู้สมัครในการสัมภาษณ์งานเขียนโค้ด ผู้สัมภาษณ์อยากให้คุณเขียนโปรแกรมตรวจสอบว่า
+       IPv4 address ถูกต้องหรือไม่ คุณได้รับกฎต่อไปนี้:</p>
+    <ul>
+      <li>IPv4 address ที่ถูกต้องประกอบด้วยตัวเลข 4 ตัวคั่นด้วยจุด</li>
+      <li>แต่ละตัวเลขต้องไม่มีเลขศูนย์นำหน้า (leading zero)</li>
+      <li>แต่ละตัวเลขต้องอยู่ในช่วง 0 ถึง 255</li>
+    </ul>
+    <p><code>1.1.1.1</code> และ <code>255.255.255.255</code> เป็นตัวอย่างของ IP address ที่ถูก
+       ต้อง</p>
+
+    <p>IPv4 address ถูกส่งมาเป็น string คุณสมมติได้ว่ามันมีแค่ตัวเลขกับจุดเท่านั้น (ไม่มีตัวอักษรใน
+       string ที่ให้มา) — คุณจะเข้าหางานนี้ยังไง?</p>
+
+    <h3 id="s05b">แตกปัญหาออกเป็นส่วนๆ</h3>
+    <p>ถ้าดูกฎให้ดี คุณจะพบว่าต้องใช้แค่ 3 ขั้นตอนในการตัดสินว่า IPv4 address ถูกต้องหรือไม่</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (pseudo-code)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">/*
+if ipAddress consists of 4 numbers
+and
+if each ipAddress number has no leading zeroes
+and
+if each ipAddress number is in range 0 - 255
+
+then ipAddress is valid
+
+else ipAddress is invalid
+*/</code></pre>
+    </div>
+
+    <p>pseudo-code เป็นวิธีที่ดีมากในการเริ่มฝ่าฟันโจทย์ ด้วย comment block นี้ คุณเชื่อมช่องว่าง
+       ระหว่างกฎในโจทย์กับโค้ดโปรแกรม ทำให้งานหลักที่โค้ดของคุณต้องทำชัดเจนขึ้น pseudo-code ไม่
+       จำเป็นต้องทำงานได้จริงหรือยึดกฎ syntax แต่ควรอธิบายชัดเจนว่าโค้ดจะทำอะไร ทีนี้มาแปลงมันเป็น
+       โค้ดจริงกัน!</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">if (ValidateLength() && ValidateZeroes() && ValidateRange())
+{
+    Console.WriteLine($"ip is a valid IPv4 address");
+}
+else
+{
+    Console.WriteLine($"ip is an invalid IPv4 address");
+}</code></pre>
+    </div>
+
+    <p>ในขั้นตอนนี้ คุณแปลง <code>if</code> statement จาก pseudo-code เป็น method ที่เรียกได้ และ
+       แสดงผลลัพธ์ออกมา ยังไม่ต้องกังวลเรื่องนิยาม method ตอนนี้ สมมติไว้ก่อนว่าแต่ละ method ทำงาน
+       ตามชื่อที่มันอธิบายไว้ คุณจะแก้ compile error และสร้างตรรกะของ method ทีหลัง แต่ตอนนี้ให้
+       โฟกัสที่ภาพรวมก่อน เวลาเริ่มโปรแกรมใหม่ การโฟกัสที่การออกแบบภาพรวมช่วยให้คุณจัดระเบียบและ
+       พัฒนาแอปได้เร็วขึ้น</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (placeholder methods)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void ValidateLength() {}
+void ValidateZeroes() {}
+void ValidateRange() {}</code></pre>
+    </div>
+
+    <p>สังเกตว่าการใช้ placeholder method ทำให้คุณเข้าหาโจทย์ได้อย่างรวดเร็ว และจัดโครงสร้างโค้ดเพื่อ
+       พัฒนา solution ได้ ตอนนี้คุณมีแผนที่มีโครงสร้างชัดเจนแล้ว คุณพัฒนาต่อได้โดยเติมโค้ดทีละชิ้น</p>
+
+    <h3 id="s05c">พัฒนา Solution</h3>
+    <p>ตอนนี้คุณมี placeholder method ครบสำหรับแก้โจทย์แล้ว ถึงเวลาโฟกัสที่รายละเอียดของ solution
+       จำไว้ว่า input format ของ IPv4 address จะเป็น string ที่มีตัวเลขคั่นด้วยจุด</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ตัวแปรตั้งต้น)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string ipv4Input = "107.31.1.5";
+bool validLength = false;
+bool validZeroes = false;
+bool validRange = false;</code></pre>
+    </div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">ValidateLength();
+ValidateZeroes();
+ValidateRange();
+
+if (validLength && validZeroes && validRange)
+{
+    Console.WriteLine($"ip is a valid IPv4 address");
+}
+else
+{
+    Console.WriteLine($"ip is an invalid IPv4 address");
+}</code></pre>
+    </div>
+
+    <p>อัปเดต method <code>ValidateLength</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void ValidateLength()
+{
+    string[] address = ipv4Input.Split(".");
+    validLength = address.Length == 4;
+};</code></pre>
+    </div>
+
+    <p>กฎแรกบอกว่า IPv4 address ต้องมีตัวเลข 4 ตัว ดังนั้นในโค้ดนี้ คุณใช้ <code>string.Split</code>
+       (ทบทวนจาก<a href="ch23.html">บทที่ 23</a>) แยกตัวเลข แล้วเช็คว่ามีครบ 4 ตัวหรือไม่</p>
+
+    <p>อัปเดต method <code>ValidateZeroes</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void ValidateZeroes()
+{
+    string[] address = ipv4Input.Split(".");
+
+    foreach (string number in address)
+    {
+        if (number.Length > 1 && number.StartsWith("0"))
+        {
+            validZeroes = false;
+            return;
+        }
+    }
+
+    validZeroes = true;
+}</code></pre>
+    </div>
+
+    <p>กฎที่สองบอกว่าตัวเลขใน IPv4 address ต้องไม่มีเลขศูนย์นำหน้า ดังนั้น method ต้องเช็คตัวเลขที่
+       มีเลขศูนย์นำหน้า พร้อมยอมรับ <code>0</code> เดี่ยวๆ ว่าเป็นค่าที่ถูกต้อง ถ้าตัวเลขทุกตัวมี
+       เลขศูนย์ถูกต้อง <code>validZeroes</code> ควรเป็น <code>true</code> ไม่งั้นเป็น
+       <code>false</code></p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ทำความรู้จัก return Statement</span>
+      ถ้าสังเกตดีๆ จะเห็นว่า <code>validZeroes</code> ถูกตั้งเป็น <code>true</code> หลัง
+      <code>foreach</code> loop จบเสมอ แต่คุณต้องการตั้งเป็น <code>true</code> เฉพาะตอนที่ไม่พบ
+      เลขศูนย์นำหน้าที่ผิดกฎเท่านั้น — คุณแก้บั๊กนี้ได้ด้วยการตั้ง <code>validZeroes = true</code>
+      ก่อน <code>foreach</code> loop รัน แต่ก็แก้ได้ด้วย <code>return</code> statement เช่นกัน —
+      <code>return</code> statement หยุดการทำงานของ method แล้วส่ง control กลับไปยังผู้เรียก การเพิ่ม
+      <code>return</code> หลัง <code>validZeroes = false;</code> ทำให้ method จบทำงานทันทีที่เจอเลข
+      ศูนย์ที่ผิดกฎตัวแรก ถ้าไม่เจอเลขศูนย์ที่ผิดกฎเลย method จะจบหลังตั้ง
+      <code>validZeroes</code> เป็น <code>true</code> (จะเรียนละเอียดเรื่อง return value ใน
+      <a href="ch30.html">บทที่ 30</a>)
+    </div>
+
+    <p>อัปเดต method <code>ValidateRange</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void ValidateRange()
+{
+    string[] address = ipv4Input.Split(".");
+
+    foreach (string number in address)
+    {
+        int value = int.Parse(number);
+        if (value < 0 || value > 255)
+        {
+            validRange = false;
+            return;
+        }
+    }
+    validRange = true;
+}</code></pre>
+    </div>
+
+    <p>กฎที่สามบอกว่าแต่ละตัวเลขต้องอยู่ในช่วง 0 ถึง 255 ดังนั้นโค้ดนี้เช็คว่าแต่ละตัวเลขน้อยกว่า 255
+       ถ้าไม่ ให้จบการทำงานหลังตั้ง <code>validRange</code> เป็น <code>false</code> เพราะ string
+       input มีแค่ตัวเลขกับจุด คุณไม่ต้องเช็คเลขติดลบ</p>
+
+    <p>แต่อาจมีบางกรณีที่ไม่มีตัวเลขอยู่ระหว่างจุดเลย เช่น <code>"255...255"</code> ในกรณีนี้
+       <code>string.Split(".")</code> จะคืน entry ว่างเปล่า ทำให้ <code>int.Parse</code> ล้มเหลว
+       คุณป้องกันปัญหานี้ได้ด้วยการระบุ <code>StringSplitOptions</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[] address = ipv4Input.Split(".", StringSplitOptions.RemoveEmptyEntries);</code></pre>
+    </div>
+
+    <p>ใช้ <code>StringSplitOptions.RemoveEmptyEntries</code> ตัด entry ว่างเปล่าออกจาก array
+       <code>address</code> และป้องกันไม่ให้พยายาม parse string ว่างเปล่า</p>
+
+    <h3 id="s05d">ทำให้ Solution สมบูรณ์</h3>
+    <p>ตอนนี้คุณมี method ครบสำหรับตรวจสอบ IP address แล้ว ถึงเวลากลับไปดู solution เริ่มต้น เพิ่ม
+       ค่า input มากขึ้น และเตรียมทดสอบโค้ด</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[] ipv4Input = {"107.31.1.5", "255.0.0.255", "555..0.555", "255...255"};</code></pre>
+    </div>
+
+    <p>ตอนพัฒนา solution สำคัญมากที่ต้องทดสอบโค้ดด้วย input หลายกรณี ในโค้ดนี้ คุณให้ค่าทดสอบที่
+       ครอบคลุมพอสมควร ตอนนี้ต้องอัปเดตโค้ดให้ทดสอบแต่ละค่าโดยใช้ loop</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">foreach (string ip in ipv4Input)
+{
+    ValidateLength();
+    ValidateZeroes();
+    ValidateRange();
+
+    if (validLength && validZeroes && validRange)
+    {
+        Console.WriteLine($"{ip} is a valid IPv4 address");
+    }
+    else
+    {
+        Console.WriteLine($"{ip} is an invalid IPv4 address");
+    }
+}</code></pre>
+    </div>
+
+    <p>สุดท้าย ต้องแก้ให้แต่ละ method ใช้ข้อมูลจากตัวแปรกลาง เพราะเปลี่ยน <code>ipv4Input</code>
+       จาก string เป็น array แล้ว — เพิ่มตัวแปร <code>address</code> ที่แต่ละ method จะอ้างอิงถึง:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[] ipv4Input = {"107.31.1.5", "255.0.0.255", "555..0.555", "255...255"};
+string[] address;
+bool validLength = false;
+bool validZeroes = false;
+bool validRange = false;</code></pre>
+    </div>
+
+    <p>กำหนดค่า <code>address</code> ด้วย <code>string.Split</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">foreach (string ip in ipv4Input)
+{
+    address = ip.Split(".", StringSplitOptions.RemoveEmptyEntries);</code></pre>
+    </div>
+
+    <p>ลบการอ้างอิง <code>string.Split</code> ออกจากแต่ละ validation method ให้ใช้ตัวแปร
+       <code>address</code> กลางแทน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ฉบับสมบูรณ์)</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] ipv4Input = {"107.31.1.5", "255.0.0.255", "555..0.555", "255...255"};
+string[] address;
+bool validLength = false;
+bool validZeroes = false;
+bool validRange = false;
+
+foreach (string ip in ipv4Input)
+{
+    address = ip.Split(".", StringSplitOptions.RemoveEmptyEntries);
+
+    ValidateLength();
+    ValidateZeroes();
+    ValidateRange();
+
+    if (validLength && validZeroes && validRange)
+    {
+        Console.WriteLine($"{ip} is a valid IPv4 address");
+    }
+    else
+    {
+        Console.WriteLine($"{ip} is an invalid IPv4 address");
+    }
+}
+
+void ValidateLength()
+{
+    validLength = address.Length == 4;
+};
+
+void ValidateZeroes()
+{
+    foreach (string number in address)
+    {
+        if (number.Length > 1 && number.StartsWith("0"))
+        {
+            validZeroes = false;
+            return;
+        }
+    }
+
+    validZeroes = true;
+}
+
+void ValidateRange()
+{
+    foreach (string number in address)
+    {
+        int value = int.Parse(number);
+        if (value < 0 || value > 255)
+        {
+            validRange = false;
+            return;
+        }
+    }
+    validRange = true;
+}</code></pre>
+    </div>
+
+    <div class="out"><div class="out-bar">Output</div><pre>
+107.31.1.5 is a valid IPv4 address
+255.0.0.255 is a valid IPv4 address
+555..0.555 is an invalid IPv4 address
+255...255 is an invalid IPv4 address</pre></div>
+
+    <div class="note tip">
+      <span class="lbl">💡 555..0.555 ผิดตรงไหน</span>
+      "555..0.555" แยกด้วยจุดแล้วได้ 3 ค่า (เพราะ RemoveEmptyEntries ตัดค่าว่างจากจุดคู่ทิ้ง):
+      "555", "0", "555" — มีแค่ 3 ตัวเลข ไม่ใช่ 4 ตัว จึงไม่ผ่าน <code>ValidateLength()</code> ทันที
+      (นอกจากนี้ "555" ยังเกิน 255 ด้วย จึงไม่ผ่าน <code>ValidateRange()</code> เช่นกัน)
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch28-g"><span>เขียน pseudo-code ก่อนเขียนโค้ดจริงได้</span></label></li>
+      <li><label><input type="checkbox" id="ch28-h"><span>ใช้ placeholder method จัดโครงสร้างโปรแกรมก่อนเติมรายละเอียดได้</span></label></li>
+      <li><label><input type="checkbox" id="ch28-i"><span>implement ตัวตรวจสอบ IPv4 address ครบทั้ง 3 กฎสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch28-j"><span>เข้าใจว่า return statement หยุด method ได้ทันทีโดยไม่ต้องมีค่า</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">28.6 ท้าทาย: หมอดูทำนายดวง</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl m">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>คุณกำลังช่วยพัฒนาเกม massive multiplayer role-playing เกมหนึ่ง ผู้เล่นแต่ละคนมีค่าสถานะ
+           "โชค" (luck) ที่ส่งผลต่อโอกาสเจอสมบัติหายาก ทุกวัน ผู้เล่นคุยกับหมอดูในเกมที่บอกว่าค่า
+           โชคของพวกเขาสูง ต่ำ หรือปานกลาง</p>
+        <p>เกมมีโค้ดสร้างคำทำนายของผู้เล่นอยู่แล้ว แต่ยังใช้ซ้ำไม่ได้ งานของคุณคือสร้าง method ชื่อ
+           <code>TellFortune</code> ที่เรียกได้ทุกเมื่อ แล้วแทนที่ตรรกะเดิมด้วยการเรียก method นี้</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">ข้อมูลตั้งต้น</span></div>
+          <pre><code class="lang-cs">Random random = new Random();
+int luck = random.Next(100);
+
+string[] text = {"You have much to", "Today is a day to", "Whatever work you do", "This is an ideal time to"};
+string[] good = {"look forward to.", "try new things!", "is likely to succeed.", "accomplish your dreams!"};
+string[] bad = {"fear.", "avoid major decisions.", "may have unexpected outcomes.", "re-evaluate your life."};
+string[] neutral = {"appreciate.", "enjoy time with friends.", "should align with your values.", "get in tune with nature."};
+
+Console.WriteLine("A fortune teller whispers the following words:");
+string[] fortune = (luck > 75 ? good : (luck < 25 ? bad : neutral));
+for (int i = 0; i < 4; i++)
+{
+    Console.Write($"{text[i]} {fortune[i]} ");
+}</code></pre>
+        </div>
+        <p>อัปเดตโค้ดให้ใช้ method แสดงคำทำนาย ทดสอบด้วยการเปลี่ยนค่า <code>luck</code> แล้วเรียก
+           method อีกครั้ง</p>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>ห่อโค้ดตั้งแต่ <code>Console.WriteLine("A fortune teller...")</code> ถึงจบ
+             <code>for</code> loop ไว้ในปีกกาของ method ใหม่ แล้วเรียก method นั้นแทนที่ตำแหน่งเดิม</p>
+        </div>
+      </details>
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย (เฉลยทางการจาก Microsoft Learn)</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">Random random = new Random();
+int luck = random.Next(100);
+
+string[] text = {"You have much to", "Today is a day to", "Whatever work you do", "This is an ideal time to"};
+string[] good = {"look forward to.", "try new things!", "is likely to succeed.", "accomplish your dreams!"};
+string[] bad = {"fear.", "avoid major decisions.", "may have unexpected outcomes.", "re-evaluate your life."};
+string[] neutral = {"appreciate.", "enjoy time with friends.", "should align with your values.", "get in tune with nature."};
+
+TellFortune();
+
+void TellFortune()
+{
+    Console.WriteLine("A fortune teller whispers the following words:");
+    string[] fortune = (luck > 75 ? good : (luck < 25 ? bad : neutral));
+    for (int i = 0; i < 4; i++)
+    {
+        Console.Write($"{text[i]} {fortune[i]} ");
+    }
+}</code></pre>
+        </div>
+        <div class="out auto"><div class="out-bar">Output ตัวอย่าง (luck > 75)</div><pre>
+A fortune teller whispers the following words:
+You have much to look forward to. Today is a day to try new things! Whatever work you do is likely to succeed. This is an ideal time to accomplish your dreams! </pre></div>
+        <p>นี่เป็น<i>เพียงหนึ่งในหลายวิธี</i>ที่แก้โจทย์นี้ได้ คุณอาจใส่การขึ้นบรรทัดใหม่ในตำแหน่ง
+           ต่างออกไป หรือจัดรูปแบบโค้ดต่างกันก็ได้ ไม่ว่าจะต่างกันเล็กน้อยยังไง ผลลัพธ์ควรขึ้นอยู่กับ
+           ค่าตัวแปร <code>luck</code> เสมอ</p>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch28-k"><span>สร้าง TellFortune() method สำเร็จ เรียกซ้ำได้หลายครั้ง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s07">28.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>compile error ตอนพยายามประกาศ method โดยไม่มีปีกกา {}</td>
+          <td>เขียน <code>void MyMethod();</code> (แค่ signature จบด้วยเซมิโคลอน) โดยไม่มี body —
+              เป็น method signature เฉยๆ ไม่ใช่นิยามที่สมบูรณ์ ต้องมี <code>{ }</code> ตามด้วยเสมอ
+              (ถึงจะว่างเปล่าก็ต้องมี)</td>
+        </tr>
+        <tr>
+          <td>ตัวแปรใน method หนึ่งมองไม่เห็นค่าจาก method อีกตัว ทั้งที่คาดว่าจะแชร์กันได้</td>
+          <td>ตัวแปรที่ประกาศ<b>ข้างใน</b> method (local variable) มี scope แค่ในตัว method นั้น
+              เท่านั้น (ทบทวนจาก <a href="ch15.html">บทที่ 15</a>) ถ้าต้องการแชร์ค่าข้าม method
+              ต้องประกาศตัวแปรนั้นไว้<b>นอก</b>ทุก method (เหมือน times, diff, address ในบทนี้)</td>
+        </tr>
+        <tr>
+          <td>ลืม return; แล้วตัวแปรผลลัพธ์ถูกเขียนทับด้วยค่า default หลัง loop จบ</td>
+          <td>ถ้าตั้งค่า false/true ไว้ข้างใน loop แต่ไม่ return ทันที โค้ดหลัง loop (เช่น
+              "validZeroes = true;" ท้าย method) จะทำงานเสมอ เขียนทับค่าที่ตั้งไว้ก่อนหน้า — ต้องใส่
+              return หลังตั้งค่าที่ควรจบการทำงานทันที</td>
+        </tr>
+        <tr>
+          <td>เรียก method ก่อนนิยามแล้วกังวลว่าจะ error</td>
+          <td>ไม่ใช่บั๊ก — local function ใน C# top-level program เรียกได้ทั้งก่อนและหลังนิยาม
+              (ทบทวนหัวข้อ 28.2b) ต่างจากตัวแปรที่ต้องประกาศก่อนใช้เสมอ</td>
+        </tr>
+        <tr>
+          <td>ตั้งชื่อ method ว่า DoStuff(), Process(), Handle() แล้วอ่านโค้ดไม่รู้เรื่องทีหลัง</td>
+          <td>ชื่อ method ที่คลุมเครือทำให้เสียประโยชน์หลักของการใช้ method (อ่านชื่อแล้วรู้ทันทีว่า
+              ทำอะไร) — ตั้งชื่อให้เจาะจงงานจริงเสมอ เช่น DisplayTimes(), ValidateRange()</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">28.8 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment ของ Microsoft Learn</p>
+
+    <div class="quiz" data-q="28-1">
+      <p class="q"><span class="num">1.</span> ข้อใดประกาศ method ได้อย่างถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>DisplayNumbers();</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>void DisplayNumbers{};</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>void DisplayNumbers() { }</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ต้องมีครบ return type, ชื่อ, วงเล็บ, และปีกกา body —
+        ข้อ A ขาด return type (เป็นการเรียก ไม่ใช่ประกาศ) ข้อ B ขาดวงเล็บ <code>()</code> หลังชื่อ
+        method</div>
+    </div>
+
+    <div class="quiz" data-q="28-2">
+      <p class="q"><span class="num">2.</span> ข้อใดเรียก method ได้อย่างถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>GenerateID();</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>void GenerateID() {}</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>GenerateID;</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> การเรียก method ต้องมีวงเล็บ <code>()</code> เสมอ (ข้อ C
+        ผิดเพราะขาดวงเล็บ) ข้อ B เป็นการ<b>ประกาศ</b> method ไม่ใช่การเรียก</div>
+    </div>
+
+    <div class="quiz" data-q="28-3">
+      <p class="q"><span class="num">3.</span> ข้อใดถูกต้องเกี่ยวกับคีย์เวิร์ด <code>return</code>?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เหมือนกับคีย์เวิร์ด break ทุกประการ</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>มันหยุดการทำงานของ method</span></li>
+        <li class="opt"><span class="k">C</span><span>ต้องใช้คู่กับค่าหรือ expression เสมอ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ตรงกับที่เห็นในหัวข้อ 28.5b — <code>return;</code>
+        เดี่ยวๆ (ไม่มีค่า) ใช้กับ method ชนิด <code>void</code> ได้ เพื่อหยุดการทำงานทันที (ข้อ C
+        ผิด) และ break ใช้ออกจาก loop/switch เท่านั้น ไม่ได้หยุดทั้ง method เหมือน return (ข้อ A
+        ผิด)</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">28.9 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>สร้าง method ชื่อ <code>PrintDivider()</code> ที่พิมพ์เส้นคั่น <code>"----------"</code>
+           แล้วเรียกใช้ 3 ครั้งสลับกับการพิมพ์ข้อความอื่น</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Console.WriteLine("Section 1");
+PrintDivider();
+Console.WriteLine("Section 2");
+PrintDivider();
+Console.WriteLine("Section 3");
+
+void PrintDivider()
+{
+    Console.WriteLine("----------");
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>สร้าง method ชื่อ <code>PrintSquares()</code> ที่พิมพ์กำลังสองของเลข 1 ถึง 10 (ใช้
+           <code>for</code> loop ข้างในเมธอด)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">PrintSquares();
+
+void PrintSquares()
+{
+    for (int i = 1; i <= 10; i++)
+    {
+        Console.WriteLine(i * i);
+    }
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้มี method 2 ตัวที่มีโค้ดซ้ำกันเกือบทั้งหมด รวมให้เหลือ method เดียว:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ก่อนแก้)</span></div>
+        <pre><code class="lang-cs">void GreetMorning()
+{
+    Console.WriteLine("=====");
+    Console.WriteLine("Good morning!");
+    Console.WriteLine("=====");
+}
+
+void GreetEvening()
+{
+    Console.WriteLine("=====");
+    Console.WriteLine("Good evening!");
+    Console.WriteLine("=====");
+}</code></pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ทั้งสอง method ต่างกันแค่ข้อความตรงกลาง — ลองนึกถึงวิธีทำให้
+           ข้อความนั้นเป็นตัวแปรที่ปรับได้จากภายนอก method (จะเรียนละเอียดเรื่องพารามิเตอร์ใน
+           <a href="ch29.html">บทที่ 29</a>) ถ้ายังไม่รู้จักพารามิเตอร์ ลองใช้ตัวแปร global ที่
+           ตั้งค่าก่อนเรียก method แทนไปก่อนได้</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (แก้แล้ว — ใช้ตัวแปร global)</span></div>
+          <pre><code class="lang-cs">string greetingMessage = "";
+
+greetingMessage = "Good morning!";
+Greet();
+
+greetingMessage = "Good evening!";
+Greet();
+
+void Greet()
+{
+    Console.WriteLine("=====");
+    Console.WriteLine(greetingMessage);
+    Console.WriteLine("=====");
+}</code></pre></div>
+          <p>รวมเหลือ method เดียวชื่อ <code>Greet()</code> ที่อ่านค่าจากตัวแปร
+             <code>greetingMessage</code> ซึ่งตั้งค่าไว้ก่อนเรียกแต่ละครั้ง — วิธีนี้ยังไม่สวยเท่า
+             การใช้พารามิเตอร์ (ซึ่งจะเรียนในบทถัดไป) แต่แสดงหลักการ "ลดโค้ดซ้ำ" ได้ชัดเจน</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียน pseudo-code (แค่ comment ไม่ต้องเป็นโค้ดจริง) สำหรับโปรแกรมตรวจสอบว่ารหัสผ่านที่
+           กรอกเข้ามาแข็งแรงพอหรือไม่ (ต้องมีความยาวอย่างน้อย 8 ตัวอักษร มีตัวเลขอย่างน้อย 1 ตัว
+           และมีตัวพิมพ์ใหญ่อย่างน้อย 1 ตัว) จากนั้นสร้าง placeholder method 3 ตัวตาม pseudo-code
+           นั้น</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">/*
+if password length is at least 8 characters
+and
+if password contains at least one digit
+and
+if password contains at least one uppercase letter
+
+then password is strong
+
+else password is weak
+*/
+
+void ValidateLength() {}
+void ValidateHasDigit() {}
+void ValidateHasUppercase() {}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>เติมโค้ดให้ placeholder method ทั้ง 3 ตัวจากข้อ 4 ทำงานได้จริง (ใช้ตัวแปร bool กลาง 3
+           ตัวเหมือนแพทเทิร์นตัวตรวจสอบ IPv4 ในหัวข้อ 28.5) ทดสอบกับรหัสผ่าน "Abc12345" (ควรผ่าน)
+           และ "abc" (ควรไม่ผ่าน)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string[] passwords = { "Abc12345", "abc" };
+string password = "";
+bool validLength = false;
+bool hasDigit = false;
+bool hasUppercase = false;
+
+foreach (string pw in passwords)
+{
+    password = pw;
+    ValidateLength();
+    ValidateHasDigit();
+    ValidateHasUppercase();
+
+    if (validLength && hasDigit && hasUppercase)
+    {
+        Console.WriteLine($"{password} is strong");
+    }
+    else
+    {
+        Console.WriteLine($"{password} is weak");
+    }
+}
+
+void ValidateLength()
+{
+    validLength = password.Length >= 8;
+}
+
+void ValidateHasDigit()
+{
+    foreach (char c in password)
+    {
+        if (char.IsDigit(c))
+        {
+            hasDigit = true;
+            return;
+        }
+    }
+    hasDigit = false;
+}
+
+void ValidateHasUppercase()
+{
+    foreach (char c in password)
+    {
+        if (char.IsUpper(c))
+        {
+            hasUppercase = true;
+            return;
+        }
+    }
+    hasUppercase = false;
+}</code></pre></div>
+          <p>ใช้ <code>char.IsDigit()</code> และ <code>char.IsUpper()</code> ตรวจสอบตัวอักษรแต่ละ
+             ตัวใน string — เมธอด built-in เหล่านี้ยังไม่เคยเจอในหนังสือเล่มนี้มาก่อน แต่ทำงานตรงตัว
+             ตามชื่อ (ทดลองใช้เมธอดใหม่ที่คาดเดาพฤติกรรมได้จากชื่อ เป็นทักษะสำคัญของนักพัฒนา)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>ย้อนกลับไปดูแอปยาข้ามโซนเวลาในหัวข้อ 28.4 — สร้าง method ใหม่ชื่อ
+           <code>ValidateGMT()</code> ที่ย้ายตรรกะ <code>Math.Abs(newGMT) > 12 || Math.Abs(currentGMT) > 12</code>
+           ออกจาก <code>if</code> statement หลัก ให้ method คืนสถานะผ่านตัวแปร bool กลางชื่อ
+           <code>invalidGMT</code> แทน</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่แก้)</span></div>
+          <pre><code class="lang-cs">bool invalidGMT = false;
+
+ValidateGMT();
+
+if (invalidGMT)
+{
+    Console.WriteLine("Invalid GMT");
+}
+else if (newGMT <= 0 && currentGMT <= 0 || newGMT >= 0 && currentGMT >= 0)
+{
+    diff = 100 * (Math.Abs(newGMT) - Math.Abs(currentGMT));
+    AdjustTimes();
+}
+else
+{
+    diff = 100 * (Math.Abs(newGMT) + Math.Abs(currentGMT));
+    AdjustTimes();
+}
+
+void ValidateGMT()
+{
+    invalidGMT = Math.Abs(newGMT) > 12 || Math.Abs(currentGMT) > 12;
+}</code></pre></div>
+          <p>แพทเทิร์นเดียวกับ <code>ValidateLength()</code>/<code>ValidateRange()</code> จาก
+             หัวข้อ 28.5 ทุกประการ — ย้ายเงื่อนไขที่ซับซ้อนออกจาก <code>if</code> หลัก ไปไว้ใน
+             method ที่ตั้งชื่อสื่อความหมาย แล้วอ่านผลผ่านตัวแปร bool กลาง</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 28</h2>
+
+    <p>เป้าหมายของคุณคือเรียนวิธีสร้าง method ของตัวเองเพื่อทำงานเฉพาะอย่าง คุณเรียนย้ายโค้ดที่ใช้ซ้ำ
+       ได้ไปไว้ใน method เพื่อลดการเขียนโค้ดซ้ำ คุณยังเรียนใช้ pseudo-code และ placeholder method
+       เข้าหาโจทย์ที่ซับซ้อน ด้วยการสร้าง method เล็กๆ ที่แต่ละตัวมีหน้าที่รับผิดชอบเฉพาะเจาะจง คุณ
+       เรียนสร้าง solution ให้โจทย์ต่างๆ ได้อย่างรวดเร็ว ด้วยโค้ดที่มีประสิทธิภาพและอ่านง่าย</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 28</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">Syntax</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>void MethodName() { }</code></td><td>นิยาม method ที่ไม่คืนค่า</td></tr>
+          <tr><td><code>MethodName();</code></td><td>เรียกใช้ method</td></tr>
+          <tr><td>เรียกก่อน/หลังนิยามได้</td><td>local function ใน top-level program ไม่ยึดลำดับ</td></tr>
+          <tr><td><code>return;</code></td><td>หยุดการทำงานของ void method ทันที</td></tr>
+          <tr><td>ตัวแปรนอก method</td><td>เข้าถึงได้จากทุก local function ในไฟล์เดียวกัน</td></tr>
+          <tr><td>pseudo-code + placeholder methods</td><td>วางแผนโครงสร้างโปรแกรมก่อนเติมรายละเอียด</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>method / function</td><td>เมธอด / ฟังก์ชัน</td><td>หน่วยโค้ดแบบโมดูลที่ทำงานเฉพาะอย่าง</td></tr>
+        <tr><td>method signature</td><td>ลายเซ็นเมธอด</td><td>ส่วนประกาศ return type, ชื่อ, และพารามิเตอร์</td></tr>
+        <tr><td>method definition / body</td><td>นิยามเมธอด / ตัวเมธอด</td><td>โค้ดข้างในปีกกาที่ทำงานตอนถูกเรียก</td></tr>
+        <tr><td>local function</td><td>ฟังก์ชันท้องถิ่น</td><td>method ที่นิยามในไฟล์เดียวกับโค้ดหลัก เข้าถึงตัวแปรภายนอกได้</td></tr>
+        <tr><td>modularize</td><td>ทำเป็นโมดูล</td><td>แยกโค้ดเป็นหน่วยย่อยที่ใช้ซ้ำและอ่านง่าย</td></tr>
+        <tr><td>pseudo-code</td><td>รหัสจำลอง</td><td>คำอธิบายขั้นตอนด้วยภาษาพูด ไม่ยึด syntax</td></tr>
+        <tr><td>placeholder method</td><td>เมธอดตัวยึดตำแหน่ง</td><td>method ว่างเปล่าที่ใช้วางโครงสร้างก่อนเติมโค้ดจริง</td></tr>
+        <tr><td>return statement</td><td>คำสั่ง return</td><td>หยุดการทำงานของ method และคืน control กลับผู้เรียก</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch27.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 27 · Challenge Project — ค้นหาหลายคำ</span></a>
+      <a class="next" href="ch29.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 29 · Method พร้อม Parameter</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

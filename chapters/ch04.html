@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 4 · Basic Operations on Numbers — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="4">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 1 · Write Your First Code / บทที่ 4</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 1 · โมดูล 4/7</span>
+      <h1>ดำเนินการทางคณิตศาสตร์ขั้นพื้นฐาน</h1>
+      <div class="en">Perform Basic Operations on Numbers in C#</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>55–75 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>บวก ลบ คูณ หาร หารเอาเศษ เพิ่ม/ลดค่า ได้อย่างถูกต้อง</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ทำการดำเนินการทางคณิตศาสตร์กับค่าตัวเลขได้</li>
+        <li>สังเกตการแปลงชนิดข้อมูลโดยปริยาย (implicit conversion) ระหว่าง string กับตัวเลข</li>
+        <li>แปลงชนิดข้อมูลแบบชั่วคราวด้วยการ cast</li>
+      </ul>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ความรู้ที่ต้องมีมาก่อน</span>
+      เข้าใจ literal/variable ของ string, int, decimal จาก
+      <a href="ch02.html">บทที่ 2</a> และ string concatenation/interpolation จาก
+      <a href="ch03.html">บทที่ 3</a> แล้ว
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">4.1 ทำไมต้องดำเนินการกับตัวเลข</h2>
+
+    <p>แอปที่คุณสร้างด้วย C# มักต้องดำเนินการกับข้อมูลตัวเลขทั้งแบบ literal และตัวแปร เช่น:</p>
+    <ul>
+      <li>บวก ลบ คูณ หารพื้นฐาน</li>
+      <li>ดำเนินการหลายขั้นตอนที่ต้องทำตามลำดับที่กำหนด</li>
+      <li>หาเศษที่เหลือจากการหาร</li>
+      <li>เพิ่มหรือลดค่าทีละหน่วย</li>
+    </ul>
+
+    <p>สมมติคุณอยากแปลงหน่วยวัด เช่น แปลงอุณหภูมิจากองศาฟาเรนไฮต์เป็นเซลเซียส พอคำนวณได้แล้ว
+       ก็ต้องแสดงผลเป็นข้อความที่จัดรูปแบบให้ผู้ใช้เข้าใจ วิธีทำคือใช้ <b>operator</b> (ตัวดำเนินการ)
+       กระทำกับ <b>operand</b> (ตัวถูกดำเนินการ) อย่างค่า literal และตัวแปร</p>
+
+    <p>ในบทนี้ คุณจะดำเนินการทั้งกับ string และตัวเลข จะเห็นว่าคอมไพเลอร์ทำงานต่างกันไปตามชนิด
+       ข้อมูลรอบๆ ตัวดำเนินการ และจะเข้าใจว่า operator กระทำกับ operand ยังไง</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">4.2 ลงมือ: บวกเลขและ Implicit Conversion</h2>
+
+    <h3 id="s02a">บวกเลขสองค่า</h3>
+    <p>การบวกเลขสองค่า ใช้ <b>addition operator</b> คือเครื่องหมายบวก <code>+</code> — ใช่แล้ว
+       เครื่องหมาย <code>+</code> ตัวเดียวกับที่ใช้ต่อสตริงในบทที่แล้ว! การใช้สัญลักษณ์เดียวทำหลาย
+       หน้าที่แบบนี้เรียกว่า <b>overloading the operator</b> (โอเวอร์โหลดตัวดำเนินการ) ซึ่งเกิดขึ้น
+       บ่อยมากใน C#</p>
+
+    <p>คอมไพเลอร์เข้าใจว่าคุณตั้งใจทำอะไร โดยดูจากชนิดข้อมูลของ operand รอบๆ <code>+</code>
+       ถ้าทั้งสองข้างเป็น <code>int</code> มันจะบวกให้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int firstNumber = 12;
+int secondNumber = 7;
+Console.WriteLine(firstNumber + secondNumber);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+19</pre></div>
+
+    <svg viewBox="0 0 720 175" role="img" aria-label="เครื่องหมาย + ทำงานต่างกันตามชนิดข้อมูลรอบๆ (operator overloading)" style="margin:18px 0">
+      <g font-family="var(--font-th)" font-size="12.5">
+        <text x="360" y="18" text-anchor="middle" fill="var(--text-faint)" font-size="12">เครื่องหมาย + ตัวเดียวกัน แต่ผลต่างกันตามชนิดข้อมูลรอบๆ</text>
+
+        <rect x="16"  y="32" width="330" height="118" rx="11" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="181" y="56" text-anchor="middle" font-weight="700" fill="var(--brand-text)">int + int → บวกเลข</text>
+        <text x="181" y="82" text-anchor="middle" font-family="var(--font-code)" font-size="13" fill="var(--text)">12 + 7</text>
+        <text x="181" y="106" text-anchor="middle" font-family="var(--font-code)" font-size="15" font-weight="700" fill="var(--brand-text)">→ 19</text>
+        <text x="181" y="130" text-anchor="middle" fill="var(--text-soft)">ทั้งสองข้างเป็นตัวเลข</text>
+
+        <rect x="374" y="32" width="330" height="118" rx="11" fill="var(--tip-soft)" stroke="var(--tip)"/>
+        <text x="539" y="56" text-anchor="middle" font-weight="700" fill="var(--tip)">string + int → ต่อสตริง</text>
+        <text x="539" y="82" text-anchor="middle" font-family="var(--font-code)" font-size="12.5" fill="var(--text)">"sold " + 7</text>
+        <text x="539" y="106" text-anchor="middle" font-family="var(--font-code)" font-size="14" font-weight="700" fill="var(--tip)">→ "sold 7"</text>
+        <text x="539" y="130" text-anchor="middle" fill="var(--text-soft)">int ถูกแปลงเป็น string ให้อัตโนมัติ</text>
+      </g>
+    </svg>
+
+    <h3 id="s02b">ผสมชนิดข้อมูลจนเกิด Implicit Conversion</h3>
+    <p>ถ้าใช้ <code>+</code> ระหว่างค่า <code>string</code> กับ <code>int</code> จะเกิดอะไรขึ้น?</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string firstName = "Bob";
+int widgetsSold = 7;
+Console.WriteLine(firstName + " sold " + widgetsSold + " widgets.");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Bob sold 7 widgets.</pre></div>
+
+    <p>กรณีนี้คอมไพเลอร์เข้าใจว่าคุณต้องการต่อสตริง (concatenate) เพราะ <code>+</code> ถูกล้อมด้วย
+       operand ชนิด <code>string</code> กับ <code>int</code> มันจึงแปลงตัวแปร <code>int</code>
+       <code>widgetsSold</code> เป็น <code>string</code> ให้ชั่วคราวโดยปริยาย เพื่อต่อเข้ากับ
+       ส่วนที่เหลือของสตริง — คอมไพเลอร์พยายามช่วยคุณเวลาทำได้ แต่ในอุดมคติ คุณควรระบุเจตนา
+       ให้ชัดเจนกว่านี้</p>
+
+    <h3 id="s02c">กรณีที่ซับซ้อนขึ้น: ผสมบวกเลขกับต่อสตริง</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string firstName = "Bob";
+int widgetsSold = 7;
+Console.WriteLine(firstName + " sold " + widgetsSold + 7 + " widgets.");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Bob sold 77 widgets.</pre></div>
+
+    <p>แทนที่จะบวกตัวแปร <code>widgetsSold</code> กับค่า literal <code>int</code> <code>7</code>
+       คอมไพเลอร์กลับปฏิบัติกับทุกอย่างเป็น string แล้วต่อกันหมด (ทำงานจากซ้ายไปขวา พอเจอ string
+       ครั้งแรกแล้ว ทุกอย่างถัดจากนั้นจะกลายเป็นการต่อสตริง)</p>
+
+    <h3 id="s02d">ใช้วงเล็บบอกเจตนาให้คอมไพเลอร์ชัดเจน</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string firstName = "Bob";
+int widgetsSold = 7;
+Console.WriteLine(firstName + " sold " + (widgetsSold + 7) + " widgets.");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Bob sold 14 widgets.</pre></div>
+
+    <p>วงเล็บ <code>()</code> กลายเป็นตัวดำเนินการที่ถูกโอเวอร์โหลดอีกตัว ในที่นี้วงเล็บเปิด-ปิด
+       ทำหน้าที่เป็น <b>ตัวดำเนินการลำดับการคำนวณ (order of operations)</b> เหมือนในสูตร
+       คณิตศาสตร์ — บอกให้แก้วงเล็บชั้นในสุดก่อน ได้ผลบวกของ <code>widgetsSold</code> กับ
+       <code>7</code> ก่อน แล้วค่อยแปลงผลลัพธ์เป็น string เพื่อต่อกับข้อความที่เหลือ</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ข้อควรระวัง</span>
+      ควรหลีกเลี่ยงการคำนวณและต่อสตริงในบรรทัดเดียวกันแบบซับซ้อนขนาดนี้ในโค้ดจริง —
+      ตัวอย่างนี้มีไว้เพื่อให้เข้าใจว่าคอมไพเลอร์มอง operator กับ operand ยังไงเท่านั้น
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch4-a"><span>บวก int สองตัวได้ผลถูกต้อง</span></label></li>
+      <li><label><input type="checkbox" id="ch4-b"><span>ผสม string+int จนเห็น implicit conversion เกิดขึ้นเอง</span></label></li>
+      <li><label><input type="checkbox" id="ch4-c"><span>ใช้วงเล็บบังคับให้บวกเลขก่อนต่อสตริง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">4.3 ลงมือ: การดำเนินการทางคณิตศาสตร์</h2>
+
+    <h3 id="s03a">บวก ลบ คูณ หาร</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int sum = 7 + 5;
+int difference = 7 - 5;
+int product = 7 * 5;
+int quotient = 7 / 5;
+
+Console.WriteLine("Sum: " + sum);
+Console.WriteLine("Difference: " + difference);
+Console.WriteLine("Product: " + product);
+Console.WriteLine("Quotient: " + quotient);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Sum: 12
+Difference: 2
+Product: 35
+Quotient: 1</pre></div>
+
+    <p><code>+</code> บวก · <code>-</code> ลบ · <code>*</code> คูณ · <code>/</code> หาร — แต่ผลหาร
+       (quotient) อาจไม่ตรงกับที่คุณคาดไว้ เพราะ <code>quotient</code> ถูกกำหนดเป็น <code>int</code>
+       ค่าหลังจุดทศนิยมจึงถูก<b>ตัดทิ้ง (truncate)</b> เนื่องจาก <code>int</code> เก็บเศษทศนิยมไม่ได้</p>
+
+    <h3 id="s03b">หารด้วย decimal ให้ได้เศษ</h3>
+    <p>ถ้าอยากให้การหารแม่นยำ ต้องใช้ชนิดข้อมูลที่รองรับเศษทศนิยมอย่าง <code>decimal</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">decimal decimalQuotient = 7.0m / 5;
+Console.WriteLine($"Decimal quotient: {decimalQuotient}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Decimal quotient: 1.4</pre></div>
+
+    <svg viewBox="0 0 720 155" role="img" aria-label="เปรียบเทียบผลหารระหว่าง int กับ decimal" style="margin:18px 0">
+      <g font-family="var(--font-th)" font-size="12.5">
+        <rect x="16"  y="14" width="330" height="118" rx="11" fill="var(--warn-soft)" stroke="var(--warn)"/>
+        <text x="181" y="38" text-anchor="middle" font-weight="700" fill="var(--warn)">int / int → ตัดเศษทิ้ง</text>
+        <text x="181" y="64" text-anchor="middle" font-family="var(--font-code)" font-size="13" fill="var(--text)">7 / 5</text>
+        <text x="181" y="88" text-anchor="middle" font-family="var(--font-code)" font-size="15" font-weight="700" fill="var(--warn)">→ 1</text>
+        <text x="181" y="112" text-anchor="middle" fill="var(--text-soft)">ทั้งสองข้างเป็น int</text>
+
+        <rect x="374" y="14" width="330" height="118" rx="11" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text x="539" y="38" text-anchor="middle" font-weight="700" fill="var(--ok)">decimal / int → คงเศษ</text>
+        <text x="539" y="64" text-anchor="middle" font-family="var(--font-code)" font-size="13" fill="var(--text)">7.0m / 5</text>
+        <text x="539" y="88" text-anchor="middle" font-family="var(--font-code)" font-size="15" font-weight="700" fill="var(--ok)">→ 1.4</text>
+        <text x="539" y="112" text-anchor="middle" fill="var(--text-soft)">มีข้างใดข้างหนึ่งเป็น decimal</text>
+      </g>
+    </svg>
+
+    <p>ต้องมีทั้ง<b>ตัวรับผลลัพธ์ (ฝั่งซ้ายของ =) เป็น decimal</b> <b>และ</b>ต้องมีตัวเลขอย่างน้อย
+       หนึ่งตัวในการหารเป็น <code>decimal</code> ด้วย (จะเป็น decimal ทั้งคู่ก็ได้) ตัวอย่างนี้
+       ก็ใช้ได้เหมือนกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">decimal decimalQuotient = 7 / 5.0m;
+decimal decimalQuotient = 7.0m / 5.0m;</code></pre>
+    </div>
+
+    <p>แต่บรรทัดเหล่านี้ใช้<b>ไม่ได้</b> (หรือได้ผลลัพธ์ที่ไม่ถูกต้อง):</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+      <pre><code class="lang-cs">int decimalQuotientA = 7 / 5.0m;
+int decimalQuotientB = 7.0m / 5;
+int decimalQuotientC = 7.0m / 5.0m;
+decimal decimalQuotientD = 7 / 5;</code></pre>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ทำไม decimalQuotientD ถึงผิด</span>
+      แม้ตัวรับผลลัพธ์จะเป็น <code>decimal</code> แต่ <code>7 / 5</code> ทั้งสองข้างเป็น
+      <code>int</code> ล้วน — คอมไพเลอร์หารแบบ int (ตัดเศษ) ก่อน ได้ <code>1</code> แล้วค่อยแปลงเป็น
+      decimal ทีหลัง จึงได้ <code>1.0</code> ไม่ใช่ <code>1.4</code>
+    </div>
+
+    <h3 id="s03c">Cast ผลลัพธ์จากการหาร int</h3>
+    <p>ถ้าไม่ได้ทำงานกับ literal แต่ต้องหารตัวแปรชนิด <code>int</code> สองตัว โดยไม่อยากให้ผลลัพธ์
+       ถูกตัดเศษ ต้อง <b>cast</b> ชนิดข้อมูลจาก <code>int</code> เป็น <code>decimal</code>
+       การ <b>cast</b> คือการแปลงชนิดข้อมูลแบบหนึ่ง ที่สั่งให้คอมไพเลอร์ปฏิบัติกับค่านั้นเป็นอีก
+       ชนิดหนึ่งชั่วคราว</p>
+
+    <p>ใส่ชื่อชนิดข้อมูลในวงเล็บไว้หน้าค่าที่จะ cast:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int first = 7;
+int second = 5;
+decimal quotient = (decimal)first / (decimal)second;
+Console.WriteLine(quotient);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+1.4</pre></div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ วงเล็บ 3 หน้าที่</span>
+      ตอนนี้คุณเจอวงเล็บ <code>()</code> ทำหน้าที่ 3 อย่างแล้ว: การเรียกใช้เมธอด (method invocation),
+      ลำดับการคำนวณ (order of operations), และการ cast — สังเกตบริบทให้ดีว่ากำลังใช้แบบไหนอยู่
+    </div>
+
+    <h3 id="s03d">หาเศษที่เหลือจากการหาร (modulus)</h3>
+    <p><b>modulus operator</b> คือ <code>%</code> ให้ค่าเศษที่เหลือจากการหารแบบ int สิ่งที่มันบอกจริงๆ
+       คือตัวเลขหนึ่งหารลงตัวกับอีกตัวหนึ่งหรือไม่ มีประโยชน์มากเวลาประมวลผลข้อมูลจำนวนมากเป็นลูป
+       แล้วอยากแจ้งความคืบหน้าทุกๆ 100 รายการ เป็นต้น</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine($"Modulus of 200 / 5 : {200 % 5}");
+Console.WriteLine($"Modulus of 7 / 5 : {7 % 5}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Modulus of 200 / 5 : 0
+Modulus of 7 / 5 : 2</pre></div>
+
+    <p>เมื่อ modulus เท่ากับ 0 แปลว่าตัวตั้งหารลงตัวกับตัวหาร</p>
+
+    <h3 id="s03e">ลำดับการคำนวณ (Order of Operations)</h3>
+    <p>คุณใช้ <code>()</code> เป็นตัวกำหนดลำดับการคำนวณไปแล้ว แต่นั่นไม่ใช่วิธีเดียวที่กำหนดลำดับได้
+       ในวิชาคณิตศาสตร์ ใช้ตัวย่อ <b>PEMDAS</b> ช่วยจำลำดับ:</p>
+
+    <ol>
+      <li><b>P</b>arentheses — วงเล็บก่อน</li>
+      <li><b>E</b>xponents — เลขยกกำลัง</li>
+      <li><b>M</b>ultiplication และ <b>D</b>ivision — คูณ/หาร จากซ้ายไปขวา</li>
+      <li><b>A</b>ddition และ <b>S</b>ubtraction — บวก/ลบ จากซ้ายไปขวา</li>
+    </ol>
+
+    <p>C# ทำตามลำดับเดียวกับ PEMDAS ยกเว้นเรื่องเลขยกกำลัง — C# ไม่มีตัวดำเนินการยกกำลังโดยตรง
+       แต่ใช้เมธอด <code>System.Math.Pow</code> แทนได้ (จะเรียนเรื่องนี้ในโมดูล "Call methods
+       from the .NET Class Library")</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int value1 = 3 + 4 * 5;
+int value2 = (3 + 4) * 5;
+Console.WriteLine(value1);
+Console.WriteLine(value2);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+23
+35</pre></div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch4-d"><span>เห็นผลต่างระหว่างหาร int กับหาร decimal ด้วยตาตัวเอง</span></label></li>
+      <li><label><input type="checkbox" id="ch4-e"><span>ลอง cast (decimal) กับตัวแปร int สองตัวแล้วหารได้ผลแม่นยำ</span></label></li>
+      <li><label><input type="checkbox" id="ch4-f"><span>ลองใช้ % หาเศษ และเข้าใจว่า 0 แปลว่าหารลงตัว</span></label></li>
+      <li><label><input type="checkbox" id="ch4-g"><span>ยืนยัน PEMDAS ด้วยโค้ด 3+4*5 กับ (3+4)*5</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">4.4 ลงมือ: Increment และ Decrement</h2>
+
+    <p>เรื่องสุดท้ายของบทนี้คือการเพิ่ม/ลดค่า ด้วยตัวดำเนินการพิเศษที่รวมสัญลักษณ์เข้าด้วยกัน</p>
+
+    <h3 id="s04a">Compound Assignment Operator</h3>
+    <p>คุณจะต้องเพิ่ม/ลดค่าบ่อยมาก โดยเฉพาะตอนเขียน loop หรือโค้ดที่ทำงานกับโครงสร้างข้อมูล</p>
+
+    <p>ตัวดำเนินการ <code>+=</code> บวกค่าฝั่งขวาเข้ากับค่าฝั่งซ้ายแล้วกำหนดค่ากลับ บรรทัดที่ 2
+       กับ 3 ด้านล่างทำงานเหมือนกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">int value = 0;     // value is now 0.
+value = value + 5; // value is now 5.
+value += 5;        // value is now 10.</code></pre>
+    </div>
+
+    <p>ตัวดำเนินการ <code>++</code> เพิ่มค่าตัวแปรทีละ 1 บรรทัดที่ 2 กับ 3 ด้านล่างทำงานเหมือนกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">int value = 0;     // value is now 0.
+value = value + 1; // value is now 1.
+value++;           // value is now 2.</code></pre>
+    </div>
+
+    <p>เทคนิคแบบเดียวกันใช้กับการลบ การคูณ และอื่นๆ ได้ด้วย</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ศัพท์</span>
+      <code>+=</code>, <code>-=</code>, <code>*=</code>, <code>++</code>, <code>--</code>
+      เรียกว่า <b>compound assignment operator</b> (ตัวดำเนินการกำหนดค่าแบบผสม) เพราะมันรวมการ
+      คำนวณเข้ากับการกำหนดค่าในตัวเดียว — <code>+=</code> มีชื่อเฉพาะว่า <b>addition assignment
+      operator</b> (ตัวดำเนินการกำหนดค่าแบบบวก)
+    </div>
+
+    <h3 id="s04b">เพิ่ม/ลดค่าทีละขั้น</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int value = 1;
+
+value = value + 1;
+Console.WriteLine("First increment: " + value);
+
+value += 1;
+Console.WriteLine("Second increment: " + value);
+
+value++;
+Console.WriteLine("Third increment: " + value);
+
+value = value - 1;
+Console.WriteLine("First decrement: " + value);
+
+value -= 1;
+Console.WriteLine("Second decrement: " + value);
+
+value--;
+Console.WriteLine("Third decrement: " + value);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+First increment: 2
+Second increment: 3
+Third increment: 4
+First decrement: 3
+Second decrement: 2
+Third decrement: 1</pre></div>
+
+    <h3 id="s04c">ตำแหน่งของ ++ มีผล: Prefix กับ Postfix</h3>
+    <p>ทั้ง <code>++</code> และ <code>--</code> มีคุณสมบัติน่าสนใจ — ตำแหน่งของมันมีผลว่าจะเพิ่ม/ลด
+       ค่า<b>ก่อน</b>หรือ<b>หลัง</b>ดึงค่าไปใช้ ถ้าวางไว้<b>หน้า</b>ตัวแปรแบบ <code>++value</code>
+       (เรียกว่า prefix) จะเพิ่มค่า<i>ก่อน</i>แล้วค่อยดึงไปใช้ ถ้าวางไว้<b>หลัง</b>แบบ
+       <code>value++</code> (เรียกว่า postfix) จะดึงค่าไปใช้<i>ก่อน</i>แล้วค่อยเพิ่มทีหลัง</p>
+
+    <svg viewBox="0 0 720 200" role="img" aria-label="เปรียบเทียบ postfix กับ prefix increment" style="margin:18px 0">
+      <defs>
+        <marker id="ar4" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="var(--text-faint)"/>
+        </marker>
+      </defs>
+      <g font-family="var(--font-th)" font-size="12.5">
+        <text x="180" y="18" text-anchor="middle" font-weight="700" fill="var(--brand-text)">value++ (postfix)</text>
+        <rect x="20"  y="30" width="90" height="46" rx="8" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="65" y="58" text-anchor="middle" font-family="var(--font-code)" fill="var(--brand-text)">ใช้ค่า</text>
+        <line x1="110" y1="53" x2="150" y2="53" stroke="var(--text-faint)" marker-end="url(#ar4)"/>
+        <rect x="150" y="30" width="90" height="46" rx="8" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="195" y="58" text-anchor="middle" font-family="var(--font-code)" fill="var(--brand-text)">แล้วเพิ่ม</text>
+        <text x="180" y="98" text-anchor="middle" fill="var(--text-soft)">value=1 → ได้ 1 ไปใช้ → value กลายเป็น 2</text>
+
+        <text x="540" y="18" text-anchor="middle" font-weight="700" fill="var(--tip)">++value (prefix)</text>
+        <rect x="380" y="30" width="90" height="46" rx="8" fill="var(--tip-soft)" stroke="var(--tip)"/>
+        <text x="425" y="58" text-anchor="middle" font-family="var(--font-code)" fill="var(--tip)">เพิ่มก่อน</text>
+        <line x1="470" y1="53" x2="510" y2="53" stroke="var(--text-faint)" marker-end="url(#ar4)"/>
+        <rect x="510" y="30" width="90" height="46" rx="8" fill="var(--tip-soft)" stroke="var(--tip)"/>
+        <text x="555" y="58" text-anchor="middle" font-family="var(--font-code)" fill="var(--tip)">ค่อยใช้ค่า</text>
+        <text x="540" y="98" text-anchor="middle" fill="var(--text-soft)">value=1 → กลายเป็น 2 → ได้ 2 ไปใช้</text>
+
+        <line x1="40" y1="120" x2="680" y2="120" stroke="var(--line)" stroke-dasharray="3 3"/>
+        <text x="360" y="145" text-anchor="middle" fill="var(--text-faint)" font-size="12">ตัวเลขที่ "ใช้" ในบรรทัดนั้นต่างกัน แม้ค่าสุดท้ายของตัวแปรจะเท่ากันก็ตาม</text>
+      </g>
+    </svg>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int value = 1;
+value++;
+Console.WriteLine("First: " + value);
+Console.WriteLine($"Second: {value++}");
+Console.WriteLine("Third: " + value);
+Console.WriteLine("Fourth: " + (++value));</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+First: 2
+Second: 2
+Third: 3
+Fourth: 4</pre></div>
+
+    <p>บรรทัด <code>{value++}</code> ทำ 2 ขั้นตอน: (1) ดึงค่าปัจจุบันของ <code>value</code>
+       มาใช้ในการ interpolate ก่อน (2) แล้วค่อยเพิ่มค่า — บรรทัดถัดไปยืนยันว่าค่าถูกเพิ่มแล้วจริง
+       ส่วน <code>(++value)</code> สลับลำดับ: (1) เพิ่มค่าก่อน (2) แล้วค่อยดึงค่าใหม่ไปใช้
+       การใส่วงเล็บรอบ <code>(++value)</code> แม้ไม่จำเป็นเชิงไวยากรณ์ แต่ช่วยให้อ่านง่ายขึ้น —
+       เพราะโค้ดถูกเขียนครั้งเดียว แต่ถูกอ่านหลายครั้ง ควรให้ความสำคัญกับความอ่านง่ายไว้ก่อน</p>
+
+    <!-- ============================================ -->
+    <h2 id="s05">4.5 ท้าทาย: แปลงฟาเรนไฮต์เป็นเซลเซียส</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl m">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>เริ่มจากโค้ดนี้:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs — บังคับใช้</span></div>
+        <pre><code class="lang-cs">int fahrenheit = 94;</code></pre></div>
+        <p>สูตรแปลงฟาเรนไฮต์เป็นเซลเซียส: <b>ลบ 32 ก่อน แล้วคูณด้วยห้าในเก้า (5/9)</b>
+           จากนั้นแสดงผลลัพธ์เป็นข้อความจัดรูปแบบแล้ว โดยผสมตัวแปรกับสตริง literal ผ่าน
+           <code>Console.WriteLine()</code></p>
+        <div class="out auto"><div class="out-bar">ผลลัพธ์ที่ต้องได้ (ประมาณนี้)</div><pre>
+The temperature is 34.444444444444444444444444447 Celsius.</pre></div>
+        <p>ยอมรับว่าตัวเลขทศนิยมยาวขนาดนี้ไม่สวยนัก จริงๆ อยากให้จัดรูปแบบเหลือทศนิยมตำแหน่งเดียว
+           คือ <code>34.4</code> — แต่การจัดรูปแบบตัวเลขแบบนั้นจะเรียนในโมดูลถัดๆ ไป
+           สำหรับตอนนี้ แค่ให้คำนวณค่าออกมาถูกต้องก็พอ</p>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p><b>คำใบ้:</b> <code>fahrenheit</code> เป็น <code>int</code> แต่สูตรต้องหารเศษ —
+             ต้องแปลง <code>32</code> และ <code>5</code>/<code>9</code> ให้เป็น literal ชนิด
+             <code>decimal</code> (เติม <code>m</code>) เพื่อให้การหารไม่ถูกตัดเศษทิ้ง</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">4.6 เฉลยและวิเคราะห์</h2>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เฉลยตัวอย่าง</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int fahrenheit = 94;
+decimal celsius = (fahrenheit - 32m) * (5m / 9m);
+Console.WriteLine("The temperature is " + celsius + " Celsius.");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+The temperature is 34.444444444444444444444444447 Celsius.</pre></div>
+
+    <p>นี่เป็น<i>เพียงหนึ่ง</i>ในหลายวิธีที่แก้โจทย์นี้ได้ สังเกตว่า <code>32m</code> และ
+       <code>5m</code>/<code>9m</code> ต่อ suffix <code>m</code> เพื่อบังคับให้เป็น decimal
+       ทั้งคู่ ทำให้ <code>fahrenheit - 32m</code> ได้ผลเป็น decimal (แม้ <code>fahrenheit</code>
+       จะเป็น int ก็ตาม เพราะ int แปลงเป็น decimal โดยปริยายได้เสมอ ไม่เหมือนทางกลับกัน)
+       แล้ว <code>5m / 9m</code> ก็หารแบบ decimal ไม่ถูกตัดเศษ สุดท้ายผลคูณของทั้งสองก็เป็น
+       decimal เต็มความละเอียด</p>
+
+    <!-- ============================================ -->
+    <h2 id="s07">4.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">พิมพ์ผิดแบบนี้</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>int q = 7 / 5;</code> แล้วงงว่าทำไมได้ 1</td>
+          <td>int หาร int จะตัดเศษทิ้งเสมอ — ต้องใช้ decimal/float/double อย่างน้อยข้างใดข้างหนึ่ง</td>
+        </tr>
+        <tr>
+          <td><code>decimal q = 7 / 5;</code> แล้วงงว่าทำไมได้ 1.0 ไม่ใช่ 1.4</td>
+          <td>ตัวรับผลลัพธ์เป็น decimal ไม่พอ — ตัวเลขที่หารกัน (7 กับ 5) ก็ต้องมีตัวใดตัวหนึ่งเป็น decimal ด้วย</td>
+        </tr>
+        <tr>
+          <td>ลืม cast ตอนหารตัวแปร int สองตัว</td>
+          <td>ต้อง <code>(decimal)ตัวแปร</code> ทั้งสองฝั่ง (หรืออย่างน้อยฝั่งเดียว) ก่อนหาร ไม่งั้นตัดเศษเหมือนเดิม</td>
+        </tr>
+        <tr>
+          <td><code>"text" + 1 + 1</code> คาดว่าจะบวกเป็น 2</td>
+          <td>ทำงานซ้าย→ขวา พอเจอ string ก่อน ทุกอย่างถัดไปจะกลายเป็นการต่อสตริง (ได้ "text11")</td>
+        </tr>
+        <tr>
+          <td>สับสนว่า <code>value++</code> กับ <code>++value</code> ให้ผลต่างกันยังไง</td>
+          <td>postfix (<code>value++</code>) ใช้ค่าเดิมก่อนแล้วค่อยเพิ่ม prefix (<code>++value</code>) เพิ่มก่อนแล้วค่อยใช้</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">4.8 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment จริงของบทนี้ใน Microsoft Learn</p>
+
+    <div class="quiz" data-q="4-1">
+      <p class="q"><span class="num">1.</span> โค้ดข้อใดพิมพ์ข้อความ <code>Windows 11</code> ออกมา?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>Console.WriteLine("Windows " + 7 + 4);</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>Console.WriteLine($"Windows {1 + 1}");</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>Console.Write("Windows " + 1 + 1);</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ทำงานซ้าย→ขวา: <code>"Windows " + 1</code> ได้ string
+        <code>"Windows 1"</code> ก่อน แล้ว <code>+ 1</code> ต่อท้ายกลายเป็น <code>"Windows 11"</code>
+        (ต่อสตริง ไม่ใช่บวกเลข) ข้อ A ได้ <code>"Windows 74"</code> ข้อ B ปีกกา <code>{1+1}</code>
+        คำนวณทางคณิตศาสตร์ก่อนเป็น <code>2</code> ได้ <code>"Windows 2"</code></div>
+    </div>
+
+    <div class="quiz" data-q="4-2">
+      <p class="q"><span class="num">2.</span> โค้ด <code>int result = 3 + 1 * 5 / 2;</code> ได้ค่าเท่าไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>10</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>5</span></li>
+        <li class="opt"><span class="k">C</span><span>6</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B (5).</b> ตาม PEMDAS คูณ/หารมาก่อนบวก/ลบ: <code>1 * 5 = 5</code>
+        แล้ว <code>5 / 2 = 2</code> (int หารตัดเศษ) สุดท้าย <code>3 + 2 = 5</code></div>
+    </div>
+
+    <div class="quiz" data-q="4-3">
+      <p class="q"><span class="num">3.</span> โค้ด <code>Console.WriteLine(5 / 10);</code> ได้ผลลัพธ์อะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>0.5</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>0</span></li>
+        <li class="opt"><span class="k">C</span><span>1</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B (0).</b> ทั้ง 5 และ 10 เป็น int literal การหารแบบ int
+        ตัดเศษทิ้งเสมอ เพราะ 5 น้อยกว่า 10 ผลหารที่แท้จริงคือ 0.5 ซึ่งถูกตัดเหลือ 0</div>
+    </div>
+
+    <div class="quiz" data-q="4-4">
+      <p class="q"><span class="num">4.</span> โค้ดข้อใดใช้ <b>addition assignment operator</b>?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>value += 5;</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>value++;</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>value = value + 5;</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> <code>+=</code> คือชื่อเรียกเฉพาะของ addition assignment
+        operator ข้อ B เป็น increment operator (เพิ่มทีละ 1 เท่านั้น) ข้อ C แม้ให้ผลเหมือนกัน
+        แต่เป็นการกำหนดค่าธรรมดาที่มีนิพจน์บวกอยู่ข้างใน ไม่ใช่ตัวดำเนินการแบบผสม</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">4.9 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ประกาศตัวแปร int สองตัว ค่า 15 กับ 4 แล้วพิมพ์ผลบวก ผลลบ ผลคูณ และผลหาร (int) ทั้ง 4 ค่า
+           คนละบรรทัด</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int a = 15;
+int b = 4;
+Console.WriteLine(a + b);
+Console.WriteLine(a - b);
+Console.WriteLine(a * b);
+Console.WriteLine(a / b);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>แก้โค้ดข้อ 1 ให้ผลหารแม่นยำ (ไม่ถูกตัดเศษ) โดยใช้ <code>decimal</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int a = 15;
+int b = 4;
+decimal quotient = (decimal)a / (decimal)b;
+Console.WriteLine(quotient);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดเช็คว่าเลข 45 หารด้วย 9 ลงตัวหรือไม่ โดยใช้ <code>%</code> แล้วพิมพ์เศษที่ได้ออกมา</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Console.WriteLine(45 % 9);</code></pre></div>
+          <p>ได้ <code>0</code> แปลว่า 45 หารด้วย 9 ลงตัวพอดี (45 ÷ 9 = 5)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ทายผลลัพธ์ก่อนรันจริง แล้วค่อยตรวจคำตอบ:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+        <pre><code class="lang-cs">int x = 2 + 3 * 4 - 1;
+int y = (2 + 3) * (4 - 1);
+Console.WriteLine(x);
+Console.WriteLine(y);</code></pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ใช้ PEMDAS: คูณ/หารก่อน แล้วค่อยบวก/ลบ จากซ้ายไปขวา</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p><code>x</code>: 3*4=12, 2+12=14, 14-1=<b>13</b> — <code>y</code>: (2+3)=5, (4-1)=3, 5*3=<b>15</b></p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ประกาศ <code>int score = 10;</code> แล้วเขียนโค้ดต่อไปนี้ ทายผลลัพธ์แต่ละบรรทัดก่อนรัน:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+        <pre><code class="lang-cs">int score = 10;
+Console.WriteLine(score++);
+Console.WriteLine(score);
+Console.WriteLine(++score);
+Console.WriteLine(score);</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ผลลัพธ์คือ <code>10, 11, 12, 12</code> — บรรทัดแรกใช้ค่าเดิม (10) ก่อนเพิ่ม
+             บรรทัดที่สามเพิ่มก่อน (11→12) แล้วค่อยใช้</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>เขียนโปรแกรมแปลงองศาเซลเซียสเป็นฟาเรนไฮต์ (สูตรกลับด้านจากหัวข้อ 4.5:
+           <b>คูณด้วยเก้าในห้า (9/5) ก่อน แล้วค่อยบวก 32</b>) จากตัวแปร
+           <code>decimal celsius = 100m;</code> แสดงผลด้วย string interpolation ทศนิยม
+           เท่าที่คำนวณได้ (ไม่ต้องตัดหลัก):</p>
+        <div class="out auto"><pre>
+100 องศาเซลเซียส เท่ากับ 212 องศาฟาเรนไฮต์</pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ต้องใช้ <code>9m / 5m</code> ไม่ใช่ <code>9 / 5</code> เพื่อไม่ให้ถูกตัดเศษ
+           ก่อนคูณกับ celsius</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">decimal celsius = 100m;
+decimal fahrenheit = (celsius * (9m / 5m)) + 32m;
+Console.WriteLine($"{celsius} องศาเซลเซียส เท่ากับ {fahrenheit} องศาฟาเรนไฮต์");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 4</h2>
+
+    <p>เป้าหมายของบทนี้คือให้คุณดำเนินการพื้นฐานกับข้อมูล string และตัวเลข เป็นโจทย์ท้าทาย
+       คุณแปลงหน่วยวัดจากฟาเรนไฮต์เป็นเซลเซียส และแสดงผลลัพธ์เป็นข้อความจัดรูปแบบแล้ว
+       คุณใช้ตัวดำเนินการหลายแบบทำงานทั้งกับ string และตัวเลข เรียนรู้ว่าสัญลักษณ์บางตัวถูกใช้ซ้ำ
+       (โอเวอร์โหลด) เป็นตัวดำเนินการต่างกันตามบริบท เรียนรู้ว่าชนิดข้อมูลของ operand มีผลต่อ
+       ความหมายของตัวดำเนินการยังไง และสุดท้ายเรียนวิธีเปลี่ยนชนิดข้อมูลของค่าชั่วคราวด้วย
+       cast operator</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 4</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:24%">ตัวดำเนินการ</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>+ - * /</code></td><td>บวก ลบ คูณ หาร</td></tr>
+          <tr><td><code>%</code></td><td>modulus — เศษที่เหลือจากการหาร</td></tr>
+          <tr><td><code>()</code></td><td>เรียกเมธอด / ลำดับการคำนวณ / cast — ดูบริบท</td></tr>
+          <tr><td><code>(ชนิดข้อมูล)ค่า</code></td><td>cast — แปลงชนิดข้อมูลชั่วคราว</td></tr>
+          <tr><td><code>+=  -=  *=</code></td><td>compound assignment — คำนวณแล้วกำหนดค่ากลับในตัวเดียว</td></tr>
+          <tr><td><code>value++</code></td><td>postfix — ใช้ค่าเดิมก่อน แล้วค่อยเพิ่ม</td></tr>
+          <tr><td><code>++value</code></td><td>prefix — เพิ่มก่อน แล้วค่อยใช้ค่าใหม่</td></tr>
+          <tr><td>int / int</td><td>ตัดเศษทศนิยมทิ้งเสมอ</td></tr>
+          <tr><td>decimal / decimal (หรือมีข้างใดข้างหนึ่ง)</td><td>คงเศษทศนิยมไว้ครบ</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:28%">English</th><th style="width:22%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>operator</td><td>ตัวดำเนินการ</td><td>สัญลักษณ์ที่กระทำการกับค่า เช่น +, -, *, /</td></tr>
+        <tr><td>operand</td><td>ตัวถูกดำเนินการ</td><td>ค่าที่ operator กระทำด้วย</td></tr>
+        <tr><td>overloading</td><td>การโอเวอร์โหลด</td><td>ใช้สัญลักษณ์เดียวทำหลายหน้าที่ตามบริบท</td></tr>
+        <tr><td>implicit conversion</td><td>การแปลงชนิดโดยปริยาย</td><td>คอมไพเลอร์แปลงชนิดข้อมูลให้อัตโนมัติ</td></tr>
+        <tr><td>cast</td><td>การแคสต์</td><td>สั่งแปลงชนิดข้อมูลชั่วคราวด้วยตัวเอง</td></tr>
+        <tr><td>truncate</td><td>ตัดทิ้ง</td><td>ตัดเศษทศนิยมทิ้งจากการหารแบบ int</td></tr>
+        <tr><td>modulus</td><td>มอดุลัส</td><td>เศษที่เหลือจากการหาร (%)</td></tr>
+        <tr><td>order of operations</td><td>ลำดับการคำนวณ</td><td>กฎ PEMDAS กำหนดว่าคำนวณอะไรก่อน-หลัง</td></tr>
+        <tr><td>compound assignment operator</td><td>ตัวดำเนินการกำหนดค่าแบบผสม</td><td>รวมคำนวณ+กำหนดค่าในตัวเดียว เช่น +=</td></tr>
+        <tr><td>increment / decrement</td><td>เพิ่มค่า / ลดค่า</td><td>++ และ -- เพิ่ม/ลดทีละ 1</td></tr>
+        <tr><td>prefix / postfix</td><td>วางหน้า / วางหลัง</td><td>ตำแหน่งของ ++/-- เทียบกับตัวแปร มีผลต่อลำดับการทำงาน</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch03.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 3 · Basic String Formatting</span></a>
+      <a class="next" href="ch05.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 5 · Guided Project — Calculate and Print Student Grades</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

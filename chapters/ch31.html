@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 31 · Guided Project: สวนสัตว์เลี้ยง — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="31">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 5 · Create Methods / บทที่ 31</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 5 · โมดูล 4/5 · 🏗️ Guided Project</span>
+      <h1>Guided Project — วางแผนพาเที่ยวสวนสัตว์เลี้ยง</h1>
+      <div class="en">Guided Project - Plan a Petting Zoo Visit</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>70–90 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>แอปสับเปลี่ยนและแบ่งกลุ่มสัตว์ให้โรงเรียนที่มาเที่ยวหลายกลุ่ม</b></span>
+        <span>🎯 ความยาก <b>สูง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>วางแผนรายละเอียดการออกแบบด้วย pseudo-code</li>
+        <li>ใช้ method ทำงานเฉพาะอย่างได้</li>
+        <li>สร้าง method ที่รับพารามิเตอร์แบบ required และ optional</li>
+        <li>ใช้ค่าที่ method คืนกลับมาได้</li>
+      </ul>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ นี่คือ Guided Project</span>
+      โมดูลนี้พาคุณสร้างแอปทั้งตัวไปทีละขั้นตอน โดยรวมทุกอย่างที่เรียนมาในบทที่ 28-30 (method,
+      parameter, optional parameter, return value) เข้าเป็นแอปพลิเคชันจริงหนึ่งตัว
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">31.1 สถานการณ์และสเปก</h2>
+
+    <p>method เป็นแนวคิดพื้นฐานของการเขียนโปรแกรม มันให้ code reusability ปรับปรุงความอ่านง่าย และ
+       ลดขนาดโค้ดของคุณ method ช่วยให้คุณแตกปัญหาซับซ้อนเป็นงานที่เป็นโมดูล และช่วยจัดระเบียบโค้ด
+       ตอนนี้คุณเรียนรู้เรื่อง method แล้ว คุณพร้อมเริ่มพัฒนาฟังก์ชันการทำงานเพิ่มเติมให้โปรแกรมของ
+       คุณแล้ว!</p>
+
+    <p>สมมติคุณเป็นผู้ประสานงานอีเวนต์ของสวนสัตว์เลี้ยงแห่งหนึ่ง คุณต้องประสานงานการมาเยี่ยมชมของ
+       โรงเรียนต่างๆ เป็นประจำ และจัดการให้กลุ่มนักเรียนหลายกลุ่มได้เยี่ยมชมสัตว์ คุณตัดสินใจเขียน
+       แอปที่ช่วยวางแผนการมาเยี่ยมชมของโรงเรียน แอปแบ่งนักเรียนเป็นกลุ่ม และกำหนดชุดสัตว์ให้แต่ละ
+       กลุ่ม นักเรียนจะหมุนเวียนกลุ่มหลังเยี่ยมชมสัตว์ที่กำหนดให้เสร็จ คุณตัดสินใจสุ่มลำดับสัตว์ เพื่อ
+       ให้การมาเยี่ยมชมของแต่ละโรงเรียนไม่ซ้ำกัน</p>
+
+    <p>โมดูลนี้จะพาคุณผ่านขั้นตอนที่จำเป็นในการพัฒนาแอปสวนสัตว์เลี้ยงของคุณ โค้ดของคุณจะใช้ method
+       วางแผนการมาเยี่ยมชมให้โรงเรียน 3 แห่ง สุ่มลำดับสัตว์ แบ่งนักเรียนเป็นกลุ่ม และแสดงผลลัพธ์ คุณ
+       จะใช้ method ที่รับพารามิเตอร์และคืนค่า รวมถึงพารามิเตอร์แบบ optional ด้วย</p>
+
+    <h3 id="s01a">สเปกของโปรเจกต์</h3>
+    <p>คุณกำลังพัฒนาแอปให้ Contoso Petting Zoo ที่ประสานงานการมาเยี่ยมชมของโรงเรียน Contoso
+       Petting Zoo เป็นบ้านของสัตว์ 18 สายพันธุ์ต่างกัน ที่สวนสัตว์ นักเรียนที่มาเยี่ยมชมจะถูกแบ่ง
+       เป็นกลุ่ม แต่ละกลุ่มมีชุดสัตว์ที่กำหนดให้ หลังเยี่ยมชมชุดสัตว์ของตัวเองแล้ว นักเรียนจะหมุนเวียน
+       กลุ่มจนกว่าจะเห็นสัตว์ทุกตัวในสวนสัตว์</p>
+
+    <p>โดยค่าเริ่มต้น นักเรียนถูกแบ่งเป็น 6 กลุ่ม อย่างไรก็ตาม บางชั้นเรียนมีนักเรียนน้อยหรือมาก จึง
+       ต้องปรับจำนวนกลุ่มตามความเหมาะสม สัตว์ยังควรถูกกำหนดให้แต่ละกลุ่มแบบสุ่มด้วย เพื่อให้ประสบการณ์
+       ไม่ซ้ำกัน</p>
+
+    <p>ข้อกำหนดการออกแบบของแอป Contoso Petting Zoo มีดังนี้:</p>
+    <ul>
+      <li>ปัจจุบันมีโรงเรียนมาเยี่ยมชม 3 แห่ง:
+        <ul>
+          <li>โรงเรียน A มี 6 กลุ่มมาเยี่ยมชม (จำนวนเริ่มต้น)</li>
+          <li>โรงเรียน B มี 3 กลุ่มมาเยี่ยมชม</li>
+          <li>โรงเรียน C มี 2 กลุ่มมาเยี่ยมชม</li>
+        </ul>
+      </li>
+      <li>สำหรับโรงเรียนที่มาเยี่ยมชมแต่ละแห่ง ทำงานต่อไปนี้:
+        <ul>
+          <li>สุ่มลำดับสัตว์</li>
+          <li>กำหนดสัตว์ให้จำนวนกลุ่มที่ถูกต้อง</li>
+          <li>พิมพ์ชื่อโรงเรียน</li>
+          <li>พิมพ์กลุ่มสัตว์</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h3 id="s01b">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch31-pettingzoo</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <p>ข้อมูลตั้งต้น — ค่าเหล่านี้แทนสัตว์แต่ละสายพันธุ์ในสวนสัตว์เลี้ยง:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[] pettingZoo =
+{
+    "alpacas", "capybaras", "chickens", "ducks", "emus", "geese",
+    "goats", "iguanas", "kangaroos", "lemurs", "llamas", "macaws",
+    "ostriches", "pigs", "ponies", "rabbits", "sheep", "tortoises",
+};</code></pre>
+    </div>
+
+    <p>นับดูจะเห็นว่ามีสัตว์ทั้งหมด 18 ตัวพอดี — ตัวเลขนี้สำคัญ เพราะ 18 หารด้วย 6 (โรงเรียน A),
+       3 (โรงเรียน B), และ 2 (โรงเรียน C) ลงตัวพอดีทุกกรณี</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch31-a"><span>เข้าใจสเปกของแอป Contoso Petting Zoo ครบถ้วน</span></label></li>
+      <li><label><input type="checkbox" id="ch31-b"><span>สร้างตัวแปร pettingZoo array สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s02">31.2 วางแผนด้วย Pseudo-code</h2>
+
+    <p>ในขั้นตอนแรกของกระบวนการพัฒนา คุณจะเริ่มวางแผนแอปผ่าน pseudo-code (ทบทวนจาก
+       <a href="ch28.html">บทที่ 28</a>) คุณจะระบุขั้นตอนและ method ที่จำเป็นต่อการทำงานให้เสร็จ
+       คุณยังต้องพิจารณา input และ output ของ method เหล่านี้ด้วย การเตรียม method ผ่าน pseudo-code
+       เป็นขั้นตอนที่มีประโยชน์มากในงานเขียนโค้ดใดๆ และช่วยให้คุณพัฒนาโค้ดที่ปราศจากบั๊กได้เร็วขึ้น</p>
+
+    <p>ในขั้นตอนนี้ คุณจะแปลงขั้นตอนที่กำหนดไว้ในสเปกของแอปให้เป็น pseudo-code — เริ่มจากโฟกัสที่
+       การเขียน pseudo-code สำหรับโรงเรียนแค่แห่งเดียวก่อน พอคิดโค้ดสำหรับโรงเรียนหนึ่งได้แล้ว คุณ
+       ประยุกต์ตรรกะเดียวกันกับโรงเรียนอื่นได้ง่ายๆ</p>
+
+    <p>งานแรกคือสุ่มลำดับสัตว์ สร้าง pseudo-code method สุ่มสัตว์ในสวนสัตว์เลี้ยง:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// RandomizeAnimals();</code></pre>
+    </div>
+
+    <p>คุณยังไม่ต้องเติมตรรกะสุ่มสัตว์ตอนนี้ ตอนนี้แค่โฟกัสที่วางแผนแอปในภาพรวมก่อน คุณสมมติได้ว่า
+       method <code>RandomizeAnimals()</code> นี้มีอยู่จริง และจะสุ่มลำดับ array
+       <code>pettingZoo</code> ได้อย่างถูกต้อง</p>
+
+    <p>ต่อไป สร้าง pseudo-code method กำหนดกลุ่มสัตว์:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// AssignGroup();</code></pre>
+    </div>
+
+    <p>เหมือนเดิม คุณสมมติได้ว่า method นี้กำหนดสัตว์ให้กลุ่มย่อยได้อย่างถูกต้อง แล้วไปทำงานถัดไป</p>
+
+    <p>คุณพิมพ์ชื่อโรงเรียนได้ง่ายๆ ด้วย <code>Console.Write</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("School A");</code></pre>
+    </div>
+
+    <p>สุดท้าย คุณต้องพิมพ์กลุ่มสัตว์:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// PrintGroup(group);</code></pre>
+    </div>
+
+    <p>สังเกตว่าคุณเพิ่มพารามิเตอร์ให้ method นี้ — คุณรู้ว่าต้องพิมพ์กลุ่มสัตว์ที่ต่างกันหลายครั้ง
+       จึงใช้ method ทำงานนี้ โดยรับกลุ่มเป็น input parameter ลองคิดสักครู่ว่าจะ initialize argument
+       <code>group</code> ตรงไหนใน pseudo-code ของคุณ</p>
+
+    <p>กำหนด argument <code>group</code> ด้วยการอัปเดตบรรทัด <code>AssignGroup</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// var group = AssignGroup();</code></pre>
+    </div>
+
+    <p>เพราะคุณเขียน pseudo-code สำหรับงานทั่วไปเสร็จแล้ว ลองพิจารณาว่าจะกำหนด data type ไหนให้ตัวแปร
+       <code>group</code> — คุณต้องการให้โรงเรียน A มีสัตว์แบ่งเป็น 6 กลุ่ม และคุณรู้ว่ามีสัตว์ 18
+       ตัว คุณยังรู้ว่าสัตว์แทนด้วย <code>string</code> ดังนั้นคุณใช้ 2D array ที่มี 6 กลุ่ม กลุ่มละ
+       3 สัตว์ได้</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] pettingZoo =
+{
+    "alpacas", "capybaras", "chickens", "ducks", "emus", "geese",
+    "goats", "iguanas", "kangaroos", "lemurs", "llamas", "macaws",
+    "ostriches", "pigs", "ponies", "rabbits", "sheep", "tortoises",
+};
+
+// RandomizeAnimals();
+// string[,] group = AssignGroup();
+Console.WriteLine("School A");
+// PrintGroup(group);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+School A</pre></div>
+
+    <p>คุณไม่ต้องเพิ่ม argument ให้ method <code>AssignGroup</code> เลย เพราะค่ากลุ่มเริ่มต้นคือ 6
+       (คุณจะทำให้มันเป็น optional parameter ในหัวข้อ 31.4)</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 ทำไมต้องเขียน pseudo-code ทั้งที่โค้ดยังรันไม่ได้จริง</span>
+      สังเกตว่าตอนนี้แอปทำแค่พิมพ์ "School A" เท่านั้น ทั้งที่โค้ดที่เหลือถูก comment ไว้หมด — นี่คือ
+      จุดประสงค์! การ "รันได้" ตั้งแต่ขั้นตอนวางแผนช่วยยืนยันว่าโครงสร้างโดยรวมของโปรแกรมไม่มี syntax
+      error ก่อนที่คุณจะเริ่มเติมรายละเอียดของแต่ละ method ทีละตัว — เป็นแพทเทิร์นเดียวกับที่เรียนใน
+      <a href="ch28.html">บทที่ 28 หัวข้อ 28.5</a> (placeholder method) แค่คราวนี้ใช้ comment แทนที่
+      จะใช้ method ว่างเปล่า
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch31-c"><span>เขียน pseudo-code ครบทั้ง 4 งานสำหรับโรงเรียนหนึ่งแห่งสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch31-d"><span>ตัดสินใจ data type ของ group เป็น string[,] ได้อย่างมีเหตุผล</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">31.3 สร้าง Method สับเปลี่ยน Array</h2>
+
+    <p>ในขั้นตอนนี้ คุณพัฒนาโค้ดให้งานย่อยแรกเสร็จสมบูรณ์ คือสุ่มลำดับสัตว์ในสวนสัตว์เลี้ยง จำได้ไหม
+       ว่าคุณอ้างอิงถึง method <code>RandomizeAnimals()</code> ไว้ใน pseudo-code แล้ว</p>
+
+    <p>การสุ่มลำดับ element ของ array อาจดูเป็นงานที่ยากมาก ก่อนเริ่ม ลองคิดสักครู่ว่าจะสลับค่าของ
+       ตัวแปร 2 ตัว <code>a</code> กับ <code>b</code> ยังไง</p>
+
+    <p>ถ้าคุณกำหนดค่า <code>a = b</code> ตรงๆ ทันที คุณจะเสียค่าเดิมของ <code>a</code> ไป แล้วได้
+       ตัวแปร 2 ตัวที่มีค่าเท่ากับ <code>b</code> ทั้งคู่ คุณต้องใช้ตัวแปรชั่วคราวเก็บค่าของ
+       <code>a</code> ก่อนถึงจะเขียนทับมันได้ มาใช้แนวคิดนี้เริ่มทำงานกัน</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void RandomizeAnimals()
+{
+
+}</code></pre>
+    </div>
+
+    <p>สำหรับ method นี้ คุณไม่ต้องใช้พารามิเตอร์ input เลย เพราะคุณจะใช้ตัวแปร global
+       <code>pettingZoo</code> ที่มีอยู่แล้ว เริ่มเขียนโค้ดสลับ element บาง element ใน array กัน</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int i = 0;
+int r = 1;
+
+string temp = pettingZoo[i];
+pettingZoo[i] = pettingZoo[r];
+pettingZoo[r] = temp;</code></pre>
+    </div>
+
+    <p>ในโค้ดนี้ คุณใช้ <code>i</code> และ <code>r</code> ชั่วคราวแทน index สุ่มบางตำแหน่งใน array
+       จากนั้นสลับค่าที่ทั้งสอง index ด้วยความช่วยเหลือของตัวแปร <code>temp</code> สังเกตว่าการใช้
+       <code>temp</code> ป้องกันไม่ให้คุณเสียค่าเดิมของ <code>pettingZoo[i]</code> หลังถูกเขียนทับ
+       ต่อไป ตั้งค่า <code>r</code> เป็นค่าสุ่มแทน <code>1</code></p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Random random = new Random();
+
+int i = 0;
+int r = random.Next(pettingZoo.Length);
+
+string temp = pettingZoo[i];
+pettingZoo[i] = pettingZoo[r];
+pettingZoo[r] = temp;</code></pre>
+    </div>
+
+    <p>ในขั้นตอนนี้ คุณ initialize object <code>random</code> ช่วยสุ่มตัวเลข และ initialize
+       <code>r</code> เป็นจำนวนเต็มสุ่มระหว่าง 0 ถึงความยาวของ array <code>pettingZoo</code> ทำให้
+       มั่นใจว่าจะไม่เข้าถึง index เกินขอบเขตของ array คุณประยุกต์โค้ดนี้กับ array ทั้งชุดเพื่อสุ่ม
+       ทุก element ได้</p>
+
+    <p>แก้ไข element ด้วย <code>for</code> loop:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Random random = new Random();
+
+for (int i = 0; i < pettingZoo.Length; i++)
+{
+    int r = random.Next(pettingZoo.Length);
+
+    string temp = pettingZoo[i];
+    pettingZoo[i] = pettingZoo[r];
+    pettingZoo[r] = temp;
+}</code></pre>
+    </div>
+
+    <p>ตอนนี้คุณวนผ่านแต่ละ element ใน array เลือก index สุ่มหนึ่งตำแหน่ง แล้วสลับกับ element
+       ปัจจุบัน อย่างไรก็ตาม ถ้ารันโค้ดนี้แล้วสังเกตความเปลี่ยนแปลงของ <code>pettingZoo</code> คุณ
+       อาจสังเกตเห็นปัญหา element บาง element ไม่ถูกสลับเลย และบาง element ถูกสลับหลายครั้ง</p>
+
+    <p>คุณปรับปรุงการกระจายของ element ที่ถูกเลือกแบบสุ่มได้ ด้วยการอัปเดตช่วงขณะที่คุณเลื่อนผ่าน
+       array</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int r = random.Next(i, pettingZoo.Length);</code></pre>
+    </div>
+
+    <p>ตอนนี้ ในขณะที่คุณวนผ่าน <code>for</code> loop คุณอัปเดตช่วงของ index ที่เลือกแบบสุ่ม เพื่อไม่
+       รวมค่าน้อยกว่า <code>i</code> เพราะ index ที่ค่าน้อยกว่า <code>i</code> ถูกสลับไปแล้วใน
+       iteration ก่อนหน้าของ loop</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 นี่คืออัลกอริทึม Fisher-Yates Shuffle</span>
+      แพทเทิร์นการสับเปลี่ยน array แบบนี้มีชื่อเรียกในวงการว่า <b>Fisher-Yates shuffle</b> —
+      เป็นอัลกอริทึมมาตรฐานที่รับประกันว่าทุก element มีโอกาสเท่ากันที่จะจบลงที่ตำแหน่งไหนก็ได้ (ไม่
+      เอนเอียง) เคล็ดลับสำคัญคือการจำกัดช่วงสุ่มให้แคบลงเรื่อยๆ ตามที่ loop ดำเนินไป (<code>random.Next(i, ...)</code>
+      แทน <code>random.Next(0, ...)</code>) เพื่อไม่ให้สุ่มไปโดน element ที่สลับเสร็จแล้ว
+    </div>
+
+    <p>uncomment การเรียก <code>RandomizeAnimals()</code> โดยลบเครื่องหมาย <code>// </code> ที่นำ
+       หน้าออก:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ฉบับสมบูรณ์ของขั้นตอนนี้)</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] pettingZoo =
+{
+    "alpacas", "capybaras", "chickens", "ducks", "emus", "geese",
+    "goats", "iguanas", "kangaroos", "lemurs", "llamas", "macaws",
+    "ostriches", "pigs", "ponies", "rabbits", "sheep", "tortoises",
+};
+
+RandomizeAnimals();
+// string[,] group = AssignGroup();
+Console.WriteLine("School A");
+// PrintGroup(group);
+
+foreach (string animal in pettingZoo)
+{
+    Console.WriteLine(animal);
+}
+
+void RandomizeAnimals()
+{
+    Random random = new Random();
+
+    for (int i = 0; i < pettingZoo.Length; i++)
+    {
+        int r = random.Next(i, pettingZoo.Length);
+
+        string temp = pettingZoo[r];
+        pettingZoo[r] = pettingZoo[i];
+        pettingZoo[i] = temp;
+    }
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output (ลำดับสุ่ม — ตัวอย่าง)</div><pre>
+School A
+ponies
+iguanas
+goats
+tortoises
+ducks
+rabbits
+lemurs
+alpacas
+capybaras
+emus
+sheep
+llamas
+pigs
+macaws
+kangaroos
+geese
+chickens
+ostriches</pre></div>
+
+    <p>ยืนยันว่าข้อความ "School A" แสดงตามที่คาดไว้ ตามด้วยรายการสัตว์ที่สุ่มลำดับแล้ว สัตว์ไม่ควร
+       เรียงตามตัวอักษร — <code>foreach</code> loop ที่เพิ่มเข้ามาแค่ใช้ทดสอบ method ชั่วคราว ให้
+       ลบออกหลังยืนยันผลลัพธ์เสร็จแล้ว</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch31-e"><span>สร้าง RandomizeAnimals() ด้วยอัลกอริทึม Fisher-Yates shuffle สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch31-f"><span>ทดสอบและยืนยันว่าลำดับสัตว์ถูกสุ่มจริง แล้วลบโค้ดทดสอบออก</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">31.4 สร้าง Method พร้อม Optional Parameter</h2>
+
+    <p>ในขั้นตอนนี้ คุณพัฒนาโค้ดให้งานย่อยอีกอย่างเสร็จสมบูรณ์ คือกำหนดสัตว์ในสวนสัตว์เลี้ยงให้กลุ่ม
+       ต่างๆ จำได้ไหมว่าคุณอ้างอิงถึง method <code>AssignGroup()</code> ไว้ใน pseudo-code แล้ว</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[,] AssignGroup(int groups)
+{
+
+}</code></pre>
+    </div>
+
+    <p>จำได้ไหมว่าคุณตัดสินใจแล้วว่า method นี้ควรคืนค่าเป็น 2D array จำนวนกลุ่มยังเปลี่ยนได้ตามขนาด
+       ของโรงเรียนที่มาเยี่ยมชม แต่มีขนาดกลุ่มเริ่มต้นอยู่ที่ 6 ดังนั้นคุณควรทำให้พารามิเตอร์นี้เป็น
+       optional</p>
+
+    <p>เปลี่ยน <code>groups</code> เป็น optional parameter:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[,] AssignGroup(int groups = 6)
+{
+
+}</code></pre>
+    </div>
+
+    <p>จำได้ไหมว่า optional parameter ถูกนิยามด้วยการกำหนดค่า default ให้มัน (ทบทวนจาก
+       <a href="ch29.html">บทที่ 29</a>) required parameter ต้องถูกประกาศก่อน optional parameter
+       เสมอ ต่อไปคุณจะเริ่มเพิ่มตรรกะให้โค้ด</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[,] AssignGroup(int groups = 6)
+{
+    string[,] result = new string[groups, pettingZoo.Length/groups];
+
+    return result;
+}</code></pre>
+    </div>
+
+    <p>เพราะ method ของคุณระบุ return value ไว้ คุณเริ่มนิยาม method ด้วยการสร้างค่าที่จะคืนก่อน
+       วิธีนี้ทำให้คุณเพิ่มตรรกะต่อได้โดยไม่มี compile-time error</p>
+
+    <p>สังเกตว่าคุณใช้ <code>[groups, pettingZoo.Length/groups]</code> กำหนดขนาด array —
+       <code>groups</code> แทนจำนวนกลุ่มสัตว์ที่คุณต้องการสร้าง <code>pettingZoo.Length/groups</code>
+       สะท้อนว่าแต่ละกลุ่มมีสัตว์กี่ตัว ตัวอย่างเช่น เพราะ <code>pettingZoo</code> เป็น array คงที่
+       ที่มี 18 element ขนาด 2D array สำหรับโรงเรียน A คือ <code>[6,3]</code></p>
+
+    <p>ต่อไป กำหนดสัตว์ให้แต่ละกลุ่ม:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[,] AssignGroup(int groups = 6)
+{
+    string[,] result = new string[groups, pettingZoo.Length/groups];
+
+    for (int i = 0; i < groups; i++)
+    {
+        for (int j = 0; j < result.GetLength(1); j++)
+        {
+
+        }
+    }
+
+    return result;
+}</code></pre>
+    </div>
+
+    <p>ในโค้ดนี้ <code>for</code> loop ชั้นนอกวนผ่านแต่ละกลุ่ม <code>for</code> loop ชั้นในวนตาม
+       จำนวนสัตว์ที่กลุ่มควรมี ต่อไปคุณต้องกำหนดสัตว์</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int start = 0;
+
+for (int i = 0; i < groups; i++)
+{
+    for (int j = 0; j < result.GetLength(1); j++)
+    {
+        result[i,j] = pettingZoo[start++];
+    }
+}</code></pre>
+    </div>
+
+    <p>ในโค้ดนี้ คุณนิยาม <code>start</code> แทนตำแหน่งเริ่มต้นของ <code>pettingZoo</code> การใช้
+       marker แบบนี้ช่วยให้คุณเลื่อนผ่าน array <code>pettingZoo</code> ทีละ element ได้ แม้
+       <code>for</code> loop ทั้งสองจะวนจำนวนรอบไม่เท่ากันก็ตาม</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ start++ คือ postfix increment</span>
+      <code>pettingZoo[start++]</code> ใช้ตัวดำเนินการ postfix increment (<code>++</code> ต่อท้าย)
+      — มันอ่านค่า <code>start</code> ปัจจุบันไปใช้ index อาร์เรย์<b>ก่อน</b> แล้วค่อยเพิ่มค่า
+      <code>start</code> ขึ้น 1<b>หลัง</b>จากนั้น เทียบเท่ากับเขียน 2 บรรทัดแยก:
+      <code>result[i,j] = pettingZoo[start]; start = start + 1;</code> — เขียนรวมกันแบบนี้กระชับ
+      กว่าและเป็นแพทเทิร์นที่พบบ่อยเวลาต้อง "อ่านแล้วเลื่อนตำแหน่งถัดไป" ทีละ element
+    </div>
+
+    <p>ตอนนี้ method ของคุณกำหนดสัตว์ในสวนสัตว์เลี้ยงให้จำนวนกลุ่มที่ระบุแล้ว uncomment การเรียก
+       <code>AssignGroup</code> ได้เลย</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ฉบับสมบูรณ์ของขั้นตอนนี้)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[] pettingZoo =
+{
+    "alpacas", "capybaras", "chickens", "ducks", "emus", "geese",
+    "goats", "iguanas", "kangaroos", "lemurs", "llamas", "macaws",
+    "ostriches", "pigs", "ponies", "rabbits", "sheep", "tortoises",
+};
+
+RandomizeAnimals();
+string[,] group = AssignGroup();
+Console.WriteLine("School A");
+// PrintGroup(group);
+
+void RandomizeAnimals()
+{
+    Random random = new Random();
+
+    for (int i = 0; i < pettingZoo.Length; i++)
+    {
+        int r = random.Next(i, pettingZoo.Length);
+
+        string temp = pettingZoo[r];
+        pettingZoo[r] = pettingZoo[i];
+        pettingZoo[i] = temp;
+    }
+}
+
+string[,] AssignGroup(int groups = 6)
+{
+    string[,] result = new string[groups, pettingZoo.Length/groups];
+    int start = 0;
+
+    for (int i = 0; i < groups; i++)
+    {
+        for (int j = 0; j < result.GetLength(1); j++)
+        {
+            result[i,j] = pettingZoo[start++];
+        }
+    }
+
+    return result;
+}</code></pre>
+    </div>
+
+    <p>ยืนยันว่าข้อความ "School A" ยังแสดงตามที่คาดไว้ และไม่มีข้อความ error ใดๆ เพราะละเว้น
+       optional parameter ไว้ ตัวแปร <code>group</code> จะเป็น 2D array ขนาด <code>[6,3]</code></p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch31-g"><span>สร้าง AssignGroup() พร้อม optional parameter สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch31-h"><span>เข้าใจการใช้ start++ กระจายสัตว์ลง 2D array ทีละตัว</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">31.5 สร้าง Method แสดงผลลัพธ์</h2>
+
+    <p>ในขั้นตอนนี้ คุณนิยาม method แสดงผลลัพธ์ของกลุ่มสัตว์ คุณยังทำการกำหนดกลุ่มสัตว์ให้โรงเรียน
+       ที่มาเยี่ยมชมแห่งอื่นให้เสร็จสมบูรณ์ด้วย</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void PrintGroup(string[,] group)
+{
+
+}</code></pre>
+    </div>
+
+    <p>จำได้ไหมว่าคุณตัดสินใจให้ method นี้รับ 2D array เป็น input ตอนนี้แค่ต้องให้ method พิมพ์
+       เนื้อหาของ 2D array นั้นออกมา</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void PrintGroup(string[,] group)
+{
+    for (int i = 0; i < group.GetLength(0); i++)
+    {
+        for (int j = 0; j < group.GetLength(1); j++)
+        {
+            Console.Write($"{group[i,j]}  ");
+        }
+    }
+}</code></pre>
+    </div>
+
+    <p>ตรงนี้ คุณใช้ <code>GetLength(0)</code> หาจำนวนแถวใน array และ <code>GetLength(1)</code>
+       หาจำนวนคอลัมน์ (ทบทวนจาก <a href="ch19.html">บทที่ 19</a>) แล้วใช้ <code>Console.Write</code>
+       พิมพ์ element พร้อมช่องว่างเพิ่มระหว่างชื่อสัตว์ ต่อไปเพิ่มข้อความช่วยอธิบายและขึ้นบรรทัดใหม่
+       แบ่งแต่ละกลุ่ม</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void PrintGroup(string[,] group)
+{
+    for (int i = 0; i < group.GetLength(0); i++)
+    {
+        Console.Write($"Group {i + 1}: ");
+        for (int j = 0; j < group.GetLength(1); j++)
+        {
+            Console.Write($"{group[i,j]}  ");
+        }
+        Console.WriteLine();
+    }
+}</code></pre>
+    </div>
+
+    <p>ตอนนี้คุณมีโค้ดครบสำหรับงานเตรียมการมาเยี่ยมชมของโรงเรียนแล้ว uncomment การเรียก
+       <code>PrintGroup</code> แล้วรันโค้ดดูผลลัพธ์:</p>
+
+    <div class="out"><div class="out-bar">Output (ตัวอย่าง — School A)</div><pre>
+School A
+Group 1: ducks  emus  rabbits  
+Group 2: lemurs  chickens  geese  
+Group 3: iguanas  macaws  alpacas  
+Group 4: goats  kangaroos  pigs  
+Group 5: capybaras  llamas  tortoises
+Group 6: sheep  ostriches  ponies</pre></div>
+
+    <h3 id="s05a">รวมทุกงานเข้าเป็น Method เดียวสำหรับทุกโรงเรียน</h3>
+    <p>พิจารณาว่าคุณต้องทำงานชุดเดียวกันให้แต่ละโรงเรียน — ความต่างมีแค่ชื่อโรงเรียนและจำนวนกลุ่ม
+       นี่คือโอกาสที่สมบูรณ์แบบในการใช้ method ที่รับพารามิเตอร์เหล่านั้น</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void PlanSchoolVisit(string schoolName, int groups = 6)
+{
+    RandomizeAnimals();
+    string[,] group = AssignGroup();
+    Console.WriteLine("School A");
+    PrintGroup(group);
+}</code></pre>
+    </div>
+
+    <p>ด้วยโค้ดนี้ คุณทำงานชุดเดียวกันให้แต่ละโรงเรียนได้ คุณยังตั้งค่า <code>groups</code> เป็นค่า
+       default ที่ 6 ด้วย ต่อไปอัปเดต method ให้ใช้ค่า input จริง:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void PlanSchoolVisit(string schoolName, int groups = 6)
+{
+    RandomizeAnimals();
+    string[,] group = AssignGroup(groups);
+    Console.WriteLine(schoolName);
+    PrintGroup(group);
+}</code></pre>
+    </div>
+
+    <p>ตอนนี้คุณพร้อมเรียก method นี้ให้แต่ละโรงเรียนแล้ว:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">PlanSchoolVisit("School A");
+PlanSchoolVisit("School B", 3);
+PlanSchoolVisit("School C", 2);</code></pre>
+    </div>
+
+    <div class="out"><div class="out-bar">Output (ลำดับสุ่ม — ตัวอย่าง)</div><pre>
+School A
+Group 1: kangaroos  lemurs  pigs  
+Group 2: alpacas  sheep  chickens  
+Group 3: ducks  geese  capybaras  
+Group 4: ponies  iguanas  tortoises  
+Group 5: ostriches  llamas  rabbits  
+Group 6: macaws  goats  emus  
+School B
+Group 1: llamas  ducks  ponies  geese  chickens  goats
+Group 2: iguanas  capybaras  macaws  kangaroos  rabbits  sheep
+Group 3: lemurs  tortoises  alpacas  pigs  emus  ostriches
+School C
+Group 1: sheep  ducks  pigs  macaws  kangaroos  ostriches  rabbits  goats  lemurs
+Group 2: iguanas  capybaras  chickens  emus  tortoises  geese  ponies  alpacas  llamas</pre></div>
+
+    <p>ตรวจสอบว่าโรงเรียน A มี 6 กลุ่ม โรงเรียน B มี 3 กลุ่ม และโรงเรียน C มี 2 กลุ่ม ลำดับสัตว์ควร
+       ถูกสุ่มสำหรับแต่ละโรงเรียนด้วย</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch31-i"><span>สร้าง PrintGroup() แสดงผล 2D array สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch31-j"><span>สร้าง PlanSchoolVisit() รวมทุก method เข้าด้วยกันสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch31-k"><span>เรียกใช้ทั้ง 3 โรงเรียนสำเร็จ ตรวจสอบจำนวนกลุ่มถูกต้องครบทุกแห่ง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">31.6 🔓 โค้ดฉบับเต็ม (Program.cs)</h2>
+
+    <details class="fold">
+      <summary>🔓 ดู Program.cs ฉบับเต็ม</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button></div>
+          <pre><code class="lang-cs">string[] pettingZoo =
+{
+    "alpacas", "capybaras", "chickens", "ducks", "emus", "geese",
+    "goats", "iguanas", "kangaroos", "lemurs", "llamas", "macaws",
+    "ostriches", "pigs", "ponies", "rabbits", "sheep", "tortoises",
+};
+
+PlanSchoolVisit("School A");
+PlanSchoolVisit("School B", 3);
+PlanSchoolVisit("School C", 2);
+
+void PlanSchoolVisit(string schoolName, int groups = 6)
+{
+    RandomizeAnimals();
+    string[,] group = AssignGroup(groups);
+    Console.WriteLine(schoolName);
+    PrintGroup(group);
+}
+
+void RandomizeAnimals()
+{
+    Random random = new Random();
+
+    for (int i = 0; i < pettingZoo.Length; i++)
+    {
+        int r = random.Next(i, pettingZoo.Length);
+
+        string temp = pettingZoo[r];
+        pettingZoo[r] = pettingZoo[i];
+        pettingZoo[i] = temp;
+    }
+}
+
+string[,] AssignGroup(int groups = 6)
+{
+    string[,] result = new string[groups, pettingZoo.Length/groups];
+    int start = 0;
+
+    for (int i = 0; i < groups; i++)
+    {
+        for (int j = 0; j < result.GetLength(1); j++)
+        {
+            result[i,j] = pettingZoo[start++];
+        }
+    }
+
+    return result;
+}
+
+void PrintGroup(string[,] groups)
+{
+    for (int i = 0; i < groups.GetLength(0); i++)
+    {
+        Console.Write($"Group {i + 1}: ");
+        for (int j = 0; j < groups.GetLength(1); j++)
+        {
+            Console.Write($"{groups[i,j]}  ");
+        }
+        Console.WriteLine();
+    }
+}</code></pre>
+        </div>
+        <p>🎉 ยินดีด้วย! คุณเพิ่งสร้างแอปที่ใช้ method ทำงานที่ซับซ้อนได้สำเร็จ — คุณแตกปัญหาใหญ่เป็น
+           method ที่เป็นโมดูล สร้าง solution ที่มีระเบียบและอ่านง่าย คุณยังใช้พารามิเตอร์และ return
+           type ทำให้โค้ดของคุณสมบูรณ์ด้วย</p>
+      </div>
+    </details>
+
+    <!-- ============================================ -->
+    <h2 id="s07">31.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>บาง element ใน array ไม่ถูกสุ่มเลย บางตัวถูกสลับซ้ำหลายรอบ</td>
+          <td>ใช้ <code>random.Next(0, pettingZoo.Length)</code> แทน
+              <code>random.Next(i, pettingZoo.Length)</code> — ต้องจำกัดขอบเขตล่างเป็น
+              <code>i</code> เสมอ ไม่ใช่ 0 ตายตัว ไม่งั้นจะไม่ใช่ Fisher-Yates shuffle ที่ถูกต้อง
+              (ทบทวนหัวข้อ 31.3)</td>
+        </tr>
+        <tr>
+          <td>IndexOutOfRangeException ตอนกำหนดสัตว์ลง 2D array</td>
+          <td>จำนวนกลุ่มที่ส่งเข้า AssignGroup() หารจำนวนสัตว์ทั้งหมด (18) ไม่ลงตัว เช่น เรียก
+              PlanSchoolVisit("School D", 5) — 18/5 ปัดเศษ integer division จะได้ 3 ทำให้เหลือสัตว์
+              3 ตัวที่ไม่มีที่ลง — สเปกนี้ออกแบบมาให้ใช้ได้แค่กับตัวหารลงตัว (1, 2, 3, 6, 9, 18)</td>
+        </tr>
+        <tr>
+          <td>ลืม uncomment การเรียก method แล้วสงสัยว่าทำไมไม่มีอะไรเกิดขึ้น</td>
+          <td>ทบทวนหัวข้อ 31.2-31.5 — ทุกครั้งที่เติมโค้ดให้ placeholder method เสร็จ ต้องกลับไปลบ
+              <code>// </code> หน้าบรรทัดที่เรียก method นั้นด้วยเสมอ</td>
+        </tr>
+        <tr>
+          <td>PrintGroup() พิมพ์สัตว์ผิดจำนวนคอลัมน์ต่อกลุ่ม</td>
+          <td>ใช้ GetLength(0) กับ GetLength(1) สลับกัน — GetLength(0) คือจำนวนแถว (จำนวนกลุ่ม)
+              GetLength(1) คือจำนวนคอลัมน์ (จำนวนสัตว์ต่อกลุ่ม) ทบทวนจาก <a href="ch19.html">บทที่
+              19</a></td>
+        </tr>
+        <tr>
+          <td>ชื่อพารามิเตอร์ groups ใน PrintGroup() ทำให้สับสนกับตัวแปร groups ใน AssignGroup()</td>
+          <td>ไม่ใช่บั๊ก — เป็นคนละตัวแปรที่ scope แยกกันสนิท (ทบทวน method scope จาก
+              <a href="ch29.html">บทที่ 29 หัวข้อ 29.3</a>) แต่การตั้งชื่อซ้ำแบบนี้ทำให้อ่านโค้ดสับสน
+              ได้ง่าย ควรตั้งชื่อพารามิเตอร์ให้ต่างกันเพื่อความชัดเจน แม้ compiler จะไม่ error ก็ตาม</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">31.8 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment ของ Microsoft Learn</p>
+
+    <div class="quiz" data-q="31-1">
+      <p class="q"><span class="num">1.</span> จุดประสงค์ของการนิยาม optional parameter ใน method
+        คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ทำให้ method ทำงานต่างออกไป</span></li>
+        <li class="opt"><span class="k">B</span><span>เพื่อทำ method overloading</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>เพื่อลดความซับซ้อนของ required parameter เมื่อพารามิเตอร์นั้นไม่มีนัยสำคัญต่อผลลัพธ์</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ตรงกับที่เห็นในหัวข้อ 31.4 — <code>groups</code> มีค่า
+        default ที่ใช้ได้ในกรณีส่วนใหญ่ (โรงเรียน A) ผู้เรียกจึงไม่ต้องระบุค่านี้ทุกครั้งถ้าไม่มี
+        ความจำเป็น</div>
+    </div>
+
+    <div class="quiz" data-q="31-2">
+      <p class="q"><span class="num">2.</span> จุดประสงค์ของ pseudo-code คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>เพื่อสร้าง design template สำหรับโค้ดที่ตั้งใจจะเขียน</span></li>
+        <li class="opt"><span class="k">B</span><span>เพื่อทำ cast operation ใน method อย่างปลอดภัย</span></li>
+        <li class="opt"><span class="k">C</span><span>เพื่อพัฒนาโค้ดที่ถูกไวยากรณ์</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ตรงกับที่เรียนในหัวข้อ 31.2 — pseudo-code ไม่จำเป็นต้อง
+        ทำงานได้จริงหรือถูกไวยากรณ์ (ข้อ C ผิด) และไม่เกี่ยวกับการ cast เลย (ข้อ B ผิด) มันเป็นแค่
+        แผนผังก่อนเขียนโค้ดจริง</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">31.9 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เพิ่มการเรียก <code>PlanSchoolVisit("School D", 9);</code> ต่อจากโรงเรียน C — ตรวจสอบว่า
+           ได้ 9 กลุ่ม กลุ่มละ 2 ตัวสัตว์</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>เพิ่มบรรทัด <code>PlanSchoolVisit("School D", 9);</code> ต่อท้าย — เพราะ 18/9 = 2
+             ลงตัวพอดี จึงได้ 9 กลุ่ม กลุ่มละ 2 ตัวสัตว์ ไม่มี error เพราะหารลงตัว</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียน method <code>void PrintZoo()</code> ที่พิมพ์ทุกสัตว์ใน <code>pettingZoo</code>
+           ทีละบรรทัด (ไม่ต้องมี parameter หรือ return value) เรียกใช้ก่อนและหลัง
+           RandomizeAnimals() เพื่อเปรียบเทียบ</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">PrintZoo();
+RandomizeAnimals();
+Console.WriteLine("--- after shuffle ---");
+PrintZoo();
+
+void PrintZoo()
+{
+    foreach (string animal in pettingZoo)
+    {
+        Console.WriteLine(animal);
+    }
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>สร้าง method <code>int CountAnimalOccurrence(string animal)</code> ที่นับว่าสัตว์ชื่อที่
+           กำหนดปรากฏใน <code>pettingZoo</code> กี่ครั้ง (ควรได้ 1 เสมอถ้าไม่มีชื่อซ้ำ) ทดสอบกับ
+           "goats" และ "dragons" (ไม่มีในสวนสัตว์)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Console.WriteLine(CountAnimalOccurrence("goats"));
+Console.WriteLine(CountAnimalOccurrence("dragons"));
+
+int CountAnimalOccurrence(string animal)
+{
+    int count = 0;
+    foreach (string a in pettingZoo)
+    {
+        if (a == animal)
+        {
+            count++;
+        }
+    }
+    return count;
+}</code></pre></div>
+          <p>ผลลัพธ์: 1 (goats มีจริง 1 ตัว) และ 0 (dragons ไม่มีในสวนสัตว์)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลง <code>PlanSchoolVisit()</code> ให้มี optional parameter ตัวที่สามชื่อ
+           <code>bool showCount = false</code> — ถ้า <code>true</code> ให้พิมพ์จำนวนสัตว์ทั้งหมด
+           ต่อท้ายชื่อโรงเรียนด้วย เช่น "School A (18 animals)"</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่แก้)</span></div>
+          <pre><code class="lang-cs">void PlanSchoolVisit(string schoolName, int groups = 6, bool showCount = false)
+{
+    RandomizeAnimals();
+    string[,] group = AssignGroup(groups);
+
+    if (showCount)
+    {
+        Console.WriteLine($"{schoolName} ({pettingZoo.Length} animals)");
+    }
+    else
+    {
+        Console.WriteLine(schoolName);
+    }
+
+    PrintGroup(group);
+}</code></pre></div>
+          <p>เรียกใช้ด้วย <code>PlanSchoolVisit("School A", showCount: true);</code> ได้ (ใช้ named
+             argument ข้าม groups ไปตั้งค่า showCount โดยตรง ทบทวนจาก <a href="ch29.html">บทที่
+             29</a>)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>เขียน method <code>string[] FlattenGroups(string[,] group)</code> ที่แปลง 2D array
+           ของกลุ่มสัตว์กลับเป็น 1D array เรียงตามลำดับเดิม (แถว 0 ก่อน แล้วแถว 1 ...) ทดสอบกับ
+           ผลลัพธ์จาก AssignGroup(3)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string[,] group = AssignGroup(3);
+string[] flat = FlattenGroups(group);
+foreach (string animal in flat)
+{
+    Console.WriteLine(animal);
+}
+
+string[] FlattenGroups(string[,] group)
+{
+    string[] result = new string[group.Length];
+    int index = 0;
+
+    for (int i = 0; i < group.GetLength(0); i++)
+    {
+        for (int j = 0; j < group.GetLength(1); j++)
+        {
+            result[index] = group[i, j];
+            index++;
+        }
+    }
+
+    return result;
+}</code></pre></div>
+          <p>ใช้ <code>group.Length</code> (ไม่ใช่ GetLength) หาจำนวน element ทั้งหมดใน 2D array
+             เพื่อกำหนดขนาด array ผลลัพธ์ 1 มิติให้พอดี</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>วิเคราะห์: ถ้าลบบรรทัด <code>int r = random.Next(i, pettingZoo.Length);</code> ใน
+           <code>RandomizeAnimals()</code> แล้วใช้ <code>random.Next(pettingZoo.Length)</code>
+           แทน (ไม่จำกัดขอบเขตล่างด้วย i) โค้ดยัง "ทำงานได้" ไหม (ไม่ throw exception)? แต่มีปัญหา
+           อะไรซ่อนอยู่ อธิบายโดยไม่ต้องรันจริง</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>โค้ดยังทำงานได้โดยไม่ throw exception — เพราะ <code>random.Next(pettingZoo.Length)</code>
+             ยังให้ค่า index ที่ถูกต้องเสมอ (0 ถึง Length-1) ไม่มีทาง out of bounds ปัญหาที่ซ่อนอยู่
+             คือ<b>คุณภาพของการสุ่ม</b> — โค้ดยังคง "ทำงาน" ในแง่ที่ไม่ error แต่การกระจายตัวของผล
+             การสุ่มจะไม่สม่ำเสมอ (biased) เหมือนที่อธิบายไว้ในหัวข้อ 31.3: บาง element อาจถูกสลับ
+             กลับไปกลับมาหลายรอบ บาง element อาจไม่ถูกแตะเลยตลอดทั้ง loop ทำให้ผลลัพธ์สุดท้ายไม่ใช่
+             การสุ่มแบบสม่ำเสมอจริงๆ (uniform random permutation) แม้จะ "ดูสุ่ม" ด้วยตาเปล่าก็ตาม —
+             นี่คือตัวอย่างของบั๊กที่ตรวจจับยากมาก เพราะโปรแกรมไม่ error และผลลัพธ์ดูสมเหตุสมผลผิว
+             เผิน แต่จริงๆ ผิดในเชิงสถิติ</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 31</h2>
+
+    <p>เป้าหมายของคุณคือสร้างแอปที่ใช้ method บรรลุงานที่ซับซ้อนได้ คุณแตกปัญหาออกเป็น method ที่เป็น
+       โมดูล เพื่อสร้าง solution ที่มีระเบียบและอ่านง่าย คุณยังใช้พารามิเตอร์และ return type ทำให้
+       โค้ดของคุณสมบูรณ์ด้วย</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 31</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">แพทเทิร์น</th><th>ใช้เมื่อ</th></tr></thead>
+        <tbody>
+          <tr><td>comment placeholder + pseudo-code</td><td>วางโครงสร้างโปรแกรมทั้งหมดก่อน แล้วค่อยเติมทีละ method</td></tr>
+          <tr><td>Fisher-Yates shuffle</td><td>สับเปลี่ยน array ให้สุ่มแบบสม่ำเสมอจริงๆ (ไม่ bias)</td></tr>
+          <tr><td><code>arr[start++]</code></td><td>อ่านค่าที่ index ปัจจุบัน แล้วเลื่อน index ไปทีละ 1</td></tr>
+          <tr><td>method รวมหลาย method ย่อย (wrapper)</td><td>ลดโค้ดซ้ำเมื่อต้องทำงานชุดเดียวกันหลายครั้งด้วยพารามิเตอร์ต่างกัน</td></tr>
+          <tr><td>optional parameter ในเมธอด wrapper</td><td>ให้ผู้เรียกใช้ค่า default ได้โดยไม่ต้องระบุทุกอาร์กิวเมนต์</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>shuffle</td><td>สับเปลี่ยน</td><td>เปลี่ยนลำดับ element ใน array แบบสุ่ม</td></tr>
+        <tr><td>Fisher-Yates algorithm</td><td>อัลกอริทึม Fisher-Yates</td><td>อัลกอริทึมมาตรฐานสำหรับสุ่มลำดับ array แบบไม่ bias</td></tr>
+        <tr><td>wrapper method</td><td>เมธอดห่อหุ้ม</td><td>method ที่เรียก method ย่อยหลายตัวรวมกันเป็นขั้นตอนเดียว</td></tr>
+        <tr><td>postfix increment</td><td>การเพิ่มค่าแบบต่อท้าย</td><td>x++ อ่านค่าก่อนแล้วค่อยเพิ่ม ต่างจาก ++x ที่เพิ่มก่อนแล้วค่อยอ่าน</td></tr>
+        <tr><td>bias (ในบริบทการสุ่ม)</td><td>ความเอนเอียง</td><td>การกระจายตัวของผลสุ่มที่ไม่สม่ำเสมอ บาง element มีโอกาสมากกว่าตัวอื่น</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch30.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 30 · Method ที่คืนค่า Return Value</span></a>
+      <a class="next" href="ch32.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 32 · Challenge Project — สร้างมินิเกม</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

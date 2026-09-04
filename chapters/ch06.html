@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 6 · Guided Project: Final GPA — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="6">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 1 · Write Your First Code / บทที่ 6</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 1 · โมดูล 6/7 · 🧩 Guided Project</span>
+      <h1>โปรเจกต์นำทาง: คำนวณ GPA สุดท้าย</h1>
+      <div class="en">Guided Project — Calculate Final GPA</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>45–65 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>แอปคำนวณ GPA พร้อมจัดรูปแบบทศนิยมเอง</b></span>
+        <span>🎯 ความยาก <b>ประยุกต์บทที่ 1–5</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ฝึกแตกโจทย์ใหญ่เป็นขั้นตอนย่อยๆ ต่อเนื่องจากบทที่แล้ว</li>
+        <li>เลือกชนิดข้อมูลที่เหมาะสมสำหรับตัวแปรแต่ละแบบ</li>
+        <li>ทำการคำนวณทางคณิตศาสตร์เพื่อหาผลลัพธ์</li>
+        <li>ใช้เทคนิคจัดรูปแบบตัวเลขทศนิยมด้วยมือ (ก่อนจะมีเครื่องมือช่วยในบทหลังๆ)</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">6.1 สถานการณ์: ผู้ช่วยอาจารย์ที่ต้องคำนวณ GPA</h2>
+
+    <p>สมมติคุณเป็นผู้ช่วยอาจารย์ในมหาวิทยาลัย ได้รับมอบหมายให้พัฒนาแอปช่วยคำนวณเกรดเฉลี่ย
+       (Grade Point Average — GPA) ของนักศึกษา แอปจะใช้เกรดและจำนวนหน่วยกิตของแต่ละวิชา
+       มาคำนวณ GPA รวม อาจารย์ยังกำหนดรูปแบบการรายงานผล GPA ที่ต้องการมาให้ด้วย</p>
+
+    <p>บทนี้จะพาคุณสร้างแอป GPA Calculator ครบวงจร โค้ดของคุณจะประกาศและกำหนดค่าตัวแปรตามข้อมูล
+       รายวิชา คำนวณตัวเลขหลายแบบ จัดรูปแบบและแสดงผลลัพธ์ การคำนวณรวมถึงการหาผลรวมแต้มเกรดที่ได้
+       และหน่วยกิตรวม เพื่อแสดงผลตามฟอร์แมตที่กำหนด คุณจะต้อง<b>ปรับแต่งค่า decimal ให้แสดงแค่
+       3 หลักเอง</b> — เป็นเทคนิคที่ท้าทายที่สุดในบทนี้</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 เหมือนบทที่ 5 แต่ยากขึ้นอีกขั้น</span>
+      โครงสร้างบทนี้คล้ายบทที่ 5 มาก (สร้างข้อมูล → คำนวณ → จัดรูปแบบ) แต่มีเทคนิคใหม่ที่สำคัญ
+      คือการ "แกะ" ตัวเลขทศนิยมออกมาทีละหลักด้วย cast และ modulo — เทคนิคที่ยังไม่มีเครื่องมือ
+      สำเร็จรูปช่วย (จะมีในโมดูลหลังๆ) แต่ช่วยให้คุณเข้าใจตัวดำเนินการที่เรียนมาอย่างลึกซึ้งขึ้นมาก
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s02">6.2 เตรียมพร้อม: โจทย์และข้อมูลตั้งต้น</h2>
+
+    <h3 id="s02a">ภาพรวมโปรเจกต์</h3>
+    <p>คุณกำลังพัฒนา Student GPA Calculator ที่ช่วยคำนวณเกรดเฉลี่ยรวมของนักศึกษา ข้อกำหนด:</p>
+    <ul>
+      <li>มีชื่อนักศึกษาและข้อมูลรายวิชา</li>
+      <li>แต่ละวิชามีชื่อวิชา เกรดที่ได้ และจำนวนหน่วยกิต</li>
+      <li>แอปต้องคำนวณทางคณิตศาสตร์เพื่อหา GPA ของนักศึกษาคนนั้น</li>
+      <li>แอปต้องแสดงชื่อนักศึกษา ข้อมูลรายวิชา และ GPA</li>
+    </ul>
+
+    <p><b>สูตรคำนวณ GPA:</b></p>
+    <ol>
+      <li>คูณค่าเกรดของแต่ละวิชาด้วยจำนวนหน่วยกิตของวิชานั้น (ได้ "แต้มเกรด" ของวิชานั้น)</li>
+      <li>ทำแบบนี้กับทุกวิชา แล้วบวกผลลัพธ์ทั้งหมดเข้าด้วยกัน</li>
+      <li>เอาผลรวมนั้นหารด้วยจำนวนหน่วยกิตรวมทั้งหมด</li>
+    </ol>
+
+    <p>ตัวอย่างข้อมูลรายวิชาและ GPA ที่ต้องการ:</p>
+    <div class="out auto"><div class="out-bar">ผลลัพธ์ที่ต้องการ</div><pre>
+Student: Sophia Johnson
+
+Course          Grade   Credit Hours	
+English 101         4       3
+Algebra 101         3       3
+Biology 101         3       4
+Computer Science I  3       4
+Psychology 101      4       3
+
+Final GPA:          3.35</pre></div>
+
+    <h3 id="s02b">เตรียมข้อมูลตั้งต้น</h3>
+    <p>สร้างโปรเจกต์ใหม่ แล้วพิมพ์โค้ดนี้ — ชื่อนักศึกษา ชื่อวิชา และหน่วยกิตของแต่ละวิชา:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string studentName = "Sophia Johnson";
+string course1Name = "English 101";
+string course2Name = "Algebra 101";
+string course3Name = "Biology 101";
+string course4Name = "Computer Science I";
+string course5Name = "Psychology 101";
+
+int course1Credit = 3;
+int course2Credit = 3;
+int course3Credit = 4;
+int course4Credit = 4;
+int course5Credit = 3;</code></pre>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ อย่าลบโค้ดนี้</span>
+      โค้ดชุดนี้เป็นฐานของทั้งโปรเจกต์ในบทนี้ — ทุกหัวข้อถัดจากนี้จะ<b>ต่อท้าย</b>โค้ดชุดนี้ไปเรื่อยๆ
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch6-a"><span>สร้างโปรเจกต์ใหม่และพิมพ์ข้อมูลตั้งต้นครบ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">6.3 ขั้นที่ 1: เก็บค่าเกรดตัวเลขของแต่ละวิชา</h2>
+
+    <p>ในหัวข้อนี้ คุณจะหาค่าตัวเลขที่แทนเกรดตัวอักษรที่นักศึกษาได้ แล้วประกาศตัวแปรเก็บค่าเกรด
+       ตัวเลขของแต่ละวิชา เนื่องจากค่าเกรดเป็นเลขจำนวนเต็ม จึงใช้ชนิดข้อมูล <code>int</code></p>
+
+    <h3 id="s03a">ค่าเทียบเกรดตัวอักษรเป็นตัวเลข</h3>
+    <p>A = 4 แต้ม, B = 3 แต้ม (ในโปรเจกต์นี้ใช้แค่สองเกรดนี้ ส่วน C, D, F ยังไม่ใช้ตอนนี้)</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — ต่อท้าย</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int gradeA = 4;
+int gradeB = 3;</code></pre>
+    </div>
+
+    <p>การใช้ค่าคงที่แบบนี้ช่วยให้โค้ดเข้าใจง่าย และลดโอกาสพิมพ์ผิดถ้าต้องใช้ค่าเกรดซ้ำหลายครั้ง</p>
+
+    <p>เกรดของนักศึกษาแต่ละวิชา:</p>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>วิชา</th><th>เกรด</th></tr></thead>
+      <tbody>
+        <tr><td>English 101</td><td>A</td></tr>
+        <tr><td>Algebra 101</td><td>B</td></tr>
+        <tr><td>Biology 101</td><td>B</td></tr>
+        <tr><td>Computer Science I</td><td>B</td></tr>
+        <tr><td>Psychology 101</td><td>A</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>สร้างตัวแปรเก็บเกรดตัวเลขของแต่ละวิชา:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int course1Grade = gradeA;
+int course2Grade = gradeB;
+int course3Grade = gradeB;
+int course4Grade = gradeB;
+int course5Grade = gradeA;</code></pre>
+    </div>
+
+    <p>แสดงชื่อวิชาคู่กับเกรดตัวเลข:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine($"{course1Name} {course1Grade}");
+Console.WriteLine($"{course2Name} {course2Grade}");
+Console.WriteLine($"{course3Name} {course3Grade}");
+Console.WriteLine($"{course4Name} {course4Grade}");
+Console.WriteLine($"{course5Name} {course5Grade}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+English 101 4
+Algebra 101 3
+Biology 101 3
+Computer Science I 3
+Psychology 101 4</pre></div>
+
+    <p>ถ้าไม่ตรง ให้ตรวจชื่อตัวแปรของคุณอีกครั้ง จากนั้นเพิ่มหน่วยกิตเข้าไปใน print statement
+       เพราะผลลัพธ์สุดท้ายต้องแสดงหน่วยกิตด้วย:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine($"{course1Name} {course1Grade} {course1Credit}");
+Console.WriteLine($"{course2Name} {course2Grade} {course2Credit}");
+Console.WriteLine($"{course3Name} {course3Grade} {course3Credit}");
+Console.WriteLine($"{course4Name} {course4Grade} {course4Credit}");
+Console.WriteLine($"{course5Name} {course5Grade} {course5Credit}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+English 101 4 3
+Algebra 101 3 3
+Biology 101 3 4
+Computer Science I 3 4
+Psychology 101 4 3</pre></div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch6-b"><span>สร้างตัวแปรเกรดตัวเลขและแสดงผลตรงกับตัวอย่าง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">6.4 ขั้นที่ 2: คำนวณผลรวมหน่วยกิตและแต้มเกรด</h2>
+
+    <p>ในหัวข้อนี้ คุณจะคำนวณและเก็บจำนวนหน่วยกิตรวม และแต้มเกรดรวมที่ได้ทั้งหมด ค่าทั้งสองจะถูกใช้
+       คำนวณ GPA ในขั้นถัดไป ทั้งหน่วยกิตและเกรดเป็นเลขจำนวนเต็ม จึงเก็บผลรวมด้วย <code>int</code></p>
+
+    <p>แต้มเกรดของวิชาหนึ่งๆ เท่ากับหน่วยกิตของวิชานั้น <b>คูณ</b> ค่าเกรดตัวเลขที่ได้ ตัวอย่างเช่น
+       English 101 หน่วยกิต 3 ได้เกรด A(4) → แต้มเกรด = 3×4 = 12</p>
+
+    <h3 id="s04a">คำนวณหน่วยกิตรวม</h3>
+    <p>หาบรรทัด <code>Console.WriteLine()</code> ที่แสดงข้อมูลรายวิชา เว้นบรรทัดว่างเหนือมัน
+       แล้วประกาศตัวแปรเก็บผลรวมหน่วยกิต เริ่มที่ 0:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int totalCreditHours = 0;</code></pre>
+    </div>
+
+    <p>เพิ่มค่าเข้าไปทีละวิชาด้วย <code>+=</code> (ทบทวนได้ที่ <a href="ch04.html">บทที่ 4</a>):</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">totalCreditHours += course1Credit;
+totalCreditHours += course2Credit;
+totalCreditHours += course3Credit;
+totalCreditHours += course4Credit;
+totalCreditHours += course5Credit;</code></pre>
+    </div>
+
+    <p>โค้ด 5 บรรทัดนี้ให้ผลเหมือนกับเขียนบรรทัดเดียว
+       <code>totalCreditHours = course1Credit + course2Credit + course3Credit + course4Credit + course5Credit;</code>
+       — แค่คนละสไตล์</p>
+
+    <h3 id="s04b">คำนวณแต้มเกรดรวม</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int totalGradePoints = 0;</code></pre>
+    </div>
+
+    <p>เพิ่มแต้มเกรดของแต่ละวิชา (หน่วยกิต × เกรด) เข้าไปทีละวิชา:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">totalGradePoints += course1Credit * course1Grade;
+totalGradePoints += course2Credit * course2Grade;
+totalGradePoints += course3Credit * course3Grade;
+totalGradePoints += course4Credit * course4Grade;
+totalGradePoints += course5Credit * course5Grade;</code></pre>
+    </div>
+
+    <p>สังเกตว่าโค้ดที่คุณเขียนแตกปัญหาใหญ่ (คำนวณ GPA) เป็นชิ้นเล็กๆ ที่จัดการได้ง่ายกว่า —
+       คำนวณ <code>totalCreditHours</code> ก่อน แล้วค่อยคำนวณ <code>totalGradePoints</code>
+       ทีหลัง จากนั้นค่อยเอาสองค่านี้ไปใช้ในการคำนวณสุดท้าย</p>
+
+    <p>เช็คผลระหว่างทางก่อนไปต่อ:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine($"{totalGradePoints} {totalCreditHours}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output (บรรทัดแรก — จะลบทิ้งภายหลัง)</div><pre>
+57 17</pre></div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ บรรทัดนี้ชั่วคราวเท่านั้น</span>
+      <code>Console.WriteLine($"{totalGradePoints} {totalCreditHours}");</code> มีไว้เพื่อตรวจสอบ
+      ระหว่างทางเท่านั้น ในหัวข้อถัดไปจะลบทิ้งเพราะไม่ใช่ส่วนหนึ่งของผลลัพธ์สุดท้าย
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch6-c"><span>ได้ totalCreditHours = 17 และ totalGradePoints = 57 ตรงกัน</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">6.5 ขั้นที่ 3: จัดรูปแบบผลลัพธ์ทศนิยม</h2>
+
+    <p>GPA เท่ากับผลรวมแต้มเกรดหารด้วยผลรวมหน่วยกิต หัวข้อนี้คือหัวใจสำคัญที่สุดของบทนี้</p>
+
+    <h3 id="s05a">คำนวณ GPA</h3>
+    <p>ลบบรรทัดตรวจสอบชั่วคราวทิ้ง แล้วเว้นบรรทัดว่างเหนือ <code>Console.WriteLine()</code> ชุดที่
+       แสดงข้อมูลรายวิชา ประกาศตัวแปรเก็บ GPA:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">decimal gradePointAverage = totalGradePoints/totalCreditHours;</code></pre>
+    </div>
+
+    <p>ทบทวนเรื่องชนิดข้อมูลที่กำลังหารกัน (บทที่ 4) — ทั้งสองข้างเป็น <code>int</code> ต้อง cast
+       อย่างน้อยข้างใดข้างหนึ่งเป็น <code>decimal</code> ก่อน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        </div>
+      <pre><code class="lang-cs">decimal gradePointAverage = (decimal) totalGradePoints/totalCreditHours;</code></pre>
+    </div>
+
+    <p>เพิ่มบรรทัดแสดง GPA ท้ายสุด แล้วรันดู:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Console.WriteLine($"Final GPA: {gradePointAverage}");</code></pre>
+    </div>
+    <div class="out auto"><div class="out-bar">Output</div><pre>
+Final GPA: 3.3529411764705882352941176471</pre></div>
+
+    <h3 id="s05b">แกะตัวเลขทศนิยมออกมาทีละหลัก</h3>
+    <p>ทศนิยมยาวขนาดนี้ไม่ใช่ GPA ที่คุ้นตา — ในหัวข้อนี้คุณจะจัดการค่า decimal นี้ด้วยมือ ให้แสดง
+       แค่ 3 หลัก (หลักเดียวหน้าจุด บวกอีก 2 หลักหลังจุด)</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ทำไมต้องทำเอง</span>
+      ในเส้นทางการเรียนถัดไป คุณจะเจอฟังก์ชันสำเร็จรูปที่จัดรูปแบบตัวเลขให้อัตโนมัติ แต่ตอนนี้
+      เป็นโอกาสดีที่จะฝึกฝนสิ่งที่เรียนมาแล้วให้แน่นขึ้น
+    </div>
+
+    <p>เว้นบรรทัดว่างเหนือ <code>Console.WriteLine()</code> ชุดแสดงรายวิชา แล้วดึงหลักแรก
+       (leading digit) ออกมาด้วยการ cast เป็น <code>int</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int leadingDigit = (int) gradePointAverage;</code></pre>
+    </div>
+
+    <p>การ cast เศษทศนิยมเป็น int จะ<b>ตัดทิ้งเสมอ ไม่ปัดขึ้น</b> ถ้า GPA เป็น 2.99 การ cast
+       เป็น int จะได้ 2 เสมอ (วิธีนี้เชื่อถือได้และตรงไปตรงมา)</p>
+
+    <p>ต่อไปดึงหลักแรกหลังจุดทศนิยม:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int firstDigit = (int) (gradePointAverage * 10) % 10;</code></pre>
+    </div>
+
+    <p>ครึ่งแรกของสูตร เลื่อนจุดทศนิยมไปทางขวา 1 ตำแหน่งแล้ว cast เป็น int ครึ่งหลัง ใช้ตัวดำเนินการ
+       เศษเหลือ (modulo) หารด้วย 10 เพื่อแยกเอาแค่หลักสุดท้ายออกมา ลองดูตัวอย่างสมมติ
+       <code>gradePointAverage = 2.994573</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ไล่ทีละขั้น</span></div>
+      <pre><code class="lang-cs">int firstDigit = (int) (2.994573 * 10) % 10;
+int firstDigit = 29 % 10;
+int firstDigit = 9;</code></pre>
+    </div>
+
+    <p>ได้ <code>firstDigit = 9</code> ต่อไปใช้เทคนิคเดียวกันดึงหลักที่สอง:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int secondDigit = (int) (gradePointAverage * 100 ) % 10;</code></pre>
+    </div>
+    <p>บรรทัดนี้เลื่อนจุดทศนิยมไป 2 ตำแหน่ง แล้วใช้ modulo ดึงหลักสุดท้ายเหมือนเดิม</p>
+
+    <svg viewBox="0 0 720 210" role="img" aria-label="ขั้นตอนแกะตัวเลข GPA ออกมาทีละหลักด้วย cast และ modulo" style="margin:18px 0">
+      <g font-family="var(--font-th)" font-size="12">
+        <text x="360" y="18" text-anchor="middle" fill="var(--text-faint)" font-size="12">gradePointAverage = 3.3529411764705882... (57 ÷ 17)</text>
+
+        <rect x="10"  y="30" width="222" height="150" rx="10" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="121" y="52" text-anchor="middle" font-weight="700" fill="var(--brand-text)">leadingDigit</text>
+        <text x="121" y="76" text-anchor="middle" font-family="var(--font-code)" font-size="11" fill="var(--text)">(int) gradePointAverage</text>
+        <text x="121" y="98" text-anchor="middle" font-family="var(--font-code)" font-size="11" fill="var(--text-soft)">= (int) 3.3529...</text>
+        <text x="121" y="128" text-anchor="middle" font-family="var(--font-code)" font-size="18" font-weight="700" fill="var(--brand-text)">= 3</text>
+
+        <rect x="248" y="30" width="222" height="150" rx="10" fill="var(--warn-soft)" stroke="var(--warn)"/>
+        <text x="359" y="52" text-anchor="middle" font-weight="700" fill="var(--warn)">firstDigit</text>
+        <text x="359" y="76" text-anchor="middle" font-family="var(--font-code)" font-size="11" fill="var(--text)">(int)(gpa * 10) % 10</text>
+        <text x="359" y="98" text-anchor="middle" font-family="var(--font-code)" font-size="11" fill="var(--text-soft)">= 33 % 10</text>
+        <text x="359" y="128" text-anchor="middle" font-family="var(--font-code)" font-size="18" font-weight="700" fill="var(--warn)">= 3</text>
+
+        <rect x="486" y="30" width="222" height="150" rx="10" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text x="597" y="52" text-anchor="middle" font-weight="700" fill="var(--ok)">secondDigit</text>
+        <text x="597" y="76" text-anchor="middle" font-family="var(--font-code)" font-size="11" fill="var(--text)">(int)(gpa * 100) % 10</text>
+        <text x="597" y="98" text-anchor="middle" font-family="var(--font-code)" font-size="11" fill="var(--text-soft)">= 335 % 10</text>
+        <text x="597" y="128" text-anchor="middle" font-family="var(--font-code)" font-size="18" font-weight="700" fill="var(--ok)">= 5</text>
+
+        <text x="360" y="196" text-anchor="middle" font-family="var(--font-code)" font-size="15" font-weight="700" fill="var(--text)">
+          ประกอบกลับ: {leadingDigit}.{firstDigit}{secondDigit} → 3.35
+        </text>
+      </g>
+    </svg>
+
+    <p>แก้บรรทัดแสดง GPA สุดท้ายให้ประกอบ 3 หลักนี้เข้าด้วยกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine($"Final GPA: {leadingDigit}.{firstDigit}{secondDigit}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Final GPA: 3.35</pre></div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch6-d"><span>ดึง leadingDigit ด้วย cast (int) สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch6-e"><span>เข้าใจว่า (gpa*10)%10 แยกหลักแรกออกมาได้ยังไง</span></label></li>
+      <li><label><input type="checkbox" id="ch6-f"><span>ประกอบ 3 หลักกลับเป็น "3.35" ด้วย interpolation</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">6.6 ขั้นที่ 4: จัดรูปแบบด้วย Escape Sequence</h2>
+
+    <p>หัวข้อสุดท้ายนี้จะปรับผลลัพธ์ให้ตรงตามฟอร์แมตที่อาจารย์กำหนด</p>
+
+    <h3 id="s06a">เพิ่มชื่อนักศึกษาและหัวตาราง</h3>
+    <p>เว้นบรรทัดว่างเหนือ <code>Console.WriteLine()</code> ชุดแสดงรายวิชา แล้วเพิ่มชื่อนักศึกษา:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Console.WriteLine($"Student: {studentName}\n");</code></pre>
+    </div>
+
+    <p>เว้นบรรทัดว่างหลังบรรทัดนี้ แล้วเพิ่มหัวตาราง:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Course\t\t\tGrade\tCredit Hours");</code></pre>
+    </div>
+
+    <p>สังเกตว่าเติม tab ถึง 3 ตัวหลังคำว่า "Course" — เผื่อพื้นที่ไว้สำหรับชื่อวิชาที่ยาวกว่า
+       (ทบทวนหลักการ tab stop ได้ที่ <a href="ch05.html">บทที่ 5</a>)</p>
+
+    <h3 id="s06b">จัดคอลัมน์ข้อมูลรายวิชา</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        </div>
+      <pre><code class="lang-cs">Console.WriteLine($"{course1Name}\t\t{course1Grade}\t\t{course1Credit}");
+Console.WriteLine($"{course2Name}\t\t{course2Grade}\t\t{course2Credit}");
+Console.WriteLine($"{course3Name}\t\t{course3Grade}\t\t{course3Credit}");
+Console.WriteLine($"{course4Name}\t{course4Grade}\t\t{course4Credit}");
+Console.WriteLine($"{course5Name}\t\t{course5Grade}\t\t{course5Credit}");</code></pre>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ สังเกตจำนวน \t ที่ไม่เท่ากัน</span>
+      <code>course4Name</code> ("Computer Science I") ใช้ <code>\t</code> แค่ตัวเดียวหลังชื่อวิชา
+      น้อยกว่าวิชาอื่นที่ใช้ <code>\t\t</code> — เพราะชื่อวิชานี้ยาวกว่า ใกล้ตำแหน่ง tab stop
+      ถัดไปมากกว่า ถ้าใช้ 2 ตัวเหมือนวิชาอื่น จะล้นไป tab stop ถัดไปอีกขั้น ทำให้คอลัมน์เยื้องออกไป
+    </div>
+
+    <p>สุดท้าย เพิ่มระยะห่างให้บรรทัดแสดง GPA:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Console.WriteLine($"\nFinal GPA:\t\t{leadingDigit}.{firstDigit}{secondDigit}");</code></pre>
+    </div>
+
+    <h3 id="s06c">ตรวจงานสุดท้าย</h3>
+    <p>โค้ดทั้งหมดของโปรเจกต์นี้ (ครบทุกขั้น):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — ฉบับสมบูรณ์</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string studentName = "Sophia Johnson";
+string course1Name = "English 101";
+string course2Name = "Algebra 101";
+string course3Name = "Biology 101";
+string course4Name = "Computer Science I";
+string course5Name = "Psychology 101";
+
+int course1Credit = 3;
+int course2Credit = 3;
+int course3Credit = 4;
+int course4Credit = 4;
+int course5Credit = 3;
+
+int gradeA = 4;
+int gradeB = 3;
+
+int course1Grade = gradeA;
+int course2Grade = gradeB;
+int course3Grade = gradeB;
+int course4Grade = gradeB;
+int course5Grade = gradeA;
+
+int totalCreditHours = 0;
+totalCreditHours += course1Credit;
+totalCreditHours += course2Credit;
+totalCreditHours += course3Credit;
+totalCreditHours += course4Credit;
+totalCreditHours += course5Credit;
+
+int totalGradePoints = 0;
+totalGradePoints += course1Credit * course1Grade;
+totalGradePoints += course2Credit * course2Grade;
+totalGradePoints += course3Credit * course3Grade;
+totalGradePoints += course4Credit * course4Grade;
+totalGradePoints += course5Credit * course5Grade;
+
+decimal gradePointAverage = (decimal) totalGradePoints/totalCreditHours;
+
+int leadingDigit = (int) gradePointAverage;
+int firstDigit = (int) (gradePointAverage * 10 ) % 10;
+int secondDigit = (int) (gradePointAverage * 100 ) % 10;
+
+Console.WriteLine($"Student: {studentName}\n");
+Console.WriteLine("Course\t\t\tGrade\tCredit Hours");
+
+Console.WriteLine($"{course1Name}\t\t{course1Grade}\t\t{course1Credit}");
+Console.WriteLine($"{course2Name}\t\t{course2Grade}\t\t{course2Credit}");
+Console.WriteLine($"{course3Name}\t\t{course3Grade}\t\t{course3Credit}");
+Console.WriteLine($"{course4Name}\t{course4Grade}\t\t{course4Credit}");
+Console.WriteLine($"{course5Name}\t\t{course5Grade}\t\t{course5Credit}");
+
+Console.WriteLine($"\nFinal GPA:\t\t{leadingDigit}.{firstDigit}{secondDigit}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Student: Sophia Johnson
+
+Course			Grade	Credit Hours
+English 101		4		3
+Algebra 101		3		3
+Biology 101		3		4
+Computer Science I	3		4
+Psychology 101		4		3
+
+Final GPA:		3.35</pre></div>
+
+    <div class="note ok">
+      <span class="lbl">✅ เสร็จสมบูรณ์!</span>
+      คุณสร้างแอปคำนวณ GPA ที่ทำงานได้จริงครบวงจร — และที่สำคัญกว่านั้น คุณเข้าใจลึกซึ้งว่า
+      cast กับ modulo ทำงานร่วมกันยังไงเพื่อแกะตัวเลขออกมาทีละหลัก ซึ่งเป็นทักษะการแก้ปัญหา
+      ที่มีค่ามากกว่าแค่โค้ดชุดนี้เอง
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">6.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:32%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>decimal gpa = totalGradePoints/totalCreditHours;</code> ได้เลขเต็มไม่มีทศนิยม</td>
+          <td>ลืม cast อีกแล้ว — ทั้งสองข้างเป็น int ต้อง (decimal) ข้างใดข้างหนึ่งก่อนหาร</td>
+        </tr>
+        <tr>
+          <td>firstDigit / secondDigit ได้ค่าผิด</td>
+          <td>ลืมวงเล็บรอบ (gpa * 10) ก่อน % — ลำดับการคำนวณผิดจะได้ผลลัพธ์คนละเรื่อง</td>
+        </tr>
+        <tr>
+          <td>คิดว่า (int) จะปัดเศษ แต่จริงๆ ตัดทิ้ง</td>
+          <td>cast เป็น int <b>ตัดทศนิยมทิ้งเสมอ ไม่ปัดขึ้น</b> — 3.99 กลายเป็น 3 ไม่ใช่ 4</td>
+        </tr>
+        <tr>
+          <td>คอลัมน์เยื้องไม่ตรงกัน</td>
+          <td>ชื่อวิชายาวไม่เท่ากัน ต้องปรับจำนวน \t ต่างกันตามหลักการ tab stop (บทที่ 5)</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">6.8 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment จริงของบทนี้ใน Microsoft Learn (บทนี้มี 2 ข้อ)</p>
+
+    <div class="quiz" data-q="6-1">
+      <p class="q"><span class="num">1.</span> สมมติ <code>decimal gradePointAverage = 3.99872831m;</code>
+        ค่าของ <code>(int) gradePointAverage</code> คือเท่าไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>3.99</span></li>
+        <li class="opt"><span class="k">B</span><span>4</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>3</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> การ cast เป็น <code>int</code> ตัดเศษทศนิยมทิ้งเสมอ
+        (ไม่ปัดเศษ) แม้ 3.998 จะใกล้ 4 มาก แต่ผลลัพธ์คือ 3 ข้อ A ผิดเพราะ int เก็บทศนิยมไม่ได้
+        ข้อ B สับสนกับการปัดเศษ ซึ่งไม่ใช่พฤติกรรมของ cast</div>
+    </div>
+
+    <div class="quiz" data-q="6-2">
+      <p class="q"><span class="num">2.</span> โค้ด <code>decimal x = 7 / 5;</code> ทำไม x จึงได้ค่า 1?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ชนิด decimal ตัดเศษทิ้งเสมอ</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>การหารเลข int สองตัวคือการหารแบบ integer division</span></li>
+        <li class="opt"><span class="k">C</span><span>โค้ดบรรทัดนี้ error</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> <code>7</code> และ <code>5</code> เป็น int literal ทั้งคู่
+        การหารจึงเป็น int/int (ตัดเศษ = 1) ไปแล้ว<b>ก่อน</b>จะถูกแปลงเป็น decimal เพื่อกำหนดค่า
+        ให้ x — ไม่ใช่ชนิด decimal ที่ตัดเศษ (ข้อ A ผิด) และโค้ดนี้คอมไพล์ผ่านปกติ ไม่ error (ข้อ C ผิด)</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">6.9 ✍️ แบบฝึกหัดต่อยอดโปรเจกต์</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดแกะ <code>leadingDigit</code>, <code>firstDigit</code>, <code>secondDigit</code>
+           จากค่า <code>decimal gpa = 2.7183m;</code> แล้วพิมพ์ผลลัพธ์เป็น <code>2.71</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">decimal gpa = 2.7183m;
+int leadingDigit = (int) gpa;
+int firstDigit = (int) (gpa * 10) % 10;
+int secondDigit = (int) (gpa * 100) % 10;
+Console.WriteLine($"{leadingDigit}.{firstDigit}{secondDigit}");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เพิ่มค่าเกรด <code>gradeC = 2;</code> แล้วสมมตินักศึกษาได้เกรด C ในวิชา Psychology 101
+           (แทน A เดิม) คำนวณ totalGradePoints ใหม่ด้วยมือ (ไม่ต้องรันจริงก็ได้ ตอบเป็นตัวเลข)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>เดิม Psychology 101 (3 หน่วยกิต, เกรด A=4) ให้แต้ม 12 ถ้าเปลี่ยนเป็น C=2 จะได้แต้ม 6
+             แทน → totalGradePoints ใหม่ = 57 - 12 + 6 = <b>51</b></p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้ error หาจุดผิดและอธิบาย:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">int totalPoints;
+totalPoints += 12;
+Console.WriteLine(totalPoints);</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ลืม initialize <code>totalPoints</code> เป็น 0 ก่อนใช้ <code>+=</code> — จะได้ error CS0165
+             (ทบทวนที่ <a href="ch02.html">บทที่ 2</a>) ต้องแก้เป็น <code>int totalPoints = 0;</code></p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโปรเจกต์ GPA ใหม่สำหรับนักศึกษาชื่อ <code>"Marco Reyes"</code> มี 3 วิชา:
+           วิชา A (หน่วยกิต 3, เกรด A) · วิชา B (หน่วยกิต 4, เกรด B) · วิชา C (หน่วยกิต 2, เกรด B)
+           คำนวณ GPA ให้ครบ (ไม่ต้องจัดคอลัมน์ด้วย tab ก็ได้ แค่ให้ตัวเลขถูก)</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>totalCreditHours = 3+4+2 = 9, totalGradePoints = 3×4 + 4×3 + 2×3 = 30,
+           GPA = 30/9 = 3.333...</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int gradeA = 4;
+int gradeB = 3;
+
+int credit1 = 3, grade1 = gradeA;
+int credit2 = 4, grade2 = gradeB;
+int credit3 = 2, grade3 = gradeB;
+
+int totalCreditHours = credit1 + credit2 + credit3;
+int totalGradePoints = (credit1 * grade1) + (credit2 * grade2) + (credit3 * grade3);
+
+decimal gpa = (decimal)totalGradePoints / totalCreditHours;
+int leadingDigit = (int)gpa;
+int firstDigit = (int)(gpa * 10) % 10;
+int secondDigit = (int)(gpa * 100) % 10;
+
+Console.WriteLine($"Marco Reyes GPA: {leadingDigit}.{firstDigit}{secondDigit}");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ทำไมเทคนิคแกะทศนิยมในบทนี้ถึงใช้ไม่ได้ถ้า GPA มีค่าติดลบ เช่น -3.35?
+           (ตอบเป็นข้อความอธิบาย ไม่ต้องเขียนโค้ด)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>modulo ของเลขลบใน C# ให้ผลลัพธ์เป็นลบด้วย เช่น <code>-33 % 10 = -3</code>
+             ไม่ใช่ 7 แบบที่คณิตศาสตร์บริสุทธิ์อาจคาดหวัง ทำให้การประกอบสตริงกลับผิดเพี้ยน
+             (แต่ในบริบทนี้ GPA ไม่มีทางติดลบอยู่แล้ว จึงไม่ใช่ปัญหาจริง)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>เขียนโปรเจกต์ GPA ฉบับเต็มสำหรับนักศึกษา 1 คน 4 วิชา ข้อมูลตามใจคุณ โดยต้องมี:
+           หัวตารางจัดคอลัมน์ด้วย tab, การคำนวณ totalCreditHours/totalGradePoints แบบ +=,
+           การ cast หารแบบ decimal, และการแกะ 3 หลักแบบในบทนี้ — ให้ได้ผลลัพธ์ที่จัดรูปแบบ
+           สวยงามเหมือนตัวอย่าง Sophia Johnson ทุกประการ</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ไล่ทำตามลำดับ 4 ขั้นของบทนี้ทีละขั้น (6.3 → 6.4 → 6.5 → 6.6)
+           อย่าข้ามขั้นไหน แล้วเช็คผลลัพธ์ระหว่างทางด้วย Console.WriteLine() ก่อนไปขั้นถัดไปเสมอ</p></div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 6</h2>
+
+    <p>เป้าหมายของบทนี้คือสร้างแอปที่รับข้อมูลรายวิชาของนักศึกษา คำนวณ GPA รวม และแสดงผลลัพธ์
+       เพื่อให้สำเร็จ คุณประกาศและกำหนดค่าตัวแปรหลายชนิดข้อมูล ทำการคำนวณทางตัวเลข และใช้เทคนิค
+       การ cast เพื่อให้ได้ผลลัพธ์แม่นยำ คุณยังใช้เมธอด <code>WriteLine()</code> ร่วมกับ
+       character escape sequence จัดรูปแบบผลลัพธ์ให้ตรงสเปก</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 6</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:40%">สูตร / เทคนิค</th><th>ใช้ทำอะไร</th></tr></thead>
+        <tbody>
+          <tr><td>หน่วยกิต × เกรด</td><td>คำนวณแต้มเกรดของ 1 วิชา</td></tr>
+          <tr><td>Σแต้มเกรด ÷ Σหน่วยกิต</td><td>คำนวณ GPA รวม</td></tr>
+          <tr><td><code>(int) ค่าdecimal</code></td><td>ดึงหลักหน้าจุดทศนิยม (ตัด ไม่ปัด)</td></tr>
+          <tr><td><code>(int)(ค่า*10)%10</code></td><td>ดึงหลักที่ 1 หลังจุดทศนิยม</td></tr>
+          <tr><td><code>(int)(ค่า*100)%10</code></td><td>ดึงหลักที่ 2 หลังจุดทศนิยม</td></tr>
+          <tr><td><code>{a}.{b}{c}</code></td><td>ประกอบหลักที่แกะแล้วกลับเป็นทศนิยมด้วย interpolation</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:28%">English</th><th style="width:22%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>GPA (grade point average)</td><td>เกรดเฉลี่ย</td><td>ค่าเฉลี่ยถ่วงน้ำหนักด้วยหน่วยกิตของทุกวิชา</td></tr>
+        <tr><td>credit hours</td><td>หน่วยกิต</td><td>น้ำหนักของแต่ละวิชาที่ใช้ถ่วง GPA</td></tr>
+        <tr><td>grade points</td><td>แต้มเกรด</td><td>หน่วยกิต × ค่าเกรดตัวเลขของวิชานั้น</td></tr>
+        <tr><td>leading digit</td><td>หลักนำหน้า</td><td>ตัวเลขหน้าจุดทศนิยม</td></tr>
+        <tr><td>truncate (cast)</td><td>ตัดทิ้ง (จาก cast)</td><td>การ cast เป็น int ตัดเศษทศนิยมทิ้งเสมอ ไม่ปัดเศษ</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <hr>
+    <h2 id="s12" data-no-toc>🏆 Trophy — สรุปรวบยอด Part 1</h2>
+
+    <div class="note ok">
+      <span class="lbl">🎉 ยินดีด้วย!</span>
+      คุณเรียนจบ <b>Part 1 · Write Your First Code Using C#</b> ครบทั้ง 6 โมดูลแล้ว — ตาม
+      หลักสูตร freeCodeCamp × Microsoft ถึงจุดนี้จะมี "Trophy" ให้เป็นเครื่องหมายว่าคุณพร้อม
+      ไปต่อ Part 2 จริงๆ ก่อนไปต่อ ลองทำแบบทดสอบรวบยอด 6 ข้อด้านล่างนี้ดู — คัดมาจากทุกบทที่ผ่านมา
+      ถ้าตอบถูกครบทุกข้อ แปลว่าพื้นฐานของคุณแน่นพอสำหรับ Part 2 แล้ว
+    </div>
+
+    <div class="quiz" data-q="t1-1">
+      <p class="q"><span class="num">1.</span> (บทที่ 1) <code>Console.Write()</code> กับ <code>Console.WriteLine()</code> ต่างกันตรงไหน?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>Write เร็วกว่า WriteLine</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>WriteLine เติมการขึ้นบรรทัดใหม่ต่อท้ายผลลัพธ์ Write ไม่เติม</span></li>
+        <li class="opt"><span class="k">C</span><span>ไม่มีความต่าง ใช้แทนกันได้เสมอ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b></div>
+    </div>
+
+    <div class="quiz" data-q="t1-2">
+      <p class="q"><span class="num">2.</span> (บทที่ 2) <code>var message;</code> โดยไม่กำหนดค่าเริ่มต้น ผิดตรงไหน?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>var ต้องมีค่าเริ่มต้นเสมอ เพราะคอมไพเลอร์ใช้อนุมานชนิดข้อมูล</span></li>
+        <li class="opt"><span class="k">B</span><span>var ใช้กับตัวแปรชนิด string เท่านั้น</span></li>
+        <li class="opt"><span class="k">C</span><span>ไม่ผิด คอมไพล์ผ่านปกติ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b></div>
+    </div>
+
+    <div class="quiz" data-q="t1-3">
+      <p class="q"><span class="num">3.</span> (บทที่ 3) เครื่องหมายใดใช้สร้าง verbatim string literal?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>$</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>@</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>#</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b></div>
+    </div>
+
+    <div class="quiz" data-q="t1-4">
+      <p class="q"><span class="num">4.</span> (บทที่ 4) <code>int q = 7 / 2;</code> ค่าของ q คือเท่าไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>3.5</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>3</span></li>
+        <li class="opt"><span class="k">C</span><span>4</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> int หาร int ตัดเศษทศนิยมทิ้งเสมอ</div>
+    </div>
+
+    <div class="quiz" data-q="t1-5">
+      <p class="q"><span class="num">5.</span> (บทที่ 5–6) ทำไมโปรเจกต์แบบ Guided Project ถึงให้เขียนโค้ดทีละขั้นแล้วเช็คผลบ่อยๆ?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เพื่อให้โค้ดยาวขึ้นดูน่าประทับใจ</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>เพื่อหาจุดผิดได้เร็ว ก่อนความซับซ้อนสะสมจนแก้ยาก</span></li>
+        <li class="opt"><span class="k">C</span><span>เพราะ C# บังคับให้เขียนแบบนี้เท่านั้น</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> การแตกปัญหาใหญ่เป็นชิ้นเล็กและตรวจสอบบ่อยๆ คือทักษะหลัก
+        ของนักพัฒนามืออาชีพ ไม่ใช่กฎบังคับของภาษา</div>
+    </div>
+
+    <div class="quiz" data-q="t1-6">
+      <p class="q"><span class="num">6.</span> (บทที่ 6) <code>(int) 3.998m</code> ได้ค่าเท่าไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>4</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>3</span></li>
+        <li class="opt"><span class="k">C</span><span>3.998</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> cast เป็น int ตัดทิ้งเสมอ ไม่ปัดเศษ</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <div class="pager">
+      <a href="ch05.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 5 · Guided Project — Student Grades</span></a>
+      <a class="next" href="ch07.html"><span class="dir">Part 2 →</span><span class="ttl">บทที่ 7 · Install and Configure Visual Studio Code</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

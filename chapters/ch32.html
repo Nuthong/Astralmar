@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 32 · Challenge Project: มินิเกม — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="32">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 5 · Create Methods / บทที่ 32</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 5 · โมดูล 5/5 · ⚔️ Challenge Project</span>
+      <h1>Challenge Project — สร้างมินิเกม</h1>
+      <div class="en">Challenge Project - Create a Mini-Game</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>80–110 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เกมคอนโซล ASCII ที่เล่นได้จริง เคลื่อนที่ กินอาหาร เปลี่ยนสถานะ</b></span>
+        <span>🎯 ความยาก <b>สูงมาก (โจทย์เปิด ไม่มีคำแนะนำทีละขั้น)</b></span>
+      </div>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ บทนี้พิเศษ: ไม่มี starter code ต้นฉบับให้เห็นเป็นตัวอักษร</span>
+      ต่างจาก Challenge Project ก่อนหน้า (<a href="ch20.html">บทที่ 20</a>, <a href="ch27.html">บทที่
+      27</a>) ที่ MS Learn ให้โค้ดตั้งต้นมาเป็นตัวอักษรเต็มๆ — โมดูลนี้ MS Learn อธิบาย starter code
+      ไว้แค่เป็น<b>รายการข้อความบรรยาย</b>เท่านั้น (บอกว่ามี method อะไรบ้าง ทำอะไร แต่ไม่ให้โค้ด
+      จริง) เพราะไฟล์ starter อยู่ใน zip ที่ดาวน์โหลดแยกต่างหาก ผมจึง<b>ออกแบบและเขียนระบบเกมทั้งหมด
+      ขึ้นเองใหม่หมด</b> ให้ตรงตามสเปกที่บรรยายไว้ทุกข้อ — เฉลยในบทนี้จึงเป็นของผมเองยิ่งกว่า
+      Challenge Project บทอื่นๆ ทั้งหมด ถือว่าเป็นโอกาสดีที่จะเห็นว่าจะออกแบบระบบทั้งชุดจากคำบรรยาย
+      ล้วนๆ ยังไง
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ใช้ Visual Studio Code พัฒนา console application ที่ใช้ method implement logical
+            workflow ได้</li>
+        <li>เข้าใจโค้ดที่มีอยู่แล้ว และตัดสินใจปรับแก้การออกแบบอย่างมีข้อมูลรองรับ</li>
+        <li>สร้าง return value และ method ที่มีทั้งพารามิเตอร์แบบ required และ optional ได้</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">32.1 สถานการณ์และสเปก</h2>
+
+    <p>การสร้างเกมของตัวเองเป็นวิธีที่น่าตื่นเต้นในการฝึกทักษะการเขียนโปรแกรม เกมพึ่งพาการประมวลผล
+       input จากผู้ใช้อย่างมาก เพื่อตัดสินใจแบบไดนามิก เกมทุกเกมยังต้องมีชุดกฎที่กำหนดไว้ชัดเจน
+       ที่ตัดสินการกระทำและเหตุการณ์ในเกม</p>
+
+    <p>สมมติคุณอยากสร้างเกมของตัวเอง คุณอาจยังไม่พร้อมพัฒนาเกมที่มีฟีเจอร์ครบเต็มรูปแบบ จึงตัดสินใจ
+       เริ่มจากเล็กที่สุดเท่าที่จะทำได้ คุณอยากขยับตัวละครไปทั่วหน้าจอ และทำให้มันกินวัตถุได้ วัตถุที่
+       กินเข้าไปส่งผลต่อสถานะของผู้เล่นได้ เพื่อให้เกมดำเนินต่อไปได้ คุณอยากให้วัตถุนั้น regenerate
+       (สร้างใหม่) ในตำแหน่งใหม่หลังถูกกินไปแล้ว คุณตัดสินใจว่าต้องใช้ method จัดระเบียบโค้ดเกมของคุณ</p>
+
+    <p>ในโมดูลนี้ คุณจะพัฒนาฟีเจอร์ต่อไปนี้ของแอปมินิเกม:</p>
+    <ul>
+      <li>ฟีเจอร์ตัดสินว่าผู้เล่นกินอาหารหรือไม่</li>
+      <li>ฟีเจอร์อัปเดตสถานะผู้เล่นตามอาหารที่กิน</li>
+      <li>ฟีเจอร์หยุดความเร็วการเคลื่อนที่ชั่วคราวตามอาหารที่กิน</li>
+      <li>ฟีเจอร์สร้างอาหารใหม่ในตำแหน่งใหม่</li>
+      <li>ตัวเลือกจบเกมถ้ากดปุ่มที่ไม่รองรับ</li>
+      <li>ฟีเจอร์จบเกมถ้าหน้าต่าง Terminal ถูกปรับขนาด</li>
+    </ul>
+
+    <h3 id="s01a">สเปกจาก MS Learn (คำบรรยาย starter code)</h3>
+    <p>โค้ดตั้งต้นตามคำบรรยายของ MS Learn ประกอบด้วย:</p>
+    <ul>
+      <li><b>ตัวแปร</b>: ขนาดหน้าต่าง Terminal, ตำแหน่งของผู้เล่นและอาหาร, array
+          <code>states</code> และ <code>foods</code> เก็บรูปลักษณ์ที่เป็นไปได้ของผู้เล่นและอาหาร,
+          ตัวแปรติดตามรูปลักษณ์ปัจจุบันของผู้เล่นและอาหาร</li>
+      <li><b>Method ที่มีอยู่แล้ว</b>: เช็คว่าหน้าต่าง Terminal ถูกปรับขนาดไหม, แสดงรูปลักษณ์อาหารสุ่ม
+          ที่ตำแหน่งสุ่ม, เปลี่ยนรูปลักษณ์ผู้เล่นให้ตรงกับอาหารที่กิน, หยุดการเคลื่อนที่ของผู้เล่น
+          ชั่วคราว, ขยับผู้เล่นตาม input ทิศทาง, ตั้งค่าสถานะเริ่มต้นของเกม</li>
+      <li><b>สิ่งที่ยังขาด</b> (งานของคุณ): เช็คว่าผู้เล่นกินอาหารที่แสดงอยู่หรือไม่, เช็คว่าอาหารที่
+          กินควรหยุดการเคลื่อนที่ของผู้เล่นไหม, เช็คว่าอาหารที่กินควรเพิ่มความเร็วการเคลื่อนที่ไหม,
+          เพิ่มความเร็วการเคลื่อนที่, แสดงอาหารใหม่หลังถูกกิน, จบการทำงานถ้ากดปุ่มที่ไม่รองรับ, จบ
+          การทำงานถ้า terminal ถูกปรับขนาด</li>
+    </ul>
+
+    <p>สเปกรายละเอียดเพิ่มเติมจาก 3 แบบฝึกหัดของโมดูลนี้:</p>
+    <ul>
+      <li><b>จบเกมถ้าปรับขนาดหน้าต่าง:</b> เช็คว่า terminal ถูกปรับขนาดก่อนให้เกมทำงานต่อ ล้างหน้าจอ
+          และจบเกมถ้าปรับขนาด แสดงข้อความ <code>"Console was resized. Program exiting."</code>
+          ก่อนจบโปรแกรม</li>
+      <li><b>เพิ่มตัวเลือกจบเกม:</b> ปรับ method <code>Move</code> ที่มีอยู่แล้วให้รองรับ optional
+          parameter — ถ้าเปิดใช้งาน parameter นี้ควรตรวจจับปุ่มที่ไม่ใช่ทิศทาง ถ้าเจอปุ่มแบบนั้น
+          ให้เกมจบได้</li>
+      <li><b>ตรวจว่าผู้เล่นกินอาหารหรือไม่:</b> สร้าง method ใช้ตัวแปรตำแหน่งของผู้เล่นและอาหารที่มี
+          อยู่แล้ว method ต้องคืนค่า หลังผู้เล่นขยับ เรียก method นี้ตัดสินว่าควรเรียก method
+          เปลี่ยนรูปลักษณ์ผู้เล่นและ method แสดงอาหารใหม่หรือไม่</li>
+      <li><b>ตรวจว่าผู้เล่นควรหยุดนิ่ง:</b> สร้าง method เช็คว่ารูปลักษณ์ผู้เล่นปัจจุบันคือ
+          <code>(X_X)</code> ไหม (เกิดจากกินอาหารค่า <code>#####</code>) method ต้องคืนค่า ก่อน
+          ยอมให้ผู้เล่นขยับ เรียก method นี้ตัดสินว่าควรเรียก method หยุดการเคลื่อนที่หรือไม่ (หยุด
+          แค่ชั่วคราวเท่านั้น ผู้เล่นต้องขยับต่อได้หลังจากนั้น)</li>
+      <li><b>เพิ่มตัวเลือกเพิ่มความเร็ว:</b> ปรับ method <code>Move</code> ให้รองรับ optional
+          parameter ความเร็วการเคลื่อนที่ ใช้เพิ่ม/ลดความเร็วซ้าย-ขวาทีละ 3 สร้าง method เช็คว่า
+          รูปลักษณ์ผู้เล่นปัจจุบันคือ <code>(^-^)</code> ไหม แล้วเรียก method นี้ตัดสินว่า
+          <code>Move</code> ควรใช้พารามิเตอร์ความเร็วหรือไม่</li>
+    </ul>
+
+    <div class="note tip">
+      <span class="lbl">💡 นี่คือ Challenge Project — ลองออกแบบเองก่อน</span>
+      แม้บทนี้จะไม่มีโค้ดตั้งต้นให้ก็ตาม ลองปิดหนังสือแล้วร่างโครงสร้างเกมของคุณเองดูก่อนก็ได้ — ลอง
+      คิดว่าคุณจะเก็บตำแหน่งผู้เล่น/อาหารยังไง จะรับ input ทิศทางยังไง (ใบ้: <code>Console.ReadKey()</code>)
+      และจะตรวจจับการปรับขนาดหน้าต่างยังไง (ใบ้: <code>Console.WindowWidth</code>/
+      <code>WindowHeight</code>)
+    </div>
+
+    <h3 id="s01b">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch32-minigame</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch32-a"><span>อ่านและเข้าใจสเปกทั้งหมดครบถ้วน</span></label></li>
+      <li><label><input type="checkbox" id="ch32-b"><span>ลองร่างโครงสร้างเกมของตัวเองก่อนดูเฉลย</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s02">32.2 🔓 การออกแบบของผม — โครงสร้างเกมและ Method ที่มีอยู่แล้ว</h2>
+
+    <p>ผมออกแบบเกมให้เป็น ASCII art ง่ายๆ บนหน้าจอ Terminal — ตัวละครผู้เล่นเป็นหน้ายิ้มแบบ
+       text เช่น <code>('-')</code> เคลื่อนที่ด้วยปุ่มลูกศร อาหารเป็น string สัญลักษณ์ เช่น
+       <code>#####</code> ปรากฏที่ตำแหน่งสุ่มบนจอ</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ตัวแปรตั้งต้น)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int windowWidth = Console.WindowWidth;
+int windowHeight = Console.WindowHeight;
+
+int playerRow;
+int playerCol;
+int foodRow;
+int foodCol;
+
+string[] foods  = { "*****", "#####", "+++++" };
+string[] states = { "('-')", "(X_X)", "(^-^)" };
+
+string currentState = states[0];
+int currentFoodIndex = 0;
+
+bool gameOver = false;</code></pre>
+    </div>
+
+    <p>ผมออกแบบ <code>foods</code> กับ <code>states</code> เป็น <b>array คู่ขนาน</b> (parallel
+       array — ทบทวนจาก <a href="ch12.html">บทที่ 12</a>) — index เดียวกันแทนความสัมพันธ์กัน:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Index</th><th>foods[i]</th><th>states[i]</th><th>ผลเมื่อกิน</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td><code>*****</code></td><td><code>('-')</code></td><td>ปกติ ไม่มีผลพิเศษ</td></tr>
+        <tr><td>1</td><td><code>#####</code></td><td><code>(X_X)</code></td><td>หยุดนิ่งชั่วคราว</td></tr>
+        <tr><td>2</td><td><code>+++++</code></td><td><code>(^-^)</code></td><td>เคลื่อนที่ซ้าย-ขวาเร็วขึ้น</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>ต่อไปนี้คือ method ที่ผมถือว่า "มีอยู่แล้ว" ตามที่สเปกบรรยายไว้ (เขียนขึ้นเองให้ตรงตามคำอธิบาย):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (method ที่ "มีอยู่แล้ว")</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// เช็คว่าหน้าต่าง Terminal ถูกปรับขนาดไหม
+bool IsResized()
+{
+    return Console.WindowWidth != windowWidth || Console.WindowHeight != windowHeight;
+}
+
+// แสดงรูปลักษณ์อาหารสุ่มที่ตำแหน่งสุ่ม
+void DisplayFood()
+{
+    Random random = new Random();
+    currentFoodIndex = random.Next(foods.Length);
+    foodRow = random.Next(1, windowHeight - 1);
+    foodCol = random.Next(1, windowWidth - foods[currentFoodIndex].Length - 1);
+
+    Console.SetCursorPosition(foodCol, foodRow);
+    Console.Write(foods[currentFoodIndex]);
+}
+
+// เปลี่ยนรูปลักษณ์ผู้เล่นให้ตรงกับอาหารที่กิน
+void ChangeAppearance(int foodIndex)
+{
+    currentState = states[foodIndex];
+}
+
+// หยุดการเคลื่อนที่ของผู้เล่นชั่วคราว
+void FreezePlayer()
+{
+    Console.SetCursorPosition(0, 0);
+    Console.Write("Frozen!   ");
+    System.Threading.Thread.Sleep(1500);
+    Console.SetCursorPosition(0, 0);
+    Console.Write("          ");
+}
+
+// ขยับผู้เล่นตาม input ทิศทาง
+void Move(ConsoleKey key)
+{
+    Console.SetCursorPosition(playerCol, playerRow);
+    Console.Write(new string(' ', currentState.Length));
+
+    switch (key)
+    {
+        case ConsoleKey.UpArrow:
+            playerRow = Math.Max(1, playerRow - 1);
+            break;
+        case ConsoleKey.DownArrow:
+            playerRow = Math.Min(windowHeight - 1, playerRow + 1);
+            break;
+        case ConsoleKey.LeftArrow:
+            playerCol = Math.Max(0, playerCol - 1);
+            break;
+        case ConsoleKey.RightArrow:
+            playerCol = Math.Min(windowWidth - currentState.Length, playerCol + 1);
+            break;
+    }
+
+    Console.SetCursorPosition(playerCol, playerRow);
+    Console.Write(currentState);
+}
+
+// ตั้งค่าสถานะเริ่มต้นของเกม
+void Setup()
+{
+    Console.Clear();
+    Console.CursorVisible = false;
+    playerRow = windowHeight / 2;
+    playerCol = windowWidth / 2;
+    DisplayFood();
+    Console.SetCursorPosition(playerCol, playerRow);
+    Console.Write(currentState);
+}</code></pre>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ Console.SetCursorPosition คืออะไร</span>
+      <code>Console.SetCursorPosition(col, row)</code> ย้าย cursor ของ Terminal ไปยังตำแหน่งคอลัมน์
+      และแถวที่กำหนด (ทั้งสองค่าเริ่มนับที่ 0) — บรรทัดถัดไปที่ <code>Console.Write()</code> ทำงาน
+      จะเขียนทับตำแหน่งนั้นแทนที่จะขึ้นบรรทัดใหม่แบบปกติ นี่คือกลไกหลักที่ทำให้ตัวละคร "เคลื่อนที่"
+      บนหน้าจอได้ — เขียนช่องว่างทับตำแหน่งเก่าก่อน (ลบภาพเดิม) แล้วค่อยเขียนตัวละครที่ตำแหน่งใหม่
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch32-c"><span>เข้าใจโครงสร้างตัวแปรและ method ที่มีอยู่แล้วครบถ้วน</span></label></li>
+      <li><label><input type="checkbox" id="ch32-d"><span>เข้าใจกลไก parallel array ระหว่าง foods กับ states</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">32.3 🔓 เฉลยของผม — จบเกมเมื่อ Resize หรือกดปุ่มไม่ถูกต้อง</h2>
+
+    <p>งานแรกคือให้เกมจบได้ 2 ทาง: (1) หน้าต่าง Terminal ถูกปรับขนาด (2) ผู้เล่นกดปุ่มที่ไม่ใช่ปุ่ม
+       ทิศทาง — งานแรกเช็คใน main loop ตรงๆ งานที่สองต้องปรับ <code>Move()</code> ให้รองรับ
+       optional parameter</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ปรับ Move ให้รองรับ checkTermination)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void Move(ConsoleKey key, bool checkTermination = true)
+{
+    Console.SetCursorPosition(playerCol, playerRow);
+    Console.Write(new string(' ', currentState.Length));
+
+    switch (key)
+    {
+        case ConsoleKey.UpArrow:
+            playerRow = Math.Max(1, playerRow - 1);
+            break;
+        case ConsoleKey.DownArrow:
+            playerRow = Math.Min(windowHeight - 1, playerRow + 1);
+            break;
+        case ConsoleKey.LeftArrow:
+            playerCol = Math.Max(0, playerCol - 1);
+            break;
+        case ConsoleKey.RightArrow:
+            playerCol = Math.Min(windowWidth - currentState.Length, playerCol + 1);
+            break;
+        default:
+            if (checkTermination)
+            {
+                gameOver = true;
+            }
+            break;
+    }
+
+    Console.SetCursorPosition(playerCol, playerRow);
+    Console.Write(currentState);
+}</code></pre>
+    </div>
+
+    <p>สังเกตว่าผมเพิ่มแค่ <code>default:</code> case เข้าไปใน <code>switch</code> เดิม (ทบทวนหลัก
+       การ switch จาก <a href="ch16.html">บทที่ 16</a>) — ถ้าปุ่มที่กดไม่ตรงกับ 4 ทิศทางเลย และ
+       <code>checkTermination</code> เป็น <code>true</code> (ค่า default) จะตั้ง global variable
+       <code>gameOver</code> เป็น <code>true</code></p>
+
+    <p>ต่อไป main loop ที่เช็ค resize <b>ก่อน</b> ประมวลผลการเคลื่อนที่ทุกครั้ง:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Setup();
+
+while (!gameOver)
+{
+    if (IsResized())
+    {
+        Console.Clear();
+        Console.WriteLine("Console was resized. Program exiting.");
+        break;
+    }
+
+    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+    Move(keyInfo.Key);
+}</code></pre>
+    </div>
+
+    <p>สังเกตว่าใช้ <code>Console.ReadKey(true)</code> — argument <code>true</code> บอกว่าไม่ต้อง
+       echo ตัวอักษรที่กดกลับไปที่หน้าจอ (ไม่งั้นตัวอักษรจะไปรบกวนภาพเกม) เมธอดนี้บล็อกโปรแกรมรอ
+       จนกว่าผู้เล่นจะกดปุ่มใดปุ่มหนึ่ง — คืน <code>ConsoleKeyInfo</code> ที่มี property
+       <code>.Key</code> เป็นค่า enum <code>ConsoleKey</code> บอกว่ากดปุ่มไหน</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 ทดสอบเปิด/ปิด optional parameter</span>
+      ทดสอบตามสเปก: เปิดใช้งาน — เรียก <code>Move(keyInfo.Key)</code> ตรงๆ (ใช้ค่า default
+      <code>true</code>) กดปุ่มที่ไม่ใช่ทิศทาง เกมควรจบ — ปิดใช้งาน — เปลี่ยนเป็น
+      <code>Move(keyInfo.Key, false)</code> กดปุ่มที่ไม่ใช่ทิศทาง เกมควรทำงานต่อ (ไม่มีอะไรเกิดขึ้น
+      เพราะไม่เข้าเงื่อนไข switch ไหนเลย) แต่ยังคงจบเกมได้ถ้าปรับขนาดหน้าต่าง เพราะ
+      <code>IsResized()</code> เช็คแยกจากพารามิเตอร์นี้โดยสิ้นเชิง
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch32-e"><span>เพิ่ม optional parameter checkTermination ให้ Move() สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch32-f"><span>เพิ่มการเช็ค IsResized() ใน main loop สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch32-g"><span>ทดสอบทั้งเปิดและปิด checkTermination สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">32.4 🔓 เฉลยของผม — ให้ผู้เล่นกินอาหารได้</h2>
+
+    <p>ตอนนี้เกมจบได้แล้ว แต่ผู้เล่นยังกินอาหารไม่ได้เลย — สร้าง method เช็คว่าผู้เล่นอยู่ตำแหน่ง
+       เดียวกับอาหารหรือไม่:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">bool ConsumedFood()
+{
+    bool sameRow = playerRow == foodRow;
+    bool overlapsCol = playerCol >= foodCol && playerCol < foodCol + foods[currentFoodIndex].Length;
+    return sameRow && overlapsCol;
+}</code></pre>
+    </div>
+
+    <p>เพราะทั้งผู้เล่นและอาหารเป็น string หลายตัวอักษร (ไม่ใช่จุดเดียว) ผมเช็คว่าผู้เล่นอยู่แถว
+       เดียวกับอาหาร (<code>sameRow</code>) และตำแหน่งคอลัมน์ของผู้เล่นอยู่ในช่วงความกว้างของ
+       string อาหาร (<code>overlapsCol</code>) — ถือว่า "กิน" ถ้าทั้งสองเงื่อนไขเป็นจริงพร้อมกัน</p>
+
+    <p>เชื่อม method นี้เข้ากับ main loop หลังผู้เล่นขยับทุกครั้ง:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Setup();
+
+while (!gameOver)
+{
+    if (IsResized())
+    {
+        Console.Clear();
+        Console.WriteLine("Console was resized. Program exiting.");
+        break;
+    }
+
+    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+    int eatenFoodIndex = currentFoodIndex;
+
+    Move(keyInfo.Key);
+
+    if (gameOver) break;
+
+    if (ConsumedFood())
+    {
+        ChangeAppearance(eatenFoodIndex);
+        DisplayFood();
+    }
+}</code></pre>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ทำไมต้องเก็บ eatenFoodIndex ไว้ก่อน Move()</span>
+      สังเกตว่าผมเก็บค่า <code>currentFoodIndex</code> ไว้ในตัวแปร <code>eatenFoodIndex</code>
+      <b>ก่อน</b>เรียก <code>Move()</code> — เพราะถ้าผู้เล่นกินอาหารสำเร็จ โค้ดจะเรียก
+      <code>DisplayFood()</code> ซึ่งเปลี่ยนค่า <code>currentFoodIndex</code> เป็นอาหารชิ้นใหม่ทันที
+      ถ้าเรียก <code>ChangeAppearance(currentFoodIndex)</code> ตรงๆ หลัง <code>DisplayFood()</code>
+      จะได้รูปลักษณ์ของอาหารชิ้น<b>ใหม่</b> (ที่ยังไม่ถูกกิน) ไม่ใช่อาหารชิ้นที่<b>เพิ่งกินไป</b> —
+      ต้องเก็บค่าดักไว้ก่อนเสมอเมื่อค่านั้นจะถูกเปลี่ยนโดย method ที่เรียกทีหลัง (ทบทวนแนวคิด
+      execution order จาก <a href="ch28.html">บทที่ 28</a>)
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch32-h"><span>สร้าง ConsumedFood() สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch32-i"><span>เชื่อมเข้ากับ main loop สำเร็จ เปลี่ยนรูปลักษณ์และสร้างอาหารใหม่ได้ถูกต้อง</span></label></li>
+      <li><label><input type="checkbox" id="ch32-j"><span>ทดสอบเดินไปกินอาหารทั้ง 3 แบบ สำเร็จ เห็นรูปลักษณ์เปลี่ยนถูกต้อง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">32.5 🔓 เฉลยของผม — ปรับการเคลื่อนที่ตามอาหารที่กิน</h2>
+
+    <p>ตอนนี้เกมเล่นได้ กินอาหารได้ เปลี่ยนรูปลักษณ์ได้ — แต่รูปลักษณ์ยังไม่ส่งผลอะไรต่อการเล่นเลย
+       งานสุดท้ายคือทำให้อาหาร <code>#####</code> (สถานะ <code>(X_X)</code>) หยุดผู้เล่นชั่วคราว
+       และอาหาร <code>+++++</code> (สถานะ <code>(^-^)</code>) เพิ่มความเร็วซ้าย-ขวา</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">bool ShouldFreeze()
+{
+    return currentState == "(X_X)";
+}
+
+bool ShouldSpeedUp()
+{
+    return currentState == "(^-^)";
+}</code></pre>
+    </div>
+
+    <p>ปรับ <code>Move()</code> อีกครั้ง เพิ่ม optional parameter ความเร็ว:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (Move ฉบับสมบูรณ์)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void Move(ConsoleKey key, bool checkTermination = true, int speed = 1)
+{
+    Console.SetCursorPosition(playerCol, playerRow);
+    Console.Write(new string(' ', currentState.Length));
+
+    switch (key)
+    {
+        case ConsoleKey.UpArrow:
+            playerRow = Math.Max(1, playerRow - 1);
+            break;
+        case ConsoleKey.DownArrow:
+            playerRow = Math.Min(windowHeight - 1, playerRow + 1);
+            break;
+        case ConsoleKey.LeftArrow:
+            playerCol = Math.Max(0, playerCol - speed);
+            break;
+        case ConsoleKey.RightArrow:
+            playerCol = Math.Min(windowWidth - currentState.Length, playerCol + speed);
+            break;
+        default:
+            if (checkTermination)
+            {
+                gameOver = true;
+            }
+            break;
+    }
+
+    Console.SetCursorPosition(playerCol, playerRow);
+    Console.Write(currentState);
+}</code></pre>
+    </div>
+
+    <p>สเปกบอกว่า "เพิ่ม/ลดความเร็วซ้าย-ขวาทีละ 3" — ผมตีความว่าหมายถึง speed เพิ่มขึ้นจากค่าปกติ 1
+       เป็น 1+3 = 4 ตอนสถานะเป็น <code>(^-^)</code> เท่านั้น (ไม่กระทบการขยับขึ้น-ลง)</p>
+
+    <p>อัปเดต main loop ให้เช็คทั้งสองสถานะก่อนเรียก <code>Move()</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ฉบับสมบูรณ์)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Setup();
+
+while (!gameOver)
+{
+    if (IsResized())
+    {
+        Console.Clear();
+        Console.WriteLine("Console was resized. Program exiting.");
+        break;
+    }
+
+    if (ShouldFreeze())
+    {
+        FreezePlayer();
+    }
+
+    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+    int eatenFoodIndex = currentFoodIndex;
+
+    int moveSpeed = ShouldSpeedUp() ? 4 : 1;
+    Move(keyInfo.Key, checkTermination: true, speed: moveSpeed);
+
+    if (gameOver) break;
+
+    if (ConsumedFood())
+    {
+        ChangeAppearance(eatenFoodIndex);
+        DisplayFood();
+    }
+}</code></pre>
+    </div>
+
+    <p>สังเกตว่าผมใช้ <b>named argument</b> (ทบทวนจาก <a href="ch29.html">บทที่ 29</a>) ตอนเรียก
+       <code>Move(keyInfo.Key, checkTermination: true, speed: moveSpeed)</code> — ทำให้อ่านโค้ด
+       เข้าใจง่ายขึ้นมาก ว่า argument แต่ละตัวคืออะไร แทนที่จะพึ่ง positional argument ล้วนๆ ซึ่งอาจ
+       สับสนได้ง่ายเมื่อมีพารามิเตอร์ประเภทเดียวกันหลายตัว (ในที่นี้คือ <code>bool</code> กับ
+       <code>int</code> ซึ่งไม่ชนกัน แต่การตั้งชื่อชัดๆ ก็ยังช่วยความอ่านง่ายอยู่ดี)</p>
+
+    <p>ตรวจสอบว่า <code>ShouldFreeze()</code> ทำให้ผู้เล่นหยุดแค่<b>ชั่วคราว</b>จริง (ไม่ใช่ค้างถาวร)
+       — เพราะ <code>FreezePlayer()</code> ใช้ <code>Thread.Sleep(1500)</code> แค่หน่วงเวลาไว้ 1.5
+       วินาทีแล้วปล่อยให้โปรแกรมทำงานต่อตามปกติ พอ loop วนกลับมาอ่าน key ใหม่ ผู้เล่นก็ขยับต่อได้
+       เหมือนเดิม ไม่ค้างตลอดไป</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 ทดสอบเปิด/ปิด Speed Boost</span>
+      ทดสอบตามสเปก: เปิดใช้งาน — <code>moveSpeed = ShouldSpeedUp() ? 4 : 1;</code> ทำงานตามปกติ
+      สถานะ <code>(^-^)</code> ควรขยับซ้าย-ขวาได้ไกลกว่าปกติต่อการกดหนึ่งครั้ง — ปิดใช้งาน — เปลี่ยน
+      เป็น <code>int moveSpeed = 1;</code> ตรงๆ (ไม่เรียก <code>ShouldSpeedUp()</code> เลย) ความเร็ว
+      ควรเป็นปกติเสมอไม่ว่าสถานะจะเป็นอะไร
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch32-k"><span>สร้าง ShouldFreeze() และ ShouldSpeedUp() สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch32-l"><span>เพิ่ม optional parameter speed ให้ Move() สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch32-m"><span>ทดสอบครบทุก state (ปกติ/หยุดนิ่ง/เร็วขึ้น) สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">32.6 🔓 โค้ดฉบับเต็ม (Program.cs)</h2>
+
+    <details class="fold">
+      <summary>🔓 ดู Program.cs ฉบับเต็ม</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button></div>
+          <pre><code class="lang-cs">int windowWidth = Console.WindowWidth;
+int windowHeight = Console.WindowHeight;
+
+int playerRow;
+int playerCol;
+int foodRow;
+int foodCol;
+
+string[] foods  = { "*****", "#####", "+++++" };
+string[] states = { "('-')", "(X_X)", "(^-^)" };
+
+string currentState = states[0];
+int currentFoodIndex = 0;
+
+bool gameOver = false;
+
+Setup();
+
+while (!gameOver)
+{
+    if (IsResized())
+    {
+        Console.Clear();
+        Console.WriteLine("Console was resized. Program exiting.");
+        break;
+    }
+
+    if (ShouldFreeze())
+    {
+        FreezePlayer();
+    }
+
+    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+    int eatenFoodIndex = currentFoodIndex;
+
+    int moveSpeed = ShouldSpeedUp() ? 4 : 1;
+    Move(keyInfo.Key, checkTermination: true, speed: moveSpeed);
+
+    if (gameOver) break;
+
+    if (ConsumedFood())
+    {
+        ChangeAppearance(eatenFoodIndex);
+        DisplayFood();
+    }
+}
+
+bool IsResized()
+{
+    return Console.WindowWidth != windowWidth || Console.WindowHeight != windowHeight;
+}
+
+void DisplayFood()
+{
+    Random random = new Random();
+    currentFoodIndex = random.Next(foods.Length);
+    foodRow = random.Next(1, windowHeight - 1);
+    foodCol = random.Next(1, windowWidth - foods[currentFoodIndex].Length - 1);
+
+    Console.SetCursorPosition(foodCol, foodRow);
+    Console.Write(foods[currentFoodIndex]);
+}
+
+void ChangeAppearance(int foodIndex)
+{
+    currentState = states[foodIndex];
+}
+
+void FreezePlayer()
+{
+    Console.SetCursorPosition(0, 0);
+    Console.Write("Frozen!   ");
+    System.Threading.Thread.Sleep(1500);
+    Console.SetCursorPosition(0, 0);
+    Console.Write("          ");
+}
+
+void Move(ConsoleKey key, bool checkTermination = true, int speed = 1)
+{
+    Console.SetCursorPosition(playerCol, playerRow);
+    Console.Write(new string(' ', currentState.Length));
+
+    switch (key)
+    {
+        case ConsoleKey.UpArrow:
+            playerRow = Math.Max(1, playerRow - 1);
+            break;
+        case ConsoleKey.DownArrow:
+            playerRow = Math.Min(windowHeight - 1, playerRow + 1);
+            break;
+        case ConsoleKey.LeftArrow:
+            playerCol = Math.Max(0, playerCol - speed);
+            break;
+        case ConsoleKey.RightArrow:
+            playerCol = Math.Min(windowWidth - currentState.Length, playerCol + speed);
+            break;
+        default:
+            if (checkTermination)
+            {
+                gameOver = true;
+            }
+            break;
+    }
+
+    Console.SetCursorPosition(playerCol, playerRow);
+    Console.Write(currentState);
+}
+
+void Setup()
+{
+    Console.Clear();
+    Console.CursorVisible = false;
+    playerRow = windowHeight / 2;
+    playerCol = windowWidth / 2;
+    DisplayFood();
+    Console.SetCursorPosition(playerCol, playerRow);
+    Console.Write(currentState);
+}
+
+bool ConsumedFood()
+{
+    bool sameRow = playerRow == foodRow;
+    bool overlapsCol = playerCol >= foodCol && playerCol < foodCol + foods[currentFoodIndex].Length;
+    return sameRow && overlapsCol;
+}
+
+bool ShouldFreeze()
+{
+    return currentState == "(X_X)";
+}
+
+bool ShouldSpeedUp()
+{
+    return currentState == "(^-^)";
+}</code></pre>
+        </div>
+        <p>🎉 ยินดีด้วย! คุณเพิ่งออกแบบและสร้างมินิเกมคอนโซลที่เล่นได้จริงตั้งแต่ต้นจนจบ — เดินได้ 4
+           ทิศทาง กินอาหารเปลี่ยนสถานะได้ หยุดนิ่งชั่วคราวได้ เร่งความเร็วได้ และจบเกมได้ 2 แบบ ลอง
+           คัดลอกไปรันจริงด้วย <code>dotnet run</code> แล้วเล่นดูให้สนุก!</p>
+      </div>
+    </details>
+
+    <!-- ============================================ -->
+    <h2 id="s07">32.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>ตัวละครวาดเป็นเส้นยาวลงมาเรื่อยๆ แทนที่จะเคลื่อนที่อยู่ตำแหน่งเดียว</td>
+          <td>ลืมเรียก <code>Console.SetCursorPosition()</code> ก่อน <code>Console.Write()</code>
+              ทุกครั้ง — ถ้าไม่ตั้งตำแหน่ง cursor ก่อน มันจะเขียนต่อจากตำแหน่งเดิมแล้วขึ้นบรรทัดใหม่
+              ตามปกติของ console ธรรมดา</td>
+        </tr>
+        <tr>
+          <td>รูปลักษณ์ผู้เล่นเปลี่ยนเป็นอาหารชิ้นถัดไปแทนที่จะเป็นชิ้นที่เพิ่งกิน</td>
+          <td>เรียก <code>ChangeAppearance(currentFoodIndex)</code> <b>หลัง</b>
+              <code>DisplayFood()</code> เปลี่ยนค่า <code>currentFoodIndex</code> ไปแล้ว — ต้องเก็บ
+              ค่าดักไว้ในตัวแปรก่อนเสมอ (ทบทวนหัวข้อ 32.4)</td>
+        </tr>
+        <tr>
+          <td>ผู้เล่นค้างนิ่งตลอดไปหลังกินอาหาร #####</td>
+          <td>ไม่ใช่บั๊ก ถ้าดีไซน์ถูกต้อง — <code>FreezePlayer()</code> ใช้แค่
+              <code>Thread.Sleep()</code> หน่วงเวลาชั่วคราว ไม่ได้ตั้ง flag ค้างถาวรใดๆ ถ้าค้างจริง
+              ให้ตรวจว่าไม่มีโค้ดอื่นตั้งค่า <code>currentState</code> เป็น <code>(X_X)</code> ซ้ำ
+              อยู่เรื่อยๆ</td>
+        </tr>
+        <tr>
+          <td>IndexOutOfRangeException ตอนแสดงอาหารใกล้ขอบจอ</td>
+          <td>สุ่มตำแหน่ง <code>foodCol</code> ไม่ได้เผื่อความยาวของ string อาหารไว้ — ต้องใช้
+              <code>random.Next(1, windowWidth - foods[currentFoodIndex].Length - 1)</code> ไม่ใช่
+              <code>random.Next(1, windowWidth - 1)</code> เฉยๆ</td>
+        </tr>
+        <tr>
+          <td>เกมไม่จบทั้งที่ปรับขนาดหน้าต่างแล้ว</td>
+          <td>เช็ค <code>IsResized()</code> วางอยู่<b>หลัง</b> <code>Console.ReadKey()</code> ซึ่ง
+              เป็นคำสั่งที่บล็อกโปรแกรมรอ input — ต้องเช็คก่อนรอ input ทุกรอบของ loop เพื่อให้จับได้
+              เร็วที่สุด (แม้จะจับได้ "รอบถัดไป" อยู่ดีเพราะ ReadKey บล็อกอยู่ ก็ควรวางเช็คไว้จุดแรก
+              สุดของ loop เสมอเป็นหลักปฏิบัติที่ดี)</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">32.8 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment ของ Microsoft Learn</p>
+
+    <div class="quiz" data-q="32-1">
+      <p class="q"><span class="num">1.</span> นักพัฒนาต้องการสร้าง method เปรียบเทียบค่า 2 ค่า
+        ข้อใดเป็น data type ที่ดีที่สุดให้ method นี้คืนค่า?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ค่า double</span></li>
+        <li class="opt"><span class="k">B</span><span>ไม่คืนอะไรเลย ควรเป็น void</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>ค่า bool</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> การเปรียบเทียบธรรมชาติแล้วให้ผลลัพธ์แบบ "จริงหรือเท็จ"
+        (เช่น เท่ากันไหม มากกว่าไหม) <code>bool</code> จึงเป็น return type ที่เหมาะสมที่สุด ตรงกับ
+        method อย่าง <code>ShouldFreeze()</code> และ <code>ShouldSpeedUp()</code> ในบทนี้</div>
+    </div>
+
+    <div class="quiz" data-q="32-2">
+      <p class="q"><span class="num">2.</span> นักพัฒนาต้องการสร้าง method ที่คืนค่าหนึ่งค่าใน
+        array ข้อใดเป็น method signature ที่ดี?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>string GetValueAtIndex(string[] array, int index)</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>bool GetValueAtIndex(string[] array, int index)</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>int GetValueAtIndex(int index)</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ต้องรับทั้ง array และ index มาเป็นพารามิเตอร์ (ข้อ C
+        ขาด array เข้าไปเลย ไม่มีทางรู้ว่าจะดึงค่าจาก array ไหน) และ return type ต้องตรงกับชนิด
+        element ใน array (<code>string[]</code> จึงควรคืน <code>string</code> ไม่ใช่
+        <code>bool</code> แบบข้อ B)</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">32.9 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เพิ่มอาหารชนิดที่ 4 ในเกม: string <code>"====="</code> จับคู่กับสถานะใหม่
+           <code>"(o_o)"</code> (ไม่มีผลพิเศษใดๆ แค่เปลี่ยนหน้าตา) ต้องแก้ทั้ง <code>foods</code>
+           และ <code>states</code> array</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่แก้)</span></div>
+          <pre><code class="lang-cs">string[] foods  = { "*****", "#####", "+++++", "=====" };
+string[] states = { "('-')", "(X_X)", "(^-^)", "(o_o)" };</code></pre></div>
+          <p>เพราะ index ยังตรงกันเป็นคู่ๆ (parallel array) จึงไม่ต้องแก้โค้ดส่วนอื่นเลย —
+             <code>ChangeAppearance()</code> ทำงานได้ทันทีกับอาหารชนิดใหม่</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียน method <code>int CountFoodTypes()</code> ที่คืนจำนวนชนิดอาหารทั้งหมดในเกม (อ่าน
+           จาก <code>foods.Length</code>) แล้วพิมพ์ผลลัพธ์ตอนเริ่มเกม</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int CountFoodTypes()
+{
+    return foods.Length;
+}
+
+// เรียกก่อน Setup():
+Console.WriteLine($"This game has {CountFoodTypes()} food types.");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เพิ่มระบบคะแนน: ตัวแปร global <code>int score = 0;</code> เพิ่มขึ้น 10 ทุกครั้งที่กิน
+           อาหาร แสดงคะแนนที่มุมซ้ายบนของจอ (แถว 1 คอลัมน์ 0 เพื่อไม่ชนข้อความ "Frozen!" ที่แถว 0)
+           ทุกครั้งที่คะแนนเปลี่ยน</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่แก้)</span></div>
+          <pre><code class="lang-cs">int score = 0;
+
+void DisplayScore()
+{
+    Console.SetCursorPosition(0, 1);
+    Console.Write($"Score: {score}   ");
+}
+
+// ใน main loop หลัง ConsumedFood():
+if (ConsumedFood())
+{
+    ChangeAppearance(eatenFoodIndex);
+    DisplayFood();
+    score += 10;
+    DisplayScore();
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลง <code>ConsumedFood()</code> ให้เป็น method ที่ทดสอบได้ง่ายขึ้น โดยรับตำแหน่ง
+           ผู้เล่นและอาหารเป็นพารามิเตอร์แทนที่จะอ่านจากตัวแปร global โดยตรง (เขียน signature ใหม่
+           พร้อมปรับจุดที่เรียกใช้ให้ตรงกัน)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">bool ConsumedFood(int pRow, int pCol, int fRow, int fCol, int fLength)
+{
+    bool sameRow = pRow == fRow;
+    bool overlapsCol = pCol >= fCol && pCol < fCol + fLength;
+    return sameRow && overlapsCol;
+}
+
+// จุดที่เรียกใช้:
+if (ConsumedFood(playerRow, playerCol, foodRow, foodCol, foods[currentFoodIndex].Length))
+{
+    ChangeAppearance(eatenFoodIndex);
+    DisplayFood();
+}</code></pre></div>
+          <p>ข้อดีของการรับพารามิเตอร์แทนอ่าน global ตรงๆ คือทดสอบ method นี้แยกได้ง่ายขึ้นมาก
+             (ป้อนค่าตำแหน่งสมมติเข้าไปตรวจผลลัพธ์ได้ โดยไม่ต้องรันเกมจริง) แต่ก็ต้องแลกกับการพิมพ์
+             argument ยาวขึ้นทุกครั้งที่เรียก — เป็น trade-off ที่นักพัฒนาต้องชั่งน้ำหนักเอง</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>เพิ่มเงื่อนไขจบเกมใหม่: ถ้าผู้เล่นเก็บคะแนนถึง 100 (จากแบบฝึกหัดข้อ 3) ให้จบเกมพร้อมข้อความ
+           "You win!" แทนที่จะให้เล่นต่อไปเรื่อยๆ ไม่มีที่สิ้นสุด</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่แก้ใน main loop)</span></div>
+          <pre><code class="lang-cs">if (ConsumedFood())
+{
+    ChangeAppearance(eatenFoodIndex);
+    DisplayFood();
+    score += 10;
+    DisplayScore();
+
+    if (score >= 100)
+    {
+        Console.Clear();
+        Console.WriteLine("You win!");
+        gameOver = true;
+    }
+}</code></pre></div>
+          <p>ใช้ <code>gameOver = true;</code> เหมือนเงื่อนไขจบเกมอื่นๆ ในบทนี้ — ทำให้
+             <code>while (!gameOver)</code> loop หยุดที่รอบถัดไปเช่นเดียวกัน</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>วิเคราะห์: โค้ดของผมเช็ค <code>IsResized()</code> ก่อน <code>Console.ReadKey()</code>
+           ทุกรอบของ loop แต่ <code>Console.ReadKey()</code> เป็นคำสั่งที่<b>บล็อก</b>โปรแกรมรอ
+           input ผู้ใช้ — ถ้าผู้ใช้ปรับขนาดหน้าต่างแล้ว<b>ไม่กด</b>ปุ่มอะไรต่อเลย เกมจะจบทันทีไหม
+           หรือต้องรอให้กดปุ่มก่อน? อธิบายเหตุผล แล้วลองเสนอวิธีแก้ถ้าต้องการให้เกมจบทันทีที่ resize
+           (ไม่ต้องรอกดปุ่ม)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>เกม<b>จะไม่จบทันที</b> — ต้องรอให้ผู้ใช้กดปุ่มก่อน เพราะ <code>Console.ReadKey()</code>
+             เป็นคำสั่ง blocking ที่หยุดโปรแกรมไว้ตรงนั้นจนกว่าจะมี key event เข้ามา โค้ดที่เช็ค
+             <code>IsResized()</code> จะไม่ได้ทำงานอีกครั้งจนกว่า <code>ReadKey()</code> รอบปัจจุบัน
+             จะคืนค่ากลับมา (คือหลังกดปุ่มแล้ว) — วิธีแก้จริงต้องใช้เทคนิคขั้นสูงกว่านี้ เช่น รันการ
+             เช็ค resize บน background thread แยกต่างหาก (ใช้ <code>System.Threading.Tasks</code>
+             หรือ <code>Timer</code>) ที่ตรวจสอบทุกๆ ช่วงเวลาสั้นๆ โดยไม่ขึ้นกับว่า main thread
+             กำลังรอ <code>ReadKey()</code> อยู่หรือไม่ — เนื้อหานี้อยู่นอกขอบเขตของ Foundational
+             C# แต่เป็นตัวอย่างที่ดีว่าเมื่อโปรแกรมโตขึ้น บางครั้งก็ต้องพึ่งแนวคิดเรื่อง concurrency
+             (การทำงานพร้อมกันหลาย thread) ด้วย</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 32</h2>
+
+    <p>เป้าหมายของคุณคือแสดงความสามารถในการพัฒนาฟีเจอร์ของแอปพลิเคชันให้บรรลุตามสเปกที่ออกแบบไว้ คุณ
+       ต้องถอดรหัสโค้ดเกมที่มีอยู่แล้ว (หรือในกรณีของบทนี้ ออกแบบมันขึ้นเองจากคำบรรยาย) เพื่อตัดสินใจ
+       ปรับแก้และเพิ่มเติมโค้ดอย่างมีข้อมูลรองรับ</p>
+
+    <p>ด้วยการสร้าง method ใหม่ เพิ่ม optional parameter และใช้โค้ดที่มีอยู่แล้ว คุณสร้างมินิเกมที่
+       ทำงานได้จริงและสนุกขึ้นมาสำเร็จ! ความสามารถในการ implement ฟีเจอร์ของแอปมินิเกมนี้ตามสเปกการ
+       ออกแบบ แสดงให้เห็นว่าคุณสร้างและเรียกใช้ method ได้อย่างแท้จริงแล้ว</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 32</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">แพทเทิร์น</th><th>ใช้เมื่อ</th></tr></thead>
+        <tbody>
+          <tr><td><code>Console.SetCursorPosition(col, row)</code></td><td>ย้าย cursor ก่อนเขียนทับตำแหน่งเดิมบนจอ</td></tr>
+          <tr><td><code>Console.ReadKey(true)</code></td><td>รับปุ่มกดโดยไม่ echo ตัวอักษรกลับจอ</td></tr>
+          <tr><td>parallel array (foods/states)</td><td>เก็บความสัมพันธ์ 1-ต่อ-1 ระหว่างข้อมูลสองชุดด้วย index เดียวกัน</td></tr>
+          <tr><td>เก็บค่าดักก่อนเรียก method ที่จะเปลี่ยนมัน</td><td>ป้องกันอ่านค่าผิดจังหวะ เมื่อลำดับการทำงานสำคัญ</td></tr>
+          <tr><td>global bool flag (gameOver)</td><td>สื่อสารสถานะ "จบ" ข้ามหลาย method และ main loop</td></tr>
+          <tr><td>optional parameter หลายตัวพร้อม named argument</td><td>เพิ่มความยืดหยุ่นให้ method โดยไม่ทำลายความอ่านง่าย</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>cursor</td><td>เคอร์เซอร์</td><td>ตำแหน่งที่ตัวอักษรถัดไปจะถูกเขียนบนหน้าจอ Terminal</td></tr>
+        <tr><td>blocking call</td><td>คำสั่งบล็อก</td><td>คำสั่งที่หยุดโปรแกรมรอจนกว่าจะได้ผลลัพธ์ (เช่น ReadKey)</td></tr>
+        <tr><td>game loop</td><td>ลูปเกม</td><td>while loop หลักที่วนรับ input และอัปเดตสถานะเกมซ้ำๆ</td></tr>
+        <tr><td>state</td><td>สถานะ</td><td>รูปลักษณ์/เงื่อนไขปัจจุบันของตัวละครหรือระบบ</td></tr>
+        <tr><td>concurrency</td><td>การทำงานพร้อมกัน</td><td>แนวคิดการรันหลายงานพร้อมกันด้วยหลาย thread</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="trophy">🏆 Trophy — สรุปรวบยอด Part 5</h2>
+    <p>ยินดีด้วย! คุณเรียนจบ <b>Part 5 · Create Methods</b> ครบทั้ง 5 โมดูลแล้ว (Write Your First
+       Method, Methods with Parameters, Methods with Return Values, Guided Project, Challenge
+       Project) ก่อนไปต่อ Part 6 มาทบทวนแนวคิดสำคัญที่สุดของ Part นี้กันอีกรอบ:</p>
+
+    <div class="quiz" data-q="t5-1">
+      <p class="q"><span class="num">Trophy 1</span> method signature <code>void Greet(string name)</code>
+        — <code>name</code> เรียกว่าอะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>parameter</span></li>
+        <li class="opt"><span class="k">B</span><span>argument</span></li>
+        <li class="opt"><span class="k">C</span><span>return type</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนจาก <a href="ch29.html">บทที่ 29</a></div>
+    </div>
+
+    <div class="quiz" data-q="t5-2">
+      <p class="q"><span class="num">Trophy 2</span> ตัวแปรชนิดไหนที่ถ้าแก้ไขข้างใน method แล้ว
+        กระทบตัวแปรต้นฉบับข้างนอกด้วย?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>int</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>array</span></li>
+        <li class="opt"><span class="k">C</span><span>string</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนจาก <a href="ch29.html">บทที่ 29</a> — array เป็น
+        reference type ที่ไม่ immutable ต่างจาก string</div>
+    </div>
+
+    <div class="quiz" data-q="t5-3">
+      <p class="q"><span class="num">Trophy 3</span> compile error "not all code paths return a
+        value" เกิดจากอะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>method มี return type ไม่ใช่ void แต่บางเส้นทางในโค้ดไม่มี return</span></li>
+        <li class="opt"><span class="k">B</span><span>ลืมใส่เซมิโคลอนท้าย return statement</span></li>
+        <li class="opt"><span class="k">C</span><span>เรียก method ก่อนนิยาม</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนจาก <a href="ch30.html">บทที่ 30</a></div>
+    </div>
+
+    <div class="quiz" data-q="t5-4">
+      <p class="q"><span class="num">Trophy 4</span> optional parameter ต้องอยู่ตำแหน่งไหนใน
+        method signature?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ต้องมาก่อน required parameter เสมอ</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>ต้องมาหลัง required parameter เสมอ</span></li>
+        <li class="opt"><span class="k">C</span><span>ตำแหน่งไหนก็ได้ ไม่มีข้อจำกัด</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนจาก <a href="ch29.html">บทที่ 29</a></div>
+    </div>
+
+    <div class="quiz" data-q="t5-5">
+      <p class="q"><span class="num">Trophy 5</span> อัลกอริทึม Fisher-Yates ใช้ทำอะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เรียงลำดับ array</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>สับเปลี่ยน (shuffle) array แบบสุ่มไม่ bias</span></li>
+        <li class="opt"><span class="k">C</span><span>ค้นหาค่าใน array</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนจาก <a href="ch31.html">บทที่ 31</a></div>
+    </div>
+
+    <div class="quiz" data-q="t5-6">
+      <p class="q"><span class="num">Trophy 6</span> pseudo-code ต้องเขียนให้ compile ผ่านได้จริง
+        ไหม?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ต้องได้ ไม่งั้นไม่เรียกว่า pseudo-code</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>ไม่จำเป็น — แค่ต้องสื่อความชัดเจนว่าโค้ดจะทำอะไร</span></li>
+        <li class="opt"><span class="k">C</span><span>ต้องได้เฉพาะตอนใช้ placeholder method เท่านั้น</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนจาก <a href="ch28.html">บทที่ 28</a> และ
+        <a href="ch31.html">บทที่ 31</a></div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <div class="pager">
+      <a href="ch31.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 31 · Guided Project — สวนสัตว์เลี้ยง</span></a>
+      <a class="next" href="ch33.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 33 · Part 6: หลักการ Debugging และ Exception</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

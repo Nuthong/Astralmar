@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 21 · Data Types — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="21">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 4 · Work with Variable Data / บทที่ 21</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 4 · โมดูล 1/7</span>
+      <h1>เลือก Data Type ให้ถูกต้องในโค้ด C#</h1>
+      <div class="en">Choose the Correct Data Type in your C# Code</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>45–60 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เข้าใจ value/reference type, integral/floating-point type, stack/heap และเลือก data type ได้อย่างมีเหตุผล</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น–กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="lbl">🎉 ยินดีต้อนรับสู่ Part 4</span>
+      คุณเพิ่งเรียนจบ <a href="ch20.html#trophy">Part 3</a> ครบทั้ง 7 โมดูลแล้ว! Part 4 นี้พาคุณลงลึก
+      เรื่อง "ข้อมูล" (data) ในภาษา C# — data type ทำงานยังไงจริงๆ เบื้องหลัง, จะแคสต์/แปลงข้อมูล
+      ยังไง, จัดรูปแบบ string ยังไง, และจัดการ array ขั้นสูงยังไง จบด้วย Guided + Challenge Project
+      อีกชุดเหมือน Part 3
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>เข้าใจความแตกต่างพื้นฐานระหว่าง <b>value type</b> กับ <b>reference type</b></li>
+        <li>อธิบายคุณสมบัติของ numeric data type ใหม่ๆ ทั้ง <b>integral type</b> และ
+            <b>floating-point type</b></li>
+        <li>เขียนโค้ดที่คืนค่าสูงสุดและต่ำสุดที่ numeric data type แต่ละชนิดเก็บได้</li>
+        <li>ใช้คีย์เวิร์ด <code>new</code> สร้าง instance ใหม่ของ reference type</li>
+        <li>ตัดสินใจเลือก data type ที่เหมาะสมกับแอปพลิเคชันของคุณได้</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">21.1 ทำไมต้องเข้าใจ Data Type ให้ลึกขึ้น</h2>
+
+    <p>ภาษา C# พึ่งพา data type อย่างมาก data type จำกัดชนิดของค่าที่เก็บในตัวแปรหนึ่งๆ ได้ ซึ่งช่วย
+       ให้เขียนโค้ดที่ปราศจากข้อผิดพลาดได้ง่ายขึ้น ในฐานะนักพัฒนา คุณมั่นใจในการดำเนินการกับตัวแปร
+       ของคุณได้ เพราะรู้ล่วงหน้าว่ามันเก็บได้แค่ค่าที่ถูกต้องเท่านั้น</p>
+
+    <p>สมมติงานของคุณคือสร้างแอปใหม่ที่ต้อง ดึง จัดการ และเก็บข้อมูลหลายชนิดมาก รวมถึงค่าตัวเลขเดี่ยว
+       และลำดับของค่าตัวเลขกับข้อความ การเลือก data type ที่ถูกต้องเป็นสิ่งสำคัญมากต่อความสำเร็จของ
+       งานพัฒนาซอฟต์แวร์ของคุณ แต่คุณมีตัวเลือกอะไรบ้าง และควรใช้เกณฑ์อะไรตัดสินใจ เมื่อเจอ
+       data type หลายตัวที่ดูคล้ายกัน?</p>
+
+    <p>ในบทนี้ คุณจะเรียนรู้ว่าแอปของคุณเก็บและประมวลผลข้อมูลยังไง คุณจะเรียนว่า data type มี 2
+       ประเภทหลักที่สอดคล้องกับ 2 วิธีที่ข้อมูลถูกประมวลผล คุณจะเขียนโค้ดที่หาค่าสูงสุดและต่ำสุดที่
+       numeric data type แต่ละชนิดเก็บได้ และเรียนเกณฑ์การเลือกระหว่าง numeric data type หลายตัวสำหรับ
+       แอปของคุณ</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">21.2 ข้อมูลคืออะไร และ Value กับ Reference Type ต่างกันยังไง</h2>
+
+    <h3 id="s02a">ข้อมูลคืออะไรจริงๆ</h3>
+    <p>ในงานพัฒนาซอฟต์แวร์ ข้อมูลก็คือค่าที่ถูกเก็บในหน่วยความจำของคอมพิวเตอร์เป็นลำดับของ bit
+       <b>bit</b> คือสวิตช์ไบนารีง่ายๆ แทนด้วย <code>0</code> หรือ <code>1</code> (คือ "off" กับ "on")
+       bit เดียวดูไม่มีประโยชน์เท่าไร แต่พอรวม 8 bit เข้าด้วยกันเป็นลำดับ มันจะกลายเป็น <b>byte</b>
+       เมื่อใช้ในหนึ่ง byte แต่ละ bit จะมีความหมายตามตำแหน่งของมัน อันที่จริงคุณแทนค่าได้ถึง 256
+       รูปแบบด้วยแค่ 8 bit ถ้าใช้ระบบเลขฐานสอง (binary)</p>
+
+    <p>ตัวอย่างเช่น ในระบบเลขฐานสอง คุณแทนเลข <code>195</code> ด้วย <code>11000011</code> ได้
+       ตารางข้างล่างช่วยให้เห็นภาพ: แถวแรกมี 8 คอลัมน์ แทนตำแหน่งใน byte แต่ละตำแหน่งแทนค่าตัวเลขที่
+       ต่างกัน แถวที่สองเก็บค่าของแต่ละ bit (<code>0</code> หรือ <code>1</code>)</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>128</th><th>64</th><th>32</th><th>16</th><th>8</th><th>4</th><th>2</th><th>1</th></tr></thead>
+      <tbody><tr><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td></tr></tbody>
+    </table>
+    </div>
+
+    <p>ถ้าบวกเลขจากแถวแรกที่ตรงกับ <code>1</code> ในแถวสอง คุณจะได้ค่าเทียบเท่าฐานสิบของค่าเลขฐานสอง
+       นี้: <code>128 + 64 + 2 + 1 = 195</code></p>
+
+    <p>ถ้าจะทำงานกับค่าที่ใหญ่กว่า <code>255</code> คอมพิวเตอร์ต้องเก็บ byte มากขึ้น (ปกติ 32-bit
+       หรือ 64-bit) ถ้าคุณทำงานกับตัวเลขจำนวนมากในบริบททางวิทยาศาสตร์ อาจต้องพิจารณาให้รอบคอบว่าใช้
+       data type ไหน เพราะโค้ดของคุณอาจต้องการหน่วยความจำมากขึ้น</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 แล้วข้อมูลข้อความล่ะ</span>
+      ถ้าคอมพิวเตอร์เข้าใจแค่ <code>0</code> กับ <code>1</code> แล้วมันให้เราทำงานกับข้อความได้ยังไง?
+      ด้วยระบบอย่าง <b>ASCII</b> (American Standard Code for Information Interchange) คอมพิวเตอร์ใช้
+      byte เดียวแทนตัวอักษรพิมพ์ใหญ่-เล็ก ตัวเลข tab backspace newline และสัญลักษณ์ทางคณิตศาสตร์อีก
+      มากมายได้ ตัวอย่างเช่น ตัวอักษร <code>a</code> พิมพ์เล็กเทียบเท่าค่าฐานสิบ <code>97</code>
+      (<code>64 + 32 + 1 = 97</code>) จึงเก็บเป็นเลขฐานสอง 8 bit ได้เป็น <code>01100001</code> —
+      คุณแทบไม่ต้องแปลงแบบนี้ด้วยตัวเองเลยในการทำงานจริง แต่การเข้าใจมุมมองของคอมพิวเตอร์ต่อข้อมูล
+      เป็นพื้นฐานสำคัญ โดยเฉพาะตอนพิจารณาเรื่อง data type
+    </div>
+
+    <h3 id="s02b">Data Type คืออะไร</h3>
+    <p><b>data type</b> คือวิธีที่ภาษาโปรแกรมกำหนดว่าจะจองหน่วยความจำไว้เท่าไรสำหรับค่าหนึ่งๆ
+       ภาษา C# มี data type มากมายให้ใช้กับแอปพลิเคชันและขนาดข้อมูลที่หลากหลาย สำหรับแอปส่วนใหญ่
+       ที่คุณสร้างตลอดอาชีพการทำงาน คุณจะใช้แค่ส่วนย่อยเล็กๆ ของ data type ทั้งหมดที่มี แต่ก็ยังสำคัญ
+       ที่จะรู้ว่ามีตัวอื่นอยู่ด้วย และทำไม</p>
+
+    <h3 id="s02c">Value Type vs Reference Type</h3>
+    <p>บทนี้เน้นที่ data type 2 ประเภทหลักใน C#: <b>reference type</b> และ <b>value type</b></p>
+
+    <p>ตัวแปรของ reference type เก็บ <i>การอ้างอิง</i> (reference) ไปยังข้อมูลของมัน (object) —
+       คือมันชี้ไปยังค่าที่เก็บอยู่ที่อื่น ในทางกลับกัน ตัวแปรของ value type เก็บข้อมูลของมันโดยตรง
+       เมื่อคุณเรียนรู้ C# มากขึ้น รายละเอียดใหม่ๆ ที่เกี่ยวกับความแตกต่างพื้นฐานนี้จะค่อยๆ ปรากฏขึ้น</p>
+
+    <p><b>Simple value type</b> คือชุดของ type ที่กำหนดไว้ล่วงหน้าโดย C# ในรูปคีย์เวิร์ด คีย์เวิร์ด
+       เหล่านี้เป็น alias (ชื่อเล่น) ของ type ที่กำหนดไว้ใน .NET Class Library เช่น คีย์เวิร์ด
+       <code>int</code> ของ C# เป็น alias ของ value type ที่กำหนดไว้ใน .NET Class Library ในชื่อ
+       <code>System.Int32</code></p>
+
+    <p>simple value type รวมถึง data type ที่คุณอาจเคยใช้แล้วอย่าง <code>char</code> และ
+       <code>bool</code> และยังมี <b>integral</b> กับ <b>floating-point</b> value type อีกหลายตัว
+       ที่แทนตัวเลขจำนวนเต็มและเลขทศนิยมได้หลากหลายช่วงค่า</p>
+
+    <div class="quiz" data-q="21-1">
+      <p class="q"><span class="num">Check ★</span> ข้อใดอธิบายวิธีที่ bit แทนค่า on/off ได้ถูกต้อง
+        ที่สุด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>bit แทนด้วยตัวอักษร "x" หรือ "o"</span></li>
+        <li class="opt"><span class="k">B</span><span>bit แทนด้วยสัญลักษณ์ "+bit" หรือ "-bit"</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>bit เป็นเลขฐานสอง แทนด้วยตัวเลข "1" หรือ "0"</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> bit คือสวิตช์ไบนารี แทนด้วยตัวเลข 1 (on) หรือ 0 (off) เท่านั้น</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch21-a"><span>เข้าใจว่าข้อมูลถูกเก็บเป็น bit/byte ยังไง</span></label></li>
+      <li><label><input type="checkbox" id="ch21-b"><span>แยกความแตกต่างระหว่าง value type กับ reference type ได้</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">21.3 Integral Types — ตัวเลขจำนวนเต็ม</h2>
+
+    <p><b>integral type</b> คือ simple value type ที่แทนจำนวนเต็มไม่มีเศษ (เช่น <code>-1</code>,
+       <code>0</code>, <code>1</code>, <code>2</code>, <code>3</code>) ตัวที่นิยมที่สุดในกลุ่มนี้คือ
+       <code>int</code></p>
+
+    <p>integral type แบ่งเป็น 2 กลุ่มย่อย: <b>signed</b> (มีเครื่องหมายบวก-ลบ) และ <b>unsigned</b>
+       (ไม่มีเครื่องหมาย)</p>
+
+    <h3 id="s03a">Signed Integral Types</h3>
+    <p><b>signed type</b> ใช้ bit ของมันแทนทั้งจำนวนบวกและลบในสัดส่วนเท่าๆ กัน</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Signed integral types:");
+
+Console.WriteLine($"sbyte  : {sbyte.MinValue} to {sbyte.MaxValue}");
+Console.WriteLine($"short  : {short.MinValue} to {short.MaxValue}");
+Console.WriteLine($"int    : {int.MinValue} to {int.MaxValue}");
+Console.WriteLine($"long   : {long.MinValue} to {long.MaxValue}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Signed integral types:
+sbyte  : -128 to 127
+short  : -32768 to 32767
+int    : -2147483648 to 2147483647
+long   : -9223372036854775808 to 9223372036854775807</pre></div>
+
+    <p>สำหรับแอปทั่วไปที่ไม่ใช่งานวิทยาศาสตร์ คุณมักต้องใช้แค่ <code>int</code> เท่านั้น ส่วนใหญ่แล้ว
+       คุณไม่ต้องการมากกว่าช่วง -2.14 พันล้าน ถึง +2.14 พันล้าน</p>
+
+    <h3 id="s03b">Unsigned Integral Types</h3>
+    <p><b>unsigned type</b> ใช้ bit ของมันแทนแค่จำนวนบวกเท่านั้น</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (เพิ่มต่อจากด้านบน)</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("");
+Console.WriteLine("Unsigned integral types:");
+
+Console.WriteLine($"byte   : {byte.MinValue} to {byte.MaxValue}");
+Console.WriteLine($"ushort : {ushort.MinValue} to {ushort.MaxValue}");
+Console.WriteLine($"uint   : {uint.MinValue} to {uint.MaxValue}");
+Console.WriteLine($"ulong  : {ulong.MinValue} to {ulong.MaxValue}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Signed integral types:
+sbyte  : -128 to 127
+short  : -32768 to 32767
+int    : -2147483648 to 2147483647
+long   : -9223372036854775808 to 9223372036854775807
+
+Unsigned integral types:
+byte   : 0 to 255
+ushort : 0 to 65535
+uint   : 0 to 4294967295
+ulong  : 0 to 18446744073709551615</pre></div>
+
+    <p>data type หนึ่งใช้ได้กับหลายกรณี แต่จากข้อเท็จจริงที่ <code>byte</code> แทนค่าได้ตั้งแต่ 0
+       ถึง 255 เห็นได้ชัดว่ามันถูกออกแบบมาให้เก็บค่าที่แทน <i>1 byte</i> ของข้อมูลพอดี ข้อมูลที่เก็บ
+       ในไฟล์หรือส่งผ่านอินเทอร์เน็ตมักอยู่ในรูปแบบไบนารี เวลาทำงานกับข้อมูลจากแหล่งภายนอกแบบนี้
+       คุณมักต้องรับข้อมูลเป็น array ของ byte แล้วค่อยแปลงเป็น string — เมธอดจำนวนมากใน .NET Class
+       Library ที่เกี่ยวกับ encoding/decoding ข้อมูล ต้องการให้คุณจัดการกับ byte array</p>
+
+    <div class="quiz" data-q="21-2">
+      <p class="q"><span class="num">Check ★</span> data type ไหนมีช่วงจำนวนเต็มระหว่าง 0 ถึง 65535
+        ในโค้ด C#?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>sbyte</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>ushort</span></li>
+        <li class="opt"><span class="k">C</span><span>byte</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ushort มีช่วง 0 ถึง 65535 พอดี ส่วน byte มีช่วงแค่ 0-255
+        และ sbyte มีช่วง -128 ถึง 127 (ไม่ใช่บวกล้วน)</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch21-c"><span>รันโค้ดแสดงช่วงค่าของ signed integral type ทั้ง 4 ตัวสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch21-d"><span>รันโค้ดแสดงช่วงค่าของ unsigned integral type ทั้ง 4 ตัวสำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">21.4 Floating-Point Types — ตัวเลขทศนิยม</h2>
+
+    <p><b>floating point</b> คือ simple value type ที่แทนตัวเลขทางขวาของจุดทศนิยม ต่างจากตัวเลข
+       integral ตรงที่มีเรื่องต้องพิจารณามากกว่าแค่ค่าสูงสุด-ต่ำสุดที่เก็บได้</p>
+
+    <p>ก่อนอื่นต้องพิจารณา <b>digits of precision</b> (จำนวนหลักความละเอียด) ที่แต่ละ type รองรับ
+       — precision คือจำนวนตำแหน่งค่าที่เก็บได้หลังจุดทศนิยม</p>
+
+    <p>สองคือต้องพิจารณาวิธีที่ค่าถูกเก็บ และผลกระทบต่อความแม่นยำของค่า ตัวอย่างเช่น ค่า
+       <code>float</code> และ <code>double</code> ถูกเก็บภายในแบบเลขฐานสอง (base 2) ในขณะที่
+       <code>decimal</code> ถูกเก็บแบบเลขฐานสิบ (base 10) ทำไมเรื่องนี้ถึงสำคัญ?</p>
+
+    <p>การคำนวณทางคณิตศาสตร์กับค่า binary floating-point อาจให้ผลลัพธ์ที่คุณคาดไม่ถึง ถ้าคุณคุ้นกับ
+       คณิตศาสตร์แบบฐานสิบ (decimal) บ่อยครั้ง binary floating-point math เป็นแค่ค่า<i>ประมาณ</i>ของ
+       ค่าจริง ดังนั้น <code>float</code> และ <code>double</code> จึงมีประโยชน์เพราะเก็บตัวเลขจำนวน
+       มากได้ด้วยหน่วยความจำน้อย แต่ควรใช้เฉพาะตอนที่ค่าประมาณเพียงพอแล้วเท่านั้น เช่น การคำนวณการ
+       กระเด็นของลูกบอลหิมะในวิดีโอเกม คลาดเคลื่อนไปสองสามในพันก็ยังถือว่าใกล้เคียงพอ</p>
+
+    <p>เมื่อคุณต้องการคำตอบที่แม่นยำกว่านั้น ควรใช้ <code>decimal</code> ค่าแต่ละค่าของชนิด
+       <code>decimal</code> ใช้พื้นที่หน่วยความจำค่อนข้างมาก แต่การคำนวณทางคณิตศาสตร์ให้ผลลัพธ์ที่
+       แม่นยำกว่า ดังนั้นคุณควรใช้ <code>decimal</code> เมื่อทำงานกับข้อมูลทางการเงิน หรือสถานการณ์
+       ใดๆ ที่ต้องการผลลัพธ์การคำนวณที่แม่นยำ</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("");
+Console.WriteLine("Floating point types:");
+Console.WriteLine($"float  : {float.MinValue} to {float.MaxValue} (with ~6-9 digits of precision)");
+Console.WriteLine($"double : {double.MinValue} to {double.MaxValue} (with ~15-17 digits of precision)");
+Console.WriteLine($"decimal: {decimal.MinValue} to {decimal.MaxValue} (with 28-29 digits of precision)");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Floating point types:
+float  : -3.402823E+38 to 3.402823E+38 (with ~6-9 digits of precision)
+double : -1.79769313486232E+308 to 1.79769313486232E+308 (with ~15-17 digits of precision)
+decimal: -79228162514264337593543950335 to 79228162514264337593543950335 (with 28-29 digits of precision)</pre></div>
+
+    <p>สังเกตว่า <code>float</code> กับ <code>double</code> ใช้ notation ต่างจาก <code>decimal</code>
+       ตอนแทนค่าสูงสุด-ต่ำสุดของมัน แต่ notation นี้หมายความว่าอะไร?</p>
+
+    <h3 id="s04a">ถอดรหัส Floating-Point แบบ E Notation</h3>
+    <p>เพราะ floating-point type เก็บตัวเลขขนาดใหญ่พร้อม precision ได้ ค่าของมันจึงแทนด้วย "E
+       notation" ซึ่งเป็นรูปแบบ scientific notation ที่แปลว่า "คูณด้วย 10 ยกกำลัง" ดังนั้นค่าอย่าง
+       <code>5E+2</code> จะมีค่าเท่ากับ 500 เพราะเทียบเท่ากับ 5 × 10<sup>2</sup></p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ float/double vs decimal — ต่างกันในระดับ compiler</span>
+      มีความแตกต่างพื้นฐานในวิธีที่ compiler และ runtime จัดการ <code>decimal</code> เทียบกับ
+      <code>float</code> หรือ <code>double</code> โดยเฉพาะตอนตัดสินว่าต้องการความแม่นยำแค่ไหนจากการ
+      คำนวณทางคณิตศาสตร์ — จำไว้ง่ายๆ ว่า: เงิน → <code>decimal</code> เสมอ ตำแหน่ง/ฟิสิกส์/
+      วิทยาศาสตร์ที่รับค่าประมาณได้ → <code>float</code>/<code>double</code>
+    </div>
+
+    <div class="quiz" data-q="21-3">
+      <p class="q"><span class="num">Check ★</span> data type ไหนดีที่สุดสำหรับประมวลผลเงินฝาก
+        ธนาคาร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>decimal</span></li>
+        <li class="opt"><span class="k">B</span><span>float</span></li>
+        <li class="opt"><span class="k">C</span><span>double</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ข้อมูลทางการเงินต้องการความแม่นยำสูงสุด ไม่ใช่ค่าประมาณ
+        — decimal เก็บแบบฐาน 10 และให้ผลคำนวณที่แม่นยำกว่า float/double ซึ่งเก็บแบบฐาน 2 และมักมี
+        ค่าคลาดเคลื่อนเล็กน้อยจากการปัดเศษ</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch21-e"><span>รันโค้ดแสดงช่วงค่าและ precision ของ float, double, decimal สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch21-f"><span>อ่านค่า E notation ได้ (เช่น 5E+2 = 500)</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">21.5 Reference Types — Stack กับ Heap</h2>
+
+    <p><b>reference type</b> รวมถึง array, class, และ string reference type ถูกจัดการต่างจาก
+       value type ในแง่ของวิธีเก็บค่าตอนแอปกำลังทำงาน</p>
+
+    <h3 id="s05a">Reference Type ต่างจาก Value Type ยังไง</h3>
+    <p>ตัวแปร value type เก็บค่าของมันโดยตรงในพื้นที่เก็บข้อมูลที่เรียกว่า <b>stack</b> — stack คือ
+       หน่วยความจำที่ถูกจัดสรรให้กับโค้ดที่กำลังทำงานอยู่บน CPU ในขณะนั้น (เรียกอีกอย่างว่า stack
+       frame หรือ activation frame) เมื่อ stack frame ทำงานเสร็จ ค่าใน stack จะถูกลบทิ้ง</p>
+
+    <p>ตัวแปร reference type เก็บค่าของมันในพื้นที่หน่วยความจำแยกต่างหากที่เรียกว่า <b>heap</b> —
+       heap คือพื้นที่หน่วยความจำที่ใช้ร่วมกันระหว่างหลายแอปพลิเคชันที่รันบนระบบปฏิบัติการพร้อมกัน
+       .NET Runtime สื่อสารกับระบบปฏิบัติการเพื่อหาว่า memory address ไหนว่างอยู่ แล้วขอ address
+       ที่จะเก็บค่านั้นไว้ .NET Runtime เก็บค่านั้น แล้วส่ง memory address กลับไปให้ตัวแปร เมื่อโค้ด
+       ของคุณใช้ตัวแปรนั้น .NET Runtime จะค้นหา address ที่เก็บอยู่ในตัวแปรอย่างราบรื่น แล้วดึงค่าที่
+       เก็บอยู่ที่นั่นออกมา</p>
+
+    <svg viewBox="0 0 720 260" role="img" aria-label="เปรียบเทียบ stack กับ heap" style="margin:18px 0">
+      <g font-family="var(--font-th)" font-size="12.5">
+        <rect x="16" y="20" width="300" height="220" rx="12" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="166" y="46" text-anchor="middle" font-weight="700" fill="var(--brand-text)" font-size="15">Stack (Value Type)</text>
+        <rect x="46" y="66" width="240" height="42" rx="6" fill="var(--surface)" stroke="var(--brand)"/>
+        <text x="166" y="91" text-anchor="middle" font-family="var(--font-code)" fill="var(--text)">int val_A = 2;</text>
+        <rect x="46" y="120" width="240" height="42" rx="6" fill="var(--surface)" stroke="var(--brand)"/>
+        <text x="166" y="145" text-anchor="middle" font-family="var(--font-code)" fill="var(--text)">int val_B = 5;</text>
+        <text x="166" y="192" text-anchor="middle" fill="var(--text-soft)">ก็อปปี้ค่าแยกกันคนละช่อง</text>
+        <text x="166" y="212" text-anchor="middle" fill="var(--text-soft)">แก้ B ไม่กระทบ A</text>
+
+        <rect x="400" y="20" width="300" height="220" rx="12" fill="var(--warn-soft)" stroke="var(--warn)"/>
+        <text x="550" y="46" text-anchor="middle" font-weight="700" fill="var(--warn)" font-size="15">Heap (Reference Type)</text>
+        <rect x="430" y="66" width="100" height="36" rx="6" fill="var(--surface)" stroke="var(--warn)"/>
+        <text x="480" y="88" text-anchor="middle" font-family="var(--font-code)" fill="var(--text)">ref_A</text>
+        <rect x="570" y="66" width="100" height="36" rx="6" fill="var(--surface)" stroke="var(--warn)"/>
+        <text x="620" y="88" text-anchor="middle" font-family="var(--font-code)" fill="var(--text)">ref_B</text>
+        <line x1="480" y1="102" x2="550" y2="150" stroke="var(--warn)" stroke-width="2"/>
+        <line x1="620" y1="102" x2="550" y2="150" stroke="var(--warn)" stroke-width="2"/>
+        <rect x="490" y="150" width="120" height="42" rx="6" fill="var(--surface)" stroke="var(--warn)" stroke-width="2"/>
+        <text x="550" y="176" text-anchor="middle" font-family="var(--font-code)" fill="var(--text)">[0] = 5</text>
+        <text x="550" y="212" text-anchor="middle" fill="var(--text-soft)">ref_A กับ ref_B ชี้ตำแหน่งเดียวกัน</text>
+        <text x="550" y="228" text-anchor="middle" fill="var(--text-soft)">แก้ B กระทบ A ด้วย</text>
+      </g>
+    </svg>
+
+    <h3 id="s05b">สร้างตัวแปร Reference Type</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int[] data;</code></pre>
+    </div>
+
+    <p>โค้ดข้างบนประกาศตัวแปรที่เก็บค่าชนิด <code>int</code> array ได้ ตอนนี้ <code>data</code> เป็น
+       แค่ตัวแปรที่<i>อาจจะ</i>เก็บ reference (memory address) ของค่าใน heap ได้ เพราะมันยังไม่ได้ชี้
+       ไปยัง memory address ใดๆ เลย จึงเรียกว่า <b>null reference</b></p>
+
+    <p>สร้าง instance ของ <code>int</code> array ด้วยคีย์เวิร์ด <code>new</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int[] data;
+data = new int[3];</code></pre>
+    </div>
+
+    <p>คีย์เวิร์ด <code>new</code> บอก .NET Runtime ให้สร้าง instance ของ <code>int</code> array
+       แล้วประสานงานกับระบบปฏิบัติการเพื่อเก็บ array ขนาด 3 ค่า <code>int</code> ในหน่วยความจำ .NET
+       Runtime ทำตาม แล้วคืน memory address ของ <code>int</code> array ตัวใหม่ สุดท้าย memory
+       address นั้นถูกเก็บไว้ในตัวแปร <code>data</code> element ของ <code>int</code> array จะมีค่า
+       default เป็น <code>0</code> เพราะนั่นคือค่า default ของ <code>int</code></p>
+
+    <p>สองบรรทัดข้างบนมักย่อเหลือบรรทัดเดียว ทั้งประกาศตัวแปรและสร้าง instance พร้อมกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int[] data = new int[3];</code></pre>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 แล้ว string ล่ะ ทำไมไม่ต้องใช้ new</span>
+      <code>string</code> data type ก็เป็น reference type เหมือนกัน คุณอาจสงสัยว่าทำไมไม่เห็นใช้
+      <code>new</code> ตอนประกาศ string เลย — นี่เป็นความสะดวกที่นักออกแบบ C# มอบให้ เพราะ
+      <code>string</code> ถูกใช้บ่อยมาก จึงเขียนแบบนี้ได้เลย:
+      <div class="code">
+        <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง</span></div>
+        <pre><code class="lang-cs">string shortenedString = "Hello World!";
+Console.WriteLine(shortenedString);</code></pre>
+      </div>
+      เบื้องหลัง ระบบสร้าง instance ใหม่ของ <code>System.String</code> และกำหนดค่าเริ่มต้นเป็น
+      "Hello World!" ให้อยู่ดี แค่ไม่ต้องให้คุณพิมพ์ <code>new</code> เอง
+    </div>
+
+    <h3 id="s05c">ข้อควรระวังในทางปฏิบัติ: Value Type vs Reference Type</h3>
+    <p><b>ตัวอย่างที่ 1 — Value Type (int):</b> <code>val_A</code> และ <code>val_B</code> เป็น
+       integer value type</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int val_A = 2;
+int val_B = val_A;
+val_B = 5;
+
+Console.WriteLine("--Value Types--");
+Console.WriteLine($"val_A: {val_A}");
+Console.WriteLine($"val_B: {val_B}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+--Value Types--
+val_A: 2
+val_B: 5</pre></div>
+
+    <p>ตอน <code>val_B = val_A</code> ทำงาน ค่าของ <code>val_A</code> จะถูก<b>ก็อปปี้</b>และเก็บใน
+       <code>val_B</code> ดังนั้นเมื่อ <code>val_B</code> ถูกเปลี่ยน <code>val_A</code> จะไม่ได้รับ
+       ผลกระทบเลย</p>
+
+    <p><b>ตัวอย่างที่ 2 — Reference Type (array):</b> <code>ref_A</code> และ <code>ref_B</code>
+       เป็น array reference type</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int[] ref_A = new int[1];
+ref_A[0] = 2;
+int[] ref_B = ref_A;
+ref_B[0] = 5;
+
+Console.WriteLine("--Reference Types--");
+Console.WriteLine($"ref_A[0]: {ref_A[0]}");
+Console.WriteLine($"ref_B[0]: {ref_B[0]}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+--Reference Types--
+ref_A[0]: 5
+ref_B[0]: 5</pre></div>
+
+    <p>ตอน <code>ref_B = ref_A</code> ทำงาน <code>ref_B</code> จะชี้ไปยัง memory location เดียวกัน
+       กับ <code>ref_A</code> ดังนั้นเมื่อ <code>ref_B[0]</code> ถูกเปลี่ยน <code>ref_A[0]</code>
+       ก็เปลี่ยนตามไปด้วย เพราะทั้งคู่ชี้ไปยัง memory location เดียวกัน — นี่คือความแตกต่างสำคัญ
+       ระหว่าง value type กับ reference type</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ กับดักที่พบบ่อยที่สุดของมือใหม่เรื่อง reference type</span>
+      หลายคนคาดว่า <code>ref_B = ref_A</code> จะ "ก็อปปี้" array เหมือนตอนก็อปปี้ <code>int</code>
+      แต่ไม่ใช่เลย — มันแค่ก็อปปี้ memory address ทำให้ตัวแปรทั้งสองชี้ไปยัง array ตัวเดียวกัน
+      ถ้าต้องการ array คนละชุดจริงๆ ต้องสร้าง <code>new int[...]</code> แยกกันชัดเจน แล้วก็อปปี้
+      element ทีละตัว (เช่นด้วย <code>foreach</code>) ไม่ใช่แค่กำหนดตัวแปรเท่ากัน
+    </div>
+
+    <div class="quiz" data-q="21-4">
+      <p class="q"><span class="num">Check ★</span> ใน C# ตอนใช้คีย์เวิร์ด <code>new</code> สร้าง
+        instance ของ class หนึ่งตัว หน่วยความจำถูกจัดสรรที่ไหน?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>Stack</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>Heap</span></li>
+        <li class="opt"><span class="k">C</span><span>Variable</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> class เป็น reference type เสมอ instance ของมันถูกเก็บใน
+        heap ตัวแปรบน stack เก็บแค่ memory address ที่ชี้ไปยัง heap เท่านั้น</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch21-g"><span>เข้าใจความต่างระหว่าง stack กับ heap</span></label></li>
+      <li><label><input type="checkbox" id="ch21-h"><span>รันตัวอย่าง value type vs reference type ทั้งสองแบบ เห็นผลลัพธ์ต่างกันจริง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">21.6 เลือก Data Type ให้ถูกต้อง</h2>
+
+    <p>คุณรู้จักความแตกต่างระหว่าง value type กับ reference type แล้ว รวมถึง integral กับ
+       floating-point type ด้วย สมมติงานของคุณคือสร้างแอปใหม่ที่ ดึง จัดการ และเก็บข้อมูลหลายชนิด
+       — คุณจะใช้ data type ไหน?</p>
+
+    <p>บางกรณีก็เลือกง่าย เช่น เวลาทำงานกับข้อความ คุณมักใช้ <code>string</code> เป็นค่า default
+       เว้นแต่ต้องทำการต่อ string (concatenation) จำนวนมาก แต่แล้วข้อมูลตัวเลขล่ะ มีตัวเลือกถึง 11
+       แบบ จะเลือก data type ที่ถูกต้องได้ยังไง?</p>
+
+    <h3 id="s06a">เลือก Data Type ที่ตรงกับช่วงค่าที่แอปต้องการ</h3>
+    <p>การเลือก data type ช่วยกำหนดขอบเขตขนาดข้อมูลที่คุณจะเก็บในตัวแปรนั้นได้ ตัวอย่างเช่น ถ้ารู้ว่า
+       ตัวแปรหนึ่งควรเก็บแค่ตัวเลขระหว่าง 1 ถึง 10,000 (นอกเหนือจากนี้ถือว่าผิดขอบเขตที่คาดไว้) คุณ
+       มักหลีกเลี่ยง <code>byte</code> และ <code>sbyte</code> เพราะช่วงค่าของมันต่ำเกินไป</p>
+
+    <p>ยิ่งไปกว่านั้น คุณอาจไม่ต้องการ <code>int</code>, <code>long</code>, <code>uint</code>, และ
+       <code>ulong</code> เพราะเก็บข้อมูลได้มากเกินความจำเป็น เช่นเดียวกัน คุณอาจข้าม
+       <code>float</code>, <code>double</code>, และ <code>decimal</code> ถ้าไม่ต้องการค่าทศนิยม
+       คุณอาจเลือกเหลือแค่ <code>short</code> กับ <code>ushort</code> ซึ่งทั้งคู่ก็ใช้ได้ ถ้ามั่นใจ
+       ว่าค่าติดลบไม่มีความหมายในแอปของคุณ อาจเลือก <code>ushort</code> (จำนวนเต็มบวกไม่มีเครื่องหมาย
+       0 ถึง 65,535) ตอนนี้ ค่าใดๆ ที่กำหนดให้ตัวแปรชนิด <code>ushort</code> ที่อยู่นอกขอบเขต 0 ถึง
+       65535 จะ throw exception ทันที ซึ่งช่วยบังคับให้เกิดการตรวจสอบความสมเหตุสมผลในแอปของคุณโดย
+       ปริยาย</p>
+
+    <h3 id="s06b">เลือก Data Type ให้เหมาะกับข้อมูล (ไม่ใช่เพื่อ optimize performance)</h3>
+    <p>คุณอาจถูกล่อใจให้เลือก data type ที่ใช้ bit น้อยที่สุดในการเก็บข้อมูล คิดว่าจะช่วยเพิ่ม
+       performance ของแอป แต่คำแนะนำที่ดีที่สุดข้อหนึ่งเกี่ยวกับ performance ของแอป (คือแอปทำงานเร็ว
+       แค่ไหน) คือ อย่า "optimize ก่อนเวลาอันควร" (premature optimization) คุณควรอดใจไม่เดาว่าส่วน
+       ไหนของโค้ด รวมถึงการเลือก data type จะกระทบ performance</p>
+
+    <p>หลายคนคิดว่า data type ที่เก็บข้อมูลน้อยกว่าต้องใช้ CPU และหน่วยความจำน้อยกว่า data type ที่
+       เก็บข้อมูลมากกว่าเสมอ แต่ที่จริงคุณควรเลือกให้เหมาะกับข้อมูลก่อน แล้วค่อยวัด performance ของ
+       แอปด้วยซอฟต์แวร์เฉพาะทางที่ให้ข้อมูลเชิงประจักษ์เกี่ยวกับส่วนที่กระทบ performance จริงๆ
+       ในภายหลัง</p>
+
+    <h3 id="s06c">เลือก Data Type ตาม Input/Output ของ Library Function ที่ใช้</h3>
+    <p>สมมติคุณต้องทำงานกับช่วงปีระหว่างสองวันที่ เพราะแอปเป็นแอปธุรกิจ คุณอาจตัดสินใจว่าต้องการแค่
+       ช่วงตั้งแต่ปี 1960 ถึง 2200 คุณอาจคิดจะใช้ <code>byte</code> เพราะแทนค่าได้ 0-255</p>
+
+    <p>แต่พอดูเมธอด built-in บน class <code>System.TimeSpan</code> และ <code>System.DateTime</code>
+       คุณจะพบว่าส่วนใหญ่รับค่าชนิด <code>double</code> และ <code>int</code> ถ้าคุณเลือก
+       <code>sbyte</code> คุณจะต้อง cast ไปมาระหว่าง <code>byte</code> กับ <code>double</code>
+       หรือ <code>int</code> ตลอดเวลา ในกรณีนี้ เลือก <code>int</code> ถ้าไม่ต้องการความละเอียดระดับ
+       เสี้ยววินาที และเลือก <code>double</code> ถ้าต้องการ อาจสมเหตุสมผลกว่า</p>
+
+    <h3 id="s06d">เลือก Data Type ตามผลกระทบต่อระบบอื่น</h3>
+    <p>บางครั้งคุณต้องพิจารณาว่าข้อมูลจะถูกใช้โดยแอปหรือระบบอื่นยังไง เช่นฐานข้อมูล ตัวอย่างเช่น
+       ระบบ type ของ SQL Server ต่างจากระบบ type ของ C# ผลก็คือต้องมีการ mapping ระหว่างสองระบบก่อน
+       จะบันทึกข้อมูลลงฐานข้อมูลได้</p>
+
+    <p>ถ้าจุดประสงค์ของแอปคือเชื่อมต่อกับฐานข้อมูล คุณต้องพิจารณาว่าข้อมูลถูกเก็บยังไงและมากแค่ไหน
+       การเลือก data type ที่ใหญ่กว่าอาจกระทบปริมาณ (และค่าใช้จ่าย) ของพื้นที่จัดเก็บทางกายภาพที่
+       ต้องใช้เก็บข้อมูลทั้งหมดที่แอปของคุณสร้างขึ้น</p>
+
+    <h3 id="s06e">เมื่อไม่แน่ใจ ให้ยึดพื้นฐาน</h3>
+    <p>แม้จะพิจารณาหลายเรื่องแล้ว แต่ตอนเริ่มต้น เพื่อความง่าย คุณควรเลือกใช้ data type พื้นฐานกลุ่ม
+       เล็กๆ ก่อน:</p>
+    <ul>
+      <li><code>int</code> สำหรับตัวเลขจำนวนเต็มส่วนใหญ่</li>
+      <li><code>decimal</code> สำหรับตัวเลขที่แทนเงิน</li>
+      <li><code>bool</code> สำหรับค่า true/false</li>
+      <li><code>string</code> สำหรับค่าตัวอักษร/ตัวเลขผสม</li>
+    </ul>
+
+    <h3 id="s06f">เลือก Complex Type เฉพาะทางสำหรับสถานการณ์พิเศษ</h3>
+    <p>อย่าคิดค้น data type ใหม่ ถ้ามี data type ที่มีอยู่แล้วสำหรับจุดประสงค์นั้น ตัวอย่าง .NET
+       data type เฉพาะทางที่มีประโยชน์:</p>
+    <ul>
+      <li><code>byte</code>: ทำงานกับข้อมูลที่ถูก encode มาจากระบบคอมพิวเตอร์อื่น หรือใช้ character
+          set ต่างกัน</li>
+      <li><code>double</code>: ใช้กับงานเรขาคณิตหรือวิทยาศาสตร์ — <code>double</code> ถูกใช้บ่อยตอน
+          สร้างเกมที่เกี่ยวกับการเคลื่อนไหว</li>
+      <li><code>System.DateTime</code> สำหรับค่าวันที่และเวลาที่เจาะจง</li>
+      <li><code>System.TimeSpan</code> สำหรับช่วงเวลา ปี/เดือน/วัน/ชั่วโมง/นาที/วินาที/มิลลิวินาที</li>
+    </ul>
+
+    <div class="cheat">
+      <h3>ตารางสรุป Data Type ทั้งหมดที่เจอในบทนี้</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>ประเภท</th><th>Data Type</th><th>ช่วงค่า</th><th>เก็บที่</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="4">Signed integral</td><td>sbyte</td><td>-128 ถึง 127</td><td rowspan="8">Stack (value type)</td></tr>
+          <tr><td>short</td><td>-32,768 ถึง 32,767</td></tr>
+          <tr><td>int</td><td>≈ -2.1 พันล้าน ถึง +2.1 พันล้าน</td></tr>
+          <tr><td>long</td><td>≈ -9.2 ล้านล้านล้าน ถึง +9.2 ล้านล้านล้าน</td></tr>
+          <tr><td rowspan="4">Unsigned integral</td><td>byte</td><td>0 ถึง 255</td></tr>
+          <tr><td>ushort</td><td>0 ถึง 65,535</td></tr>
+          <tr><td>uint</td><td>0 ถึง ≈ 4.3 พันล้าน</td></tr>
+          <tr><td>ulong</td><td>0 ถึง ≈ 1.8 × 10¹⁹</td></tr>
+          <tr><td rowspan="3">Floating-point</td><td>float</td><td>±3.4 × 10³⁸ (~6-9 หลัก precision)</td><td rowspan="3">Stack (value type)</td></tr>
+          <tr><td>double</td><td>±1.8 × 10³⁰⁸ (~15-17 หลัก precision)</td></tr>
+          <tr><td>decimal</td><td>±7.9 × 10²⁸ (28-29 หลัก precision)</td></tr>
+          <tr><td>Reference</td><td>string, array, class</td><td>ขึ้นกับข้อมูล</td><td>Heap (ตัวแปรเก็บ address บน Stack)</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch21-i"><span>อธิบายเกณฑ์เลือก data type ได้อย่างน้อย 3 ข้อ</span></label></li>
+      <li><label><input type="checkbox" id="ch21-j"><span>รู้ว่าเมื่อไม่แน่ใจ ควรใช้ int/decimal/bool/string เป็นค่าเริ่มต้น</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s07">21.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>ใช้ float หรือ double คำนวณเงิน แล้วผลรวมเพี้ยนไปนิดหน่อย (เช่น 0.1 + 0.2 ≠ 0.3 พอดี)</td>
+          <td>float/double เก็บค่าแบบฐาน 2 ซึ่งแทนเศษส่วนฐาน 10 บางค่าไม่ได้แม่นยำ 100% ต้องใช้
+              decimal กับข้อมูลการเงินเสมอ</td>
+        </tr>
+        <tr>
+          <td>คิดว่าก็อปปี้ array ด้วย <code>arr2 = arr1;</code> แล้วแก้ arr2 ไม่กระทบ arr1</td>
+          <td>array เป็น reference type — การกำหนดค่าแบบนี้แค่ก็อปปี้ address ทั้งสองตัวแปรชี้ไปยัง
+              array ตัวเดียวกัน ถ้าต้องการ array แยกจริงๆ ต้องสร้าง <code>new</code> แล้วก็อปปี้
+              element ทีละตัว</td>
+        </tr>
+        <tr>
+          <td>OverflowException ตอนกำหนดค่าเกินขอบเขตให้ตัวแปรชนิด byte/short/ushort</td>
+          <td>เป็นพฤติกรรมที่ถูกต้อง (ไม่ใช่บั๊ก) — ค่าที่เกินช่วง MinValue-MaxValue ของ type นั้น
+              ทำให้เกิด exception ตามที่ตั้งใจ (ใช้เป็นการ sanity-check โดยปริยายได้)</td>
+        </tr>
+        <tr>
+          <td>เลือก byte/sbyte เพราะคิดว่า "เล็กกว่า เร็วกว่า" ทั้งที่ข้อมูลจริงอาจเกินขอบเขต</td>
+          <td>อย่า optimize ก่อนเวลาอันควร — เลือก data type ให้พอดีกับข้อมูลก่อน ไม่ใช่เพื่อ
+              performance ที่ยังไม่ได้วัดจริง</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">21.8 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment ของ Microsoft Learn</p>
+
+    <div class="quiz" data-q="21-5">
+      <p class="q"><span class="num">1.</span> โค้ดต้องเก็บค่าตัวเลขจำนวนเต็มระหว่างลบและบวก
+        1,000,000 data type ไหนดีที่สุด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>float</span></li>
+        <li class="opt"><span class="k">B</span><span>double</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>int</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> เป็นตัวเลขจำนวนเต็ม (whole number) ไม่มีเศษ ไม่จำเป็นต้อง
+        ใช้ floating-point type เลย <code>int</code> ครอบคลุมช่วง ±1,000,000 ได้สบายๆ (ช่วงจริงของ
+        int คือ ±2.1 พันล้าน) และเป็นตัวเลือกที่เหมาะสมที่สุดตามหลัก "เมื่อไม่แน่ใจ ให้ยึดพื้นฐาน"</div>
+    </div>
+
+    <div class="quiz" data-q="21-6">
+      <p class="q"><span class="num">2.</span> โค้ดของเกมต้องเก็บค่าทศนิยมจำนวนมากที่แทนตำแหน่ง x,
+        y, z ในพื้นที่ 3 มิติขนาดใหญ่ น่าจะต้องคำนวณฟิสิกส์เรื่องวิถีการเคลื่อนที่ต่างๆ ไม่จำเป็น
+        ต้องแม่นยำสมบูรณ์แบบ แต่สำคัญที่โปรแกรมต้องทำงานได้อย่างมีประสิทธิภาพที่สุด data type ไหน
+        ดีที่สุด?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>float</span></li>
+        <li class="opt"><span class="k">B</span><span>decimal</span></li>
+        <li class="opt"><span class="k">C</span><span>int</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ค่าตำแหน่งเป็นทศนิยม (int ตัดออก) ไม่ต้องการความแม่นยำ
+        สมบูรณ์แบบและเน้นประสิทธิภาพ (ตัดการใช้ decimal ที่แม่นยำแต่หนักและช้ากว่าออก) float ใช้
+        หน่วยความจำน้อยกว่า double (4 byte เทียบ 8 byte) เหมาะกับค่าจำนวนมากในพื้นที่ 3 มิติที่เน้น
+        ความเร็วมากกว่าความละเอียด</div>
+    </div>
+
+    <div class="quiz" data-q="21-7">
+      <p class="q"><span class="num">3.</span> ข้อความใดต่อไปนี้ <b>ถูกต้อง</b>?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>Reference type ถูกเก็บใน stack</span></li>
+        <li class="opt"><span class="k">B</span><span>Value type เก็บได้แค่ตัวเลขเท่านั้น</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>ใช้ตัวดำเนินการ new สร้าง instance ใหม่ของ reference type แล้วคืน address ของมันให้ตัวแปร</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ตรงกับหัวข้อ 21.5b ทุกประการ ข้อ A ผิดเพราะ reference
+        type ถูกเก็บใน heap (ตัวแปรบน stack เก็บแค่ address) ข้อ B ผิดเพราะ value type มีทั้ง
+        <code>bool</code>, <code>char</code>, และ struct อื่นๆ ที่ไม่ใช่ตัวเลข ไม่ใช่แค่ตัวเลข
+        เท่านั้น</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">21.9 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดพิมพ์ <code>MinValue</code> และ <code>MaxValue</code> ของ <code>char</code>
+           (ใบ้: <code>char</code> ก็มี MinValue/MaxValue เหมือน numeric type)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Console.WriteLine($"char: {(int)char.MinValue} to {(int)char.MaxValue}");</code></pre></div>
+          <p>ต้อง cast เป็น <code>(int)</code> ก่อนพิมพ์ ไม่งั้นจะได้ตัวอักษรที่มองไม่เห็น (control
+             character) แทนที่จะเห็นตัวเลข</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ตอบคำถามสั้นๆ: ตัวแปรที่เก็บ "อายุของคน" (0-120 ปี) ควรใช้ data type ไหนในกลุ่ม integral
+           ที่ประหยัดหน่วยความจำที่สุด ตามเกณฑ์หัวข้อ 21.6a?</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p><code>byte</code> (0-255) ครอบคลุมช่วง 0-120 ได้พอดีและประหยัดที่สุดในบรรดา integral
+             type ทั้งหมด — แต่ในทางปฏิบัติ นักพัฒนาส่วนใหญ่มักเลือก <code>int</code> อยู่ดีตามหลัก
+             "เมื่อไม่แน่ใจ ให้ยึดพื้นฐาน" (หัวข้อ 21.6e) เว้นแต่มีเหตุผลเฉพาะเจาะจงจริงๆ ที่ต้อง
+             ประหยัดหน่วยความจำ (เช่น เก็บอายุคนนับล้านคนพร้อมกัน)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดสร้าง <code>int[] scores = new int[3];</code> กำหนดค่า
+           <code>scores[0] = 10;</code> จากนั้นสร้างตัวแปรใหม่ <code>backup</code> ที่เป็น array
+           แยกจาก <code>scores</code> จริงๆ (แก้ backup ไม่กระทบ scores) โดยก็อปปี้ค่าทีละ element
+           ด้วย <code>for</code> loop (ห้ามใช้ <code>backup = scores;</code> ตรงๆ)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int[] scores = new int[3];
+scores[0] = 10;
+
+int[] backup = new int[scores.Length];
+for (int i = 0; i < scores.Length; i++)
+{
+    backup[i] = scores[i];
+}
+
+backup[0] = 999;
+
+Console.WriteLine($"scores[0]: {scores[0]}");
+Console.WriteLine($"backup[0]: {backup[0]}");</code></pre></div>
+          <p>ผลลัพธ์: <code>scores[0]: 10</code> และ <code>backup[0]: 999</code> — เพราะ
+             <code>backup</code> เป็น array คนละตัวที่มี memory address ของตัวเอง แม้เนื้อหาข้างใน
+             จะเหมือนกันตอนแรกก็ตาม</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดที่พยายามกำหนดค่า <code>300</code> ให้ตัวแปรชนิด <code>byte</code> แล้วอธิบายว่า
+           เกิดอะไรขึ้นและทำไม (ทบทวนหัวข้อ 21.3b)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (compile error)</span></div>
+          <pre><code class="lang-cs">byte myByte = 300;</code></pre></div>
+          <p>เกิด compile-time error: <code>error CS0031: Constant value '300' cannot be converted
+             to a 'byte'</code> — เพราะ <code>byte</code> เก็บได้แค่ 0-255 เท่านั้น 300 อยู่นอก
+             ขอบเขตนี้ นี่คือตัวอย่างของ "sanity checking โดยปริยาย" ที่หัวข้อ 21.6a พูดถึง —
+             compiler จับปัญหานี้ให้คุณตั้งแต่ก่อนรันโปรแกรมด้วยซ้ำ</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดเปรียบเทียบผลบวก <code>0.1f + 0.2f</code> (float) กับ <code>0.1m + 0.2m</code>
+           (decimal — ใส่ <code>m</code> suffix บอกว่าเป็น decimal literal) แล้วพิมพ์ทั้งสองผลลัพธ์
+           ออกมา สังเกตความต่าง</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">float floatResult = 0.1f + 0.2f;
+decimal decimalResult = 0.1m + 0.2m;
+
+Console.WriteLine($"float:   {floatResult}");
+Console.WriteLine($"decimal: {decimalResult}");</code></pre></div>
+          <div class="out"><pre>
+float:   0.3
+decimal: 0.3</pre></div>
+          <p>ในกรณีนี้ C# ปัด float ให้แสดงเป็น 0.3 พอดีตอน <code>WriteLine</code> (เพราะ default
+             formatting ปัดตำแหน่งที่ไม่มีนัยสำคัญออก) แต่ถ้าเทียบค่าด้วย <code>==</code>
+             แบบตรงๆ หรือคำนวณต่อหลายรอบ ความคลาดเคลื่อนเล็กๆ ของ float จะเริ่มสะสมและแสดงผลชัดขึ้น
+             เรื่อยๆ นี่คือเหตุผลที่ควรใช้ <code>decimal</code> กับการคำนวณการเงินเสมอ ไม่ใช่
+             <code>float</code>/<code>double</code></p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>ให้เหตุผลว่าทำไม <code>System.DateTime</code> และ <code>System.TimeSpan</code> (จาก
+           หัวข้อ 21.6f) น่าจะเป็น <b>reference type</b> หรือ <b>value type</b> — ลองเดาจาก
+           พฤติกรรมที่คุณคาดหวังตอนใช้งานจริง (เช่น ก็อปปี้ตัวแปรวันที่แล้วแก้ค่า ควรกระทบตัวต้นฉบับ
+           หรือไม่) แล้วถ้าอยากได้คำตอบจริง ลองค้นหา "C# DateTime struct" ดู</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p><code>DateTime</code> และ <code>TimeSpan</code> เป็น <b>value type</b> (โดยเฉพาะเป็น
+             <code>struct</code> — โครงสร้างข้อมูลชนิดหนึ่งที่ยังไม่ได้เรียนในบทนี้) เหตุผลเชิง
+             ปฏิบัติ: ถ้าคุณก็อปปี้ตัวแปร <code>DateTime</code> ไปอีกตัวแล้วแก้ไขค่าใหม่ (เช่น
+             เปลี่ยนวันที่) คุณคงไม่อยากให้ตัวแปรต้นฉบับเปลี่ยนตามไปด้วยโดยไม่ตั้งใจ — พฤติกรรมแบบ
+             "ก็อปปี้ค่าจริง แยกกันเด็ดขาด" แบบ value type จึงเหมาะกับแนวคิดของวันที่/เวลามากกว่า
+             พฤติกรรมแบบ reference type ที่ใช้ "ชี้ตำแหน่งเดียวกัน"</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 21</h2>
+
+    <p>การเลือก data type ที่ถูกต้องสำหรับแอปของคุณเป็นทักษะการเขียนโปรแกรมที่สำคัญมาก เป้าหมายของ
+       คุณคือเข้าใจความแตกต่างระหว่าง data type แต่ละตัว เพื่อตัดสินใจเลือก data type ในโค้ดของคุณ
+       ได้อย่างมีข้อมูลรองรับ</p>
+
+    <p>คุณเริ่มสร้างแบบจำลองทางความคิดว่าข้อมูลถูกเก็บยังไงตอนแอปของคุณทำงาน คุณมีประสบการณ์ทำงานกับ
+       integral และ floating point data type ใหม่ๆ คุณมีเกณฑ์ที่ใช้ตัดสินใจว่าจะเลือก data type
+       ไหนในโค้ดของคุณ และสุดท้าย คุณเข้าใจว่าทำไมต้องใช้คีย์เวิร์ด <code>new</code> ตอนสร้าง
+       instance ของ reference type</p>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>bit</td><td>บิต</td><td>สวิตช์ไบนารี 0 หรือ 1 หน่วยข้อมูลเล็กที่สุด</td></tr>
+        <tr><td>byte</td><td>ไบต์</td><td>กลุ่มของ 8 bit</td></tr>
+        <tr><td>value type</td><td>ชนิดค่า</td><td>type ที่เก็บข้อมูลโดยตรงบน stack</td></tr>
+        <tr><td>reference type</td><td>ชนิดอ้างอิง</td><td>type ที่เก็บ address ชี้ไปยังข้อมูลบน heap</td></tr>
+        <tr><td>integral type</td><td>ชนิดจำนวนเต็ม</td><td>value type ที่แทนจำนวนเต็มไม่มีเศษ</td></tr>
+        <tr><td>floating-point type</td><td>ชนิดจุดทศนิยม</td><td>value type ที่แทนตัวเลขมีเศษ</td></tr>
+        <tr><td>precision</td><td>ความละเอียด</td><td>จำนวนหลักที่เก็บได้อย่างแม่นยำหลังจุดทศนิยม</td></tr>
+        <tr><td>stack</td><td>สแตก</td><td>หน่วยความจำของ value type ลบทิ้งเมื่อ scope จบ</td></tr>
+        <tr><td>heap</td><td>ฮีป</td><td>หน่วยความจำของ reference type แชร์ร่วมกันในระบบ</td></tr>
+        <tr><td>null reference</td><td>การอ้างอิงว่างเปล่า</td><td>ตัวแปร reference ที่ยังไม่ชี้ไปยัง address ใดๆ</td></tr>
+        <tr><td>E notation</td><td>สัญกรณ์ E</td><td>scientific notation แบบ "×10 ยกกำลัง" เช่น 5E+2 = 500</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch20.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 20 · Challenge Project — Contoso Pets ภาคจบ</span></a>
+      <a class="next" href="ch22.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 22 · Convert Data Types Using Casting and Conversion</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 27 · Challenge Project: ค้นหาหลายคำ — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="27">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 4 · Work with Variable Data / บทที่ 27</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 4 · โมดูล 7/7 · ⚔️ Challenge Project</span>
+      <h1>Challenge Project — ค้นหาหลายคำพร้อมแอนิเมชัน</h1>
+      <div class="en">Challenge Project - Work with Variable Data in C#</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>75–100 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>ค้นหาหลายคำพร้อมกัน + แอนิเมชันหมุนพร้อมนับถอยหลัง</b></span>
+        <span>🎯 ความยาก <b>สูง (โจทย์เปิด ไม่มีคำแนะนำทีละขั้น)</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ใช้ iteration statement รับ input ข้อมูลได้</li>
+        <li>ประมวลผลข้อมูลอย่างมีระบบ</li>
+        <li>จัดรูปแบบ output ของข้อมูล</li>
+        <li>เลือก data type ที่ถูกต้อง และแปลง data type อย่างปลอดภัย</li>
+        <li>สร้างและจัดการ string array รวมถึงเรียงลำดับข้อมูลใน array</li>
+        <li>แก้ไขและประกอบ string ที่ซับซ้อนจากหลายแหล่งข้อมูล และจัดรูปแบบสำหรับแสดงผล</li>
+      </ul>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ นี่คือ Challenge Project — ไม่มีคำแนะนำทีละขั้นตอน</span>
+      เหมือนกับ<a href="ch20.html">บทที่ 20</a> โมดูลนี้ให้แค่<b>สเปก</b>กับ<b>ผลลัพธ์ที่ต้องได้</b>
+      แล้วให้คุณออกแบบโค้ดเอง เฉลยที่ให้ในบทนี้เป็น<b>คำตอบของผมเอง ไม่ใช่เฉลยทางการจาก
+      Microsoft</b> (Microsoft ไม่ได้เผยแพร่เฉลยของ Challenge Project ไว้แบบเปิดเผย) — ขอแนะนำให้
+      ลองเขียนเองก่อนเปิดดูเฉลย มีหลายวิธีที่แก้โจทย์นี้ได้ถูกต้องเช่นกัน
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">27.1 สถานการณ์และสเปก</h2>
+
+    <p>สมมติคุณเป็นหนึ่งในนักพัฒนาที่ทำงานบนแอป Contoso Pets ที่ช่วยหาบ้านใหม่ให้สัตว์เลี้ยง แอป
+       เวอร์ชันเริ่มต้นของคุณ (จาก<a href="ch26.html">บทที่ 26</a>) รับคำค้นหาแค่คำเดียว ใช้ค้นหา
+       คำอธิบายของสุนัข การค้นหาคำเดียวมีประโยชน์ แต่ feedback จากทีมบอกว่าแอปต้องการความสามารถ
+       ค้นหาที่มากกว่านี้ ทีมต้องการให้คุณขยายฟีเจอร์ค้นหาให้รองรับ<b>หลายคำค้นหาพร้อมกัน</b>
+       นอกจากนี้ ทีมยังต้องการทดลองอัปเดต animation "สถานะการค้นหา" ที่แสดงความคืบหน้าด้วย</p>
+
+    <p>ในโปรเจกต์ท้าทายนี้ คุณจะประยุกต์ใช้ความรู้และทักษะข้อมูล C# ของคุณกับ:</p>
+    <ul>
+      <li>สร้าง string array ด้วยการแยก string</li>
+      <li>จัดการข้อมูลใน array วนผ่าน element และเรียงลำดับข้อมูลใน array</li>
+      <li>แก้ไขและประกอบ string จากหลายแหล่งข้อมูล</li>
+    </ul>
+
+    <p>สรุปสั้นๆ คุณจะ:</p>
+    <ul>
+      <li>พัฒนาฟีเจอร์ค้นหาหลายคำสำหรับการค้นหา "สุนัข"</li>
+      <li>อัปเดต animation "สถานะการค้นหา" ข้อมูล และการนับถอยหลัง</li>
+    </ul>
+
+    <h3 id="s01a">สเปกฟีเจอร์ค้นหาหลายคำ</h3>
+    <p><b>รวบรวมคำค้นหาหลายคำจากผู้ใช้:</b></p>
+    <ul>
+      <li>ให้ผู้ใช้กรอกคำค้นหาหลายคำได้ตอนค้นหาสุนัข</li>
+      <li>ผู้ใช้ต้องได้รับคำแนะนำให้ "กรอกคำค้นหาคั่นด้วยจุลภาค"</li>
+      <li>แยกคำค้นหาแต่ละคำออกจาก string ที่ผู้ใช้กรอก แล้วเก็บเป็นค่าใน array</li>
+      <li>เรียงคำใน array ตามลำดับ <i>alphanumeric</i></li>
+    </ul>
+
+    <p><b>ระบุสุนัขที่คำอธิบายตรงกับคำค้นหาหนึ่งคำหรือมากกว่า:</b></p>
+    <ul>
+      <li>เมื่อระบุสุนัขใน array ของสัตว์ได้แล้ว ค้นหาว่าตรงกับคำค้นหาแต่ละคำที่ผู้ใช้กรอกหรือไม่</li>
+      <li>ถ้าคำตรงกัน แสดงข้อความชื่อสุนัขพร้อมคำที่ตรงกัน เช่น:
+          <code>"Our dog Jake is a match for your search for sheppard!"</code></li>
+      <li>เมื่อค้นหาครบทุกคำสำหรับสุนัขตัวปัจจุบันแล้ว: ถ้าตรงกันอย่างน้อยหนึ่งคำ แสดงชื่อเล่นและ
+          คำอธิบายของสุนัขตัวนั้น และติดตามไว้ว่ามีการตรงกันเกิดขึ้นแล้ว (เพื่อไม่ให้แสดงข้อความ
+          "ไม่พบที่ตรงกันเลย" ทีหลัง)</li>
+      <li>หลังค้นหาสุนัข<i>ทุกตัว</i>เสร็จ ถ้าไม่มีตัวไหนตรงกันเลย ให้แสดงข้อความ "No matches found
+          for any available dogs"</li>
+    </ul>
+
+    <p><b>กฎตรวจสอบความถูกต้อง:</b> ค่าห้ามเป็น null, ค่าห้ามมีความยาวศูนย์ตัวอักษร,
+       ข้อจำกัดเพิ่มเติมแล้วแต่ผู้พัฒนา</p>
+
+    <h3 id="s01b">สเปกแอนิเมชันการค้นหา</h3>
+    <ul>
+      <li>ปรับ <code>string[] searchingIcons = {".  ", ".. ", "..."};</code> ให้เป็นไอคอนที่
+          จำลองการหมุน (เหมือน spinner)</li>
+      <li>animation "searching..." ต้องถูกเขียนทับ (overwrite) หลังแต่ละเฟรมจบ เพื่อให้อยู่บรรทัด
+          เดิมเสมอ และต้องไม่ค้างแสดงหลัง animation จบแล้ว</li>
+      <li>เพิ่มการนับถอยหลังในแอนิเมชัน: จาก "2" ไป "1" แล้วไป "0"</li>
+    </ul>
+
+    <div class="note tip">
+      <span class="lbl">💡 ออกแบบแอนิเมชันเองได้ ไม่ต้องเหมือนต้นฉบับเป๊ะ</span>
+      MS Learn บอกไว้ตรงๆ ว่า "You can design the searching animation to display spinning to work
+      differently than displayed in the animated image" — คุณออกแบบรูปแบบการหมุนเองได้ตามใจ ขอแค่
+      มี spinner + countdown 2→1→0 ตามสเปก
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch27-a"><span>อ่านและเข้าใจสเปกทั้งฟีเจอร์ค้นหาหลายคำและแอนิเมชันครบถ้วน</span></label></li>
+      <li><label><input type="checkbox" id="ch27-b"><span>ลองออกแบบและเขียนโค้ดด้วยตัวเองก่อนดูเฉลย</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s02">27.2 🔓 เฉลยของผม — ค้นหาหลายคำ</h2>
+
+    <p>แนวคิดหลัก: รับ input เป็น string เดียวคั่นด้วยจุลภาค (เหมือนรูปแบบที่เจอใน
+       <a href="ch23.html">บทที่ 23</a>) ใช้ <code>Split(',')</code> แยกเป็น array แล้ว
+       <code>Trim().ToLower()</code> แต่ละคำ กรองคำว่างทิ้ง แล้ว <code>Array.Sort()</code> เรียง
+       ตามตัวอักษร — จากนั้นวนผ่านสุนัขแต่ละตัวเหมือนเดิมจากบทที่ 26 แต่เปลี่ยนจากเช็คคำเดียวเป็น
+       วนเช็คทุกคำในคำค้นหา</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ใน case "2":)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">case "2":
+    // Display all dogs with a specified characteristic (multi-term search)
+    string searchInput = "";
+
+    while (searchInput == "")
+    {
+        Console.WriteLine("\nEnter dog characteristics to search for separated by commas");
+        readResult = Console.ReadLine();
+        if (readResult != null)
+        {
+            searchInput = readResult.Trim();
+        }
+    }
+
+    // #1 แยกคำค้นหาเป็น array แล้ว trim + lowercase แต่ละคำ กรองคำว่างทิ้ง
+    string[] rawTerms = searchInput.Split(',');
+    int validCount = 0;
+    foreach (string term in rawTerms)
+    {
+        if (term.Trim() != "") validCount += 1;
+    }
+
+    string[] searchTerms = new string[validCount];
+    int idx = 0;
+    foreach (string term in rawTerms)
+    {
+        string cleaned = term.Trim().ToLower();
+        if (cleaned != "")
+        {
+            searchTerms[idx] = cleaned;
+            idx += 1;
+        }
+    }
+
+    // #2 เรียงคำค้นหาตามลำดับตัวอักษร
+    Array.Sort(searchTerms);
+
+    // #3 วนหาสุนัข แล้วเช็คทุกคำค้นหากับคำอธิบายที่รวมแล้ว
+    bool noMatchesDog = true;
+
+    for (int i = 0; i < maxPets; i++)
+    {
+        if (ourAnimals[i, 1].Contains("dog"))
+        {
+            string dogDescription = ourAnimals[i, 4] + "\n" + ourAnimals[i, 5];
+            bool dogMatched = false;
+
+            foreach (string term in searchTerms)
+            {
+                if (dogDescription.Contains(term))
+                {
+                    Console.WriteLine($"Our dog {ourAnimals[i, 3]} matches your search for {term}");
+                    dogMatched = true;
+                }
+            }
+
+            if (dogMatched)
+            {
+                Console.WriteLine($"{ourAnimals[i, 3]} ({ourAnimals[i, 0]})");
+                Console.WriteLine(ourAnimals[i, 4]);
+                Console.WriteLine(ourAnimals[i, 5]);
+                Console.WriteLine();
+                noMatchesDog = false;
+            }
+        }
+    }
+
+    if (noMatchesDog)
+    {
+        Console.WriteLine("None of our dogs are a match for: " + string.Join(", ", searchTerms));
+    }
+
+    Console.WriteLine("\nPress the Enter key to continue");
+    readResult = Console.ReadLine();
+    break;</code></pre>
+    </div>
+
+    <div class="out auto"><div class="out-bar">ทดสอบรัน — ค้นหา "large, cream, golden" (เจอทั้ง lola และ gus)</div><pre>
+Enter dog characteristics to search for separated by commas
+large, cream, golden
+
+Our dog Nickname: lola matches your search for cream
+Our dog Nickname: lola matches your search for golden
+Nickname: lola (ID #: d1)
+Physical description: medium sized cream colored female golden retriever weighing about 45 pounds. housebroken.
+Personality: loves to have her belly rubbed and likes to chase her tail. gives lots of kisses.
+
+Our dog Nickname: gus matches your search for golden
+Our dog Nickname: gus matches your search for large
+Nickname: gus (ID #: d2)
+Physical description: large reddish-brown male golden retriever weighing about 85 pounds. housebroken.
+Personality: loves to have his ears rubbed when he greets you at the door, or at any time! loves to lean-in and give doggy hugs.
+
+Press the Enter key to continue</pre></div>
+
+    <p>สังเกตลำดับคำที่ตรงกัน: คำค้นหาที่ผู้ใช้กรอก <code>"large, cream, golden"</code> ถูกเรียง
+       ใหม่เป็น <code>cream, golden, large</code> (ตามลำดับตัวอักษร) ก่อนเริ่มค้นหา — สำหรับ lola
+       (คำอธิบาย "medium sized cream colored... golden retriever...") คำว่า "cream" ตรวจเจอก่อน
+       ตามด้วย "golden" ส่วน "large" ไม่ตรงเลย (เพราะ lola ตัวขนาด "medium" ไม่ใช่ "large") — สำหรับ
+       gus (คำอธิบาย "large reddish-brown... golden retriever...") คำว่า "cream" ไม่ตรง แต่
+       "golden" ตรงก่อน ตามด้วย "large" — ลำดับการแสดงผลจึงตรงกับลำดับที่เรียงไว้ใน
+       <code>searchTerms</code> เป๊ะ</p>
+
+    <div class="out auto"><div class="out-bar">ทดสอบรัน — ค้นหา "big, grey, stripes" (ไม่เจอเลย)</div><pre>
+Enter dog characteristics to search for separated by commas
+big, grey, stripes
+
+None of our dogs are a match for: big, grey, stripes
+
+Press the Enter key to continue</pre></div>
+
+    <div class="note tip">
+      <span class="lbl">💡 ทำไมต้อง Trim() ก่อน Sort() เสมอ</span>
+      ถ้าผู้ใช้พิมพ์ <code>"large, cream, golden"</code> (มีช่องว่างหลังจุลภาค) การ
+      <code>Split(',')</code> ตรงๆ จะได้ <code>"large"</code>, <code>" cream"</code> (มีช่องว่าง
+      นำหน้า!), <code>" golden"</code> — ถ้าไม่ <code>Trim()</code> ก่อน <code>Sort()</code>
+      ช่องว่างนำหน้าจะถูกนับเป็นตัวอักษรด้วย และในตาราง ASCII ช่องว่างมีค่าน้อยกว่าตัวอักษรทุกตัว
+      (ทบทวนแนวคิด ASCII จาก <a href="ch21.html">บทที่ 21</a>) ทำให้คำที่มีช่องว่างนำหน้าถูกเรียง
+      มาก่อนเสมอ ไม่ว่าตัวอักษรจริงจะเป็นอะไรก็ตาม — ผลลัพธ์การเรียงจึงผิดเพี้ยนไปจากที่ตั้งใจ
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch27-c"><span>implement การแยกและเรียงคำค้นหาสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch27-d"><span>implement การค้นหาหลายคำต่อสุนัขหนึ่งตัวสำเร็จ ตรงตามผลลัพธ์ที่กำหนด</span></label></li>
+      <li><label><input type="checkbox" id="ch27-e"><span>ทดสอบทั้งกรณีเจอผลลัพธ์และไม่เจอเลยสำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">27.3 🔓 เฉลยของผม — แอนิเมชันหมุนพร้อมนับถอยหลัง</h2>
+
+    <p>ใช้ 4 สัญลักษณ์คลาสสิกที่จำลองการหมุนของ spinner: <code>| / - \</code> วนซ้ำ พร้อมนับถอยหลัง
+       จาก 2 ลงมา 0 คู่กับแต่ละสัญลักษณ์ ใช้ <code>\r</code> (carriage return) เขียนทับบรรทัดเดิม
+       แทนการขึ้นบรรทัดใหม่ทุกครั้ง (ทบทวน escape sequence จาก <a href="ch03.html">บทที่ 3</a>) —
+       เพิ่มโค้ดนี้ไว้<b>ก่อน</b>เช็ค <code>dogDescription.Contains(term)</code> ในแต่ละรอบของ
+       <code>foreach (string term in searchTerms)</code> จากหัวข้อ 27.2</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (แทรกก่อน if (dogDescription.Contains(term)))</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[] searchingIcons = { "|", "/", "-", "\\" };
+
+for (int count = 2; count >= 0; count--)
+{
+    foreach (string icon in searchingIcons)
+    {
+        Console.Write($"\rsearching our dog {ourAnimals[i, 3]} for {term} {icon} {count}   ");
+        System.Threading.Thread.Sleep(120);
+    }
+}
+
+// ล้างบรรทัดแอนิเมชันทิ้งก่อนพิมพ์ผลลัพธ์จริง
+Console.Write("\r" + new string(' ', 60) + "\r");</code></pre>
+    </div>
+
+    <p>เพราะ <code>searchingIcons</code> ประกาศไว้นอก loop การค้นหาสุนัข มันถูกสร้างแค่ครั้งเดียว
+       ส่วน <code>for (int count = 2; count >= 0; count--)</code> วนนับถอยหลัง 3 รอบ (2, 1, 0) แต่
+       ละรอบวนแสดงสัญลักษณ์ทั้ง 4 ตัวติดกันเป็น "การหมุน" หนึ่งรอบ — <code>\r</code> ที่ต้นข้อความ
+       ทำให้ cursor กลับไปต้นบรรทัดก่อนพิมพ์ทับของเดิม แทนที่จะขึ้นบรรทัดใหม่ (สังเกตช่องว่างท้าย
+       string <code>"   "</code> ไว้เผื่อ "ลบ" ตัวอักษรเก่าที่อาจยาวกว่าข้อความใหม่)</p>
+
+    <p>หลังจบ animation ของคำค้นหานั้น เขียนช่องว่างทับทั้งบรรทัดแล้วกลับไปต้นบรรทัดอีกครั้ง เพื่อ
+       "ล้าง" ข้อความ animation ก่อนพิมพ์ข้อความผลลัพธ์จริงตามปกติ — ตรงตามสเปกที่บอกว่า
+       "ต้องไม่ค้างแสดงหลัง animation จบแล้ว"</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ตัวอย่างเฟรมของแอนิเมชัน (จำลองบนกระดาษ — ในเทอร์มินัลจริงจะเขียนทับกัน)</span>
+      เพราะ <code>\r</code> เขียนทับบรรทัดเดิมในเทอร์มินัลจริง หนังสือเล่มนี้แสดงผลลัพธ์แบบ static
+      ไม่ได้ แต่ถ้าดูทีละเฟรม (เหมือนถ่ายภาพหน้าจอทุก 120 มิลลิวินาที) จะเห็นบรรทัดเดียวเปลี่ยนไป
+      เรื่อยๆ แบบนี้:
+      <div class="code">
+        <div class="code-bar"><span class="dot"></span><span class="name">เฟรมที่ 1-4 (คำค้นหา "golden", สุนัข lola)</span></div>
+        <pre><code>searching our dog Nickname: lola for golden | 2
+searching our dog Nickname: lola for golden / 2
+searching our dog Nickname: lola for golden - 2
+searching our dog Nickname: lola for golden \ 2
+searching our dog Nickname: lola for golden | 1
+   ... (วนต่อจนครบ count = 0) ...
+searching our dog Nickname: lola for golden \ 0</code></pre>
+      </div>
+      พอรันจริงในเทอร์มินัล คุณจะเห็นแค่บรรทัดเดียวที่ตัวเลขนับถอยหลังและสัญลักษณ์หมุนเปลี่ยนไปเรื่อยๆ
+      อยู่กับที่ ไม่ใช่หลายบรรทัดแบบนี้
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ Thread.Sleep() ทำให้โปรแกรมหยุดชั่วคราวจริงๆ</span>
+      <code>System.Threading.Thread.Sleep(120)</code> สั่งให้โปรแกรมหยุดทำงาน 120 มิลลิวินาทีจริงๆ
+      (ไม่ใช่แค่ simulate) ทั้งโปรแกรมจะค้างระหว่างนั้น ถ้าตั้งเวลานานเกินไปหรือมีคำค้นหา/สุนัข
+      หลายตัว โปรแกรมอาจดูเหมือนค้างนานผิดปกติ ควรตั้งค่าให้พอเหมาะ (100-150 มิลลิวินาทีต่อเฟรม
+      ถือว่าดูเป็นธรรมชาติ) และจำนวนสุนัข × จำนวนคำค้นหา × 3 รอบนับถอยหลัง × 4 เฟรมสัญลักษณ์ ควร
+      อยู่ในระดับที่ผู้ใช้รอไหว
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch27-f"><span>implement แอนิเมชันหมุนด้วย \r เขียนทับบรรทัดสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch27-g"><span>เพิ่มการนับถอยหลัง 2→1→0 สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch27-h"><span>ล้างบรรทัดแอนิเมชันก่อนแสดงผลลัพธ์จริงสำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">27.4 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>ลืม Trim() คำค้นหาแต่ละคำหลัง Split(',') แล้วเรียงลำดับเพี้ยน</td>
+          <td>ช่องว่างนำหน้า (จากการพิมพ์ "term1, term2" มีช่องว่างหลังจุลภาค) มีค่า ASCII น้อยกว่า
+              ตัวอักษรทุกตัว ทำให้คำที่มีช่องว่างนำหน้าถูกเรียงมาก่อนเสมอ ต้อง Trim() ก่อน Sort()
+              ทุกครั้ง (ทบทวนหัวข้อ 27.2)</td>
+        </tr>
+        <tr>
+          <td>ค้นหาแล้วได้คำว่างเปล่าติดมาด้วย (เช่น พิมพ์ "large,,golden" มีจุลภาคติดกัน)</td>
+          <td>Split(',') สร้าง element ว่างเปล่าตรงกลาง — ต้องกรองคำว่างทิ้งก่อนใช้งานเสมอ ตรงตาม
+              กฎ "values can't have zero characters" ในสเปก</td>
+        </tr>
+        <tr>
+          <td>แอนิเมชันเขียนทับไม่สนิท มีตัวอักษรเก่าค้างอยู่ท้ายบรรทัด</td>
+          <td>ข้อความใหม่สั้นกว่าข้อความเก่า (เช่น "0" สั้นกว่า "golden") การเขียนทับด้วย
+              <code>\r</code> เขียนทับแค่ความยาวของข้อความใหม่ ตัวอักษรเก่าที่ยาวกว่าจึงโผล่ค้างท้าย
+              บรรทัด — ต้องเติมช่องว่างท้ายข้อความให้พอ (หรือล้างทั้งบรรทัดก่อนเขียนใหม่ทุกครั้ง)</td>
+        </tr>
+        <tr>
+          <td>โปรแกรมค้างนานผิดปกติตอนค้นหาหลายคำกับสุนัขหลายตัว</td>
+          <td>เวลารวมของ animation คูณกันตามจำนวนสุนัข × คำค้นหา × รอบนับถอยหลัง × เฟรม — ถ้าตั้ง
+              Thread.Sleep() นานเกินไป เวลารวมจะยาวเกินจำเป็น ควรคำนวณเวลารวมสูงสุดที่เป็นไปได้
+              ก่อนตั้งค่า</td>
+        </tr>
+        <tr>
+          <td>คำที่ตรงกันหลายคำแสดงซ้ำ ทั้งที่สุนัขตัวเดียวควรแสดงคำอธิบายแค่ครั้งเดียว</td>
+          <td>ใช้ตัวแปร <code>dogMatched</code> (bool) แยกจาก <code>noMatchesDog</code> เสมอ — ตัวแรก
+              ติดตามสถานะ "ตรงกันไหม" ต่อสุนัข<b>หนึ่งตัว</b> ตัวหลังติดตามสถานะ "ตรงกันไหม" ของ
+              การค้นหา<b>ทั้งหมด</b> ถ้าใช้ตัวแปรเดียวปนกันจะพิมพ์คำอธิบายซ้ำทุกครั้งที่มีคำตรงกัน</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s05">27.5 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment ของ Microsoft Learn</p>
+
+    <div class="quiz" data-q="27-1">
+      <p class="q"><span class="num">1.</span> ตอนเรียง string array ทำไมการใช้เมธอด
+        <code>String.Trim()</code> กับแต่ละ element ก่อนเรียงจึงสำคัญ?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เฉพาะ array ที่ trim แล้วเท่านั้นที่เรียงได้</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>String.Trim() ตัดช่องว่างนำหน้าที่จะถูกเรียงมาก่อนตัวเลขและตัวอักษรทิ้ง</span></li>
+        <li class="opt"><span class="k">C</span><span>การเรียงเร็วขึ้นอย่างเห็นได้ชัดเมื่อใช้ String.Trim() กับแต่ละ element</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ตรงกับที่อธิบายในหัวข้อ 27.2 — ช่องว่างมีค่า ASCII
+        น้อยกว่าตัวอักษรทุกตัว ถ้าไม่ Trim() ก่อน คำที่มีช่องว่างนำหน้าจะถูกเรียงมาก่อนเสมอ ทำให้
+        ผลการเรียงผิดเพี้ยนจากที่ตั้งใจ ไม่เกี่ยวกับความเร็วในการเรียงเลย (ข้อ C ผิด) และ array
+        ที่ไม่ trim ก็เรียงได้ปกติ แค่ผลลัพธ์อาจไม่ตรงตามคาด (ข้อ A ผิด)</div>
+    </div>
+
+    <div class="quiz" data-q="27-2">
+      <p class="q"><span class="num">2.</span> ทั้ง <code>foreach</code> และ <code>for</code> เป็น
+        ตัวเลือกที่ดีสำหรับวน array มิติเดียวขนาดเล็ก เช่น
+        <code>{"cat", "fox", "dog", "snake", "eagle"}</code> แต่เมื่อไรที่ควรใช้ <code>for</code>
+        loop ดีที่สุด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เมื่อ element เรียงตามลำดับตัวอักษรอยู่แล้ว</span></li>
+        <li class="opt"><span class="k">B</span><span>เพื่อค้นหาใน element แต่ละตัวของ array</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>เพื่อประเมินช่วง (range) ที่เจาะจงของ element</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ตรงกับหลักการที่เรียนใน <a href="ch17.html">บทที่ 17</a>
+        — for ให้ควบคุม index ได้ละเอียด จึงเหมาะกับการเข้าถึงช่วง element เฉพาะเจาะจง (เช่น
+        element ที่ 2 ถึง 4 เท่านั้น) ซึ่ง foreach ทำไม่ได้เพราะมันวนทุก element เสมอ ส่วนการค้นหา
+        (ข้อ B) และการเรียงตามลำดับตัวอักษร (ข้อ A) ไม่ใช่เหตุผลที่ต้องเลือก for โดยเฉพาะ —
+        foreach ก็ค้นหาได้เหมือนกัน</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">27.6 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดแยกและเรียง string
+           <code>"  Zebra ,apple,  Mango,banana "</code> ด้วย Split + Trim + ToLower + Sort
+           แล้วพิมพ์ผลลัพธ์ทีละบรรทัด</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string input = "  Zebra ,apple,  Mango,banana ";
+string[] items = input.Split(',');
+
+for (int i = 0; i < items.Length; i++)
+{
+    items[i] = items[i].Trim().ToLower();
+}
+
+Array.Sort(items);
+
+foreach (string item in items)
+{
+    Console.WriteLine(item);
+}</code></pre></div>
+          <p>ผลลัพธ์: apple, banana, mango, zebra (เรียงถูกต้องแม้ input จะมีช่องว่างและตัวพิมพ์
+             ใหญ่-เล็กปนกัน)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียน spinner แอนิเมชันง่ายๆ ที่หมุน 3 รอบ (ไม่ต้องนับถอยหลัง) ใช้สัญลักษณ์
+           <code>| / - \</code> เขียนทับบรรทัดเดิมด้วย <code>\r</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string[] icons = { "|", "/", "-", "\\" };
+
+for (int round = 0; round < 3; round++)
+{
+    foreach (string icon in icons)
+    {
+        Console.Write($"\rLoading {icon}   ");
+        System.Threading.Thread.Sleep(150);
+    }
+}
+Console.Write("\r" + new string(' ', 20) + "\r");
+Console.WriteLine("Done!");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ในเฉลยหัวข้อ 27.2 ทำไมต้องแยกตัวแปร <code>dogMatched</code> ออกจาก
+           <code>noMatchesDog</code>? ลองอธิบายด้วยคำพูดตัวเอง แล้วยกตัวอย่างสถานการณ์ที่ถ้าใช้
+           ตัวแปรเดียวจะเกิดปัญหา</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p><code>dogMatched</code> ต้องรีเซ็ตเป็น <code>false</code> ใหม่ทุกครั้งที่เริ่มตรวจ
+             สุนัขตัวใหม่ (เพราะแค่ต้องการรู้ว่า "สุนัขตัวนี้" ตรงกับคำค้นหาไหม) ส่วน
+             <code>noMatchesDog</code> ต้องคงค่าอยู่ตลอดการวนสุนัข<b>ทุกตัว</b> (เพราะต้องการรู้ว่า
+             "มีสุนัขตัวไหนเลยไหม" ที่ตรงกัน) ถ้าใช้ตัวแปรเดียวปนกัน เช่น ใช้แค่
+             <code>noMatchesDog</code> แล้วรีเซ็ตเป็น <code>true</code> ทุกครั้งที่เริ่มสุนัขตัว
+             ใหม่ พอสุนัขตัวที่สองไม่ตรงกับคำค้นหาเลย ตัวแปรจะถูกรีเซ็ตกลับเป็น <code>true</code>
+             ทับค่า <code>false</code> ที่ตัวแรกตั้งไว้ (ทั้งที่สุนัขตัวแรกเจอที่ตรงกันแล้ว) ทำให้
+             ข้อความ "ไม่พบที่ตรงกันเลย" แสดงผิดพลาดทั้งที่จริงๆ เจอผลลัพธ์แล้ว</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงเฉลยหัวข้อ 27.2 ให้จำกัดจำนวนคำค้นหาไม่เกิน 5 คำ ถ้าผู้ใช้กรอกเกิน 5 คำ ให้แสดง
+           ข้อความเตือนและใช้แค่ 5 คำแรกเท่านั้น (ทบทวน Array.Resize จาก <a href="ch23.html">
+           บทที่ 23</a>)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่เพิ่ม หลังสร้าง searchTerms)</span></div>
+          <pre><code class="lang-cs">if (searchTerms.Length > 5)
+{
+    Console.WriteLine("You entered more than 5 terms. Only the first 5 will be used.");
+    Array.Resize(ref searchTerms, 5);
+}</code></pre></div>
+          <p>วางโค้ดนี้ก่อน <code>Array.Sort(searchTerms);</code> เพื่อให้ตัดคำเกินออกก่อนเรียง
+             (ถ้าเรียงก่อนตัด จะตัดคำผิดตัวไป เพราะลำดับเปลี่ยนไปแล้ว)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดนับว่าคำค้นหาแต่ละคำ (ไม่ใช่แค่สุนัขแต่ละตัว) ตรงกับสุนัขกี่ตัว แล้วแสดงสรุปท้าย
+           การค้นหา เช่น <code>"cream: 1 dog, golden: 2 dogs, large: 1 dog"</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int[] termMatchCounts = new int[searchTerms.Length];
+
+for (int i = 0; i < maxPets; i++)
+{
+    if (ourAnimals[i, 1].Contains("dog"))
+    {
+        string dogDescription = ourAnimals[i, 4] + "\n" + ourAnimals[i, 5];
+
+        for (int t = 0; t < searchTerms.Length; t++)
+        {
+            if (dogDescription.Contains(searchTerms[t]))
+            {
+                termMatchCounts[t] += 1;
+            }
+        }
+    }
+}
+
+string summary = "";
+for (int t = 0; t < searchTerms.Length; t++)
+{
+    summary += $"{searchTerms[t]}: {termMatchCounts[t]} dog(s), ";
+}
+Console.WriteLine("\n" + summary.TrimEnd(',', ' '));</code></pre></div>
+          <p>ใช้ array คู่ขนาน <code>termMatchCounts</code> (ทบทวนแนวคิด array คู่ขนานจาก
+             <a href="ch12.html">บทที่ 12</a>) เก็บจำนวนที่ตรงกันของแต่ละคำ index เดียวกับ
+             <code>searchTerms</code> — ต้องวนผ่านสุนัขทั้งหมดแยกต่างหาก (ไม่ปนกับ loop หลักที่
+             แสดงผลลัพธ์) เพื่อความชัดเจนของโค้ด</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>วิเคราะห์: สเปกบอกว่า "ค้นหาคำที่ตรงกันหนึ่งคำหรือมากกว่า" (OR logic — ตรงคำไหนก็ได้) —
+           ถ้าทีมเปลี่ยนใจอยากให้เป็น "ต้องตรงกับ<b>ทุกคำ</b>ที่ค้นหา" (AND logic) แทน จะต้องแก้โค้ด
+           ตรงไหนบ้าง? ลองเขียนเวอร์ชัน AND logic ออกมา</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (เปลี่ยนจาก OR เป็น AND)</span></div>
+          <pre><code class="lang-cs">for (int i = 0; i < maxPets; i++)
+{
+    if (ourAnimals[i, 1].Contains("dog"))
+    {
+        string dogDescription = ourAnimals[i, 4] + "\n" + ourAnimals[i, 5];
+        bool matchesAllTerms = true;
+
+        foreach (string term in searchTerms)
+        {
+            if (!dogDescription.Contains(term))
+            {
+                matchesAllTerms = false;
+                break;
+            }
+        }
+
+        if (matchesAllTerms)
+        {
+            Console.WriteLine($"{ourAnimals[i, 3]} ({ourAnimals[i, 0]})");
+            Console.WriteLine(ourAnimals[i, 4]);
+            Console.WriteLine(ourAnimals[i, 5]);
+            Console.WriteLine();
+            noMatchesDog = false;
+        }
+    }
+}</code></pre></div>
+          <p>จุดต่างหลัก: ค่าเริ่มต้นเปลี่ยนจาก <code>false</code> (OR — เริ่มที่ "ยังไม่เจอ") เป็น
+             <code>true</code> (AND — เริ่มที่ "ตรงทุกคำ") แล้วพอเจอคำที่<b>ไม่</b>ตรงคำแรก ให้ตั้ง
+             เป็น <code>false</code> ทันทีและ <code>break</code> ออกจาก loop เลย (ไม่ต้องเช็คคำที่
+             เหลือต่อ เพราะรู้แล้วว่าไม่ผ่านเงื่อนไข AND) — ไม่มีการพิมพ์ "matches your search
+             for..." ทีละคำแบบเดิมด้วย เพราะ AND logic ต้องรอครบทุกคำก่อนถึงจะสรุปได้ว่าตรงหรือไม่</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">📌 สรุปบทที่ 27</h2>
+
+    <p>ความท้าทายของคุณคืออัปเดตแอปให้รองรับการค้นหาหลายคำ และปรับปรุงข้อมูลแอนิเมชัน "สถานะการ
+       ค้นหา" ในโมดูลนี้ คุณพัฒนาโค้ดที่รวม: วน iteration รับ input ข้อมูล, ประมวลผลข้อมูล, จัดรูปแบบ
+       output ของข้อมูล, เลือก data type ที่ถูกต้องและแปลง data type อย่างปลอดภัย, สร้างและจัดการ
+       string array รวมถึงเรียงลำดับข้อมูลใน array, และแก้ไข/ประกอบ string ที่ซับซ้อนจากหลายแหล่ง
+       ข้อมูลพร้อมจัดรูปแบบสำหรับแสดงผล</p>
+
+    <p>คุณส่งมอบฟีเจอร์ให้ทีม Contoso Pets ได้แก่: รวบรวมคำค้นหาหลายคำจากผู้ใช้, เก็บคำค้นหาไว้ใน
+       array ที่เรียงลำดับแล้ว, แสดงสุนัขที่มีคำตรงกัน, และแอนิเมชันสถานะการค้นหาที่ปรับปรุงแล้วพร้อม
+       การนับถอยหลัง</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 27</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">แพทเทิร์น</th><th>ใช้เมื่อ</th></tr></thead>
+        <tbody>
+          <tr><td><code>Split(',')</code> → Trim → ToLower → Sort</td><td>แปลง input คั่นจุลภาคเป็น array ที่พร้อมค้นหา/เปรียบเทียบ</td></tr>
+          <tr><td>flag ต่อ item (dogMatched) vs flag รวม (noMatchesDog)</td><td>แยกสถานะ "ตัวนี้ตรงไหม" ออกจาก "มีตัวไหนตรงเลยไหม"</td></tr>
+          <tr><td><code>Console.Write($"\r...")</code></td><td>เขียนทับบรรทัดเดิมแทนขึ้นบรรทัดใหม่ — ใช้ทำแอนิเมชัน</td></tr>
+          <tr><td><code>Thread.Sleep(ms)</code></td><td>หน่วงเวลาระหว่างเฟรมแอนิเมชัน</td></tr>
+          <tr><td>เติมช่องว่างท้าย string ก่อนเขียนทับ</td><td>ล้างตัวอักษรเก่าที่อาจยาวกว่าข้อความใหม่</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s08">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>alphanumeric sort</td><td>การเรียงตามตัวอักษร-ตัวเลข</td><td>เรียงลำดับข้อมูลตามอักขระ (a-z, 0-9)</td></tr>
+        <tr><td>spinner</td><td>ไอคอนหมุน</td><td>แอนิเมชันข้อความที่หมุนวนแสดงความคืบหน้า</td></tr>
+        <tr><td>carriage return (\r)</td><td>การกลับต้นบรรทัด</td><td>escape sequence ที่ย้าย cursor กลับต้นบรรทัดโดยไม่ขึ้นบรรทัดใหม่</td></tr>
+        <tr><td>parallel array</td><td>array คู่ขนาน</td><td>array หลายตัวที่ index เดียวกันแทนข้อมูลของ item เดียวกัน</td></tr>
+        <tr><td>AND / OR logic</td><td>ตรรกะ และ / หรือ</td><td>เงื่อนไข "ต้องตรงทุกอย่าง" เทียบกับ "ตรงอย่างใดอย่างหนึ่งก็พอ"</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="trophy">🏆 Trophy — สรุปรวบยอด Part 4</h2>
+    <p>ยินดีด้วย! คุณเรียนจบ <b>Part 4 · Work with Variable Data</b> ครบทั้ง 7 โมดูลแล้ว (Choose
+       Data Type, Casting/Conversion, Array Operations, Format Strings, Modify String Content,
+       Guided Project, Challenge Project) ก่อนไปต่อ Part 5 มาทบทวนแนวคิดสำคัญที่สุดของ Part นี้กัน
+       อีกรอบ:</p>
+
+    <div class="quiz" data-q="t4-1">
+      <p class="q"><span class="num">Trophy 1</span> data type ไหนควรใช้กับการคำนวณทางการเงินเสมอ?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>decimal</span></li>
+        <li class="opt"><span class="k">B</span><span>float</span></li>
+        <li class="opt"><span class="k">C</span><span>double</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนจาก <a href="ch21.html">บทที่ 21</a></div>
+    </div>
+
+    <div class="quiz" data-q="t4-2">
+      <p class="q"><span class="num">Trophy 2</span> การ cast <code>(int)3.9</code> กับ
+        <code>Convert.ToInt32(3.9)</code> ต่างกันยังไง?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>cast ตัดทศนิยมทิ้ง (ได้ 3), Convert ปัดเศษ (ได้ 4)</span></li>
+        <li class="opt"><span class="k">B</span><span>ทั้งคู่ให้ผลเหมือนกันทุกกรณี</span></li>
+        <li class="opt"><span class="k">C</span><span>cast ปัดเศษ, Convert ตัดทิ้ง</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนจาก <a href="ch22.html">บทที่ 22</a></div>
+    </div>
+
+    <div class="quiz" data-q="t4-3">
+      <p class="q"><span class="num">Trophy 3</span> ทำไม <code>Array.Resize()</code> ต้องใช้
+        คีย์เวิร์ด <code>ref</code>?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เพราะ array เป็น value type</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>เพราะมันสร้าง array ใหม่ทั้งชุด แล้วต้องเปลี่ยนตัวแปรต้นทางให้ชี้ไปยังของใหม่</span></li>
+        <li class="opt"><span class="k">C</span><span>เพราะ C# บังคับให้ทุกเมธอดที่แก้ไข array ต้องใช้ ref</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนจาก <a href="ch23.html">บทที่ 23</a></div>
+    </div>
+
+    <div class="quiz" data-q="t4-4">
+      <p class="q"><span class="num">Trophy 4</span> format specifier ตัวไหนแสดงเปอร์เซ็นต์
+        (คูณ 100 อัตโนมัติ)?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>:N</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>:P</span></li>
+        <li class="opt"><span class="k">C</span><span>:C</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนจาก <a href="ch24.html">บทที่ 24</a></div>
+    </div>
+
+    <div class="quiz" data-q="t4-5">
+      <p class="q"><span class="num">Trophy 5</span> เมธอดไหนคืนตำแหน่งของการปรากฏ<b>ครั้งแรก</b>
+        ของ substring?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>IndexOf()</span></li>
+        <li class="opt"><span class="k">B</span><span>LastIndexOf()</span></li>
+        <li class="opt"><span class="k">C</span><span>Remove()</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนจาก <a href="ch25.html">บทที่ 25</a></div>
+    </div>
+
+    <div class="quiz" data-q="t4-6">
+      <p class="q"><span class="num">Trophy 6</span> ทำไมต้อง Trim() คำค้นหาก่อน Array.Sort()
+        เสมอ?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>Sort() ทำงานไม่ได้ถ้าไม่ trim ก่อน</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>ช่องว่างนำหน้ามีค่า ASCII น้อยกว่าตัวอักษร ทำให้เรียงลำดับผิดเพี้ยน</span></li>
+        <li class="opt"><span class="k">C</span><span>เพื่อให้ Sort() ทำงานเร็วขึ้น</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนจาก <a href="ch27.html">บทที่ 27</a></div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <div class="pager">
+      <a href="ch26.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 26 · Guided Project — ค้นหาและเงินบริจาค</span></a>
+      <a class="next" href="ch28.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 28 · Part 5: Write Your First C# Method</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

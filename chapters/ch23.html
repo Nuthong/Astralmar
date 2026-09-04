@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 23 · Array Helper Methods — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="23">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 4 · Work with Variable Data / บทที่ 23</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 4 · โมดูล 3/7</span>
+      <h1>จัดการ Array ด้วย Helper Methods</h1>
+      <div class="en">Perform Operations on Arrays Using Helper Methods in C#</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>60–75 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>ใช้ Sort, Reverse, Clear, Resize, Split, Join คล่องแคล่ว</b></span>
+        <span>🎯 ความยาก <b>กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>เรียงลำดับ (sort) และสลับลำดับ (reverse) element ของ array ได้</li>
+        <li>ล้างค่า (clear) และปรับขนาด (resize) element ของ array ได้</li>
+        <li>แยก (split) string เป็น array ของ string หรือ char ได้</li>
+        <li>รวม (join) element ของ array กลับเป็น string เดียวได้</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">23.1 สถานการณ์: บริษัทโลจิสติกส์</h2>
+
+    <p>สมมติคุณเป็นนักพัฒนาซอฟต์แวร์ในทีมที่ทำงานร่วมกับบริษัทโลจิสติกส์ งานของคุณคือรวบรวมและ
+       จัดระเบียบข้อมูลธุรกิจของพวกเขา คุณมีส่วนร่วมในหลายโปรเจกต์ แต่ละโปรเจกต์ไม่เหมือนกันแต่ทั้งหมด
+       เกี่ยวข้องกับการประมวลผลข้อมูล โปรเจกต์เหล่านี้รวมถึงการติดตามและรายงานสินค้าคงคลัง การ
+       แลกเปลี่ยนข้อมูลกับพาร์ทเนอร์ทางธุรกิจ และการระบุคำสั่งซื้อที่อาจเป็นการฉ้อโกง การดำเนินการ
+       ที่พบร่วมกันในทุกโปรเจกต์นี้คือ การเพิ่ม ลบ เรียงลำดับ รวมข้อมูล คำนวณ ตรวจสอบข้อมูล และจัด
+       รูปแบบผลลัพธ์</p>
+
+    <p>ในบทนี้ คุณทำงานกับ C# array เพื่อเก็บลำดับของค่าในโครงสร้างข้อมูลเดียว เมื่อเก็บข้อมูลใน
+       array แล้ว คุณปรับทั้งลำดับและเนื้อหาของมันได้ นอกจากนี้ คุณยังทำ string operation ที่ซับซ้อน
+       ได้ด้วย array helper method</p>
+
+    <p>คุณเริ่มจากใช้ helper method เรียงลำดับหรือสลับลำดับข้อมูล ต่อไปคุณเรียนวิธีลบ item ออกจาก
+       array และปรับขนาด array ให้รองรับ item ใหม่ จากนั้นคุณเรียนวิธีแปลง string เป็น array ด้วย
+       การแยกมันเป็น string ย่อยๆ ทุกครั้งที่เจออักขระที่กำหนด เช่น เครื่องหมายจุลภาค เมธอดเดียวกันนี้
+       ยังใช้แยก string เป็น array ของตัวอักษรได้ด้วย สุดท้าย คุณเรียนวิธีรวม element ทั้งหมดของ
+       array กลับเป็น string เดียว</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ Collection Expression Syntax ใหม่ (C# 12)</span>
+      โค้ดในบทนี้ใช้ syntax ใหม่ประกาศ array: <code>string[] pallets = [ "B14", "A11" ];</code> —
+      สังเกตว่าใช้ <code>[ ]</code> แทน <code>new string[] { }</code> แบบที่คุณคุ้นเคยจากบทก่อนๆ
+      นี่คือ <b>collection expression syntax</b> เพิ่มมาใน C# 12 เป็นวิธีย่อเขียน array ให้กระชับ
+      ขึ้น ทั้งสองแบบทำงานเหมือนกันทุกประการ:
+      <div class="code">
+        <div class="code-bar"><span class="dot"></span><span class="name">เทียบกัน</span></div>
+        <pre><code class="lang-cs">// แบบเดิม (ที่ใช้มาตลอดในหนังสือเล่มนี้)
+string[] pallets = new string[] { "B14", "A11", "B12", "A13" };
+
+// แบบใหม่ (C# 12 collection expression) — สั้นกว่า
+string[] pallets = [ "B14", "A11", "B12", "A13" ];</code></pre>
+      </div>
+      ในหนังสือเล่มนี้จากนี้ไปจะใช้ syntax แบบใหม่ตามต้นฉบับ MS Learn — ใช้แบบไหนก็ได้ตามที่คุณ
+      ถนัด compiler ยอมรับทั้งคู่
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s02">23.2 Array.Sort() และ Array.Reverse()</h2>
+
+    <p><code>Array</code> class มีเมธอดที่ใช้จัดการเนื้อหา ลำดับ และขนาดของ array ได้ ในหัวข้อนี้
+       คุณเขียนโค้ดที่ทำการดำเนินการต่างๆ กับ array ของรหัสพาเลท (pallet identifier) — โค้ดของคุณ
+       อาจเป็นจุดเริ่มต้นของแอปติดตามและปรับการใช้พาเลทของบริษัทให้เหมาะสม</p>
+
+    <h3 id="s02a">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch23-arrayops</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <h3 id="s02b">เรียงลำดับ Array ด้วย Sort()</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] pallets = [ "B14", "A11", "B12", "A13" ];
+
+Console.WriteLine("Sorted...");
+Array.Sort(pallets);
+foreach (var pallet in pallets)
+{
+    Console.WriteLine($"-- {pallet}");
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Sorted...
+-- A11
+-- A13
+-- B12
+-- B14</pre></div>
+
+    <p>คุณใช้เมธอด <code>Sort()</code> ของ <code>Array</code> class เรียงลำดับ item ใน array แบบ
+       alphanumeric (ตามตัวอักษรและตัวเลข)</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ Sort() เรียงลำดับแบบ in-place</span>
+      <code>Array.Sort(pallets)</code> ไม่ได้คืน array ใหม่ที่เรียงแล้ว — มันแก้ไข
+      <code>pallets</code> ตัวเดิมโดยตรง (in-place) ต่างจากบางภาษาที่ <code>sort()</code> คืนค่า
+      array ใหม่ ถ้าต้องการเก็บลำดับเดิมไว้ด้วย ต้องก็อปปี้ array ก่อน sort (ทบทวนเทคนิคก็อปปี้
+      array แยกจริงจาก <a href="ch21.html">บทที่ 21 แบบฝึกหัดข้อ 3</a>)
+    </div>
+
+    <h3 id="s02c">สลับลำดับ Array ด้วย Reverse()</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] pallets = [ "B14", "A11", "B12", "A13" ];
+
+Console.WriteLine("Sorted...");
+Array.Sort(pallets);
+foreach (var pallet in pallets)
+{
+    Console.WriteLine($"-- {pallet}");
+}
+
+Console.WriteLine("");
+Console.WriteLine("Reversed...");
+Array.Reverse(pallets);
+foreach (var pallet in pallets)
+{
+    Console.WriteLine($"-- {pallet}");
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Sorted...
+-- A11
+-- A13
+-- B12
+-- B14
+
+Reversed...
+-- B14
+-- B12
+-- A13
+-- A11</pre></div>
+
+    <p>ที่นี่คุณใช้เมธอด <code>Reverse()</code> ของ <code>Array</code> class สลับลำดับของ item —
+       สังเกตว่า "Reversed" ในตัวอย่างนี้ทำงานบน array ที่ถูก <code>Sort()</code> ไปแล้ว จึงได้ผล
+       เป็นลำดับจากมากไปน้อย ไม่ใช่การย้อนกลับลำดับเดิมก่อน sort</p>
+
+    <div class="quiz" data-q="23-1">
+      <p class="q"><span class="num">Check ★</span> ข้อใดอธิบายโค้ด <code>Array.Sort(pallets);</code>
+        (เมื่อ <code>pallets</code> เป็น string array) ได้ถูกต้องที่สุด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>Sort คือการทำ cast operation</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>Sort เป็นเมธอดของ Array class</span></li>
+        <li class="opt"><span class="k">C</span><span>Sort ใช้เรียง precision ของ array</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> Sort() เป็น static method บน Array class ไม่เกี่ยวกับ
+        การ cast หรือ precision เลย</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch23-a"><span>ใช้ Array.Sort() เรียง string array สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch23-b"><span>ใช้ Array.Reverse() สลับลำดับ array สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">23.3 Array.Clear() และ Array.Resize()</h2>
+
+    <p>เมื่อพัฒนาระบบติดตามพาเลทต่อไป คุณต้องติดตามพาเลทใหม่และลบพาเลทเก่าออกจากระบบด้วย จะสร้าง
+       ฟังก์ชันที่รองรับการเพิ่มและลบพาเลทได้ยังไง?</p>
+
+    <p><code>Array.Clear()</code> ใช้ล้างเนื้อหาของ element ที่กำหนดใน array ของคุณ แทนที่ด้วยค่า
+       default ของ array นั้น เช่น ถ้าล้าง element ใน string array ค่าที่ถูกล้างจะกลายเป็น
+       <code>null</code> ถ้าล้าง element ใน int array ค่าที่แทนที่จะเป็น <code>0</code></p>
+
+    <p><code>Array.Resize()</code> ใช้เพิ่มหรือลบ element ออกจาก array ได้</p>
+
+    <h3 id="s03a">ล้างค่าด้วย Clear()</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] pallets = [ "B14", "A11", "B12", "A13" ];
+Console.WriteLine("");
+
+Array.Clear(pallets, 0, 2);
+Console.WriteLine($"Clearing 2 ... count: {pallets.Length}");
+foreach (var pallet in pallets)
+{
+    Console.WriteLine($"-- {pallet}");
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Clearing 2 ... count: 4
+-- 
+-- 
+-- B12
+-- A13</pre></div>
+
+    <p><code>Array.Clear(pallets, 0, 2);</code> ล้างค่าที่เก็บใน element ของ array
+       <code>pallets</code> โดยเริ่มที่ index <code>0</code> และล้างทั้งหมด <code>2</code>
+       element เมื่อรัน คุณจะเห็นว่าค่าใน 2 element แรกถูกล้างออก — ใน property <code>Length</code>
+       และ <code>foreach</code> statement, element เหล่านั้นยังคงอยู่ แค่ว่างเปล่า</p>
+
+    <h3 id="s03b">Empty String กับ null ต่างกันยังไง</h3>
+    <p>ตอนใช้ <code>Array.Clear()</code> element ที่ถูกล้างจะไม่อ้างอิงไปยัง string ใดๆ ในหน่วย
+       ความจำอีกต่อไป — จริงๆ แล้ว element นั้นไม่ได้ชี้ไปยังอะไรเลย การชี้ไปยัง "ไม่มีอะไร" เป็น
+       แนวคิดสำคัญที่อาจเข้าใจยากในตอนแรก</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] pallets = [ "B14", "A11", "B12", "A13" ];
+Console.WriteLine("");
+
+Console.WriteLine($"Before: {pallets[0]}");
+Array.Clear(pallets, 0, 2);
+Console.WriteLine($"After: {pallets[0]}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Before: B14
+After: </pre></div>
+
+    <p>ถ้าดูที่บรรทัด <code>After: </code> คุณอาจคิดว่าค่าที่เก็บใน <code>pallets[0]</code> เป็น
+       empty string (<code>""</code>) แต่จริงๆ แล้ว C# Compiler แปลงค่า <code>null</code> เป็น
+       empty string โดยปริยาย (implicit) แค่ตอนแสดงผลเท่านั้น</p>
+
+    <p>เพื่อพิสูจน์ว่าค่าที่เก็บใน <code>pallets[0]</code> หลังถูกล้างเป็น <code>null</code> จริงๆ
+       ลองเรียกเมธอด <code>ToLower()</code> บน <code>pallets[0]</code> ดู — ถ้าเป็น string มันควร
+       ทำงานได้ปกติ แต่ถ้าเป็น <code>null</code> ควรทำให้เกิด exception:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] pallets = [ "B14", "A11", "B12", "A13" ];
+Console.WriteLine("");
+
+Console.WriteLine($"Before: {pallets[0].ToLower()}");
+Array.Clear(pallets, 0, 2);
+Console.WriteLine($"After: {pallets[0].ToLower()}");</code></pre>
+    </div>
+    <div class="out err"><div class="out-bar">Output</div><pre>
+System.NullReferenceException: Object reference not set to an instance of an object.</pre></div>
+
+    <p>exception นี้เกิดขึ้นเพราะความพยายามเรียกเมธอดบนเนื้อหาของ element <code>pallets[0]</code>
+       เกิดขึ้น<b>ก่อน</b>ที่ C# Compiler จะมีโอกาสแปลง <code>null</code> เป็น empty string โดย
+       ปริยาย</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ บทเรียนสำคัญ: เช็ค null ก่อนเรียกเมธอดเสมอ</span>
+      <code>Array.Clear()</code> ลบการอ้างอิงของ array element ไปยังค่าที่มีอยู่ (ถ้ามี) เพื่อแก้
+      ปัญหานี้ ควรเช็ค <code>null</code> ก่อนพยายามพิมพ์หรือเรียกเมธอดบนค่านั้น เพื่อหลีกเลี่ยง
+      error ให้เพิ่ม <code>if</code> statement ก่อนเข้าถึง array element ที่อาจเป็น
+      <code>null</code>:
+      <div class="code">
+        <div class="code-bar"><span class="dot"></span><span class="name">วิธีป้องกัน</span></div>
+        <pre><code class="lang-cs">if (pallets[0] != null)
+    Console.WriteLine($"After: {pallets[0].ToLower()}");</code></pre>
+      </div>
+    </div>
+
+    <h3 id="s03c">ปรับขนาด Array ให้ใหญ่ขึ้นด้วย Resize()</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] pallets = [ "B14", "A11", "B12", "A13" ];
+Console.WriteLine("");
+
+Array.Clear(pallets, 0, 2);
+Console.WriteLine($"Clearing 2 ... count: {pallets.Length}");
+foreach (var pallet in pallets)
+{
+    Console.WriteLine($"-- {pallet}");
+}
+
+Console.WriteLine("");
+Array.Resize(ref pallets, 6);
+Console.WriteLine($"Resizing 6 ... count: {pallets.Length}");
+
+pallets[4] = "C01";
+pallets[5] = "C02";
+
+foreach (var pallet in pallets)
+{
+    Console.WriteLine($"-- {pallet}");
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Clearing 2 ... count: 4
+-- 
+-- 
+-- B12
+-- A13
+
+Resizing 6 ... count: 6
+-- 
+-- 
+-- B12
+-- A13
+-- C01
+-- C02</pre></div>
+
+    <p>สังเกตบรรทัด <code>Array.Resize(ref pallets, 6);</code> — คุณกำลังเรียกเมธอด
+       <code>Resize()</code> โดยส่ง array <code>pallets</code> เข้าไปแบบ pass by reference ด้วย
+       คีย์เวิร์ด <code>ref</code> บางกรณี เมธอดต้องการให้คุณส่ง argument แบบ pass by value
+       (ค่า default) หรือ pass by reference (ใช้คีย์เวิร์ด <code>ref</code>) เหตุผลที่จำเป็นต้อง
+       ใช้ <code>ref</code> ตรงนี้ต้องอธิบายยาวและซับซ้อนเกี่ยวกับวิธีที่ .NET จัดการ object ซึ่งเกิน
+       ขอบเขตของบทนี้ — เมื่อไม่แน่ใจ แนะนำให้ดู IntelliSense หรือ Microsoft Docs เพื่อดูตัวอย่างวิธี
+       เรียกเมธอดนั้นอย่างถูกต้อง</p>
+
+    <p>ในกรณีนี้ คุณกำลังปรับขนาด array <code>pallets</code> จาก 4 element เป็น <code>6</code>
+       element ใหม่ที่เพิ่มมาถูกเติมต่อท้าย element เดิม element ใหม่ทั้งสองจะเป็น <code>null</code>
+       จนกว่าคุณจะกำหนดค่าให้มัน</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 ทำไม Resize() ต้องใช้ ref</span>
+      <code>Array.Resize()</code> ไม่ได้แค่แก้ไข array เดิม แต่จริงๆ แล้วสร้าง array
+      <b>ใหม่ทั้งชุด</b>ในหน่วยความจำ (เพราะ array มีขนาดคงที่เมื่อสร้างแล้ว เปลี่ยนขนาดของมันตรงๆ
+      ไม่ได้ — ทบทวนแนวคิด reference type จาก <a href="ch21.html">บทที่ 21</a>) แล้วก็อปปี้ค่าเดิม
+      ไปยัง array ใหม่นั้น เพราะเมธอดต้องเปลี่ยนว่าตัวแปร <code>pallets</code> ของคุณชี้ไปยัง array
+      ตัวไหน (ไม่ใช่แค่แก้ไขเนื้อหาข้างในของตัวเดิม) มันจึงต้องการ <code>ref</code> เพื่อแก้ไข
+      ตัวแปรต้นทางของคุณโดยตรง
+    </div>
+
+    <h3 id="s03d">ปรับขนาด Array ให้เล็กลง (ลบ Element)</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (เพิ่มต่อจากด้านบน)</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("");
+Array.Resize(ref pallets, 3);
+Console.WriteLine($"Resizing 3 ... count: {pallets.Length}");
+
+foreach (var pallet in pallets)
+{
+    Console.WriteLine($"-- {pallet}");
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Resizing 3 ... count: 3
+-- 
+-- 
+-- B12</pre></div>
+
+    <p>สังเกตว่าการเรียก <code>Array.Resize()</code> ครั้งนี้<b>ไม่ได้</b>ลบ 2 element ที่เป็น
+       <code>null</code> ออก แต่กลับลบ 3 element สุดท้ายออกไปแทน — ที่น่าสังเกตคือ 3 element
+       สุดท้ายถูกลบไปแม้จะมีค่า string อยู่จริงก็ตาม เพราะ <code>Resize()</code> ตัดจาก<b>ท้าย</b>
+       array เสมอ ไม่สนใจว่า element ไหนมีค่าหรือเป็น null</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ไม่มีเมธอดสำเร็จรูปสำหรับ "ลบเฉพาะ element ที่เป็น null"</span>
+      ถ้า <code>Array.Resize()</code> ไม่ได้ลบ element ที่ว่างเปล่าออกให้ มีเมธอด helper อื่นที่ทำ
+      แบบนั้นอัตโนมัติไหม? <b>ไม่มี</b> วิธีที่ดีที่สุดในการล้าง element ว่างเปล่าออกจาก array คือ
+      นับจำนวน element ที่ไม่ใช่ null ด้วยการวนผ่านแต่ละ item แล้วเพิ่มค่าตัวแปร (ตัวนับ) จากนั้น
+      สร้าง array ที่สองที่มีขนาดเท่ากับตัวแปรตัวนับนั้น สุดท้ายวนผ่านแต่ละ element ใน array เดิม
+      แล้วก็อปปี้เฉพาะค่าที่ไม่ใช่ null ไปยัง array ใหม่
+    </div>
+
+    <div class="quiz" data-q="23-2">
+      <p class="q"><span class="num">Check ★</span> ข้อใดอธิบายโค้ด <code>Array.Clear(pallets, 0, 2);</code>
+        (เมื่อ <code>pallets</code> เป็น string array) ได้ถูกต้องที่สุด?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>ลบข้อมูลออกจาก 2 element เริ่มจากตำแหน่ง 0</span></li>
+        <li class="opt"><span class="k">B</span><span>ลบข้อมูลออกจากตำแหน่ง pallets[0] และ pallets[2]</span></li>
+        <li class="opt"><span class="k">C</span><span>ลบ element ที่มีค่าเท่ากับ 0 หรือ 2</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> พารามิเตอร์คือ (array, startIndex, count) — เริ่มที่
+        index 0 ล้างทั้งหมด 2 element (index 0 กับ 1) ไม่ใช่ index 0 กับ 2 ตรงๆ และไม่เกี่ยวกับค่า
+        ใน element เลย</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch23-c"><span>ใช้ Array.Clear() ล้างค่า element สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch23-d"><span>เข้าใจว่า null ต่างจาก empty string ยังไง และทำไม NullReferenceException เกิดขึ้น</span></label></li>
+      <li><label><input type="checkbox" id="ch23-e"><span>ใช้ Array.Resize() ทั้งขยายและย่อขนาด array สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">23.4 String ↔ Array: ToCharArray(), Join(), Split()</h2>
+
+    <p>คุณทำงานพัฒนาต่อให้บริษัทโลจิสติกส์ต่อไป เริ่มสร้างชุดแอปเล็กๆ ที่ทำงานร่วมกัน — รับข้อมูลจาก
+       ระบบของพาร์ทเนอร์รายหนึ่ง ปรับแก้ แล้วส่งต่อไปยังระบบภายในตามรูปแบบที่กำหนด เพื่อแปลงข้อมูล
+       คุณต้องรับข้อมูลที่เข้ามาเป็น string, แยกเป็นชิ้นข้อมูลย่อย แล้วปรับให้ตรงกับรูปแบบที่ต้องการ
+       — จะแยก string เป็นชิ้นข้อมูลย่อยได้ยังไง?</p>
+
+    <p>ตัวแปรชนิด <code>string</code> มี built-in method จำนวนมากที่แปลง string เดียวให้กลายเป็น
+       array ของ string ย่อยๆ หรือ array ของตัวอักษรแต่ละตัวได้ เมื่อคุณประมวลผลข้อมูลจากระบบ
+       คอมพิวเตอร์อื่น บางครั้งมันถูกจัดรูปแบบหรือ encode มาในแบบที่ใช้ประโยชน์ตรงๆ ไม่ได้ ในกรณีนี้
+       คุณใช้ Array method ของ <code>string</code> data type แยก string เป็น array</p>
+
+    <h3 id="s04a">ใช้ ToCharArray() กลับด้าน String</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string value = "abc123";
+char[] valueArray = value.ToCharArray();</code></pre>
+    </div>
+
+    <p>ตัวอย่างนี้ใช้เมธอด <code>ToCharArray()</code> สร้าง array ของ <code>char</code> โดยแต่ละ
+       element แทนตัวอักษรหนึ่งตัวของ string ต้นฉบับ</p>
+
+    <h3 id="s04b">กลับด้านแล้วรวมกลับเป็น String ใหม่</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string value = "abc123";
+char[] valueArray = value.ToCharArray();
+Array.Reverse(valueArray);
+string result = new string(valueArray);
+Console.WriteLine(result);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+321cba</pre></div>
+
+    <p>expression <code>new string(valueArray)</code> สร้าง instance ใหม่ของ
+       <code>System.String</code> class (ซึ่งก็คือ <code>string</code> data type ใน C#) แล้วส่ง
+       char array เข้าไปเป็น constructor</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 new string(...) คืออะไรกันแน่</span>
+      คีย์เวิร์ด <code>new</code> คืออะไร? <code>System.String</code> class เกี่ยวข้องกับ
+      <code>string</code> data type ใน C# ยังไง? constructor คืออะไร? คำถามดีๆ ทั้งหมดนี้ยังอยู่
+      นอกขอบเขตของบทนี้ (จะได้เรียนเรื่อง class และ constructor แบบเต็มๆ ในโมดูลถัดๆ ไปของหลักสูตร)
+      ตอนนี้แค่จำไว้ว่า <code>new string(char[])</code> คือวิธีมาตรฐานแปลง char array กลับเป็น
+      string
+    </div>
+
+    <h3 id="s04c">รวม char เข้าเป็น Comma-Separated String ด้วย Join()</h3>
+    <p>บางกรณีคุณอาจต้องการคั่นแต่ละ element ของ char array ด้วยเครื่องหมายจุลภาค ซึ่งเป็นวิธีที่
+       นิยมทำเวลาทำงานกับข้อมูลที่แทนเป็น ASCII text — ใช้เมธอด <code>Join()</code> ของ
+       <code>String</code> class โดยส่งตัวอักษรที่ต้องการใช้คั่น (จุลภาค) กับตัว array เข้าไป:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string value = "abc123";
+char[] valueArray = value.ToCharArray();
+Array.Reverse(valueArray);
+string result = String.Join(",", valueArray);
+Console.WriteLine(result);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+3,2,1,c,b,a</pre></div>
+
+    <h3 id="s04d">แยก Comma-Separated String กลับเป็น Array ด้วย Split()</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (เพิ่มต่อจากด้านบน)</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] items = result.Split(',');
+foreach (string item in items)
+{
+    Console.WriteLine(item);
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output รวม (ต่อจากโค้ด Join ด้านบน)</div><pre>
+3,2,1,c,b,a
+3
+2
+1
+c
+b
+a</pre></div>
+
+    <p>เมธอด <code>.Split()</code> ออกแบบมาสำหรับตัวแปรชนิด <code>string</code> สร้าง array ของ
+       string ขึ้นมา — เครื่องหมายจุลภาคถูกส่งให้ <code>.Split()</code> เป็นตัวคั่น (delimiter)
+       ใช้แยก string ยาวหนึ่งอันเป็น string ย่อยๆ จากนั้นโค้ดใช้ <code>foreach</code> loop วนผ่าน
+       แต่ละ element ของ array ใหม่ที่ชื่อ <code>items</code></p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ สรุปทิศทางการแปลง</span>
+      <b>String → Array:</b> <code>.ToCharArray()</code> (เป็น char array) หรือ
+      <code>.Split(delimiter)</code> (เป็น string array) — <b>Array → String:</b>
+      <code>new string(charArray)</code> หรือ <code>String.Join(separator, array)</code>
+    </div>
+
+    <div class="quiz" data-q="23-3">
+      <p class="q"><span class="num">Check ★</span> <code>String.Join("-", myArray);</code> เป็น
+        ตัวอย่างของ Join คำอธิบายข้อใดตรงกับตัวอย่างนี้ที่สุด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>สร้าง character array จาก item ใน myArray เชื่อมด้วยเครื่องหมายจุลภาค (,)</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>สร้าง string จาก item ใน myArray เชื่อมด้วยเครื่องหมายขีดกลาง (-)</span></li>
+        <li class="opt"><span class="k">C</span><span>สร้าง string ชื่อ myArray เชื่อมด้วยเครื่องหมายขีดกลาง (-)</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> Join() รวม element ของ array เข้าเป็น string เดียว โดย
+        ใส่ตัวคั่นที่กำหนด (ในที่นี้คือ "-") ระหว่างแต่ละ element — ไม่เกี่ยวกับ character array
+        หรือจุลภาคเลย และผลลัพธ์เป็น string ที่มีเนื้อหาจาก myArray ไม่ใช่ string ที่ชื่อว่า
+        "myArray"</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch23-f"><span>ใช้ ToCharArray() แปลง string เป็น char array สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch23-g"><span>ใช้ String.Join() รวม array กลับเป็น string สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch23-h"><span>ใช้ .Split() แยก string เป็น array สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">23.5 ท้าทาย 1: กลับตัวอักษรแต่ละคำในประโยค</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl h">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>ใช้ตัวแปรตั้งต้นนี้:</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">ข้อมูลตั้งต้น</span></div>
+          <pre><code class="lang-cs">string pangram = "The quick brown fox jumps over the lazy dog";</code></pre>
+        </div>
+        <p>เขียนโค้ดกลับตัวอักษรของแต่ละคำ<b>ในตำแหน่งเดิม</b>ของมัน แล้วแสดงผลลัพธ์ — พูดอีกแบบคือ
+           อย่าแค่กลับทุกตัวอักษรในตัวแปร <code>pangram</code> ทั้งก้อน แต่ต้องกลับเฉพาะตัวอักษร
+           ในแต่ละ<b>คำ</b> แล้วพิมพ์คำที่กลับด้านแล้วในตำแหน่งเดิมของมันในประโยค</p>
+        <p>ผลลัพธ์ที่ต้องได้:</p>
+        <div class="out auto"><pre>
+ehT kciuq nworb xof spmuj revo eht yzal god</pre></div>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>โจทย์นี้ยากพอสมควร ต้องรวมหลายแนวคิดจากบทนี้เข้าด้วยกัน รวมถึงการใช้
+             <code>Split()</code>, <code>ToCharArray()</code>, <code>Array.Reverse()</code>, และ
+             <code>String.Join()</code> คุณจะต้องสร้าง array หลายตัว และใช้ iteration statement
+             อย่างน้อยหนึ่งตัว — ลองแตกปัญหาใหญ่เป็นขั้นตอนย่อยๆ ก่อน: (1) แยกประโยคเป็นคำๆ (2) กลับ
+             แต่ละคำ (3) ประกอบกลับเป็นประโยคเดียว</p>
+        </div>
+      </details>
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย (เฉลยทางการจาก Microsoft Learn)</summary>
+      <div class="fold-body">
+        <p>เฉลยนี้แบ่งเป็น 4 ขั้นตอน:</p>
+        <ol>
+          <li>สร้าง string array <code>message</code> โดยแยก <code>pangram</code> ที่อักขระ
+              ช่องว่าง</li>
+          <li>สร้าง array <code>newMessage</code> ใหม่ เก็บสำเนาของแต่ละ "คำ" ที่กลับด้านแล้วจาก
+              array <code>message</code></li>
+          <li>วนผ่านแต่ละ element ใน <code>message</code> กลับด้านมัน แล้วเก็บลง
+              <code>newMessage</code></li>
+          <li>รวมคำใน <code>newMessage</code> เข้าด้วยกันด้วยช่องว่างอีกครั้ง สร้าง string เดียว
+              เพื่อพิมพ์ออกมา</li>
+        </ol>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">string pangram = "The quick brown fox jumps over the lazy dog";
+
+// Step 1
+string[] message = pangram.Split(' ');
+
+// Step 2
+string[] newMessage = new string[message.Length];
+
+// Step 3
+for (int i = 0; i < message.Length; i++)
+{
+    char[] letters = message[i].ToCharArray();
+    Array.Reverse(letters);
+    newMessage[i] = new string(letters);
+}
+
+// Step 4
+string result = String.Join(" ", newMessage);
+Console.WriteLine(result);</code></pre>
+        </div>
+        <div class="out"><div class="out-bar">Output</div><pre>
+ehT kciuq nworb xof spmuj revo eht yzal god</pre></div>
+        <p>นี่เป็น<i>เพียงหนึ่งในหลายวิธี</i>ที่แก้โจทย์นี้ได้ — คุณอาจใช้วิธีอื่นในแต่ละขั้นตอนก็ได้
+           ขอแค่ผลลัพธ์ตรงกันก็ถือว่าสำเร็จ</p>
+        <p>สังเกตว่า loop ใน Step 3 ใช้ <code>for</code> ไม่ใช่ <code>foreach</code> เพราะต้องใช้
+           ตัวแปร <code>i</code> เป็น index อ้างอิงทั้ง <code>message[i]</code> (อ่านคำต้นฉบับ)
+           และ <code>newMessage[i]</code> (เขียนคำที่กลับด้านแล้วลงตำแหน่งเดียวกัน) — นี่คือรูปแบบ
+           ที่คุณเจอบ่อยเมื่อต้อง "map" ข้อมูลจาก array หนึ่งไปยังอีก array หนึ่งแบบ 1-ต่อ-1</p>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch23-i"><span>แก้โจทย์ท้าทาย 1 สำเร็จ ได้ผลลัพธ์ตรงตามที่กำหนด</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">23.6 ท้าทาย 2: แยกวิเคราะห์ Order, เรียงลำดับ, และแท็ก Error</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl m">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>ข้อมูลมาในหลายรูปแบบ ในโจทย์นี้ คุณต้องแยกวิเคราะห์ "Order ID" แต่ละตัว แล้วแสดง
+           "Order ID" ที่เรียงลำดับแล้ว พร้อมแท็ก "Error" ให้ตัวที่ความยาวไม่เท่ากับ 4 ตัวอักษร
+           พอดี</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">ข้อมูลตั้งต้น</span></div>
+          <pre><code class="lang-cs">string orderStream = "B123,C234,A345,C15,B177,G3003,C235,B179";</code></pre>
+        </div>
+        <p>ตัวแปร <code>orderStream</code> เก็บ string ของ Order ID หลายตัวคั่นด้วยจุลภาค เขียนโค้ด
+           ที่:</p>
+        <ul>
+          <li>แยกวิเคราะห์ Order ID จาก string ของคำสั่งซื้อที่เข้ามา แล้วเก็บไว้ใน array</li>
+          <li>แสดงแต่ละ Order ID แบบเรียงลำดับแล้ว และแท็ก order ที่ความยาวไม่เท่ากับ 4 ตัวอักษร
+              พอดีด้วย <code>"- Error"</code></li>
+        </ul>
+        <p>ผลลัพธ์ที่ต้องได้:</p>
+        <div class="out auto"><pre>
+A345
+B123
+B177
+B179
+C15     - Error
+C234
+C235
+G3003   - Error</pre></div>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>ใช้ <code>Split(',')</code> แยก order ก่อน แล้วใช้ <code>Array.Sort()</code> เรียง
+             แล้ววนด้วย <code>foreach</code> เช็ค <code>.Length</code> ของแต่ละ order</p>
+        </div>
+      </details>
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย (เฉลยทางการจาก Microsoft Learn)</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">string orderStream = "B123,C234,A345,C15,B177,G3003,C235,B179";
+string[] items = orderStream.Split(',');
+Array.Sort(items);
+
+foreach (var item in items)
+{
+    if (item.Length == 4)
+    {
+        Console.WriteLine(item);
+    }
+    else
+    {
+        Console.WriteLine(item + "\t- Error");
+    }
+}</code></pre>
+        </div>
+        <div class="out"><div class="out-bar">Output</div><pre>
+A345
+B123
+B177
+B179
+C15     - Error
+C234
+C235
+G3003   - Error</pre></div>
+        <p>นี่เป็น<i>เพียงหนึ่งในหลายวิธี</i>ที่แก้โจทย์นี้ได้ สังเกตว่าเฉลยนี้ทำแค่ 3 ขั้นตอนหลัก:
+           แยก (Split) → เรียง (Sort) → วนพิมพ์พร้อมเช็คเงื่อนไข (foreach + if) — ตัวอักษร
+           <code>\t</code> คือ escape sequence สำหรับ tab (ทบทวนจาก <a href="ch03.html">บทที่ 3</a>)
+           ใช้จัดตำแหน่งข้อความ "- Error" ให้อยู่ห่างจาก Order ID เล็กน้อย</p>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch23-j"><span>แก้โจทย์ท้าทาย 2 สำเร็จ ได้ผลลัพธ์ตรงตามที่กำหนด</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s07">23.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>System.NullReferenceException ตอนเรียกเมธอดบน array element</td>
+          <td>element นั้นอาจถูก Clear() ไปแล้ว หรือเป็น element ใหม่จาก Resize() ที่ยังไม่ได้
+              กำหนดค่า — ต้องเช็ค <code>!= null</code> ก่อนเรียกเมธอดบนมันเสมอ</td>
+        </tr>
+        <tr>
+          <td>Resize() แล้ว element ว่างเปล่ายังอยู่ ทั้งที่คาดว่าจะถูกลบไปด้วย</td>
+          <td>ไม่ใช่บั๊ก — Resize() ตัดจากท้าย array เสมอ ไม่สนใจว่า element ไหนว่างหรือไม่ ถ้าต้องการ
+              ลบเฉพาะ element ว่าง ต้องเขียนโค้ดกรองเองด้วยการนับ+สร้าง array ใหม่</td>
+        </tr>
+        <tr>
+          <td>ลืมใส่ ref ตอนเรียก Array.Resize() แล้ว compile error</td>
+          <td>Resize() ต้องการ ref เพราะมันเปลี่ยนตัวแปรต้นทางให้ชี้ไปยัง array ใหม่ทั้งชุด (ไม่ใช่
+              แค่แก้ไขของเดิม) ต้องเขียน <code>Array.Resize(ref arr, newSize)</code> เสมอ</td>
+        </tr>
+        <tr>
+          <td>Sort() แล้วข้อมูลชุดเดิมหายไป ไม่มีลำดับต้นฉบับให้ใช้อีก</td>
+          <td>Sort() แก้ไข array แบบ in-place เสมอ ถ้าต้องการเก็บลำดับเดิมไว้ด้วย ต้องก็อปปี้ array
+              ก่อน sort</td>
+        </tr>
+        <tr>
+          <td>Split() ได้ element ว่างเปล่าปนมาในผลลัพธ์ (เช่น จาก string ที่มีจุลภาคติดกัน "a,,b")</td>
+          <td>เป็นพฤติกรรมปกติของ Split() — ถ้าไม่ต้องการ element ว่าง ใช้ overload
+              <code>Split(',', StringSplitOptions.RemoveEmptyEntries)</code> แทน</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">23.8 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment ของ Microsoft Learn</p>
+
+    <div class="quiz" data-q="23-4">
+      <p class="q"><span class="num">1.</span> เมธอดไหนเปลี่ยนลำดับของ item ใน string array?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>myArray.Resize()</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>myArray.Clear()</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>Array.Sort()</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> Array.Sort() เปลี่ยนลำดับของ element ตามค่าของมัน —
+        Resize() เปลี่ยนแค่ขนาด (จำนวน element) ไม่ได้เรียงลำดับ ส่วน Clear() แค่ล้างค่า ไม่ได้
+        แตะลำดับเลย</div>
+    </div>
+
+    <div class="quiz" data-q="23-5">
+      <p class="q"><span class="num">2.</span> null คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เหมือนกับ empty string</span></li>
+        <li class="opt"><span class="k">B</span><span>เหมือนกับค่าศูนย์</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>ค่าที่บ่งบอกว่าตัวแปรชี้ไปยัง "ไม่มีอะไร" ในหน่วยความจำ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ตรงกับที่พิสูจน์ให้เห็นในหัวข้อ 23.3b — null ไม่ใช่
+        empty string และไม่ใช่ศูนย์ มันคือการไม่ชี้ไปยังอะไรเลย เรียกเมธอดบนมันจึงทำให้เกิด
+        NullReferenceException</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">23.9 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>สร้าง <code>int[] numbers = [5, 2, 8, 1, 9];</code> เรียงจากมากไปน้อย (ใบ้: Sort() ก่อน
+           แล้ว Reverse() ต่อ)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int[] numbers = [5, 2, 8, 1, 9];
+Array.Sort(numbers);
+Array.Reverse(numbers);
+foreach (var n in numbers)
+{
+    Console.WriteLine(n);
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ใช้ <code>.Split()</code> แยก string <code>"apple,banana,cherry"</code> เป็น array
+           แล้วใช้ <code>String.Join()</code> รวมกลับด้วยตัวคั่น <code>" | "</code> แทนจุลภาค</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string fruits = "apple,banana,cherry";
+string[] fruitArray = fruits.Split(',');
+string result = String.Join(" | ", fruitArray);
+Console.WriteLine(result);</code></pre></div>
+          <p>ผลลัพธ์: <code>apple | banana | cherry</code></p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้ throw NullReferenceException หาสาเหตุและแก้ไข:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">string[] names = ["Ann", "Bob", "Cee"];
+Array.Clear(names, 1, 1);
+Console.WriteLine(names[1].ToUpper());</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p><code>names[1]</code> ถูก Clear() เป็น null ไปแล้ว การเรียก <code>.ToUpper()</code>
+             บน null จึงทำให้เกิด exception ต้องเช็ค null ก่อน:</p>
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (แก้แล้ว)</span></div>
+          <pre><code class="lang-cs">string[] names = ["Ann", "Bob", "Cee"];
+Array.Clear(names, 1, 1);
+if (names[1] != null)
+{
+    Console.WriteLine(names[1].ToUpper());
+}
+else
+{
+    Console.WriteLine("(ไม่มีข้อมูล)");
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดที่มี array <code>string[] data = ["x", null, "y", null, "z"];</code> แล้วสร้าง
+           array ใหม่ที่มีแค่ element ที่ไม่ใช่ null เท่านั้น (ทบทวนแนวทางจาก note ในหัวข้อ 23.3d)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string?[] data = ["x", null, "y", null, "z"];
+
+int count = 0;
+foreach (var item in data)
+{
+    if (item != null) count++;
+}
+
+string[] cleaned = new string[count];
+int index = 0;
+foreach (var item in data)
+{
+    if (item != null)
+    {
+        cleaned[index] = item;
+        index++;
+    }
+}
+
+foreach (var item in cleaned)
+{
+    Console.WriteLine(item);
+}</code></pre></div>
+          <p>ผลลัพธ์: x, y, z — ตรงตามแนวทาง "นับก่อน แล้วค่อยสร้าง array ใหม่ขนาดพอดี" ที่อธิบายไว้
+             ในหัวข้อ 23.3d</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงเฉลยท้าทาย 1 (หัวข้อ 23.5) ให้กลับด้าน<b>ลำดับของคำ</b>ในประโยคด้วย (ไม่ใช่แค่กลับ
+           ตัวอักษรในแต่ละคำ) ทดสอบกับ <code>"The quick brown fox"</code> ผลลัพธ์ควรเป็น
+           <code>"xof nworb kciuq ehT"</code></p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>เพิ่ม <code>Array.Reverse(newMessage);</code> อีกบรรทัดหลัง
+           loop จบ ก่อนทำ Join()</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string pangram = "The quick brown fox";
+
+string[] message = pangram.Split(' ');
+string[] newMessage = new string[message.Length];
+
+for (int i = 0; i < message.Length; i++)
+{
+    char[] letters = message[i].ToCharArray();
+    Array.Reverse(letters);
+    newMessage[i] = new string(letters);
+}
+
+Array.Reverse(newMessage);
+
+string result = String.Join(" ", newMessage);
+Console.WriteLine(result);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงเฉลยท้าทาย 2 (หัวข้อ 23.6) ให้ error ที่ตรวจสอบเปลี่ยนกฎเป็น: Order ID ต้องขึ้นต้น
+           ด้วยตัวอักษร A, B, หรือ C เท่านั้น (นอกเหนือจากกฎความยาว 4 ตัวอักษรเดิม) ถ้าขึ้นต้นด้วย
+           ตัวอักษรอื่น (เช่น G) ให้แท็กเป็น <code>"- Error (invalid prefix)"</code> แยกจาก error
+           ความยาว ทดสอบกับ <code>orderStream</code> เดิม</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string orderStream = "B123,C234,A345,C15,B177,G3003,C235,B179";
+string[] items = orderStream.Split(',');
+Array.Sort(items);
+
+foreach (var item in items)
+{
+    char prefix = item[0];
+    bool validPrefix = (prefix == 'A' || prefix == 'B' || prefix == 'C');
+
+    if (!validPrefix)
+    {
+        Console.WriteLine(item + "\t- Error (invalid prefix)");
+    }
+    else if (item.Length != 4)
+    {
+        Console.WriteLine(item + "\t- Error");
+    }
+    else
+    {
+        Console.WriteLine(item);
+    }
+}</code></pre></div>
+          <p>ใช้ <code>item[0]</code> เข้าถึงตัวอักษรแรกของ string ตรงๆ (string เข้าถึงแบบ index ได้
+             เหมือน char array) เช็ค prefix ก่อนเช็คความยาว เพราะ G3003 ผิดทั้งสองกฎ แต่โจทย์ต้องการ
+             ให้แท็กเป็น "invalid prefix" เป็นหลัก</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 23</h2>
+
+    <p>ในบทนี้ คุณทำแบบฝึกหัดที่ใช้ helper method ทำงานกับ array ได้อย่างมีประสิทธิภาพมากขึ้น:</p>
+    <ul>
+      <li>ล้าง item ใน array ด้วยเมธอด <code>Array.Clear()</code> และเรียนรู้ว่า element ที่ถูกล้าง
+          จะถูกตั้งเป็น <code>null</code></li>
+      <li>ปรับขนาด array เพิ่ม/ลบ element ด้วยเมธอด <code>Array.Resize()</code></li>
+      <li>แปลง string เป็น array ด้วย <code>String.Split()</code> โดยกำหนดตัวคั่นเพื่อสร้างค่าใน
+          array ที่คืนกลับมา</li>
+      <li>รวม element ทั้งหมดของ array เป็น string เดียวด้วยเมธอด <code>String.Join()</code></li>
+    </ul>
+
+    <p>array helper method ช่วยให้คุณทำงานกับข้อมูลในแอปพลิเคชันได้อย่างยืดหยุ่น ถ้าไม่มีฟีเจอร์
+       เหล่านี้ array จะมีประโยชน์น้อยลงมาก</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 23</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">เมธอด</th><th>ใช้ทำอะไร</th></tr></thead>
+        <tbody>
+          <tr><td><code>Array.Sort(arr)</code></td><td>เรียงลำดับ in-place</td></tr>
+          <tr><td><code>Array.Reverse(arr)</code></td><td>สลับลำดับ in-place</td></tr>
+          <tr><td><code>Array.Clear(arr, start, count)</code></td><td>ล้างค่าเป็น default (null/0) เริ่มที่ start จำนวน count</td></tr>
+          <tr><td><code>Array.Resize(ref arr, newSize)</code></td><td>เปลี่ยนขนาด (ต้องมี ref) เพิ่ม/ตัดจากท้าย</td></tr>
+          <tr><td><code>str.ToCharArray()</code></td><td>string → char[]</td></tr>
+          <tr><td><code>str.Split(delimiter)</code></td><td>string → string[]</td></tr>
+          <tr><td><code>new string(charArray)</code></td><td>char[] → string</td></tr>
+          <tr><td><code>String.Join(sep, arr)</code></td><td>array ใดๆ → string เดียว</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>helper method</td><td>เมธอดช่วยเหลือ</td><td>เมธอดสำเร็จรูปที่ทำงานทั่วไปให้ ไม่ต้องเขียนเอง</td></tr>
+        <tr><td>in-place</td><td>แก้ไขที่เดิม</td><td>แก้ไข object ต้นฉบับโดยตรง ไม่สร้างตัวใหม่</td></tr>
+        <tr><td>collection expression</td><td>นิพจน์คอลเลกชัน</td><td>syntax ย่อ [ ] สร้าง array/collection (C# 12)</td></tr>
+        <tr><td>delimiter</td><td>ตัวคั่น</td><td>อักขระที่ใช้แบ่ง string ออกเป็นส่วนย่อยตอน Split()</td></tr>
+        <tr><td>pass by reference</td><td>ส่งผ่านโดยอ้างอิง</td><td>ส่ง address ของตัวแปรเข้าเมธอด (ref) แทนที่จะส่งค่า</td></tr>
+        <tr><td>constructor</td><td>ตัวสร้าง</td><td>โค้ดพิเศษที่รันตอนสร้าง instance ใหม่ (เช่น new string(...))</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch22.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 22 · Casting และ Conversion</span></a>
+      <a class="next" href="ch24.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 24 · Format Alphanumeric Data for Presentation</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

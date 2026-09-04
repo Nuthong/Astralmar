@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 0 · ก่อนเริ่มต้น — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="0">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ ปฐมบท / บทที่ 0</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">ปฐมบท · ก่อนเข้าคอร์ส</span>
+      <h1>ก่อนเริ่มต้น</h1>
+      <div class="en">Before You Begin</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>25–40 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เครื่องพร้อมเขียน C#</b></span>
+        <span>🎯 ความยาก <b>ง่ายมาก</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>รู้ว่าหนังสือเล่มนี้ใช้ยังไง มีสัญลักษณ์อะไรบ้าง</li>
+        <li>อธิบายได้ว่า <b>C#</b> กับ <b>.NET</b> ต่างกันอย่างไร</li>
+        <li>เห็นแผนที่ทั้งเส้นทาง 44 โมดูล จนถึงวันสอบใบรับรอง</li>
+        <li>ติดตั้ง .NET SDK และรันโปรแกรม C# ตัวแรกบนเครื่องตัวเองได้</li>
+      </ul>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ บทนี้ไม่มีใน Microsoft Learn</span>
+      หลักสูตรต้นฉบับสอนติดตั้งเครื่องมือตอน <b>คอร์สที่ 2</b> แต่หนังสือเล่มนี้อยากให้คุณ
+      <b>รันโค้ดจริงได้ตั้งแต่บทแรก</b> เลยยกเรื่องเตรียมเครื่องขึ้นมาไว้ข้างหน้า
+      ถ้าคุณติดตั้ง .NET ไว้อยู่แล้ว ข้ามไปหัวข้อ 0.3 ได้เลย
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">0.1 หนังสือเล่มนี้ใช้ยังไง</h2>
+
+    <p>ทุกบทในเล่มนี้เรียงเหมือนกันหมด 9 ส่วน เพื่อให้คุณจับจังหวะได้และไม่หลงทาง:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:34%">ส่วน</th><th>ทำอะไร</th></tr></thead>
+      <tbody>
+        <tr><td>🎯 จุดหมายบทนี้</td><td>บอกล่วงหน้าว่าจบบทแล้วทำอะไรได้</td></tr>
+        <tr><td>📖 ทฤษฎีทีละก้าว</td><td>อธิบายแนวคิด พร้อมแผนภาพ</td></tr>
+        <tr><td>💻 โค้ดตัวอย่าง</td><td>มีปุ่ม <b>Copy</b> และ <b>▶ Run</b> ให้ดูผลลัพธ์</td></tr>
+        <tr><td>🔬 ห้องทดลอง</td><td>ลงมือทำตามทีละขั้น มีช่องติ๊กความคืบหน้า</td></tr>
+        <tr><td>⚠️ กับดักที่พบบ่อย</td><td>ข้อความ error จริง + สาเหตุ + วิธีแก้</td></tr>
+        <tr><td>✍️ แบบฝึกหัด 3 ระดับ</td><td>ง่าย / กลาง / ท้าทาย — มีคำใบ้และเฉลยพับซ่อน</td></tr>
+        <tr><td>❓ Knowledge Check</td><td>ข้อสอบกดตอบได้ เฉลยทันทีพร้อมเหตุผล</td></tr>
+        <tr><td>📌 สรุป + Cheat Sheet</td><td>ตารางสิ่งที่ต้องจำ ใช้ทบทวนก่อนสอบ</td></tr>
+        <tr><td>🔤 ศัพท์ EN–TH</td><td>เตรียมพร้อมอ่านข้อสอบภาษาอังกฤษ</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 id="s01b">สัญลักษณ์ที่จะเจอบ่อย</h3>
+
+    <div class="note"><span class="lbl">ℹ️ หมายเหตุ</span>ข้อมูลเสริมที่ควรรู้</div>
+    <div class="note tip"><span class="lbl">💡 เคล็ดลับ</span>ทางลัดหรือวิธีที่มืออาชีพใช้</div>
+    <div class="note warn"><span class="lbl">⚠️ ระวัง</span>จุดที่คนพลาดกันเยอะ</div>
+    <div class="note bad"><span class="lbl">🛑 ผิดพลาด</span>ตัวอย่างโค้ดที่คอมไพล์ไม่ผ่าน</div>
+    <div class="note ok"><span class="lbl">✅ ถูกต้อง</span>วิธีที่แนะนำ</div>
+
+    <div class="note tip">
+      <span class="lbl">💡 ความคืบหน้าถูกจำไว้ให้</span>
+      ทุกช่องที่คุณติ๊ก และทุกข้อสอบที่คุณตอบ จะถูกบันทึกไว้ในเบราว์เซอร์ของคุณเอง
+      ปิดไปแล้วเปิดใหม่ก็ยังอยู่ — และไม่มีข้อมูลใดถูกส่งออกไปไหนทั้งสิ้น
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s02">0.2 C# กับ .NET ต่างกันอย่างไร</h2>
+
+    <p>สองคำนี้มาคู่กันเสมอจนหลายคนสับสน ลองเทียบง่าย ๆ แบบนี้:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:16%"></th><th style="width:42%">C#</th><th>.NET</th></tr></thead>
+      <tbody>
+        <tr><td><b>คืออะไร</b></td><td><b>ภาษา</b> — กฎการเขียน คำสั่ง ไวยากรณ์</td><td><b>แพลตฟอร์ม</b> — ตัวรันโปรแกรม + คลังคำสั่งสำเร็จรูป</td></tr>
+        <tr><td><b>เทียบกับ</b></td><td>ภาษาไทย (คำ + ไวยากรณ์)</td><td>ปากกา กระดาษ พจนานุกรม โรงพิมพ์</td></tr>
+        <tr><td><b>คุณเขียน</b></td><td>โค้ด <code>.cs</code></td><td>เรียกใช้ของที่ .NET เตรียมไว้ เช่น <code>Console</code></td></tr>
+        <tr><td><b>ใครทำ</b></td><td colspan="2">Microsoft ทั้งคู่ และเป็น open-source ทั้งคู่</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>เวลาคุณสั่งรันโปรแกรม สิ่งที่เกิดขึ้นจริงเป็นแบบนี้:</p>
+
+    <svg viewBox="0 0 720 210" role="img" aria-label="แผนภาพขั้นตอนตั้งแต่เขียนโค้ดจนโปรแกรมทำงาน" style="margin:18px 0">
+      <defs>
+        <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="var(--text-faint)"/>
+        </marker>
+      </defs>
+      <g font-family="var(--font-th)" font-size="13">
+        <rect x="8"   y="52" width="140" height="76" rx="11" fill="var(--bg-soft)"   stroke="var(--line)"/>
+        <rect x="196" y="52" width="140" height="76" rx="11" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <rect x="384" y="52" width="140" height="76" rx="11" fill="var(--bg-soft)"   stroke="var(--line)"/>
+        <rect x="572" y="52" width="140" height="76" rx="11" fill="var(--ok-soft)"   stroke="var(--ok)"/>
+
+        <text x="78"  y="80"  text-anchor="middle" fill="var(--text)" font-weight="700">1. คุณเขียน</text>
+        <text x="78"  y="102" text-anchor="middle" fill="var(--text-soft)" font-size="12">Program.cs</text>
+        <text x="266" y="80"  text-anchor="middle" fill="var(--brand-text)" font-weight="700">2. คอมไพล์</text>
+        <text x="266" y="102" text-anchor="middle" fill="var(--text-soft)" font-size="12">Roslyn compiler</text>
+        <text x="454" y="80"  text-anchor="middle" fill="var(--text)" font-weight="700">3. .NET รัน</text>
+        <text x="454" y="102" text-anchor="middle" fill="var(--text-soft)" font-size="12">runtime + CPU</text>
+        <text x="642" y="80"  text-anchor="middle" fill="var(--ok)" font-weight="700">4. เห็นผล</text>
+        <text x="642" y="102" text-anchor="middle" fill="var(--text-soft)" font-size="12">Hello World!</text>
+
+        <line x1="152" y1="90" x2="190" y2="90" stroke="var(--text-faint)" stroke-width="1.6" marker-end="url(#ar)"/>
+        <line x1="340" y1="90" x2="378" y2="90" stroke="var(--text-faint)" stroke-width="1.6" marker-end="url(#ar)"/>
+        <line x1="528" y1="90" x2="566" y2="90" stroke="var(--text-faint)" stroke-width="1.6" marker-end="url(#ar)"/>
+
+        <text x="360" y="26"  text-anchor="middle" fill="var(--text-faint)" font-size="12">มนุษย์อ่านออก</text>
+        <line x1="8" y1="34" x2="336" y2="34" stroke="var(--line)" stroke-dasharray="3 3"/>
+        <text x="360" y="176" text-anchor="middle" fill="var(--text-faint)" font-size="12">เครื่องอ่านออก</text>
+        <line x1="384" y1="148" x2="712" y2="148" stroke="var(--line)" stroke-dasharray="3 3"/>
+      </g>
+    </svg>
+
+    <div class="note">
+      <span class="lbl">ℹ️ คำที่จะได้ยินอีก</span>
+      <b>SDK</b> = ชุดเครื่องมือสำหรับ <i>สร้าง</i> โปรแกรม (มีคอมไพเลอร์อยู่ในนั้น) ·
+      <b>Runtime</b> = ตัวที่ใช้ <i>รัน</i> โปรแกรมอย่างเดียว ·
+      คนเขียนโปรแกรมต้องติดตั้ง <b>SDK</b> เพราะ SDK มี Runtime อยู่ในตัวแล้ว
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s03">0.3 แผนที่ทั้งเส้นทาง</h2>
+
+    <p>หลักสูตร <b>Foundational C# with Microsoft</b> ที่ Microsoft ทำร่วมกับ freeCodeCamp
+       ประกอบด้วย <b>6 คอร์ส · 44 โมดูล</b> แล้วปิดท้ายด้วยข้อสอบรับใบรับรองฟรี</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:8%">Part</th><th>คอร์ส</th><th style="width:14%">โมดูล</th><th style="width:16%">บทในเล่มนี้</th></tr></thead>
+      <tbody>
+        <tr><td><b>0</b></td><td>ก่อนเริ่มต้น <small>(เพิ่มเอง)</small></td><td>–</td><td>บทที่ 0</td></tr>
+        <tr><td><b>1</b></td><td>Write Your First Code Using C#</td><td>7</td><td>บทที่ 1–6</td></tr>
+        <tr><td><b>2</b></td><td>Create and Run Simple C# Console Applications</td><td>8</td><td>บทที่ 7–13</td></tr>
+        <tr><td><b>3</b></td><td>Add Logic to C# Console Applications</td><td>8</td><td>บทที่ 14–20</td></tr>
+        <tr><td><b>4</b></td><td>Work with Variable Data in C# Console Applications</td><td>8</td><td>บทที่ 21–27</td></tr>
+        <tr><td><b>5</b></td><td>Create Methods in C# Console Applications</td><td>6</td><td>บทที่ 28–32</td></tr>
+        <tr><td><b>6</b></td><td>Debug C# Console Applications</td><td>7</td><td>บทที่ 33–38</td></tr>
+        <tr><td><b>7</b></td><td>Foundational C# Certification Exam</td><td>1</td><td>บทที่ 39</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 อย่ารีบ</span>
+      แต่ละโมดูลออกแบบมาให้ใช้เวลา 30–60 นาที ถ้าทำวันละ 1 โมดูล จะจบทั้งหลักสูตรใน
+      ประมาณ <b>6–8 สัปดาห์</b> — ความสม่ำเสมอสำคัญกว่าความเร็ว
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s04">0.4 ติดตั้ง .NET SDK</h2>
+
+    <p>เราจะติดตั้งแค่ตัวเดียวก่อน คือ <b>.NET SDK</b> (ส่วน Visual Studio Code จะติดตั้งตอนบทที่ 7
+       ตามลำดับของหลักสูตรจริง) เลือกวิธีไหนก็ได้:</p>
+
+    <h3 id="s04a">วิธี ก — โหลดตัวติดตั้งจากเว็บ Microsoft</h3>
+    <ol>
+      <li>เข้า <b>dotnet.microsoft.com/download</b></li>
+      <li>เลือกรุ่นที่ติดป้าย <b>LTS</b> (Long-Term Support) — เสถียรและได้รับการดูแลยาว</li>
+      <li>กด <b>Download .NET SDK x64</b> แล้วเปิดไฟล์ที่ได้ กด Next จนจบ</li>
+      <li><b>ปิด PowerShell/Terminal ที่เปิดค้างไว้ทั้งหมด แล้วเปิดใหม่</b> (ไม่งั้นจะยังหาคำสั่ง <code>dotnet</code> ไม่เจอ)</li>
+    </ol>
+
+    <h3 id="s04b">วิธี ข — ติดตั้งผ่านคำสั่งเดียว (Windows)</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">PowerShell</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>winget install Microsoft.DotNet.SDK.8</code></pre>
+    </div>
+
+    <h3 id="s04c">ตรวจว่าติดตั้งสำเร็จหรือยัง</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">PowerShell</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code>dotnet --version</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">ผลลัพธ์ที่ควรได้ (ตัวเลขอาจต่างกัน)</div><pre>
+8.0.404</pre></div>
+
+    <div class="note bad">
+      <span class="lbl">🛑 ถ้าขึ้นแบบนี้แทน</span>
+      <code>dotnet : The term 'dotnet' is not recognized...</code><br>
+      แปลว่า Windows ยังหาคำสั่งไม่เจอ → <b>ปิดหน้าต่าง PowerShell แล้วเปิดใหม่</b>
+      ถ้ายังไม่ได้ ให้ <b>รีสตาร์ตเครื่อง</b> หนึ่งครั้ง เกือบทุกกรณีหายด้วยวิธีนี้
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s05">0.5 รันโปรแกรม C# ตัวแรกของคุณ</h2>
+
+    <p>ยังไม่ต้องเข้าใจโค้ดนะครับ แค่พิสูจน์ว่าเครื่องพร้อมใช้งาน ทำตาม 4 ขั้นนี้:</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch0-a"><span>เปิด <b>PowerShell</b> (กดปุ่ม Windows แล้วพิมพ์ <code>powershell</code>)</span></label></li>
+      <li><label><input type="checkbox" id="ch0-b"><span>พิมพ์ 3 คำสั่งด้านล่างทีละบรรทัด</span></label></li>
+      <li><label><input type="checkbox" id="ch0-c"><span>เห็นข้อความ <code>Hello, World!</code> โผล่มา</span></label></li>
+      <li><label><input type="checkbox" id="ch0-d"><span>เครื่องพร้อมแล้ว ✅ ไปบทที่ 1 ได้</span></label></li>
+    </ul>
+
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">PowerShell</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code>dotnet new console -o HelloCSharp
+cd HelloCSharp
+dotnet run</code></pre>
+      <div class="code-notes"><ol>
+        <li><b>บรรทัด 1</b> — สร้างโปรเจกต์ console เปล่า ๆ ไว้ในโฟลเดอร์ชื่อ <code>HelloCSharp</code></li>
+        <li><b>บรรทัด 2</b> — เดินเข้าไปในโฟลเดอร์นั้น</li>
+        <li><b>บรรทัด 3</b> — คอมไพล์แล้วรันทันทีในคำสั่งเดียว</li>
+      </ol></div>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Hello, World!</pre></div>
+
+    <p>โปรเจกต์ที่เพิ่งสร้างจะมีไฟล์แค่ 2 อย่าง ลองเปิด <code>Program.cs</code> ด้วย Notepad ดูได้ —
+       ข้างในมีบรรทัดเดียวเท่านั้น:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">HelloCSharp/Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// See https://aka.ms/new-console-template for more information
+Console.WriteLine("Hello, World!");</code></pre>
+    </div>
+
+    <div class="note ok">
+      <span class="lbl">✅ นี่แหละคือบทที่ 1</span>
+      บรรทัด <code>Console.WriteLine("Hello, World!");</code> คือสิ่งที่เราจะผ่ามันออกเป็นชิ้น ๆ
+      ในบทถัดไป — ทุกคำ ทุกจุด ทุกวงเล็บ มีเหตุผลของมันหมด
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">0.6 ถ้ายังไม่อยากติดตั้งอะไรเลย</h2>
+
+    <p>ไม่เป็นไรครับ คุณยังอ่านหนังสือเล่มนี้ได้ครบทุกบท เพราะ:</p>
+    <ul>
+      <li>ทุกตัวอย่างโค้ดมีปุ่ม <b>▶ Run</b> ที่จะ<b>เล่นผลลัพธ์ให้ดู</b>ในหน้าเว็บทันที</li>
+      <li>แบบฝึกหัดมีเฉลยพับซ่อนไว้ให้เทียบ</li>
+      <li>ข้อสอบกดตอบได้ตามปกติ</li>
+    </ul>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ แต่ต้องเข้าใจตรงกัน</span>
+      ปุ่ม <b>▶ Run</b> ในหน้าเว็บ <b>ไม่ใช่คอมไพเลอร์จริง</b> — มันแค่เล่นซ้ำผลลัพธ์ที่เตรียมไว้
+      เพื่อให้คุณเห็นภาพ ถ้าอยากรู้ว่าโค้ดที่<b>คุณแก้เอง</b>ให้ผลอะไร ต้องรันด้วย
+      <code>dotnet run</code> เท่านั้น และการพิมพ์โค้ดเองคือส่วนที่ทำให้จำได้จริง
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">📌 สรุปบทที่ 0</h2>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — คำสั่ง dotnet ที่ใช้บ่อย</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:40%">คำสั่ง</th><th>ทำอะไร</th></tr></thead>
+        <tbody>
+          <tr><td><code>dotnet --version</code></td><td>ดูว่าติดตั้งรุ่นไหนอยู่</td></tr>
+          <tr><td><code>dotnet new console -o ชื่อ</code></td><td>สร้างโปรเจกต์ console ใหม่</td></tr>
+          <tr><td><code>dotnet run</code></td><td>คอมไพล์ + รัน (ต้องอยู่ในโฟลเดอร์โปรเจกต์)</td></tr>
+          <tr><td><code>dotnet build</code></td><td>คอมไพล์อย่างเดียว ไม่รัน</td></tr>
+          <tr><td><code>cd ชื่อโฟลเดอร์</code></td><td>เดินเข้าโฟลเดอร์</td></tr>
+          <tr><td><code>cd ..</code></td><td>ถอยออกมาหนึ่งชั้น</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s08">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:26%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>source code</td><td>ซอร์สโค้ด</td><td>ข้อความคำสั่งที่มนุษย์เขียน</td></tr>
+        <tr><td>compile</td><td>คอมไพล์</td><td>แปลโค้ดให้เป็นภาษาที่เครื่องเข้าใจ</td></tr>
+        <tr><td>compiler</td><td>คอมไพเลอร์</td><td>โปรแกรมที่ทำหน้าที่แปลนั้น</td></tr>
+        <tr><td>runtime</td><td>รันไทม์</td><td>ตัวที่คอยรันโปรแกรมที่แปลเสร็จแล้ว</td></tr>
+        <tr><td>SDK</td><td>ชุดพัฒนา</td><td>เครื่องมือครบชุดสำหรับสร้างโปรแกรม</td></tr>
+        <tr><td>console</td><td>คอนโซล</td><td>หน้าต่างข้อความล้วน ไม่มีปุ่มกด</td></tr>
+        <tr><td>output</td><td>ผลลัพธ์</td><td>สิ่งที่โปรแกรมแสดงออกมา</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="../index.html"><span class="dir">← ย้อนกลับ</span><span class="ttl">สารบัญ</span></a>
+      <a class="next" href="ch01.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 1 · Write Your First C# Code</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

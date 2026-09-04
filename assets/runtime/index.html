@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <title>C# Runner</title>
+    <base href="./" />
+    <link href="_framework/dotnet.vim1eie53k.js" rel="preload" as="script" fetchpriority="high" crossorigin="anonymous" integrity="sha256-R54kiGIXfbkPKlQGMHBHT1O7w9B4OufIt/QsGS87LAk=" />
+    <script type="importmap">{
+  "imports": {
+    "./_framework/blazor.webassembly.js": "./_framework/blazor.webassembly.w3qd1tpl0e.js",
+    "./_framework/dotnet.native.js": "./_framework/dotnet.native.fqrp4he4si.js",
+    "./_framework/dotnet.runtime.js": "./_framework/dotnet.runtime.web2r9gqbh.js",
+    "./_framework/dotnet.js": "./_framework/dotnet.vim1eie53k.js"
+  },
+  "scopes": {},
+  "integrity": {
+    "./_framework/blazor.webassembly.js": "sha256-lDXsDYFgm62F+YUvxES7IOTCXYpiHpU3uR45YdC6mq4=",
+    "./_framework/blazor.webassembly.w3qd1tpl0e.js": "sha256-lDXsDYFgm62F+YUvxES7IOTCXYpiHpU3uR45YdC6mq4=",
+    "./_framework/dotnet.js": "sha256-R54kiGIXfbkPKlQGMHBHT1O7w9B4OufIt/QsGS87LAk=",
+    "./_framework/dotnet.native.fqrp4he4si.js": "sha256-p6D9S3rUc0ZNzQzAU5LnD/pPwUxsEFqR8TeaJD5KmII=",
+    "./_framework/dotnet.native.js": "sha256-p6D9S3rUc0ZNzQzAU5LnD/pPwUxsEFqR8TeaJD5KmII=",
+    "./_framework/dotnet.runtime.js": "sha256-SOUHEQ3FhDAibBSR2u90NWZpoBjPuWRmH0BAATUlhJU=",
+    "./_framework/dotnet.runtime.web2r9gqbh.js": "sha256-SOUHEQ3FhDAibBSR2u90NWZpoBjPuWRmH0BAATUlhJU=",
+    "./_framework/dotnet.vim1eie53k.js": "sha256-R54kiGIXfbkPKlQGMHBHT1O7w9B4OufIt/QsGS87LAk="
+  }
+}</script>
+</head>
+
+<body>
+    <div id="app"></div>
+
+    <script src="_framework/blazor.webassembly.w3qd1tpl0e.js" autostart="false"></script>
+    <script>
+        var pending = [];
+        var ready = false;
+
+        function handleRun(msg) {
+            DotNet.invokeMethodAsync('CSharpRunner', 'RunAsync', msg.code)
+                .then(function (output) {
+                    parent.postMessage({ type: 'result', id: msg.id, output: output }, '*');
+                })
+                .catch(function (err) {
+                    parent.postMessage({ type: 'result', id: msg.id, output: 'Runner error: ' + err }, '*');
+                });
+        }
+
+        window.addEventListener('message', function (ev) {
+            var msg = ev.data;
+            if (!msg || msg.type !== 'run') return;
+            if (ready) {
+                handleRun(msg);
+            } else {
+                pending.push(msg);
+            }
+        });
+
+        Blazor.start().then(function () {
+            ready = true;
+            parent.postMessage({ type: 'ready' }, '*');
+            pending.forEach(handleRun);
+            pending = [];
+        }).catch(function (err) {
+            parent.postMessage({ type: 'boot-error', error: String(err) }, '*');
+        });
+    </script>
+</body>
+
+</html>

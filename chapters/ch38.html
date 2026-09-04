@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 38 · Challenge Project: Debug an App — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="38">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 6 · Debug Console Applications / บทที่ 38</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 6 · โมดูล 6/6 · ⚔️ Challenge Project</span>
+      <h1>Challenge Project — Debug แอปให้สมบูรณ์</h1>
+      <div class="en">Challenge Project - Debug a C# Console Application Using Visual Studio Code</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>50–70 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>หาและแก้บั๊ก logic ที่ซ่อนอยู่ด้วยตัวเอง ไม่มีคำแนะนำทีละขั้น</b></span>
+        <span>🎯 ความยาก <b>สูง (โจทย์เปิด)</b></span>
+      </div>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ บทนี้พิเศษ: บั๊กที่ต้องหาเป็นของที่ผมออกแบบเอง</span>
+      MS Learn ให้โค้ดตั้งต้นของ Challenge Project นี้เป็นไฟล์ zip แยกดาวน์โหลด (ไม่ได้แสดงเป็น
+      ตัวอักษรในบทเรียน) สเปกบอกแค่ว่า: "MakeChange มีบั๊ก logic ที่ทำให้ยอดลิ้นชักไม่ balance
+      เมื่อรันด้วยข้อมูลสุ่ม 100 รายการ แต่ทำงานถูกต้องเมื่อรันด้วย testData" — ผมจึงนำแอป
+      เครื่องคิดเงินจาก<a href="ch37.html">บทที่ 37</a>ที่แก้บั๊กแรกไปแล้วมาใช้ต่อ แล้ว<b>ปลูกบั๊ก
+      ใหม่อีกจุดหนึ่งเอง</b> ที่มีคุณสมบัติเดียวกันตามสเปก (มองไม่เห็นตอนรันด้วย testData
+      มองเห็นเฉพาะตอนรันด้วยข้อมูลสุ่มจำนวนมาก) เพื่อให้คุณได้ฝึกกระบวนการเดียวกับที่ MS Learn
+      ตั้งใจให้ฝึกจริงๆ
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>แสดงความสามารถในการใช้เครื่องมือ debugger ของ VS Code หาและแก้ปัญหา logic ในโค้ด
+            ได้ด้วยตัวเอง โดยไม่มีคำแนะนำทีละขั้น</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">38.1 สเปกของ Challenge</h2>
+
+    <p>โค้ดตั้งต้นของบทนี้คือแอปเครื่องคิดเงินตัวเดียวกับบทที่ 37 (ที่แก้บั๊ก "ทอนแบงก์ห้าผิด
+       index" ไปแล้ว และมี exception handling ครบแล้ว) — แต่มีบั๊ก logic ใหม่อีกจุดซ่อนอยู่ ทำให้
+       ยอดลิ้นชักไม่ balance ในบางสถานการณ์ ตามสเปกนี้:</p>
+
+    <ul>
+      <li>top-level statements จำลองธุรกรรมด้วยราคาสินค้าสุ่ม</li>
+      <li>สุ่มค่า <code>itemCost</code> ในช่วง 2-49</li>
+      <li>จำลองธุรกรรมทั้งหมด 100 รายการ</li>
+      <li>ผลลัพธ์ต้องมีข้อความ <code>"Could not complete transaction: InvalidOperationException:
+          Not enough money provided to complete the transaction."</code> ปรากฏบ้าง</li>
+      <li>ผลลัพธ์ต้องมีข้อความ <code>"Could not complete transaction: InvalidOperationException:
+          The till is unable to make change for the cash provided."</code> ปรากฏบ้าง</li>
+      <li><b>เป้าหมายสุดท้าย</b>: ยอด "reported" กับ "expected" ต้องเท่ากันเป๊ะ หลังรันครบ 100
+          ธุรกรรม</li>
+    </ul>
+
+    <div class="note tip">
+      <span class="lbl">💡 ลองก่อนดูเฉลย</span>
+      บทนี้ไม่มีคำแนะนำทีละขั้นเหมือนบทที่ 37 แล้ว — ลองใช้ทักษะ debugger ทั้งหมดจากบทที่ 34, 37
+      (breakpoint, Step Into/Over, VARIABLES, safety check) ไล่หาเองก่อน แล้วค่อยเปิดดูเฉลยที่
+      ซ่อนไว้ท้ายบท
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s02">38.2 โค้ดตั้งต้น (มีบั๊กซ่อนอยู่)</h2>
+
+    <p>เตรียมโปรเจกต์ใหม่ (แยกจากบทที่ 37):</p>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch38-challenge</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <p>คัดลอกโค้ดฉบับสมบูรณ์จากบทที่ 37 มาวางใน <code>Program.cs</code> แล้วปรับตามสเปกใหม่นี้
+       เท่านั้น:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (จุดที่ต้องปรับ)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">bool useTestData = true; // เริ่มด้วย true ก่อนเสมอ เพื่อยืนยัน baseline
+
+// ...
+
+int transactions = 100; // เดิม 40
+
+// ...
+
+int itemCost = valueGenerator.Next(2, 50); // ช่วงเดิมตามสเปก (คงไว้เหมือนบทที่ 37)</code></pre>
+    </div>
+
+    <p>อย่าลืมแก้ <code>launch.json</code> เป็น <code>"console": "integratedTerminal"</code>
+       เหมือนทุกครั้งที่แอปมี <code>Console.ReadLine()</code></p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch38-a"><span>คัดลอกโค้ดจากบทที่ 37 มาเตรียมพร้อมสำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">38.3 ลงมือ: ยืนยัน Baseline ด้วย testData</h2>
+
+    <p>ก่อนไล่หาบั๊ก ต้องยืนยันก่อนว่า <code>testData</code> ยังทำงานถูกต้องอยู่ (ค่า
+       <code>useTestData = true</code>) รันแอปด้วย debugger แล้วดูบรรทัดท้ายผลลัพธ์ — ยอด
+       "reported" กับ "expected" ควรตรงกันเป๊ะเหมือนบทที่ 37</p>
+
+    <p>ถ้ายอดตรงกัน แปลว่าบั๊กใหม่ที่ซ่อนอยู่ (ถ้ามี) จะ<b>ไม่แสดงตัว</b>เมื่อใช้ testData —
+       สอดคล้องกับสเปกที่บอกว่าปัญหาปรากฏเฉพาะตอนใช้ข้อมูลสุ่มจำนวนมากเท่านั้น</p>
+
+    <!-- ============================================ -->
+    <h2 id="s04">38.4 เปิดใช้ข้อมูลสุ่ม 100 รายการ</h2>
+
+    <p>เปลี่ยน <code>useTestData</code> เป็น <code>false</code> บันทึกแล้วรันใหม่ — ตรวจสอบว่า
+       ผลลัพธ์ตรงตามสเปกครบทุกข้อ:</p>
+
+    <ul>
+      <li>มีบันทึกธุรกรรมครบ 100 รายการ</li>
+      <li>มีข้อความ "Not enough money provided" ปรากฏอย่างน้อยหนึ่งครั้ง</li>
+      <li>มีข้อความ "unable to make change" ปรากฏอย่างน้อยหนึ่งครั้ง</li>
+      <li>ยอด "reported" กับ "expected" ท้ายผลลัพธ์<b>ไม่ตรงกัน</b> (นี่คือสัญญาณของบั๊กที่ต้องหา)</li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">38.5 ใช้ Debugger หาบั๊ก</h2>
+
+    <p>ใช้กระบวนการเดียวกับบทที่ 37 ทุกประการ:</p>
+
+    <ol>
+      <li>ตั้ง breakpoint บนบรรทัด <code>Console.WriteLine();</code> เปล่าๆ ท้ายแต่ละรอบของ
+          <code>while</code> loop หลัก</li>
+      <li>Start Debugging แล้วกด <b>Continue</b> ไปเรื่อยๆ จนกว่ายอด reported/expected จะเริ่ม
+          ไม่ตรงกัน</li>
+      <li>สังเกตรายละเอียดธุรกรรมรอบที่เกิดปัญหา — เงินที่รับมาถูกต้องไหม? เงินทอนที่คืนถูกต้อง
+          ไหม? ลิ้นชักขาด/เกินเท่าไหร่?</li>
+      <li>ธนบัตรชนิดที่ขาดหายไปคือเบาะแสสำคัญที่สุด — ไล่ดู <code>while</code> loop ของธนบัตร
+          ชนิดนั้นใน <code>MakeChange</code> ทีละบรรทัด</li>
+    </ol>
+
+    <div class="quiz" data-q="38-1">
+      <p class="q"><span class="num">Check ★</span> ทำไม testData ถึงไม่เจอบั๊กที่ซ่อนอยู่ ทั้งที่โค้ดจุดนั้นถูกเรียกจริงหรือเปล่าก็ยังไม่รู้?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>เพราะชุด testData ที่ออกแบบไว้อาจไม่เคยทำให้เงื่อนไขของ while loop จุดที่มีบั๊กเป็นจริงเลยสักครั้ง</span></li>
+        <li class="opt"><span class="k">B</span><span>เพราะ testData ปิด exception handling ไปโดยอัตโนมัติ</span></li>
+        <li class="opt"><span class="k">C</span><span>เพราะ debugger ทำงานกับ testData ไม่ได้</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ถ้า while loop ที่มีบั๊กไม่เคยถูก "เข้าไปทำงานข้างใน"
+        เลยสักครั้งกับชุดข้อมูลทดสอบ บั๊กก็ไม่มีทางแสดงตัวออกมา — นี่คือเหตุผลที่การทดสอบด้วย
+        ข้อมูลหลากหลาย (โดยเฉพาะข้อมูลสุ่มจำนวนมาก) สำคัญกว่าการทดสอบด้วยชุดข้อมูลตายตัวเพียง
+        อย่างเดียวเสมอ</div>
+    </div>
+
+    <details class="fold">
+      <summary>💡 คำใบ้ 1 (เปิดถ้าติดจริงๆ)</summary>
+      <div class="fold-body">
+        <p>ชุด <code>testData</code> ที่ใช้มาตลอด (<code>{6, 10, 17, 20, 31, 36, 40, 41}</code>)
+           ไม่เคยทำให้ <code>changeNeeded</code> มากกว่า 19 เลยสักรายการ — ลองคำนวณด้วยมือดูว่า
+           <code>while</code> loop ไหนใน <code>MakeChange</code> ที่<b>ไม่เคย</b>ถูกเข้าไปทำงาน
+           ข้างในเลยสักครั้งกับชุดข้อมูลนี้</p>
+      </div>
+    </details>
+
+    <details class="fold">
+      <summary>💡 คำใบ้ 2 (เปิดถ้ายังติดอยู่)</summary>
+      <div class="fold-body">
+        <p>ธนบัตรที่ไม่เคยถูกทดสอบเลยคือใบ $20 — ลองดูบล็อก <code>while</code> ที่ทอนแบงก์ยี่สิบ
+           ในเมธอด <code>MakeChange</code> อย่างละเอียด เทียบ index ของ array ที่เงื่อนไข
+           ใช้เช็ค กับ index ที่โค้ดข้างในบล็อกใช้ลดค่า — เหมือนกันไหม?</p>
+      </div>
+    </details>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย</summary>
+      <div class="fold-body">
+        <p>บั๊กอยู่ในบล็อก <code>while</code> ที่ทอนแบงก์ยี่สิบ:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">MakeChange (มีบั๊ก)</span></div>
+        <pre><code class="lang-cs">while ((changeNeeded > 19) && (cashTill[3] > 0))
+{
+    cashTill[2]--; // บั๊ก! ควรเป็น cashTill[3]-- (ลดจำนวนแบงก์สิบแทนแบงก์ยี่สิบ)
+    changeNeeded -= 20;
+    Console.WriteLine("\t A twenty");
+}</code></pre></div>
+        <p>เงื่อนไขเช็ค <code>cashTill[3]</code> (แบงก์ยี่สิบ) ถูกต้อง แต่ข้างในบล็อกกลับลดค่า
+           <code>cashTill[2]</code> (แบงก์สิบ) แทน — พิมพ์ข้อความ "A twenty" ให้ลูกค้าเห็นถูกต้อง
+           แต่ระบบหักแบงก์สิบออกจากลิ้นชักแทนแบงก์ยี่สิบจริงๆ ทำให้บัญชีไม่ตรงกัน เหมือนกับบั๊ก
+           แบงก์ห้าในบทที่ 37 เป๊ะ เพียงแค่คนละธนบัตรและซ่อนลึกกว่าเพราะต้องมีเงื่อนไข
+           <code>changeNeeded &gt; 19</code> เกิดขึ้นก่อนถึงจะเจอ ซึ่ง testData ไม่เคยทำให้เงื่อนไข
+           นี้เป็นจริงเลย</p>
+        <p>แก้โดยเปลี่ยน index ให้ตรงกัน:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">MakeChange (แก้แล้ว)</span></div>
+        <pre><code class="lang-cs">while ((changeNeeded > 19) && (cashTill[3] > 0))
+{
+    cashTill[3]--;
+    changeNeeded -= 20;
+    Console.WriteLine("\t A twenty");
+}</code></pre></div>
+      </div>
+    </details>
+
+    <!-- ============================================ -->
+    <h2 id="s06">38.6 ตรวจผลลัพธ์สุดท้าย</h2>
+
+    <p>ลบ breakpoint ทั้งหมด รันแอปอีกครั้งด้วยข้อมูลสุ่ม 100 รายการ ยืนยันว่า:</p>
+
+    <ul>
+      <li>มี 100 ธุรกรรมครบ</li>
+      <li>เห็นข้อความ exception ทั้งสองแบบปรากฏอย่างน้อยหนึ่งครั้ง</li>
+      <li>ยอด "reported" กับ "expected" ท้ายผลลัพธ์<b>ตรงกันเป๊ะ</b>ทุกครั้งที่รัน</li>
+    </ul>
+
+    <p>ถ้าครบทุกข้อ — ยินดีด้วย! คุณจบ Part 6 ทั้ง Part แล้ว พร้อมพิสูจน์ฝีมือ debugger ของ
+       ตัวเองแบบไม่มีใครจูงมือ</p>
+
+    <!-- ============================================ -->
+    <h2 id="s07">38.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>รันหลายครั้งแล้วบางครั้งยอด balance บางครั้งไม่</td>
+          <td>ปกติ — ข้อมูลสุ่มใหม่ทุกครั้งที่รัน เงื่อนไขที่ทำให้บั๊กแสดงตัว (เช่น
+              changeNeeded &gt; 19) อาจไม่เกิดขึ้นเลยในบางรอบที่โชคดี ลองรันหลายรอบเพื่อให้มั่นใจ
+              ว่าแก้ครบจริง</td>
+        </tr>
+        <tr>
+          <td>หาบั๊กไม่เจอสักที ทั้งที่ step ผ่านทุกบรรทัดแล้ว</td>
+          <td>ลองเทียบ "ธนบัตรที่ระบบพิมพ์ว่าทอนออกไป" กับ "ธนบัตรที่ array ถูกลดค่าจริง" ทีละ
+              ธุรกรรม — บั๊กแบบนี้ซ่อนอยู่ตรงความไม่ตรงกันระหว่างสอง "เรื่องเล่า" นี้เสมอ</td>
+        </tr>
+        <tr>
+          <td>แก้บั๊กแล้วแต่ยอดยังไม่ balance</td>
+          <td>เช็คว่าคัดลอกโค้ดจากบทที่ 37 มาครบทุกจุดจริง โดยเฉพาะการแก้บั๊กแบงก์ห้าที่ทำไปแล้ว
+              — ถ้าลืมเอาการแก้เดิมมาด้วย จะเจอทั้งสองบั๊กพร้อมกัน สับสนได้ง่าย</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">38.8 ❓ Knowledge Check</h2>
+
+    <div class="quiz" data-q="38-2">
+      <p class="q"><span class="num">1.</span> วิธีใดช่วยยืนยันได้ดีที่สุดว่าเมธอดที่จัดการเงิน/ทรัพยากรทำงานถูกต้องจริง ไม่ใช่แค่ "ดูรันได้ไม่พัง"?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เช็คว่าไม่มี error สีแดงขึ้นตอนรัน</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>ทำ safety check คำนวณผลลัพธ์ที่คาดไว้แยกต่างหาก แล้วเทียบกับผลจริง</span></li>
+        <li class="opt"><span class="k">C</span><span>เช็คว่าโค้ด compile ผ่าน</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> เหมือนที่แอปเครื่องคิดเงินทำ — คำนวณ
+        <code>registerCheckTillTotal</code> แยกต่างหากจาก <code>cashTill</code> แล้วเทียบกัน
+        ท้ายสุด นี่คือวิธีเดียวที่จับบั๊ก "เงียบ" แบบในบทนี้ได้ ต่อให้โค้ด compile ผ่านและรันไม่
+        พังเลยก็ตาม</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">38.9 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนฟังก์ชันช่วยเทสต์ <code>bool VerifyTillBalance(int reported, int expected)</code>
+           ที่คืน <code>true</code> ถ้าสองค่าตรงกัน และพิมพ์ข้อความเตือนพร้อมผลต่างถ้าไม่ตรงกัน
+           ก่อนคืน <code>false</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">static bool VerifyTillBalance(int reported, int expected)
+{
+    if (reported == expected)
+    {
+        return true;
+    }
+    Console.WriteLine($"Till mismatch! reported={reported}, expected={expected}, diff={expected - reported}");
+    return false;
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>ตั้งใจปลูกบั๊กแบบเดียวกัน (index ผิดใน while block) ไว้ในบล็อกทอนแบงก์หนึ่งดอลลาร์
+           (ones) แทน แล้วลองอธิบายว่าทำไมบั๊กจุดนี้ถึง<b>ง่ายกว่า</b>ที่จะถูกจับได้ด้วย testData
+           เมื่อเทียบกับบั๊กแบงก์ยี่สิบในบทนี้</p>
+      </div>
+      <details class="fold"><summary>ดูแนวคำตอบ</summary>
+        <div class="fold-body">
+          <p>แนวคำตอบตัวอย่าง: บล็อกทอนแบงก์หนึ่งดอลลาร์ถูกเข้าไปทำงานข้างในบ่อยมากในชุด
+             testData (แทบทุกธุรกรรมที่มีเศษเป็นจำนวนคี่จะต้องทอนแบงก์หนึ่งอย่างน้อยหนึ่งใบ)
+             ต่างจากบล็อกทอนแบงก์ยี่สิบที่ต้องการเงื่อนไข <code>changeNeeded &gt; 19</code>
+             ซึ่ง testData ไม่เคยทำให้เป็นจริงเลย — ยิ่งโค้ดส่วนไหนถูกเรียกใช้บ่อยเท่าไหร่
+             (code coverage สูง) จากชุดทดสอบที่มีอยู่ โอกาสที่บั๊กในส่วนนั้นจะถูกจับได้เร็วก็ยิ่ง
+             สูงตามไปด้วย</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 38</h2>
+
+    <p>Challenge Project นี้ให้คุณพิสูจน์ทักษะ debugger ทั้งหมดที่สั่งสมมาตลอด Part 6 แบบไม่มี
+       ใครจูงมือทีละขั้น — ตั้ง breakpoint, step ผ่านโค้ด, เทียบค่าที่คาดกับค่าจริงผ่าน safety
+       check และไล่หาความไม่ตรงกันระหว่าง "สิ่งที่โค้ดพิมพ์บอก" กับ "สิ่งที่โค้ดทำจริง" — ทักษะ
+       นี้คือหัวใจของงาน debug ในโลกจริง ที่ error message มักไม่ช่วยอะไรเลยเมื่อบั๊กเป็นบั๊ก
+       logic เงียบๆ</p>
+
+    <p>ยินดีด้วยที่เรียนจบ <b>Part 6 · Debug C# Console Applications</b> ครบทั้ง 6 โมดูล!
+       ทบทวนภาพรวมทั้ง Part ผ่าน Trophy quiz ด้านล่างก่อนไปต่อ</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 38</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:40%">เทคนิค</th><th>ใช้เมื่อ</th></tr></thead>
+        <tbody>
+          <tr><td>safety check คำนวณแยก</td><td>ยืนยันผลลัพธ์จากเมธอดโดยไม่พึ่งเมธอดนั้นเอง</td></tr>
+          <tr><td>ทดสอบด้วยข้อมูลหลากหลาย ไม่ใช่แค่ชุดเดียว</td><td>เปิดโปงบั๊กที่ code path บางเส้นทางไม่เคยถูกทดสอบ</td></tr>
+          <tr><td>เทียบ "ข้อความที่พิมพ์" กับ "ตัวแปรที่ถูกแก้จริง"</td><td>หาบั๊กที่รายงานผลถูกแต่การกระทำจริงผิด</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>code coverage</td><td>ความครอบคลุมของโค้ดที่ถูกทดสอบ</td><td>สัดส่วนของโค้ดที่ถูกเรียกใช้จริงระหว่างการทดสอบ</td></tr>
+        <tr><td>edge case</td><td>กรณีขอบ</td><td>เงื่อนไขที่เกิดขึ้นไม่บ่อย มักไม่ถูกครอบคลุมในชุดทดสอบเล็กๆ</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="trophy">🏆 Trophy — สรุปรวบยอด Part 6</h2>
+    <p>ยินดีด้วย! คุณเรียนจบ <b>Part 6 · Debug C# Console Applications</b> ครบทั้ง 6 โมดูลแล้ว
+       (หลักการ Debug/Exception, เครื่องมือ VS Code, try-catch, throw exception เอง, Guided
+       Project, Challenge Project) ทบทวนแนวคิดสำคัญที่สุดของ Part นี้กันอีกรอบ:</p>
+
+    <div class="quiz" data-q="t6-1">
+      <p class="q"><span class="num">Trophy 1</span> ข้อผิดพลาดที่เกิดตอน build (เช่น syntax ผิด) เรียกว่าอะไร ต่างจาก exception อย่างไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>เรียกว่า error — เกิดตอน build ไม่ใช่ตอน runtime แบบ exception</span></li>
+        <li class="opt"><span class="k">B</span><span>เรียกว่า exception เหมือนกัน แค่คนละชื่อ</span></li>
+        <li class="opt"><span class="k">C</span><span>ไม่มีชื่อเรียกต่างกัน ใช้แทนกันได้เสมอ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนจาก<a href="ch33.html">บทที่ 33</a></div>
+    </div>
+
+    <div class="quiz" data-q="t6-2">
+      <p class="q"><span class="num">Trophy 2</span> ปุ่มใดบน Debug toolbar ใช้ "เข้าไปดูข้างใน" method ทีละบรรทัด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>Step Over</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>Step Into</span></li>
+        <li class="opt"><span class="k">C</span><span>Step Out</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนจาก<a href="ch34.html">บทที่ 34</a></div>
+    </div>
+
+    <div class="quiz" data-q="t6-3">
+      <p class="q"><span class="num">Trophy 3</span> catch (Exception ex) ทั่วไปควรวางอยู่ตำแหน่งไหนเมื่อมีหลาย catch ต่อกัน?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>บนสุดเสมอ</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>ล่างสุดเสมอ</span></li>
+        <li class="opt"><span class="k">C</span><span>ตำแหน่งไหนก็ได้</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนจาก<a href="ch35.html">บทที่ 35</a> — ไม่งั้น
+        compile ไม่ผ่านเพราะ catch เจาะจงกว่ากลายเป็น unreachable</div>
+    </div>
+
+    <div class="quiz" data-q="t6-4">
+      <p class="q"><span class="num">Trophy 4</span> throw; กับ throw ex; ต่างกันอย่างไรตอน re-throw?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>throw; รักษา StackTrace เดิมไว้ ส่วน throw ex; จะรีเซ็ต StackTrace ใหม่</span></li>
+        <li class="opt"><span class="k">B</span><span>ทั้งสองแบบทำงานเหมือนกันทุกประการ ไม่มีความต่าง</span></li>
+        <li class="opt"><span class="k">C</span><span>throw ex; เร็วกว่าเสมอ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนจาก<a href="ch36.html">บทที่ 36</a></div>
+    </div>
+
+    <div class="quiz" data-q="t6-5">
+      <p class="q"><span class="num">Trophy 5</span> "safety check" ในแอปเครื่องคิดเงินมีไว้ทำอะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>คำนวณยอดที่คาดไว้แยกต่างหาก เพื่อยืนยันว่า logic ของเมธอดหลักทำงานถูกต้อง</span></li>
+        <li class="opt"><span class="k">B</span><span>ป้องกันไม่ให้แอปถูกแฮ็ก</span></li>
+        <li class="opt"><span class="k">C</span><span>เข้ารหัสข้อมูลลิ้นชักเงิน</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนจาก<a href="ch37.html">บทที่ 37</a> และ
+        <a href="ch38.html">บทที่ 38</a></div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <div class="pager">
+      <a href="ch37.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 37 · Guided Project — Debug และจัดการ Exception</span></a>
+      <a class="next" href="exam.html"><span class="dir">บทถัดไป →</span><span class="ttl">Part 7 · คู่มือสอบ + ข้อสอบจำลอง</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

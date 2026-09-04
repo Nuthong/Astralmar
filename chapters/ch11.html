@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 11 · Readable Code — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="11">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 2 · Create and Run Simple Console Apps / บทที่ 11</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 2 · โมดูล 5/8</span>
+      <h1>เขียนโค้ดให้อ่านง่าย ด้วยธรรมเนียม ช่องว่าง และคอมเมนต์</h1>
+      <div class="en">Create Readable Code with Conventions, Whitespace, and Comments</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>45–60 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เขียนโค้ดที่คนอื่น (และตัวเองในอนาคต) อ่านเข้าใจง่าย</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>เลือกชื่อตัวแปรที่สื่อความหมายและเจตนาได้</li>
+        <li>ใช้คอมเมนต์สั่งให้คอมไพเลอร์ข้ามโค้ดชั่วคราวได้</li>
+        <li>ใช้คอมเมนต์อธิบายจุดประสงค์ระดับสูงของโค้ดได้</li>
+        <li>ใช้ whitespace สื่อความสัมพันธ์ระหว่างบรรทัดโค้ดได้</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">11.1 ทำไมต้องเขียนโค้ดให้อ่านง่าย</h2>
+
+    <p>โค้ดที่คุณเขียนควรสื่อสารเจตนาให้ทั้งคอมไพเลอร์<i>และ</i>นักพัฒนาคนอื่นที่อาจต้องอ่านโค้ด
+       ของคุณเข้าใจ และเพราะคุณเองคือคนที่จะอ่านโค้ดตัวเองบ่อยที่สุด — บางทีอีกหลายเดือนถัดจากวัน
+       ที่เขียน — การเขียนโค้ดให้ชัดเจนและเข้าใจง่ายจึงเป็นผลดีกับตัวคุณเองโดยตรง จำไว้ว่า
+       คุณอาจเขียนโค้ดครั้งเดียว แต่ต้องอ่านมันหลายครั้ง</p>
+
+    <p>สมมติมีคนขอให้คุณเขียนโค้ดให้ทีมนักพัฒนาอีกกลุ่ม ประชุมคุยสเปกกันจนเข้าใจตรงกัน หลังประชุม
+       พวกเขาบอกว่าคุณจะทำงานคนเดียวระหว่างพัฒนา พอเสร็จแล้วต้องส่งมอบโค้ดให้อีกทีมดูแลต่อ —
+       งานไม่ได้ยากเกินความสามารถ แต่คุณไม่เคยเขียนโค้ดที่คนอื่นต้องมาดูแลต่อมาก่อน ทีมบอกว่าแค่
+       ทำตามธรรมเนียมมาตรฐานของ C# ก็ไม่มีปัญหา</p>
+
+    <p>ในบทนี้ คุณจะเรียนวิธีเลือกชื่อตัวแปรที่สื่อจุดประสงค์และเจตนา เพิ่มคอมเมนต์ที่บันทึกความ
+       ต้องการระดับสูงและแนวทางที่ใช้ในโค้ด รวมถึงสั่งให้คอมไพเลอร์ข้ามบางบรรทัดชั่วคราว และวิธีใช้
+       whitespace สื่อความสัมพันธ์ระหว่างบรรทัดโค้ดแต่ละบรรทัด</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">11.2 เลือกชื่อตัวแปรตามกฎและธรรมเนียม</h2>
+
+    <p>มีนักพัฒนาเคยพูดไว้ว่า "ส่วนที่ยากที่สุดของการพัฒนาซอฟต์แวร์คือการตั้งชื่อสิ่งต่างๆ"
+       ชื่อตัวแปรไม่ใช่แค่ต้องตรงกฎไวยากรณ์ แต่ยังต้องช่วยให้โค้ดอ่านเข้าใจง่ายขึ้นด้วย —
+       เยอะมากสำหรับแค่โค้ดบรรทัดเดียว!</p>
+
+    <h3 id="s02a">กฎการตั้งชื่อตัวแปร (บังคับโดยคอมไพเลอร์)</h3>
+    <ul>
+      <li>ใช้ตัวอักษร ตัวเลข และ underscore (<code>_</code>) ได้เท่านั้น ห้ามใช้อักขระพิเศษอย่าง
+          <code>#</code>, <code>-</code>, <code>$</code></li>
+      <li>ต้องขึ้นต้นด้วยตัวอักษรหรือ <code>_</code> ห้ามขึ้นต้นด้วยตัวเลข (การขึ้นต้นด้วย
+          underscore มักสงวนไว้สำหรับ private instance field)</li>
+      <li>ห้ามตั้งชื่อซ้ำกับคำสงวนของ C# เช่น <code>float float;</code> หรือ <code>string string;</code></li>
+      <li>คำนึงตัวพิมพ์เล็ก-ใหญ่ — <code>MyValue</code> กับ <code>myValue</code> คือคนละตัวแปร</li>
+    </ul>
+
+    <h3 id="s02b">ธรรมเนียมการตั้งชื่อตัวแปร (ข้อตกลงของวงการ ไม่บังคับแต่ควรทำ)</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:24%">ธรรมเนียม</th><th style="width:36%">ตัวอย่างที่ดี</th><th>ตัวอย่างที่ไม่ควรทำ</th></tr></thead>
+      <tbody>
+        <tr><td>ใช้ camelCase</td><td><code>string thisIsCamelCase;</code></td><td>PascalCase หรือ snake_case</td></tr>
+        <tr><td>สื่อความหมาย ไม่ใช่ชนิดข้อมูล</td><td><code>bool orderComplete;</code></td><td><code>bool isComplete;</code></td></tr>
+        <tr><td>ใช้คำเต็ม ไม่ย่อ</td><td><code>decimal orderAmount;</code></td><td><code>decimal odrAmt;</code></td></tr>
+        <tr><td>ไม่แปะชนิดข้อมูลในชื่อ</td><td><code>string myValue;</code></td><td><code>string strMyValue;</code> (ล้าสมัยแล้ว)</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>ตัวอย่าง <code>string firstName;</code> ทำตามกฎและธรรมเนียมครบทุกข้อ (สมมติจะใช้เก็บชื่อจริง)
+       ตัวอย่างอื่นๆ ที่ถูกต้อง:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง</span></div>
+      <pre><code class="lang-cs">char userOption;
+
+int gameScore;
+
+float particlesPerMillion;
+
+bool processedCustomer;</code></pre>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ กฎ/ธรรมเนียมนี้ใช้กับ local variable</span>
+      กฎและธรรมเนียมข้างต้นใช้กับ <b>local variable</b> — ตัวแปรที่อยู่ในขอบเขตของเมธอด หรือใน
+      console app แบบ top-level statement (แบบที่หลักสูตรนี้ใช้มาตลอด) โครงสร้างอื่นๆ เช่นคลาส
+      ก็มีธรรมเนียมของตัวเอง (จะเจอตอนเรียนเรื่อง class) แต่ธรรมเนียมที่เรียนตอนนี้เป็นพื้นฐาน
+      ของกรอบการตั้งชื่อทั้งหมด
+    </div>
+
+    <div class="quiz" data-q="11-1">
+      <p class="q"><span class="num">Check ★</span> ข้อใดคือรูปแบบ camelCase ที่ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>UserOption</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>user Option</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>userOption</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> camelCase ต้องขึ้นต้นด้วยตัวพิมพ์เล็กเสมอ (ข้อ A
+        ขึ้นต้นตัวใหญ่ เป็น PascalCase) และห้ามมีช่องว่างในชื่อตัวแปร (ข้อ B ผิดไวยากรณ์ทันที)</div>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s03">11.3 ลงมือ: เขียน Comment ที่มีประโยชน์</h2>
+
+    <h3 id="s03a">Code Comment คืออะไร</h3>
+    <p><b>code comment</b> คือคำสั่งบอกคอมไพเลอร์ให้ข้ามทุกอย่างหลังสัญลักษณ์คอมเมนต์ในบรรทัดนั้น:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง</span></div>
+      <pre><code class="lang-cs">// This is a code comment!</code></pre>
+    </div>
+
+    <p>ฟังดูอาจไม่มีประโยชน์ในแวบแรก แต่มีประโยชน์ใน 3 สถานการณ์:</p>
+    <ul>
+      <li><b>บันทึกเจตนา</b> — อธิบายจุดประสงค์หรือแนวคิดของโค้ดส่วนที่ซับซ้อน ตัวคุณในอนาคตจะ
+          ขอบคุณตัวเองแน่นอน</li>
+      <li><b>ปิดโค้ดชั่วคราว</b> — ลบโค้ดออกไปก่อนเพื่อลองวิธีอื่น แต่ยังไม่มั่นใจว่าไอเดียใหม่
+          จะได้ผล คอมเมนต์โค้ดเก่าไว้ก่อน เขียนโค้ดใหม่ พอมั่นใจแล้วค่อยลบของเก่าทิ้ง</li>
+      <li><b>เพิ่มข้อความเตือน</b> เช่น <code>TODO</code> ให้กลับมาดูจุดนี้ทีหลัง — ควรใช้อย่าง
+          ระมัดระวัง แต่มีประโยชน์เวลาเจอจุดที่น่ากังวลระหว่างทำงานเรื่องอื่นอยู่</li>
+    </ul>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ คอมเมนต์ควรอธิบายสิ่งที่โค้ดบอกไม่ได้</span>
+      หลายครั้งนักพัฒนาแก้โค้ดแต่ลืมอัปเดตคอมเมนต์ให้ตรงกัน ควรใช้คอมเมนต์อธิบายแนวคิดระดับสูง
+      ไม่ใช่อธิบายว่าโค้ดแต่ละบรรทัดทำงานยังไง (เพราะโค้ดที่ดีควรอธิบายตัวเองอยู่แล้ว)
+    </div>
+
+    <h3 id="s03b">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch11-readable</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <h3 id="s03c">ทดลองใช้ Comment ปิดโค้ดชั่วคราว</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string firstName = "Bob";
+int widgetsSold = 7;
+Console.WriteLine($"{firstName} sold {widgetsSold} widgets.");</code></pre>
+    </div>
+
+    <p>ปรับแก้ทดสอบข้อความใหม่ โดยคอมเมนต์ของเดิมไว้ก่อน:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string firstName = "Bob";
+int widgetsPurchased = 7;
+// Testing a change to the message.
+// int widgetsSold = 7;
+// Console.WriteLine($"{firstName} sold {widgetsSold} widgets.");
+Console.WriteLine($"{firstName} purchased {widgetsPurchased} widgets.");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Bob purchased 7 widgets.</pre></div>
+
+    <p>ถ้าพอใจผลลัพธ์ใหม่แล้ว ลบโค้ดเก่าที่คอมเมนต์ไว้ทิ้งได้เลย เหลือแค่:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">string firstName = "Bob";
+int widgetsPurchased = 7;
+Console.WriteLine($"{firstName} purchased {widgetsPurchased} widgets.");</code></pre>
+    </div>
+
+    <h3 id="s03d">Block Comment ปิดหลายบรรทัดพร้อมกัน</h3>
+    <p>ใช้ <code>/*</code> เปิดและ <code>*/</code> ปิด — เร็วและง่ายที่สุดสำหรับปิดโค้ดตั้งแต่
+       3 บรรทัดขึ้นไป:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง</span></div>
+      <pre><code class="lang-cs">/*
+string firstName = "Bob";
+int widgetsPurchased = 7;
+Console.WriteLine($"{firstName} purchased {widgetsPurchased} widgets.");
+*/</code></pre>
+    </div>
+
+    <h3 id="s03e">คอมเมนต์แบบไหนไม่ควรเขียน</h3>
+    <p>ลองพิมพ์โค้ดนี้ (ยังไม่ต้องเข้าใจทุกบรรทัด — จุดสำคัญคือดูว่าคอมเมนต์ช่วยหรือไม่ช่วยยังไง):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — คอมเมนต์แบบไม่ดี</span>
+        <button data-act="copy" type="button">Copy</button>
+        </div>
+      <pre><code class="lang-cs">Random random = new Random();
+string[] orderIDs = new string[5];
+// Loop through each blank orderID
+for (int i = 0; i < orderIDs.Length; i++)
+{
+    // Get a random value that equates to ASCII letters A through E
+    int prefixValue = random.Next(65, 70);
+    // Convert the random value into a char, then a string
+    string prefix = Convert.ToChar(prefixValue).ToString();
+    // Create a random number, pad with zeroes
+    string suffix = random.Next(1, 1000).ToString("000");
+    // Combine the prefix and suffix together, then assign to current OrderID
+    orderIDs[i] = prefix + suffix;
+}
+// Print out each orderID
+foreach (var orderID in orderIDs)
+{
+    Console.WriteLine(orderID);
+}</code></pre>
+    </div>
+
+    <div class="note bad">
+      <span class="lbl">🛑 ปัญหาของคอมเมนต์ชุดนี้</span>
+      <b>ปัญหาที่ 1:</b> คอมเมนต์อธิบายสิ่งที่เห็นอยู่แล้วจากโค้ดแต่ละบรรทัด (low-quality)
+      ถ้าผู้อ่านไม่คุ้นกับเมธอดพวกนี้ ก็ไปค้น learn.microsoft.com หรือใช้ IntelliSense ได้เอง
+      <b>ปัญหาที่ 2:</b> คอมเมนต์ไม่ได้บอกบริบทว่าโค้ดชุดนี้มีไว้ทำอะไรในระบบใหญ่เลย (ทำไมต้องมี
+      โค้ดชุดนี้อยู่?)
+    </div>
+
+    <p>ลบคอมเมนต์รายบรรทัดทิ้ง แล้วเพิ่มคอมเมนต์บล็อกอธิบายภาพรวมแทน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — คอมเมนต์ที่ดีขึ้น</span>
+        <button data-act="copy" type="button">Copy</button>
+        </div>
+      <pre><code class="lang-cs">/*
+  The following code creates five random OrderIDs
+  to test the fraud detection process.  OrderIDs 
+  consist of a letter from A to E, and a three
+  digit number. Ex. A123.
+*/
+Random random = new Random();
+string[] orderIDs = new string[5];
+
+for (int i = 0; i < orderIDs.Length; i++)
+{
+    int prefixValue = random.Next(65, 70);
+    string prefix = Convert.ToChar(prefixValue).ToString();
+    string suffix = random.Next(1, 1000).ToString("000");
+
+    orderIDs[i] = prefix + suffix;
+}
+
+foreach (var orderID in orderIDs)
+{
+    Console.WriteLine(orderID);
+}</code></pre>
+    </div>
+
+    <p>คอมเมนต์บล็อกเดียวตรงหัวไฟล์บอกภาพรวมว่า<i>ทำไม</i>โค้ดนี้ถึงมีอยู่ — มีประโยชน์กว่าคอมเมนต์
+       รายบรรทัดที่บอกแค่<i>อย่างไร</i> (ซึ่งอ่านจากโค้ดเองก็รู้อยู่แล้ว) ประโยชน์ของคอมเมนต์เป็นเรื่อง
+       ที่ขึ้นกับดุลยพินิจ — ใช้วิจารณญาณของคุณเองว่าอะไรช่วยให้โค้ดชัดเจนขึ้นจริงๆ</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ อย่าเชื่อคอมเมนต์เสมอไป</span>
+      คอมเมนต์อาจไม่ตรงกับสถานะปัจจุบันของโค้ดอีกต่อไป หลังผ่านการแก้ไขหลายรอบ — เชื่อโค้ดจริง
+      มากกว่าคอมเมนต์เสมอเวลามีข้อสงสัย
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch11-a"><span>ใช้ // คอมเมนต์ปิดโค้ดชั่วคราวสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch11-b"><span>ใช้ /* */ ปิดหลายบรรทัดพร้อมกัน</span></label></li>
+      <li><label><input type="checkbox" id="ch11-c"><span>แยกแยะได้ว่าคอมเมนต์แบบไหนดี/ไม่ดี</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">11.4 ลงมือ: ใช้ Whitespace ให้โค้ดอ่านง่าย</h2>
+
+    <p>นักออกแบบสื่อสิ่งพิมพ์และเว็บรู้ดีว่าการยัดข้อมูลแน่นเกินไปในพื้นที่เล็กๆ ทำให้ผู้ชมสับสน
+       จึงใช้ whitespace (พื้นที่ว่าง) แบ่งข้อมูลอย่างมีกลยุทธ์ นักพัฒนาก็ใช้หลักการเดียวกันได้
+       กับโค้ด</p>
+
+    <h3 id="s04a">Whitespace คืออะไร</h3>
+    <p><b>whitespace</b> หมายถึงช่องว่างจากการกด spacebar, tab จากปุ่ม tab, และการขึ้นบรรทัดใหม่
+       จากปุ่ม enter — คอมไพเลอร์ C# <b>ไม่สนใจ whitespace เลย</b></p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">// Example 1:
+Console
+.
+WriteLine
+(
+"Hello Example 1!"
+)
+;
+
+// Example 2:
+string firstWord="Hello";string lastWord="Example 2";Console.WriteLine(firstWord+" "+lastWord+"!");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Hello Example 1!
+Hello Example 2!</pre></div>
+
+    <p>ทั้งสองตัวอย่างนี้ (สุดโต่งไปคนละทาง) พิสูจน์ 2 อย่าง: whitespace ไม่มีผลต่อคอมไพเลอร์เลย
+       — แต่ถ้าใช้อย่างเหมาะสม whitespace ช่วยให้อ่าน/เข้าใจโค้ดง่ายขึ้นมาก คุณอาจเขียนโค้ดครั้งเดียว
+       แต่ต้องอ่านมันหลายครั้ง จึงควรให้ความสำคัญกับความอ่านง่ายของโค้ด</p>
+
+    <p>แนวทางเบื้องต้น:</p>
+    <ul>
+      <li>แต่ละคำสั่ง (statement) ที่สมบูรณ์ควรอยู่คนละบรรทัด</li>
+      <li>ถ้าบรรทัดเดียวยาวเกินไป แบ่งได้ แต่อย่าแบ่งคำสั่งเดียวออกหลายบรรทัดโดยไม่มีเหตุผลดีพอ</li>
+      <li>เว้นวรรคทั้งซ้ายและขวาของตัวดำเนินการกำหนดค่า <code>=</code></li>
+    </ul>
+
+    <h3 id="s04b">ปรับ Whitespace แนวตั้ง (บรรทัดว่าง)</h3>
+    <p>ลองพิมพ์โค้ดที่ไม่มี whitespace เลย (โค้ดเกมทอยลูกเต๋าจาก <a href="ch09.html">บทที่ 9</a>):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — ก่อนปรับ</span></div>
+      <pre><code class="lang-cs">Random dice = new Random();
+int roll1 = dice.Next(1, 7);
+int roll2 = dice.Next(1, 7);
+int roll3 = dice.Next(1, 7);
+int total = roll1 + roll2 + roll3;
+Console.WriteLine($"Dice roll: {roll1} + {roll2} + {roll3} = {total}");
+if ((roll1 == roll2) || (roll2 == roll3) || (roll1 == roll3)) {
+    if ((roll1 == roll2) && (roll2 == roll3)) {
+        Console.WriteLine("You rolled triples!  +6 bonus to total!");
+        total += 6; 
+    } else {
+        Console.WriteLine("You rolled doubles!  +2 bonus to total!");
+        total += 2;
+    }
+}</code></pre>
+    </div>
+
+    <p>สังเกต 2 อย่าง: ไม่มีบรรทัดว่างคั่นเลย ทุกอย่างอัดแน่นเป็นก้อนเดียว และ code block ที่ล้อม
+       ด้วย <code>{ }</code> ก็ชิดกันจนแยกขอบเขตด้วยสายตายาก หลักทั่วไปคือ เพิ่มบรรทัดว่างคั่น
+       ระหว่างกลุ่มโค้ด 2-4 บรรทัดที่ทำงานคล้ายกันหรือเกี่ยวข้องกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เพิ่มบรรทัดว่างคั่น</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Random dice = new Random();
+
+int roll1 = dice.Next(1, 7);
+int roll2 = dice.Next(1, 7);
+int roll3 = dice.Next(1, 7);
+
+int total = roll1 + roll2 + roll3;
+Console.WriteLine($"Dice roll: {roll1} + {roll2} + {roll3} = {total}");
+
+if ((roll1 == roll2) || (roll2 == roll3) || (roll1 == roll3)) {
+    if ((roll1 == roll2) && (roll2 == roll3)) {
+        Console.WriteLine("You rolled triples!  +6 bonus to total!");
+        total += 6; 
+    } else {
+        Console.WriteLine("You rolled doubles!  +2 bonus to total!");
+        total += 2;
+    }
+}</code></pre>
+    </div>
+
+    <p>บรรทัดว่างที่ 1 แยกการประกาศ <code>dice</code> ออกจากการทอยลูกเต๋า — ทำให้เห็นชัดว่า
+       <code>dice</code> ถูกใช้ยังไง บรรทัดว่างที่ 2 แยกกลุ่มตัวแปร roll ออกจากการประกาศ
+       <code>total</code> — ตัวแปรทั้งสามชื่อคล้ายกันและรูปแบบประกาศเหมือนกัน จัดกลุ่มไว้ด้วยกัน
+       ช่วยให้สายตาจับความคล้าย/ต่างได้ง่าย บรรทัดว่างที่ 3 แยกกลุ่มคำสั่งที่เกี่ยวข้องกันด้วย
+       "จุดประสงค์" (ไม่ใช่แค่หน้าตา) ออกจาก if ที่ซ้อนกัน — บางคนอาจแย้งว่าควรมีบรรทัดว่างระหว่าง
+       <code>total</code> กับ <code>Console.WriteLine()</code> ด้วย ก็แล้วแต่ดุลยพินิจของคุณ
+       เลือกสไตล์ที่คุณว่าอ่านง่ายที่สุด แล้วใช้ให้สม่ำเสมอ</p>
+
+    <h3 id="s04c">จัดวางปีกกาให้อยู่คนละบรรทัด</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — ฉบับสมบูรณ์</span>
+        <button data-act="copy" type="button">Copy</button>
+        </div>
+      <pre><code class="lang-cs">Random dice = new Random();
+
+int roll1 = dice.Next(1, 7);
+int roll2 = dice.Next(1, 7);
+int roll3 = dice.Next(1, 7);
+
+int total = roll1 + roll2 + roll3;
+Console.WriteLine($"Dice roll: {roll1} + {roll2} + {roll3} = {total}");
+
+if ((roll1 == roll2) || (roll2 == roll3) || (roll1 == roll3)) 
+{
+    if ((roll1 == roll2) && (roll2 == roll3)) 
+    {
+        Console.WriteLine("You rolled triples!  +6 bonus to total!");
+        total += 6; 
+    } 
+    else 
+    {
+        Console.WriteLine("You rolled doubles!  +2 bonus to total!");
+        total += 2;
+    }
+}</code></pre>
+    </div>
+
+    <p>ย้ายปีกกาเปิด-ปิดให้อยู่บรรทัดของตัวเอง เพราะสัญลักษณ์ <code>{</code> และ <code>}</code>
+       สร้าง code block — โครงสร้าง C# หลายแบบต้องมี code block ควรวางไว้คนละบรรทัดให้เห็นขอบเขต
+       ชัดเจน ใช้ปุ่ม <code>tab</code> จัดให้ปีกกาอยู่แนวตรงกับคีย์เวิร์ดที่มันเป็นของ เช่น
+       บรรทัด <code>if</code> กับ <code>{</code> ที่อยู่บรรทัดถัดมา ควรอยู่แนวเดียวกัน —
+       การจัดแนวคู่กับการเยื้อง (indent) ทำให้เห็นจุดเริ่ม-จบของ code block ได้ง่าย โค้ดข้างใน
+       code block ควรเยื้องเข้าไปเพื่อบ่งบอกว่า "เป็นของ" block นั้น</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 นี่เป็นแนวทาง ไม่ใช่กฎตายตัว</span>
+      ไม่ใช่ทุกคนเห็นด้วยกับสไตล์นี้เป๊ะๆ แต่ควรใช้เป็นจุดเริ่มต้น แล้วค่อยๆ ปรับเปลี่ยนอย่างมี
+      เหตุผลตามประสบการณ์ที่มากขึ้น
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch11-d"><span>เห็นว่า whitespace ไม่มีผลต่อผลลัพธ์การรันด้วยตัวเอง</span></label></li>
+      <li><label><input type="checkbox" id="ch11-e"><span>เพิ่มบรรทัดว่างจัดกลุ่มโค้ดที่เกี่ยวข้องกัน</span></label></li>
+      <li><label><input type="checkbox" id="ch11-f"><span>ย้ายปีกกาลงบรรทัดใหม่และจัดแนวให้ตรงกัน</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">11.5 ท้าทาย: ปรับปรุงโค้ดให้อ่านง่าย</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl m">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้จัดรูปแบบและคอมเมนต์ไม่ดีเลย จุดประสงค์ระดับสูงคือ "กลับข้อความ แล้วนับว่าตัวอักษร
+           ตัวหนึ่งปรากฏกี่ครั้ง":</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs — บังคับใช้ (ปรับปรุงได้ทุกอย่าง)</span></div>
+        <pre><code class="lang-cs">string str = "The quick brown fox jumps over the lazy dog.";
+// convert the message into a char array
+char[] charMessage = str.ToCharArray();
+// Reverse the chars
+Array.Reverse(charMessage);
+int x = 0;
+// count the o's
+foreach (char i in charMessage) { if (i == 'o') { x++; } }
+// convert it back to a string
+string new_message = new String(charMessage);
+// print it out
+Console.WriteLine(new_message);
+Console.WriteLine($"'o' appears {x} times.");</code></pre></div>
+        <p>ใช้เทคนิคที่เรียนในบทนี้ (ชื่อตัวแปร, คอมเมนต์, whitespace) ปรับปรุงโค้ดชุดนี้ให้อ่านง่ายขึ้น
+           — ไม่จำเป็นต้องเข้าใจ <code>ToCharArray()</code> หรือ <code>Array.Reverse()</code>
+           ทุกรายละเอียดก็ทำโจทย์นี้ได้</p>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>เช็คทีละจุด: ชื่อ <code>str</code>, <code>x</code>, <code>new_message</code> สื่อ
+             ความหมายพอไหม? คอมเมนต์รายบรรทัดพวกนี้อธิบายสิ่งที่เห็นอยู่แล้วหรือเปล่า? บรรทัด
+             <code>foreach</code> ที่ยัดทุกอย่างไว้บรรทัดเดียวอ่านง่ายไหม?</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">11.6 เฉลยและวิเคราะห์</h2>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เฉลยตัวอย่าง</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">/*
+   This code reverses a message, counts the number of times 
+   a particular character appears, then prints the results
+   to the console window.
+ */
+
+string originalMessage = "The quick brown fox jumps over the lazy dog.";
+
+char[] message = originalMessage.ToCharArray();
+Array.Reverse(message);
+
+int letterCount = 0;
+
+foreach (char letter in message)
+{
+    if (letter == 'o')
+    {
+        letterCount++;
+    }
+}
+
+string newMessage = new String(message);
+
+Console.WriteLine(newMessage);
+Console.WriteLine($"'o' appears {letterCount} times.");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+.god yzal eht revo spmuj xof nworb kciuq ehT
+'o' appears 4 times.</pre></div>
+
+    <p>นี่เป็น<i>เพียงหนึ่ง</i>ในหลายวิธีที่แก้โจทย์นี้ได้ ชื่อตัวแปรและระยะห่างของคุณอาจต่างไปบ้าง
+       การเปลี่ยนแปลงหลักๆ ในเฉลยนี้คือ:</p>
+    <ul>
+      <li>เพิ่มคอมเมนต์บล็อกอธิบายภาพรวมไว้ตอนต้น — ให้บริบทที่คอมเมนต์เดิมไม่มี</li>
+      <li>ลบคอมเมนต์รายบรรทัดทิ้ง เพราะไม่ได้ให้ข้อมูลเชิงลึกอะไรจริงๆ</li>
+      <li>เพิ่มบรรทัดว่างคั่นเพื่อจัดกลุ่มโค้ดที่ทำงานคล้ายกันหรือร่วมมือกันทำงานเล็กๆ ชิ้นหนึ่ง</li>
+      <li>เพิ่มการขึ้นบรรทัดและ tab ให้ <code>foreach</code> กับ <code>if</code> ดูดีขึ้น</li>
+      <li>ใช้ธรรมเนียมตั้งชื่อตัวแปรท้องถิ่น เพื่อสื่อจุดประสงค์ของแต่ละค่าให้ชัดเจนขึ้น
+          (<code>str</code>→<code>originalMessage</code>, <code>x</code>→<code>letterCount</code>,
+          <code>new_message</code>→<code>newMessage</code>)</li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s07">11.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>ตัวแปรชื่อ <code>x</code>, <code>temp</code>, <code>data</code></td>
+          <td>ไม่สื่อความหมาย — เปลี่ยนเป็นชื่อที่บอกว่าเก็บอะไรจริงๆ เช่น <code>letterCount</code></td>
+        </tr>
+        <tr>
+          <td>ตัวแปรชื่อ <code>new_message</code> (snake_case)</td>
+          <td>C# นิยมใช้ camelCase สำหรับ local variable ไม่ใช่ snake_case (เป็นธรรมเนียมของภาษาอื่นอย่าง Python)</td>
+        </tr>
+        <tr>
+          <td>คอมเมนต์บอกว่า "เพิ่มค่าทีละ 1" เหนือบรรทัด <code>count++;</code></td>
+          <td>คอมเมนต์แบบนี้ซ้ำซ้อนกับสิ่งที่โค้ดบอกอยู่แล้ว ไม่ใช่คอมเมนต์คุณภาพดี — เก็บไว้ใช้
+              อธิบาย "ทำไม" แทน "ทำอะไร"</td>
+        </tr>
+        <tr>
+          <td>ยัดหลายคำสั่งไว้บรรทัดเดียวเพื่อ "ประหยัดบรรทัด"</td>
+          <td>คอมไพเลอร์ไม่สนใจ แต่คนอ่านงงแน่นอน — แต่ละ statement ควรอยู่คนละบรรทัด</td>
+        </tr>
+        <tr>
+          <td>ลืมอัปเดตคอมเมนต์หลังแก้โค้ด</td>
+          <td>คอมเมนต์ที่ไม่ตรงกับโค้ดจริงอันตรายกว่าไม่มีคอมเมนต์เลย — อย่าเชื่อคอมเมนต์มากกว่าโค้ดจริง</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">11.8 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Microsoft Learn (1 ข้อฝังในเนื้อหา + 3 ข้อ Module Assessment)</p>
+
+    <div class="quiz" data-q="11-2">
+      <p class="q"><span class="num">1.</span> ข้อใดตรงตามแนวทางการตั้งชื่อตัวแปรที่แนะนำ?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>my-string</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>initialMessage$</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>initialMessage</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ข้อ A มีเครื่องหมายขีดกลาง (ไม่อนุญาต) ข้อ B มี
+        <code>$</code> (ไม่อนุญาต) ข้อ C เป็น camelCase ที่ถูกต้องทั้งกฎและธรรมเนียม</div>
+    </div>
+
+    <div class="quiz" data-q="11-3">
+      <p class="q"><span class="num">2.</span> ข้อใดคือเหตุผลที่<b>ไม่ดี</b>ในการใช้คอมเมนต์?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>อธิบายเจตนาระดับสูงของโค้ด</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>อธิบายว่าคีย์เวิร์ด C# ตัวใหม่ตัวหนึ่งทำงานยังไง</span></li>
+        <li class="opt"><span class="k">C</span><span>ปิดโค้ดชั่วคราวระหว่างทดลองแนวทางอื่น</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> คอมเมนต์ที่อธิบายกลไกของภาษา/เมธอดที่มีอยู่แล้วเป็น
+        "low-quality comment" — ถ้าผู้อ่านไม่รู้ ควรไปค้น learn.microsoft.com หรือ IntelliSense
+        เอง ไม่ใช่พึ่งคอมเมนต์ในโค้ด ข้อ A และ C เป็นการใช้คอมเมนต์ที่เหมาะสมทั้งคู่</div>
+    </div>
+
+    <div class="quiz" data-q="11-4">
+      <p class="q"><span class="num">3.</span> ข้อความใดเกี่ยวกับการใช้ whitespace ในโค้ดถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ลด whitespace ให้น้อยที่สุดจะช่วยให้โปรแกรมรันเร็วขึ้น</span></li>
+        <li class="opt"><span class="k">B</span><span>ควรเว้นบรรทัดว่างทุกๆ 2-3 บรรทัดเสมอ</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>ควรใช้ whitespace อย่างมีวิจารณญาณ เพื่อเพิ่มความอ่านง่ายของโค้ด</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> คอมไพเลอร์ไม่สนใจ whitespace เลย จึงไม่มีผลต่อความเร็ว
+        การรัน (ข้อ A ผิด) และไม่มีกฎตายตัวว่าต้องเว้นทุกกี่บรรทัด (ข้อ B ผิด) — ขึ้นกับดุลยพินิจ
+        ว่าอะไรช่วยให้อ่านง่ายที่สุด</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">11.9 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ตัวแปรเหล่านี้ตั้งชื่อผิดกฎหรือผิดธรรมเนียมข้อใดบ้าง? <code>string strName;</code>,
+           <code>int 2ndScore;</code>, <code>bool IsReady;</code>, <code>decimal totalAmount;</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p><code>strName</code> — ผิดธรรมเนียม (แปะชนิดข้อมูลในชื่อ) · <code>2ndScore</code>
+             — ผิดกฎ (ขึ้นต้นด้วยตัวเลข คอมไพล์ไม่ผ่านเลย) · <code>IsReady</code> — ผิดธรรมเนียม
+             (ขึ้นต้นตัวใหญ่ เป็น PascalCase ไม่ใช่ camelCase) · <code>totalAmount</code> — ถูกทั้งกฎและธรรมเนียม</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียน block comment 3 บรรทัด อธิบายว่าโค้ดถัดไปนี้ "คำนวณราคาสุทธิหลังหักส่วนลด 10%
+           สำหรับสมาชิก VIP" แล้วเขียนโค้ดคำนวณจริงตามคำอธิบายนั้น (ราคาตั้งต้น 500 บาท)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">/*
+  คำนวณราคาสุทธิหลังหักส่วนลด 10%
+  สำหรับสมาชิก VIP
+*/
+decimal originalPrice = 500m;
+decimal finalPrice = originalPrice * 0.9m;
+Console.WriteLine(finalPrice);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>จัดรูปแบบโค้ดนี้ใหม่ให้อ่านง่ายขึ้น (แยกบรรทัด เพิ่ม whitespace ตามหลักที่เรียนมา
+           ไม่ต้องเปลี่ยนชื่อตัวแปร):</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ก่อนแก้)</span></div>
+        <pre><code class="lang-cs">int a=5;int b=10;int sum=a+b;Console.WriteLine(sum);</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (หลังแก้)</span></div>
+          <pre><code class="lang-cs">int a = 5;
+int b = 10;
+int sum = a + b;
+
+Console.WriteLine(sum);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ตั้งชื่อตัวแปรใหม่ให้เหมาะสมตามธรรมเนียม (โจทย์เดิมทำงานถูกต้อง แค่ตั้งชื่อไม่ดี):</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ตั้งชื่อไม่ดี)</span></div>
+        <pre><code class="lang-cs">bool b1 = true;
+int n = 30;
+string s1 = "somchai";
+decimal d = 1500.50m;</code></pre></div>
+        <p>สมมติว่า <code>b1</code> แทนสถานะ "จ่ายเงินแล้ว", <code>n</code> แทนอายุ,
+           <code>s1</code> แทนชื่อลูกค้า, <code>d</code> แทนยอดค้างชำระ</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ตั้งชื่อดีขึ้น)</span></div>
+          <pre><code class="lang-cs">bool isPaid = true;
+int customerAge = 30;
+string customerName = "somchai";
+decimal outstandingBalance = 1500.50m;</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้มีคอมเมนต์คุณภาพต่ำ 2 จุด หาและอธิบายว่าทำไมไม่ดี แล้วเสนอวิธีแก้:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+        <pre><code class="lang-cs">// declare an int variable named count
+int count = 0;
+// add 1 to count
+count++;
+// print count to the console
+Console.WriteLine(count);</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ทั้ง 3 คอมเมนต์ล้วน "อธิบายสิ่งที่โค้ดบอกอยู่แล้ว" ไม่ได้เพิ่มข้อมูลอะไรใหม่เลย
+             — ควรลบทิ้งทั้งหมด (โค้ดสั้นและชัดเจนอยู่แล้วโดยไม่ต้องมีคอมเมนต์) ถ้าต้องการคอมเมนต์
+             จริงๆ ควรอธิบายว่า "ทำไม" เช่น <code>// นับจำนวนครั้งที่ผู้ใช้กดปุ่มรีเฟรช</code>
+             ซึ่งเป็นบริบทที่โค้ดเองบอกไม่ได้</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>นำโค้ดตรวจปีอธิกสุรทินจาก <a href="ch09.html">บทที่ 9 แบบฝึกหัดข้อ 4</a> มาปรับปรุงให้
+           อ่านง่ายที่สุดตามหลักทั้งหมดในบทนี้: ตั้งชื่อตัวแปรสื่อความหมาย เพิ่ม comment อธิบาย
+           กฎปีอธิกสุรทินแบบสั้นๆ ตอนต้น และจัดวาง whitespace/ปีกกาให้ถูกหลัก</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">/*
+  ปีอธิกสุรทิน: หารด้วย 4 ลงตัว และ
+  (หารด้วย 100 ไม่ลงตัว หรือ หารด้วย 400 ลงตัว)
+*/
+
+int year = 2028;
+
+bool divisibleBy4 = (year % 4 == 0);
+bool divisibleBy100 = (year % 100 == 0);
+bool divisibleBy400 = (year % 400 == 0);
+
+bool isLeapYear = divisibleBy4 && (!divisibleBy100 || divisibleBy400);
+
+if (isLeapYear)
+{
+    Console.WriteLine($"{year} เป็นปีอธิกสุรทิน");
+}
+else
+{
+    Console.WriteLine($"{year} ไม่ใช่ปีอธิกสุรทิน");
+}</code></pre></div>
+          <p><small>หมายเหตุ: ตัวแปร bool ย่อยช่วยให้แต่ละเงื่อนไขมีชื่อสื่อความหมายในตัวเอง
+             อ่านง่ายกว่า expression ยาวๆ ก้อนเดียว (เครื่องหมาย <code>!</code> คือ "ไม่ใช่"
+             จะได้เรียนละเอียดในโมดูล Boolean expression ของ Part 3)</small></p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 11</h2>
+
+    <p>เป้าหมายของบทนี้คือเขียนโค้ดที่อ่านและเข้าใจง่าย คุณใช้ธรรมเนียมการตั้งชื่อตัวแปรเพื่อเพิ่ม
+       ความอ่านง่ายของโค้ด camelCase ช่วยให้แยก local variable ออกจากตัวระบุอื่นๆ ในโค้ดได้ และให้
+       วิธีใช้หลายคำอธิบายจุดประสงค์ของตัวแปรแต่ละตัวแก่ผู้อ่าน คุณใช้คอมเมนต์ปิดโค้ดที่ต้องการ
+       เขียนใหม่ไว้ชั่วคราวก่อนลบทิ้ง และใช้คอมเมนต์เพิ่มคำอธิบายจุดประสงค์ระดับสูงของระบบให้
+       มีความหมายมากขึ้น สุดท้าย คุณเห็นแล้วว่าคอมไพเลอร์ไม่สนใจ whitespace ในโค้ดเลย จึงใช้
+       whitespace อย่างมีวิจารณญาณเพื่อช่วยเพิ่มความอ่านง่ายของโค้ด</p>
+
+    <p>คุณเรียนรู้ว่าคุณเขียนโค้ดครั้งเดียว แต่ต้องอ่านมันหลายครั้ง การปรับปรุงความอ่านง่ายช่วยให้
+       ทั้งคุณและนักพัฒนาคนอื่นดูแลรักษาโค้ดได้ในระยะยาว</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 11</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:32%">เทคนิค</th><th>ใช้ตอนไหน</th></tr></thead>
+        <tbody>
+          <tr><td>camelCase + ชื่อสื่อความหมาย</td><td>ตั้งชื่อ local variable ทุกครั้ง</td></tr>
+          <tr><td><code>// คอมเมนต์</code></td><td>บันทึกเจตนา หรือปิดโค้ด 1-2 บรรทัดชั่วคราว</td></tr>
+          <tr><td><code>/* คอมเมนต์ */</code></td><td>ปิดโค้ดหลายบรรทัด หรือคำอธิบายภาพรวมยาวๆ ต้นไฟล์</td></tr>
+          <tr><td>บรรทัดว่างคั่น</td><td>จัดกลุ่มโค้ดที่เกี่ยวข้องกัน แยกจากกลุ่มอื่น</td></tr>
+          <tr><td>ปีกกาขึ้นบรรทัดใหม่ + จัดแนว</td><td>ให้เห็นขอบเขต code block ชัดเจน</td></tr>
+          <tr><td>เยื้อง (indent) โค้ดในบล็อก</td><td>บ่งบอกว่าโค้ดนั้น "เป็นของ" บล็อกไหน</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>readability</td><td>ความอ่านง่าย</td><td>คุณภาพของโค้ดที่คนอื่นเข้าใจได้ง่าย</td></tr>
+        <tr><td>local variable</td><td>ตัวแปรท้องถิ่น</td><td>ตัวแปรที่อยู่ในขอบเขตของเมธอด/ไฟล์เดียว</td></tr>
+        <tr><td>camelCase</td><td>คาเมลเคส</td><td>ตัวแรกเล็ก คำถัดไปขึ้นต้นตัวใหญ่</td></tr>
+        <tr><td>code comment</td><td>คอมเมนต์</td><td>ข้อความที่คอมไพเลอร์ข้ามไม่ทำงาน</td></tr>
+        <tr><td>block comment</td><td>คอมเมนต์บล็อก</td><td>คอมเมนต์หลายบรรทัด ใช้ /* */</td></tr>
+        <tr><td>whitespace</td><td>ช่องว่าง</td><td>ช่องว่าง แท็บ และการขึ้นบรรทัดใหม่</td></tr>
+        <tr><td>vertical whitespace</td><td>ช่องว่างแนวตั้ง</td><td>บรรทัดว่างที่คั่นระหว่างกลุ่มโค้ด</td></tr>
+        <tr><td>indentation</td><td>การเยื้อง</td><td>การร่นบรรทัดเข้าไปบ่งบอกว่าเป็นของ block ไหน</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch10.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 10 · Arrays and the foreach Statement</span></a>
+      <a class="next" href="ch12.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 12 · Guided Project — Arrays, Iteration, and Selection</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

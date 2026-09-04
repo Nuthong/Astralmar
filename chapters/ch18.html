@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 18 · do-while และ while — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="18">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 3 · Add Logic to Console Apps / บทที่ 18</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 3 · โมดูล 5/7</span>
+      <h1>เพิ่มตรรกะวนซ้ำด้วย do-while และ while Statement</h1>
+      <div class="en">Add Looping Logic to your Code using the do-while and while Statements</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>60–80 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เขียนเกมต่อสู้ RPG + validate user input ได้</b></span>
+        <span>🎯 ความยาก <b>กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>เขียนโค้ดที่ใช้ <code>do-while</code> statement วน code block ได้</li>
+        <li>เขียนโค้ดที่ใช้ <code>while</code> statement วน code block ได้</li>
+        <li>ใช้ <code>continue</code> statement ข้ามไปประเมินเงื่อนไข Boolean ทันทีได้</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">18.1 ทำไมต้องมี do-while และ while</h2>
+
+    <p>ตามที่เราพูดถึงหลายครั้งในโมดูลก่อนหน้าเรื่อง iteration และ decision statement — มีหลาย
+       เทคนิคที่ให้ผลลัพธ์คล้ายกัน เหมือนภาษาพูดและภาษาเขียน ภาษาโปรแกรมก็สื่อความคิดเดียวกันได้
+       หลายแบบ แต่ละแบบก็มีความหมายที่ต่างกันเล็กน้อย</p>
+
+    <p><code>do-while</code> และ <code>while</code> statement ควบคุม flow การทำงานของโค้ดด้วยการ
+       วน code block จนกว่าเงื่อนไขจะเป็นจริง ตอนใช้ <code>foreach</code> เราวนหนึ่งครั้งต่อหนึ่ง
+       item ในลำดับข้อมูล เช่น array ส่วน <code>for</code> ให้เราวนตามจำนวนรอบที่กำหนดไว้ล่วงหน้า
+       และควบคุมกระบวนการวนซ้ำได้ <code>do-while</code> และ <code>while</code> ให้เราวน code block
+       โดยที่ตรรกะ<b>ข้างใน</b> code block เองเป็นตัวกำหนดว่าจะหยุดวนเมื่อไร</p>
+
+    <p>สมมติคุณต้องการรับและประมวลผล input จากผู้ใช้ต่อเนื่องไปเรื่อยๆ จนกว่าผู้ใช้จะกด <code>q</code>
+       เพื่อ "quit" คุณใช้ <code>do-while</code> และ <code>while</code> วนรับและประมวลผล input
+       จนกว่าผู้ใช้จะพร้อมหยุดได้</p>
+
+    <p>ในบทนี้ คุณใช้ <code>do-while</code> statement และ <code>while</code> statement วน code
+       block คุณจะเข้าใจว่าเมื่อไรควรเลือกใช้อันไหน และใช้ <code>continue</code> statement
+       ข้ามการประมวลผลที่เหลือใน code block ไปประเมินเงื่อนไข Boolean ของ <code>while</code>
+       โดยตรง</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">18.2 ลงมือ: do-while, while, และ continue</h2>
+
+    <h3 id="s02a">do-while Statement คืออะไร</h3>
+    <p><code>do-while</code> statement รัน statement หรือ code block ตราบเท่าที่เงื่อนไข Boolean
+       ที่กำหนดเป็นจริง เพราะเงื่อนไขนั้นถูกประเมิน<b>หลัง</b>การรันแต่ละรอบ loop แบบ
+       <code>do-while</code> จึงรัน code block <b>อย่างน้อยหนึ่งครั้งเสมอ</b></p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">syntax</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">do
+{
+    // โค้ดนี้รันอย่างน้อยหนึ่งครั้ง
+} while (true);</code></pre>
+    </div>
+
+    <p>flow การทำงานเริ่มข้างในปีกกา โค้ดรันอย่างน้อยหนึ่งครั้ง จากนั้นเงื่อนไข Boolean ข้างๆ
+       คีย์เวิร์ด <code>while</code> ถูกประเมิน ถ้าเงื่อนไขคืนค่า <code>true</code> code block
+       จะถูกรันอีกครั้ง</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ระวัง infinite loop</span>
+      ถ้า hard-code เงื่อนไข Boolean เป็น <code>true</code> ตรงๆ แบบตัวอย่างข้างบน จะได้
+      <b>infinite loop</b> — loop ที่ไม่มีวันจบ (อย่างน้อยก็ไม่จบตามที่เขียนไว้ตอนนี้) ต้องมีวิธี
+      <code>break</code> ออกจาก loop ข้างใน code block
+    </div>
+
+    <h3 id="s02b">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch18-dowhile</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <h3 id="s02c">เขียน do-while ที่ break เมื่อสุ่มได้เลขที่กำหนด</h3>
+    <p>ลองเขียนโค้ดที่สุ่มตัวเลข 1 ถึง 10 ไปเรื่อยๆ จนกว่าจะสุ่มได้เลข 7 — อาจใช้แค่ 1 รอบ หรือ
+       หลายสิบรอบก็ได้ แล้วแต่โชค</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Random random = new Random();
+int current = 0;
+
+do
+{
+    current = random.Next(1, 11);
+    Console.WriteLine(current);
+} while (current != 7);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output (ค่าสุ่ม — ตัวอย่าง)</div><pre>
+2
+5
+8
+2
+7</pre></div>
+
+    <p>เพราะเป็นเลขสุ่ม ผลลัพธ์ของคุณจะต่างออกไป แต่ค่า <code>7</code> จะเป็นเลขสุดท้ายที่ถูกพิมพ์
+       เสมอ เพราะเงื่อนไข Boolean จะเป็น <code>false</code> ทันทีที่สุ่มได้ 7 และ flow การทำงาน
+       จะออกจาก code block</p>
+
+    <p>ข้อสังเกตสำคัญ: code block ของ <code>do-while</code> loop รันอย่างน้อยหนึ่งครั้งเสมอ
+       อาจวนซ้ำหลายรอบมาก และมักไม่รู้ล่วงหน้าว่าจะวนกี่รอบ นอกจากนี้โค้ด<b>ข้างใน</b> code
+       block เองเป็นตัวกำหนดว่าจะวนต่อหรือไม่ — นี่คือเหตุผลหลักที่เลือกใช้ <code>do-while</code>
+       หรือ <code>while</code> แทนที่จะใช้ <code>foreach</code> หรือ <code>for</code> ซึ่งทั้งคู่
+       อาศัยปัจจัยภายนอก code block ในการกำหนดจำนวนรอบ</p>
+
+    <h3 id="s02d">while Statement คืออะไร</h3>
+    <p>ทีนี้มาดู <code>while</code> statement บ้าง</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Random random = new Random();
+int current = random.Next(1, 11);
+
+while (current >= 3)
+{
+    Console.WriteLine(current);
+    current = random.Next(1, 11);
+}
+Console.WriteLine($"Last number: {current}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output (ค่าสุ่ม — ตัวอย่าง)</div><pre>
+9
+7
+5
+Last number: 1</pre></div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ตำแหน่งของเงื่อนไขสำคัญ</span>
+      คราวนี้เราวางคีย์เวิร์ด <code>while</code> และเงื่อนไข Boolean <b>ก่อน</b> code block
+      ทำให้ความหมายเปลี่ยนไป — มันทำหน้าที่เป็น "ประตู" ที่ยอม flow การทำงานเข้าไปเฉพาะเมื่อ
+      เงื่อนไข Boolean เป็นจริงเท่านั้น
+    </div>
+
+    <p>โค้ดข้างบน: เริ่มต้นใช้ <code>random</code> กำหนดค่าเริ่มต้นให้ตัวแปร <code>int</code>
+       ชื่อ <code>current</code> บรรทัดถัดไปที่ทำงานจริงคือ <code>while</code> statement ซึ่งวน
+       ตามเงื่อนไข <code>(current >= 3)</code> — เราไม่รู้ค่าที่ <code>current</code> จะได้รับ
+       แต่มี 2 ความเป็นไปได้ที่ส่งผลต่อ loop:</p>
+
+    <ul>
+      <li>ถ้า <code>current</code> เริ่มต้นด้วยค่ามากกว่าหรือเท่ากับ <code>3</code> เงื่อนไข
+          Boolean จะคืน <code>true</code> flow การทำงานจึงเข้า code block — ข้างในพิมพ์ค่า
+          <code>current</code> ก่อน จากนั้นสุ่มค่าใหม่ให้ <code>current</code> แล้ววนกลับไป
+          ประเมินเงื่อนไขที่หัว <code>while</code> ใหม่ ทำแบบนี้ต่อไปจนกว่าเงื่อนไขจะเป็น
+          <code>false</code></li>
+      <li>ถ้า <code>current</code> เริ่มต้นด้วยค่าน้อยกว่า <code>3</code> เงื่อนไขจะคืน
+          <code>false</code> ทันที และ code block จะ<b>ไม่ทำงานเลยสักครั้ง</b></li>
+    </ul>
+
+    <p>บรรทัดสุดท้ายพิมพ์ค่า <code>current</code> ออกมา ทำงานไม่ว่า code block จะรันหรือไม่ก็ตาม
+       เป็นโอกาสสุดท้ายที่เราจะพิมพ์ค่าสุดท้ายของ <code>current</code></p>
+
+    <h3 id="s02e">ใช้ continue ข้ามไปประเมินเงื่อนไขทันที</h3>
+    <p>บางครั้งเราต้องการตัดจบส่วนที่เหลือของ code block แล้ววนไปรอบถัดไปเลย ทำได้ด้วย
+       <code>continue</code> statement</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Random random = new Random();
+int current = random.Next(1, 11);
+
+do
+{
+    current = random.Next(1, 11);
+
+    if (current >= 8) continue;
+
+    Console.WriteLine(current);
+} while (current != 7);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output (ค่าสุ่ม — ตัวอย่าง)</div><pre>
+5
+1
+6
+7</pre></div>
+
+    <p>สังเกตว่ากลับไปใช้ <code>do-while</code> — เพราะ <code>do-while</code> รับประกันว่า loop
+       จะวนอย่างน้อยหนึ่งครั้ง</p>
+
+    <p>บรรทัดแรกใน code block สุ่มค่าใหม่ให้ <code>current</code> จากนั้นเช็คว่า
+       <code>current</code> มากกว่าหรือเท่ากับ <code>8</code> หรือไม่ ถ้าใช่ คีย์เวิร์ด
+       <code>continue</code> จะโอนควบคุมไปที่ท้าย code block ทันที แล้ว <code>while</code>
+       จะประเมิน <code>(current != 7)</code> loop จึงวนต่อไปตราบที่ <code>current</code>
+       ไม่เท่ากับ 7</p>
+
+    <p>บรรทัดหัวใจของขั้นตอนนี้คือ:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">if (current >= 8) continue;</code></pre>
+    </div>
+
+    <p>เพราะโค้ดที่พิมพ์ค่า <code>current</code> อยู่<b>หลัง</b>บรรทัดนี้ ค่าที่มากกว่าหรือเท่ากับ
+       <code>8</code> จึงไม่มีวันถูกพิมพ์ออกมาเลย</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 continue vs break</span>
+      <code>continue</code> โอนควบคุมไป<b>ท้ายรอบปัจจุบัน</b>ของ loop (แล้ววนต่อ) ส่วน
+      <code>break</code> (จาก <a href="ch17.html">บทที่ 17</a> และ <a href="ch16.html">บทที่ 16</a>)
+      <b>หยุด</b> iteration (หรือ switch) ทันที แล้วโอนควบคุมไปยัง statement ถัดจาก loop นั้น
+      ถ้าไม่มี statement ถัดไป ก็จะไปสิ้นสุดที่ท้ายไฟล์หรือท้ายเมธอด
+    </div>
+
+    <div class="quiz" data-q="18-1">
+      <p class="q"><span class="num">Check ★</span> ข้อใดอธิบายพฤติกรรมของ do-while หรือ while ได้ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>do-while statement รัน code block ศูนย์ครั้งหรือมากกว่า</span></li>
+        <li class="opt"><span class="k">B</span><span>while statement รัน code block อย่างน้อยหนึ่งครั้ง</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>do-while statement รัน code block อย่างน้อยหนึ่งครั้ง</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> do-while ประเมินเงื่อนไข<b>หลัง</b>รันแต่ละรอบ จึงรัน
+        code block อย่างน้อย 1 ครั้งเสมอ (ข้อ A ผิด) ส่วน while ประเมินเงื่อนไข<b>ก่อน</b>เข้า
+        code block จึงอาจไม่รันเลยสักครั้งก็ได้ ไม่ใช่รันอย่างน้อยหนึ่งครั้งเสมอ (ข้อ B ผิด)</div>
+    </div>
+
+    <div class="quiz" data-q="18-2">
+      <p class="q"><span class="num">Check ★</span> ต้องการรับ input จากผู้ใช้ในลูป โดยผู้ใช้กด
+        <code>ctrl + Esc</code> เพื่อออกเมื่อกรอกเสร็จ ควรใช้ iteration statement ตัวไหนดีที่สุด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>while</span></li>
+        <li class="opt"><span class="k">B</span><span>for</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>do-while</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ต้องรับ input อย่างน้อยหนึ่งครั้งก่อนถึงจะเช็คได้ว่าผู้ใช้
+        กด ctrl+Esc หรือไม่ — do-while ตอบโจทย์นี้พอดี เพราะรัน code block ก่อนแล้วค่อยเช็คเงื่อนไข</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch18-a"><span>เขียน do-while ที่วนจนสุ่มได้ค่าที่กำหนดสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch18-b"><span>เขียน while ที่วนตามเงื่อนไขก่อนเข้า code block สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch18-c"><span>ใช้ continue ข้ามไปประเมินเงื่อนไขได้สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">18.3 ท้าทาย: เกมต่อสู้ RPG</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl h">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>ในเกม RPG หลายเกม ตัวละครผู้เล่นต่อสู้กับ NPC ที่มักเป็นสัตว์ประหลาดหรือ "ตัวร้าย"
+           บางครั้งการต่อสู้ประกอบด้วยแต่ละฝ่ายทอยลูกเต๋าสุ่มค่าขึ้นมา แล้วเอาค่านั้นไปลบเลือด
+           (health) ของฝ่ายตรงข้าม พอฝ่ายใดฝ่ายหนึ่งเลือดหมด ฝ่ายนั้นแพ้</p>
+        <p>ในโจทย์นี้ เราตัดทอนกลไกให้เหลือแก่นสำคัญที่สุด: hero กับ monster เริ่มต้นด้วยเลือด
+           เท่ากัน ในตาของ hero จะสุ่มค่าหนึ่งมาลบเลือดของ monster ถ้าเลือดของ monster ยังมากกว่า 0
+           ก็จะโจมตี hero กลับ ตราบใดที่ทั้งคู่ยังมีเลือดมากกว่า 0 การต่อสู้ก็ดำเนินต่อไป</p>
+        <p>กติกาที่ต้อง implement:</p>
+        <ul>
+          <li>ต้องใช้ <code>do-while</code> หรือ <code>while</code> statement เป็น game loop ชั้นนอก</li>
+          <li>hero และ monster เริ่มต้นด้วยเลือด 10 หน่วยเท่ากัน</li>
+          <li>ค่าโจมตีทุกครั้งเป็นค่าสุ่มระหว่าง 1 ถึง 10</li>
+          <li>hero โจมตีก่อนเสมอ</li>
+          <li>พิมพ์ปริมาณเลือดที่ monster เสีย และเลือดที่เหลือ</li>
+          <li>ถ้าเลือดของ monster มากกว่า 0 ให้ monster โจมตี hero กลับ</li>
+          <li>พิมพ์ปริมาณเลือดที่ hero เสีย และเลือดที่เหลือ</li>
+          <li>ทำลำดับการโจมตีนี้ต่อไปจนกว่าเลือดของ monster หรือ hero จะเหลือศูนย์หรือน้อยกว่า</li>
+          <li>พิมพ์ผู้ชนะ</li>
+        </ul>
+        <p>ตัวอย่างผลลัพธ์ที่โค้ดควรให้ (ค่าสุ่ม ผลลัพธ์จริงของคุณจะต่างออกไป):</p>
+        <div class="out auto"><pre>
+Monster was damaged and lost 1 health and now has 9 health.
+Hero was damaged and lost 1 health and now has 9 health.
+Monster was damaged and lost 7 health and now has 2 health.
+Hero was damaged and lost 6 health and now has 3 health.
+Monster was damaged and lost 9 health and now has -7 health.
+Hero wins!</pre></div>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>ใช้ <code>continue</code> ในจังหวะที่ monster เลือดหมดแล้ว เพื่อข้ามไม่ให้ monster
+             โจมตี hero กลับ (ทบทวนหัวข้อ 18.2e) และใช้ ternary operator (<a href="ch08.html">
+             บทที่ 8</a>) ตัดสินผู้ชนะในบรรทัดสุดท้าย</p>
+        </div>
+      </details>
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">int hero = 10;
+int monster = 10;
+
+Random dice = new Random();
+
+do
+{
+    int roll = dice.Next(1, 11);
+    monster -= roll;
+    Console.WriteLine($"Monster was damaged and lost {roll} health and now has {monster} health.");
+
+    if (monster <= 0) continue;
+
+    roll = dice.Next(1, 11);
+    hero -= roll;
+    Console.WriteLine($"Hero was damaged and lost {roll} health and now has {hero} health.");
+
+} while (hero > 0 && monster > 0);
+
+Console.WriteLine(hero > monster ? "Hero wins!" : "Monster wins!");</code></pre>
+        </div>
+        <div class="out auto"><div class="out-bar">Output (ค่าสุ่ม — ตัวอย่าง)</div><pre>
+Monster was damaged and lost 1 health and now has 9 health.
+Hero was damaged and lost 2 health and now has 8 health.
+Monster was damaged and lost 1 health and now has 8 health.
+Hero was damaged and lost 4 health and now has 4 health.
+Monster was damaged and lost 7 health and now has 1 health.
+Hero was damaged and lost 6 health and now has -2 health.
+Monster wins!</pre></div>
+        <p>นี่เป็น<i>เพียงหนึ่งในหลายวิธี</i>ที่แก้โจทย์นี้ได้ ตรรกะการโจมตีเขียนได้หลายแบบ
+           จุดสำคัญที่ควรสังเกต:</p>
+        <ul>
+          <li><code>do-while</code> รับประกันว่า hero โจมตีก่อนอย่างน้อยหนึ่งครั้งเสมอ ตรงตาม
+              กติกา "hero โจมตีก่อน"</li>
+          <li><code>if (monster <= 0) continue;</code> ข้ามการโจมตีกลับของ monster ทันทีที่มัน
+              เลือดหมด แล้ววนไปประเมินเงื่อนไข <code>while</code> เลย</li>
+          <li>เงื่อนไข <code>hero > 0 && monster > 0</code> ทำให้ loop หยุดทันทีที่ฝ่ายใดฝ่ายหนึ่ง
+              เลือดหมด</li>
+        </ul>
+      </div>
+    </details>
+
+    <!-- ============================================ -->
+    <h2 id="s04">18.4 ท้าทาย: แยกแยะ do-while กับ while</h2>
+
+    <p>C# มี iteration statement 4 แบบ: <code>for</code>, <code>foreach</code>,
+       <code>do-while</code>, และ <code>while</code> เอกสารอ้างอิงภาษาของ Microsoft อธิบายไว้ว่า:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Statement</th><th>คำนิยาม</th></tr></thead>
+      <tbody>
+        <tr><td><code>for</code></td><td>รัน body ตราบเท่าที่เงื่อนไข Boolean ที่กำหนด ("condition") เป็นจริง</td></tr>
+        <tr><td><code>foreach</code></td><td>enumerate element ของ collection แล้วรัน body สำหรับแต่ละ element</td></tr>
+        <tr><td><code>do-while</code></td><td>รัน body แบบมีเงื่อนไข อย่างน้อยหนึ่งครั้งหรือมากกว่า</td></tr>
+        <tr><td><code>while</code></td><td>รัน body แบบมีเงื่อนไข ศูนย์ครั้งหรือมากกว่า</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p><code>for</code> กับ <code>foreach</code> แยกความแตกต่างจากตัวอื่นได้ชัดเจน แต่นิยามของ
+       <code>do-while</code> กับ <code>while</code> ดูคล้ายกันมาก การจะรู้ว่าเมื่อไรควรเลือกใช้
+       ตัวไหนจึงดูค่อนข้างไม่แน่นอน และอาจสับสนได้ โจทย์ท้าทายนี้จะช่วยให้ความแตกต่างชัดเจนขึ้น
+       ผ่าน 3 โปรเจกต์โค้ด</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ รับ input ตัวเลขด้วย int.TryParse()</span>
+      เมื่อรับ input ด้วย <code>Console.ReadLine()</code> ค่าที่ได้เป็น <code>string</code>
+      ถ้าต้องแปลงเป็นตัวเลข ใช้ <code>int.TryParse()</code> ซึ่งรับ 2 พารามิเตอร์ (string ที่จะ
+      แปลง + ตัวแปร <code>out</code> ที่จะรับค่า) และคืนค่า <code>bool</code> บอกว่าแปลงสำเร็จ
+      หรือไม่:
+      <div class="code">
+        <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง</span></div>
+        <pre><code class="lang-cs">int numericValue = 0;
+bool validNumber = int.TryParse(readResult, out numericValue);</code></pre>
+      </div>
+      ถ้า <code>readResult</code> เป็น <code>"7"</code> ค่า <code>7</code> จะถูกกำหนดให้
+      <code>numericValue</code> และ <code>validNumber</code> เป็น <code>true</code> ถ้าแปลงไม่ได้
+      <code>validNumber</code> จะเป็น <code>false</code>
+    </div>
+
+    <h3 id="s04a">โปรเจกต์ 1 — ตรวจสอบ input ตัวเลข</h3>
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <ul>
+          <li>ต้องใช้ <code>do-while</code> หรือ <code>while</code></li>
+          <li>ก่อนเข้า loop: พิมพ์ข้อความขอให้ผู้ใช้กรอกเลขจำนวนเต็มระหว่าง 5 ถึง 10</li>
+          <li>ข้างใน loop: รับ input ด้วย <code>Console.ReadLine()</code>, ตรวจว่าเป็นเลขจำนวนเต็มที่
+              ถูกต้อง, ถ้าค่าไม่อยู่ระหว่าง 5-10 ให้พิมพ์ขอ input ใหม่</li>
+          <li>ต้องมั่นใจว่าค่าตัวเลขอยู่ระหว่าง 5-10 ก่อนออกจาก loop</li>
+          <li>หลัง loop: พิมพ์ข้อความยืนยันว่ารับค่าแล้ว</li>
+        </ul>
+        <div class="out auto"><div class="out-bar">ตัวอย่างผลลัพธ์</div><pre>
+Enter an integer value between 5 and 10
+two
+Sorry, you entered an invalid number, please try again
+2
+You entered 2. Please enter a number between 5 and 10.
+7
+Your input value (7) has been accepted.</pre></div>
+      </div>
+      <details class="fold"><summary>🔓 ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code">
+            <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+              <button data-act="copy" type="button">Copy</button></div>
+            <pre><code class="lang-cs">string? readResult;
+string valueEntered = "";
+int numValue = 0;
+bool validNumber = false;
+
+Console.WriteLine("Enter an integer value between 5 and 10");
+
+do
+{
+    readResult = Console.ReadLine();
+    if (readResult != null)
+    {
+        valueEntered = readResult;
+    }
+
+    validNumber = int.TryParse(valueEntered, out numValue);
+
+    if (validNumber == true)
+    {
+        if (numValue <= 5 || numValue >= 10)
+        {
+            validNumber = false;
+            Console.WriteLine($"You entered {numValue}. Please enter a number between 5 and 10.");
+        }
+    }
+    else
+    {
+        Console.WriteLine("Sorry, you entered an invalid number, please try again");
+    }
+} while (validNumber == false);
+
+Console.WriteLine($"Your input value ({numValue}) has been accepted.");</code></pre>
+          </div>
+          <p>ใช้ <code>do-while</code> เพราะต้องรัน code block อย่างน้อยหนึ่งครั้งเสมอ (ต้องให้
+             ผู้ใช้กรอกก่อนถึงจะตรวจสอบได้) — ก็ใช้ <code>while</code> แทนได้เช่นกัน ถ้ารู้สึกว่า
+             เขียนแบบนั้นอ่านง่ายกว่า แต่ compiler ส่วนใหญ่จะ optimize <code>while</code>
+             ที่เขียนแบบนี้ให้กลายเป็น <code>do-while</code> อยู่ดี</p>
+        </div>
+      </details>
+    </div>
+
+    <h3 id="s04b">โปรเจกต์ 2 — ตรวจสอบ input string</h3>
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <ul>
+          <li>ต้องใช้ <code>do-while</code> หรือ <code>while</code></li>
+          <li>ก่อนเข้า loop: พิมพ์ข้อความขอให้ผู้ใช้กรอกชื่อ role อย่างใดอย่างหนึ่งใน 3 ชื่อ:
+              Administrator, Manager, หรือ User</li>
+          <li>ข้างใน loop: รับ input, ตรวจว่าตรงกับ role ใดใน 3 ชื่อ, ใช้ <code>Trim()</code>
+              ตัดช่องว่างหน้า-หลัง, ใช้ <code>ToLower()</code> ให้ไม่สนตัวพิมพ์เล็ก-ใหญ่, ถ้าไม่ตรง
+              ให้ขอ input ใหม่</li>
+          <li>หลัง loop: พิมพ์ข้อความยืนยันว่ารับค่าแล้ว</li>
+        </ul>
+        <div class="out auto"><div class="out-bar">ตัวอย่างผลลัพธ์</div><pre>
+Enter your role name (Administrator, Manager, or User)
+Admin
+The role name that you entered, "Admin" is not valid. Enter your role name (Administrator, Manager, or User)
+   Administrator
+Your input value (Administrator) has been accepted.</pre></div>
+      </div>
+      <details class="fold"><summary>🔓 ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code">
+            <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+              <button data-act="copy" type="button">Copy</button></div>
+            <pre><code class="lang-cs">string? readResult;
+string roleName = "";
+bool validEntry = false;
+
+do
+{
+    Console.WriteLine("Enter your role name (Administrator, Manager, or User)");
+    readResult = Console.ReadLine();
+    if (readResult != null)
+    {
+        roleName = readResult.Trim();
+    }
+
+    if (roleName.ToLower() == "administrator" || roleName.ToLower() == "manager" || roleName.ToLower() == "user")
+    {
+        validEntry = true;
+    }
+    else
+    {
+        Console.Write($"The role name that you entered, \"{roleName}\" is not valid. ");
+    }
+
+} while (validEntry == false);
+
+Console.WriteLine($"Your input value ({roleName}) has been accepted.");</code></pre>
+          </div>
+          <p>เหตุผลเดียวกับโปรเจกต์ 1 — ใช้ <code>do-while</code> เพราะ code block ต้องรันอย่าง
+             น้อยหนึ่งครั้ง สังเกตว่าใช้ <code>Console.Write()</code> (ไม่ใช่ <code>WriteLine()</code>)
+             ต่อท้ายข้อความ error เข้ากับข้อความขอ input ใหม่ในบรรทัดเดียวกัน</p>
+        </div>
+      </details>
+    </div>
+
+    <h3 id="s04c">โปรเจกต์ 3 — แยกประโยคจาก string array</h3>
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>ใช้ array ต่อไปนี้เป็น input:</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">ข้อมูลตั้งต้น</span></div>
+          <pre><code class="lang-cs">string[] myStrings = new string[2] { "I like pizza. I like roast chicken. I like salad", "I like all three of the menu choices" };</code></pre>
+        </div>
+        <ul>
+          <li>ประกาศตัวแปร <code>int</code> ชื่อ <code>periodLocation</code> เก็บตำแหน่งของ
+              เครื่องหมายจุดในสตริง</li>
+          <li>ใช้ <code>foreach</code> หรือ <code>for</code> เป็น loop ชั้นนอก วนแต่ละ element
+              ของ array (ตัวแปรชื่อ <code>myString</code>)</li>
+          <li>ใน loop ชั้นนอก ใช้ <code>myString.IndexOf(".")</code> หาตำแหน่งจุดตัวแรก (ถ้าไม่มี
+              จุดจะได้ -1)</li>
+          <li>ใช้ <code>do-while</code> หรือ <code>while</code> เป็น loop ชั้นในประมวลผล
+              <code>myString</code></li>
+          <li>ใน loop ชั้นใน แยกและพิมพ์แต่ละประโยคออกมา โดย<b>ไม่แสดง</b>เครื่องหมายจุด</li>
+          <li>ใช้เมธอด <code>Remove()</code>, <code>Substring()</code>, และ <code>TrimStart()</code></li>
+        </ul>
+        <div class="out auto"><div class="out-bar">ตัวอย่างผลลัพธ์</div><pre>
+I like pizza
+I like roast chicken
+I like salad
+I like all three of the menu choices</pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้: ทำไมต้องเป็น for ไม่ใช่ foreach ชั้นนอก</summary>
+        <div class="fold-body">
+          <p>ถ้าใช้ <code>foreach (string myString in myStrings)</code> แล้วพยายามแก้ไข
+             <code>myString</code> ข้างใน (ซึ่งจำเป็นสำหรับโจทย์นี้) จะเจอ compile error
+             เหมือนที่เจอใน <a href="ch17.html">บทที่ 17 หัวข้อ 17.2h</a> — "Cannot assign to
+             ... because it is a 'foreach iteration variable'" จึงต้องใช้ <code>for</code> แทน</p>
+        </div>
+      </details>
+      <details class="fold"><summary>🔓 ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code">
+            <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+              <button data-act="copy" type="button">Copy</button>
+              <button class="run" data-act="run" type="button">▶ Run</button></div>
+            <pre><code class="lang-cs">string[] myStrings = new string[2] { "I like pizza. I like roast chicken. I like salad", "I like all three of the menu choices" };
+int stringsCount = myStrings.Length;
+
+string myString = "";
+int periodLocation = 0;
+
+for (int i = 0; i < stringsCount; i++)
+{
+    myString = myStrings[i];
+    periodLocation = myString.IndexOf(".");
+
+    string mySentence;
+
+    while (periodLocation != -1)
+    {
+        mySentence = myString.Remove(periodLocation);
+        myString = myString.Substring(periodLocation + 1);
+        myString = myString.TrimStart();
+        periodLocation = myString.IndexOf(".");
+
+        Console.WriteLine(mySentence);
+    }
+
+    mySentence = myString.Trim();
+    Console.WriteLine(mySentence);
+}</code></pre>
+          </div>
+          <div class="out"><div class="out-bar">Output</div><pre>
+I like pizza
+I like roast chicken
+I like salad
+I like all three of the menu choices</pre></div>
+          <p>loop ชั้นนอกใช้ <code>for</code> (ไม่ใช่ <code>foreach</code>) เพราะเหตุผลข้างบน
+             ส่วน loop ชั้นในใช้ <code>while</code> — ไม่ใช่ <code>do-while</code> — เพราะขึ้นอยู่
+             กับข้อมูลของแต่ละ string อาจไม่จำเป็นต้องรัน code block เลยสักครั้ง (กรณี string
+             ไม่มีจุดอยู่เลย) จึง<b>ไม่ควร</b>ใช้ <code>do</code> ในสถานการณ์ที่ iteration block
+             อาจไม่จำเป็นต้องทำงานเลย</p>
+          <p>วิธีคิดของลูปชั้นใน: <code>Remove(periodLocation)</code> ตัดเอาส่วนก่อนจุดออกมาเป็น
+             ประโยค, <code>Substring(periodLocation + 1)</code> เอาส่วนที่เหลือหลังจุด,
+             <code>TrimStart()</code> ตัดช่องว่างหน้าประโยคถัดไปออก แล้ววนหาจุดตัวถัดไป — ทำแบบนี้
+             ไปเรื่อยๆ จนไม่เจอจุดอีก (<code>periodLocation == -1</code>) แล้วพิมพ์ส่วนที่เหลือ
+             สุดท้ายที่ไม่มีจุดต่อท้ายออกมา</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 สรุปหลักการเลือก do-while vs while</span>
+      รู้แน่ชัดว่าต้องรัน code block อย่างน้อยหนึ่งครั้ง (เช่น ต้องรับ input ก่อนถึงจะตรวจสอบได้)
+      → <code>do-while</code>. ไม่แน่ใจว่า code block จำเป็นต้องรันเลยหรือเปล่า (ขึ้นอยู่กับเงื่อนไข
+      ที่รู้อยู่แล้วก่อนเข้า loop) → <code>while</code>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch18-d"><span>ทำโจทย์เกม RPG สำเร็จ พร้อมเข้าใจว่าทำไมต้องใช้ continue</span></label></li>
+      <li><label><input type="checkbox" id="ch18-e"><span>ทำโจทย์ validate ตัวเลขและ string สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch18-f"><span>ทำโจทย์แยกประโยคจาก string array สำเร็จ และเข้าใจว่าทำไมชั้นในใช้ while ไม่ใช่ do-while</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">18.5 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>compile error CS1002 ที่ท้าย do-while</td>
+          <td>ลืมใส่เซมิโคลอนหลัง <code>while (เงื่อนไข)</code> ของ <code>do-while</code> — ต่างจาก
+              <code>while</code> ธรรมดาและ <code>for</code> ที่ไม่ต้องมีเซมิโคลอนปิดท้าย ต้องเขียน
+              <code>} while (condition);</code> ให้ครบเซมิโคลอน</td>
+        </tr>
+        <tr>
+          <td>while loop ไม่ทำงานเลยทั้งที่คาดว่าจะทำงาน</td>
+          <td>ลืมเผื่อกรณี "ศูนย์ครั้ง" ของ <code>while</code> — ถ้าเงื่อนไขเป็น false ตั้งแต่แรก
+              code block จะไม่รันเลย ถ้าต้องการอย่างน้อยหนึ่งครั้งเสมอ ต้องใช้ <code>do-while</code>
+              แทน</td>
+        </tr>
+        <tr>
+          <td>while (condition); ตามด้วย { } ว่างเปล่า ทำงานผิดคาด (บั๊กคลาสสิกจากตระกูล C)</td>
+          <td>ใส่เซมิโคลอนต่อท้าย <code>while (condition)</code> โดยไม่ตั้งใจ ทำให้ตัว
+              <code>while</code> วนที่ statement ว่าง (ไม่ทำอะไรเลย) จนกว่าเงื่อนไขจะ false แล้ว
+              code block <code>{ }</code> ถัดมาทำงานแค่ครั้งเดียว — C# compiler บางกรณีจะเตือน
+              (warning CS0642) แต่ไม่ใช่ทุกกรณี ต้องระวังด้วยตาเปล่า</td>
+        </tr>
+        <tr>
+          <td>infinite loop ใน do-while หรือ while</td>
+          <td>ลืมอัปเดตตัวแปรที่ใช้ในเงื่อนไขข้างในเงื่อนไข ให้ตรวจว่ามีบรรทัดที่เปลี่ยนค่าตัวแปร
+              นั้นอยู่จริงในทุกเส้นทางของ code block</td>
+        </tr>
+        <tr>
+          <td>ใช้ continue แล้ว "โค้ดหลังจากนั้น" ในรอบเดิมไม่ทำงาน จนงง</td>
+          <td>นี่คือพฤติกรรมที่ถูกต้องของ <code>continue</code> — มันข้ามส่วนที่เหลือของ code block
+              ในรอบนั้นไปเลย ถ้าไม่ต้องการพฤติกรรมนี้ ให้ใช้ <code>if-else</code> แทน</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">18.6 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment ของ Microsoft Learn</p>
+
+    <div class="quiz" data-q="18-3">
+      <p class="q"><span class="num">1.</span> ต้องวนผ่าน array ที่ไม่รู้จำนวน element ล่วงหน้า
+        โค้ดข้างในตรวจสอบแต่ละ item ตามลำดับเพื่อเลือก item ที่ตรงเงื่อนไขที่กำหนด ไม่สนใจ index
+        ของ item ที่เลือก และ item ที่เลือกถูกอ้างอิงหลายครั้งข้างใน code block ควรใช้ iteration
+        statement แบบไหนดีที่สุด?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>foreach</span></li>
+        <li class="opt"><span class="k">B</span><span>for</span></li>
+        <li class="opt"><span class="k">C</span><span>while</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> เพราะไม่สนใจ index และแค่ต้องวนผ่านทุก element ตามลำดับ
+        <code>foreach</code> จึงเหมาะที่สุด — โจทย์บอกแค่ว่า item ที่เลือก "ถูกอ้างอิง" (อ่านค่า)
+        หลายครั้ง ไม่ได้บอกว่าต้องกำหนดค่าใหม่ให้ตัวแปรวนซ้ำ จึงไม่ชนข้อจำกัดของ foreach
+        ที่เจอในบทที่ 17</div>
+    </div>
+
+    <div class="quiz" data-q="18-4">
+      <p class="q"><span class="num">2.</span> ต้องการรับรายการ item จากผู้ใช้ ผู้ใช้กด
+        <code>ctrl + Esc</code> เพื่อออก ควรใช้ iteration statement ตัวไหนดีที่สุด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>foreach</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>do-while</span></li>
+        <li class="opt"><span class="k">C</span><span>while</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ต้องรับ input อย่างน้อยหนึ่งรายการก่อนถึงจะตรวจสอบได้ว่า
+        ผู้ใช้กด ctrl+Esc หรือไม่ — เหมือนกับคำถาม 18-2 ทุกประการ</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">18.7 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียน <code>while</code> loop ที่พิมพ์ตัวเลข 1 ถึง 5 (ใช้ตัวแปร <code>int</code> เริ่มที่
+           1 และ increment ข้างใน loop)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int i = 1;
+while (i <= 5)
+{
+    Console.WriteLine(i);
+    i++;
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียน <code>do-while</code> loop ที่สุ่มตัวเลข 1-6 (จำลองลูกเต๋า) ไปเรื่อยๆ จนกว่าจะ
+           สุ่มได้เลข 6 พิมพ์ค่าที่สุ่มได้ทุกรอบ</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Random dice = new Random();
+int roll;
+
+do
+{
+    roll = dice.Next(1, 7);
+    Console.WriteLine(roll);
+} while (roll != 6);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้มี bug คลาสสิกที่กล่าวถึงในหัวข้อ 18.5 หาจุดผิดและอธิบายว่าทำไมมันไม่ทำงาน
+           ตามที่ตั้งใจ:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">int i = 0;
+while (i < 5);
+{
+    Console.WriteLine(i);
+    i++;
+}</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>มีเซมิโคลอนเกินหลัง <code>while (i &lt; 5)</code> ทำให้ <code>while</code> วนที่
+             statement ว่างเปล่า (ไม่ทำอะไร ไม่เปลี่ยนค่า <code>i</code>) จนเป็น infinite loop
+             (เพราะ <code>i</code> ไม่เคยเปลี่ยนค่า เงื่อนไขเป็น true ตลอดไป) โค้ดจะไม่มีวันไปถึง
+             code block <code>{ }</code> ด้านล่างเลย วิธีแก้คือลบเซมิโคลอนหลัง
+             <code>while (i &lt; 5)</code> ออก</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโปรแกรมขอให้ผู้ใช้กรอกรหัสผ่านซ้ำไปเรื่อยๆ (ด้วย <code>Console.ReadLine()</code>)
+           จนกว่าจะกรอกคำว่า <code>"opensesame"</code> (ไม่สนตัวพิมพ์เล็ก-ใหญ่ ใช้
+           <code>ToLower()</code>) พอถูกต้องแล้วให้พิมพ์ "เข้าสู่ระบบสำเร็จ!"</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ต้องรับ input อย่างน้อยหนึ่งครั้งก่อนถึงจะเช็คได้ — เลือก
+           iteration statement ที่เหมาะกับสถานการณ์นี้ตามหลักการในหัวข้อ 18.4</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string? input;
+
+do
+{
+    Console.WriteLine("กรุณากรอกรหัสผ่าน:");
+    input = Console.ReadLine();
+} while (input == null || input.ToLower() != "opensesame");
+
+Console.WriteLine("เข้าสู่ระบบสำเร็จ!");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงเกม RPG จากหัวข้อ 18.3 ให้มีโอกาสสุ่ม "critical hit" — ถ้าค่าที่ทอยได้เท่ากับ 10
+           พอดี ให้ค่าความเสียหายเพิ่มเป็น 2 เท่า และพิมพ์ข้อความ "CRITICAL HIT!" เพิ่มก่อนพิมพ์
+           ข้อความความเสียหายปกติ (ใช้กติกาที่เหลือเหมือนเดิมทั้งหมด)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int hero = 10;
+int monster = 10;
+Random dice = new Random();
+
+do
+{
+    int roll = dice.Next(1, 11);
+    if (roll == 10)
+    {
+        Console.WriteLine("CRITICAL HIT!");
+        roll *= 2;
+    }
+    monster -= roll;
+    Console.WriteLine($"Monster was damaged and lost {roll} health and now has {monster} health.");
+
+    if (monster <= 0) continue;
+
+    roll = dice.Next(1, 11);
+    if (roll == 10)
+    {
+        Console.WriteLine("CRITICAL HIT!");
+        roll *= 2;
+    }
+    hero -= roll;
+    Console.WriteLine($"Hero was damaged and lost {roll} health and now has {hero} health.");
+
+} while (hero > 0 && monster > 0);
+
+Console.WriteLine(hero > monster ? "Hero wins!" : "Monster wins!");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>เขียนโปรแกรมที่มี array <code>string[] sentences = { "Cats are great, dogs are great, birds are okay", "Fish are quiet pets" };</code>
+           ใช้แนวทางเดียวกับโปรเจกต์ 3 ในหัวข้อ 18.4c แต่เปลี่ยนตัวคั่นจากเครื่องหมายจุด
+           <code>"."</code> เป็นเครื่องหมายจุลภาค <code>","</code> แทน แล้วพิมพ์แต่ละท่อนออกมา
+           (ตัดช่องว่างหน้า-หลังด้วย)</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>โครงสร้างเหมือนเฉลยโปรเจกต์ 3 ทุกอย่าง แค่เปลี่ยน
+           <code>IndexOf(".")</code> เป็น <code>IndexOf(",")</code></p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string[] sentences = { "Cats are great, dogs are great, birds are okay", "Fish are quiet pets" };
+
+for (int i = 0; i < sentences.Length; i++)
+{
+    string current = sentences[i];
+    int commaLocation = current.IndexOf(",");
+    string part;
+
+    while (commaLocation != -1)
+    {
+        part = current.Remove(commaLocation);
+        current = current.Substring(commaLocation + 1);
+        current = current.TrimStart();
+        commaLocation = current.IndexOf(",");
+
+        Console.WriteLine(part.Trim());
+    }
+
+    part = current.Trim();
+    Console.WriteLine(part);
+}</code></pre></div>
+          <p>ผลลัพธ์: "Cats are great" / "dogs are great" / "birds are okay" / "Fish are quiet pets"</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">📌 สรุปบทที่ 18</h2>
+
+    <p>เป้าหมายของบทนี้คือใช้ <code>do-while</code> และ <code>while</code> statement ทำ iteration
+       — <code>do-while</code> และ <code>while</code> พิเศษตรงที่ตัว code block เองเป็นตัวกำหนด
+       ว่า flow การทำงานควรวนต่อหรือหยุด</p>
+
+    <p>ด้วย <code>do-while</code> คุณรัน code block หนึ่งครั้งก่อน แล้วค่อยประเมินเงื่อนไข Boolean
+       และอาจออกจาก iteration ด้วย <code>while</code> คุณประเมินเงื่อนไข Boolean ทันที และวน
+       ประเมินต่อจนกว่าจะออกจาก iteration คุณใช้ <code>continue</code> statement ข้างใน code
+       block ข้ามไปที่เงื่อนไข Boolean โดยตรง</p>
+
+    <p>คุณพัฒนาแอปพลิเคชันที่ใช้ <code>do-while</code> และ <code>continue</code> จำลองการต่อสู้ใน
+       เกม role-playing สถานการณ์ในโลกจริงที่เกี่ยวกับ <code>do-while</code> และ <code>while</code>
+       มักเกี่ยวกับการทำงานกับ stream ข้อมูล จากไฟล์ จากอินเทอร์เน็ต หรือสถานการณ์อื่นที่คุณต้อง
+       ทำ iteration ต่อไปจนกว่าเงื่อนไขจะสำเร็จ</p>
+
+    <p>ถ้าไม่มี <code>do-while</code> และ <code>while</code> statement การเขียนและดูแลโค้ดที่ตั้ง
+       เงื่อนไขจบไว้ข้างใน iteration code block จะทำได้ยากมาก</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 18</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">ไวยากรณ์</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>do { } while (cond);</code></td><td>รันก่อน เช็คทีหลัง — อย่างน้อย 1 ครั้ง (อย่าลืม ; ท้ายสุด!)</td></tr>
+          <tr><td><code>while (cond) { }</code></td><td>เช็คก่อน รันทีหลัง — ศูนย์ครั้งขึ้นไป</td></tr>
+          <tr><td><code>continue;</code></td><td>ข้ามไปท้ายรอบปัจจุบัน แล้วประเมินเงื่อนไขต่อ</td></tr>
+          <tr><td><code>break;</code></td><td>หยุด loop ทันที ออกจาก loop เลย</td></tr>
+          <tr><td><code>int.TryParse(s, out n)</code></td><td>แปลง string เป็น int แบบปลอดภัย คืนค่า bool</td></tr>
+          <tr><td>do-while vs while</td><td>รู้แน่ว่าต้องรันอย่างน้อย 1 ครั้ง → do-while; ไม่แน่ใจ → while</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s09">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>do-while statement</td><td>คำสั่ง do-while</td><td>วน code block อย่างน้อยหนึ่งครั้ง เช็คเงื่อนไขทีหลัง</td></tr>
+        <tr><td>while statement</td><td>คำสั่ง while</td><td>เช็คเงื่อนไขก่อน อาจไม่วนเลยก็ได้</td></tr>
+        <tr><td>continue statement</td><td>คำสั่ง continue</td><td>ข้ามไปประเมินเงื่อนไขของ loop ทันที</td></tr>
+        <tr><td>nullable string</td><td>สตริงที่เป็น null ได้</td><td><code>string?</code> — ชนิดที่อนุญาตให้เก็บค่า null</td></tr>
+        <tr><td>infinite loop</td><td>ลูปไม่รู้จบ</td><td>loop ที่เงื่อนไขไม่มีวันเป็น false</td></tr>
+        <tr><td>TryParse</td><td>ลองแปลงค่า</td><td>เมธอดแปลงชนิดข้อมูลแบบไม่ throw exception เมื่อล้มเหลว</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch17.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 17 · for Statement</span></a>
+      <a class="next" href="ch19.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 19 · Guided Project — Console App ครบวงจร</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

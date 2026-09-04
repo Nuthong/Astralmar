@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 22 · Casting และ Conversion — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="22">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 4 · Work with Variable Data / บทที่ 22</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 4 · โมดูล 2/7</span>
+      <h1>แปลง Data Type ด้วยเทคนิค Casting และ Conversion</h1>
+      <div class="en">Convert Data Types Using Casting and Conversion Techniques in C#</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>60–75 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เลือกใช้ cast, Convert, ToString(), Parse(), TryParse() ได้ถูกจังหวะ</b></span>
+        <span>🎯 ความยาก <b>กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ใช้ casting operator แปลงค่าเป็น data type อื่นได้</li>
+        <li>ใช้ conversion method แปลงค่าเป็น data type อื่นได้</li>
+        <li>ป้องกันการสูญเสียข้อมูลตอนทำ cast หรือ conversion</li>
+        <li>ใช้เมธอด <code>TryParse()</code> แปลง string เป็น numeric data type อย่างปลอดภัย</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">22.1 สถานการณ์: ฟอร์มรับผู้ป่วยทางการแพทย์</h2>
+
+    <p>สมมติคุณเป็นนักพัฒนาซอฟต์แวร์ในทีมที่ทำงานเกี่ยวกับระบบอัตโนมัติสำหรับฟอร์มรับผู้ป่วยทาง
+       การแพทย์ คุณได้รับมอบหมายให้ส่งมอบฟีเจอร์ของแอปสำหรับเก็บข้อมูลที่เจ้าหน้าที่การแพทย์กรอกก่อน
+       ที่แพทย์จะพบผู้ป่วย เจ้าหน้าที่ใช้แอปบันทึกวันที่และเวลา อายุผู้ป่วย ส่วนสูง น้ำหนัก ชีพจร
+       และความดันโลหิต แอปยังมีช่องข้อความสำหรับข้อมูลอื่นๆ เช่น เหตุผลที่มาพบแพทย์ ยาที่กำลังใช้อยู่
+       และรายการอื่นๆ คุณต้องทำงานกับข้อมูลที่มี data type ผสมกันหลายแบบ สำหรับต้นแบบ (prototype)
+       คุณจะสร้าง console application แล้วรับ input ทั้งหมดเป็น <code>string</code></p>
+
+    <p>เพราะ input เริ่มต้นถูกกรอกมาเป็น string คุณจึงต้องเปลี่ยนค่าจาก data type หนึ่งไปเป็นอีก
+       ชนิดในโค้ดเป็นครั้งคราว ตัวอย่างง่ายๆ คือการดำเนินการทางคณิตศาสตร์ใดๆ ที่คุณต้องการทำกับข้อมูล
+       string — คุณต้องเปลี่ยนค่าเป็น numeric data type อย่าง <code>int</code> ก่อน ถึงจะดำเนินการ
+       ได้ หรือในทางกลับกัน คุณอาจต้องการจัดรูปแบบและแสดงค่าตัวเลขสำหรับรายงานสรุปด้วย string
+       interpolation</p>
+
+    <p>คุณจะใช้เทคนิคต่างกันในการเปลี่ยน data type เมื่อจำเป็น คุณจะเรียนว่าเมื่อไรควรใช้เทคนิคไหน
+       และเมื่อไรที่เทคนิคหนึ่งๆ อาจเสี่ยงต่อการสูญเสียข้อมูล</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ตั้งค่า Culture ก่อนเริ่ม (ถ้าจำเป็น)</span>
+      โค้ดตัวอย่างในบทนี้ออกแบบตามการตั้งค่า culture แบบ en-US ซึ่งใช้จุด (<code>.</code>) เป็นตัวคั่น
+      ทศนิยม ถ้าเครื่องคุณตั้งค่า culture ที่ใช้ตัวคั่นทศนิยมต่างออกไป (เช่น จุลภาค) ผลลัพธ์อาจไม่
+      ตรงกับที่แสดงในหนังสือ ถ้าเจอปัญหานี้ ให้เพิ่มโค้ดต่อไปนี้ไว้บนสุดของไฟล์ (หลัง
+      <code>using</code> อื่นๆ ถ้ามี):
+      <div class="code">
+        <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (บนสุด)</span>
+          <button data-act="copy" type="button">Copy</button></div>
+        <pre><code class="lang-cs">using System.Globalization;
+CultureInfo.CurrentCulture = new CultureInfo("en-US");</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s02">22.2 ทำไม int + string ถึง Error แต่ string + int ทำงานได้</h2>
+
+    <p>มีเทคนิคหลายแบบในการแปลง data type เทคนิคที่คุณเลือกขึ้นอยู่กับคำตอบของ 2 คำถามสำคัญ:</p>
+    <ul>
+      <li>มีความเป็นไปได้ไหมที่ การเปลี่ยน data type ของค่านั้น อาจทำให้เกิด exception ตอนรันจริง
+          ขึ้นอยู่กับค่านั้นๆ?</li>
+      <li>มีความเป็นไปได้ไหมที่ การเปลี่ยน data type ของค่านั้น จะทำให้ข้อมูลสูญหาย ขึ้นอยู่กับ
+          ค่านั้นๆ?</li>
+    </ul>
+
+    <h3 id="s02a">ลองบวก int กับ string ดู</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int first = 2;
+string second = "4";
+int result = first + second;
+Console.WriteLine(result);</code></pre>
+    </div>
+    <div class="out err"><div class="out-bar">Output</div><pre>
+Program.cs(3,14): error CS0029: Cannot implicitly convert type 'string' to 'int'</pre></div>
+
+    <p>ส่วนสำคัญของข้อความ error คือ <code>Cannot implicitly convert type 'string' to 'int'</code>
+       บอกว่าปัญหาอยู่ที่การใช้ data type <code>string</code></p>
+
+    <p>แต่ทำไม C# compiler ถึงจัดการ error นี้ให้ไม่ได้ ในเมื่อทำแบบตรงข้ามได้ — ต่อ (concatenate)
+       ตัวเลขเข้ากับ string แล้วเก็บใน string variable — ลองเปลี่ยนชนิดของตัวแปร
+       <code>result</code> จาก <code>int</code> เป็น <code>string</code> ดู:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int first = 2;
+string second = "4";
+string result = first + second;
+Console.WriteLine(result);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+24</pre></div>
+
+    <p>ผลลัพธ์นี้ผิดในทางคณิตศาสตร์ แต่รันได้ เพราะรวมค่าเป็นตัวอักษร "2" กับ "4" เข้าด้วยกัน
+       (concatenation ไม่ใช่ addition) — คำถามคือ ทำไม C# compiler ไม่ฉลาดพอที่จะรู้ว่าคุณต้องการ
+       ปฏิบัติกับตัวแปร <code>second</code> ที่มีค่า <code>4</code> เป็นตัวเลข ไม่ใช่ string?</p>
+
+    <h3 id="s02b">Compiler เลือกทำเฉพาะการแปลงที่ปลอดภัย</h3>
+    <p>C# compiler มองเห็นปัญหาที่อาจเกิดขึ้นล่วงหน้า ตัวแปร <code>second</code> เป็นชนิด
+       <code>string</code> ดังนั้นมันอาจถูกกำหนดค่าเป็นอย่างอื่นได้ เช่น <code>"hello"</code> ถ้า
+       C# compiler พยายามแปลง <code>"hello"</code> เป็นตัวเลข มันจะทำให้เกิด exception ตอนรันจริง
+       เพื่อป้องกันความเป็นไปได้นี้ C# compiler จึงไม่ทำการแปลงจาก <code>string</code> เป็น
+       <code>int</code> ให้คุณโดยอัตโนมัติ (implicit)</p>
+
+    <p>จากมุมมองของ C# compiler การดำเนินการที่ปลอดภัยกว่าคือแปลง <code>int</code> เป็น
+       <code>string</code> แล้วทำ concatenation แทน</p>
+
+    <p>ถ้าคุณตั้งใจจะบวกเลขโดยใช้ string จริงๆ C# compiler จะบังคับให้คุณควบคุมกระบวนการแปลง
+       data type อย่างชัดเจนมากขึ้น พูดอีกแบบคือ มันบังคับให้คุณมีส่วนร่วมมากขึ้น เพื่อให้คุณวาง
+       มาตรการป้องกันที่เหมาะสมสำหรับจัดการความเป็นไปได้ที่การแปลงอาจ throw exception</p>
+
+    <p>ถ้าคุณต้องเปลี่ยนค่าจาก data type เดิมเป็น data type ใหม่ และการเปลี่ยนนั้นอาจทำให้เกิด
+       exception ตอนรันจริง คุณต้องทำ <b>data conversion</b> — มีเทคนิคหลายแบบที่ใช้ทำ data
+       conversion ได้:</p>
+    <ul>
+      <li>ใช้ helper method บนตัวแปร (เช่น <code>myVar.ToString()</code>)</li>
+      <li>ใช้ helper method บน data type (เช่น <code>int.Parse(myString)</code>)</li>
+      <li>ใช้เมธอดของ <code>Convert</code> class (เช่น <code>Convert.ToInt32(myString)</code>)</li>
+    </ul>
+
+    <div class="quiz" data-q="22-1">
+      <p class="q"><span class="num">Check ★</span> เทคนิคไหนดีที่สุดสำหรับแปลง decimal type เป็น
+        int type แบบปัดเศษ (ไม่ใช่ตัดทิ้ง)?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>Convert</span></li>
+        <li class="opt"><span class="k">B</span><span>Narrowing (cast operator ตรงๆ)</span></li>
+        <li class="opt"><span class="k">C</span><span>Implicit conversion</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> <code>Convert</code> class ปัดเศษให้ตามที่คาดหวัง ส่วน
+        cast operator ตรงๆ (narrowing) จะตัดทศนิยมทิ้งเฉยๆ ไม่ปัด และ implicit conversion ใช้ไม่ได้
+        กับ narrowing conversion อยู่แล้ว (compiler ไม่ยอมทำให้อัตโนมัติ)</div>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s03">22.3 Widening vs Narrowing, Cast vs Convert</h2>
+
+    <h3 id="s03a">Widening Conversion (แปลงแบบขยาย) — ใช้ Implicit ได้</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int myInt = 3;
+Console.WriteLine($"int: {myInt}");
+
+decimal myDecimal = myInt;
+Console.WriteLine($"decimal: {myDecimal}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+int: 3
+decimal: 3</pre></div>
+
+    <p>บรรทัดสำคัญคือ <code>decimal myDecimal = myInt;</code> — เพราะค่า <code>int</code> ใดๆ
+       ก็ใส่ใน <code>decimal</code> ได้อย่างสบาย compiler จึงทำการแปลงให้เลย</p>
+
+    <p>คำว่า <b>widening conversion</b> (แปลงแบบขยาย) หมายถึงคุณกำลังแปลงค่า<i>จาก</i> data type
+       ที่เก็บข้อมูลได้<i>น้อยกว่า</i>ไปเป็น data type ที่เก็บข้อมูลได้<i>มากกว่า</i> ในกรณีนี้ ค่าที่
+       เก็บในตัวแปรชนิด <code>int</code> ถูกแปลงเป็นตัวแปรชนิด <code>decimal</code> โดยไม่สูญเสีย
+       ข้อมูลเลย เมื่อคุณรู้ว่ากำลังทำ widening conversion คุณพึ่งพา <b>implicit conversion</b>
+       ได้เลย — compiler จัดการ implicit conversion ให้เอง</p>
+
+    <h3 id="s03b">Narrowing Conversion (แปลงแบบย่อ) — ต้อง Cast เอง</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">decimal myDecimal = 3.14m;
+Console.WriteLine($"decimal: {myDecimal}");
+
+int myInt = (int)myDecimal;
+Console.WriteLine($"int: {myInt}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+decimal: 3.14
+int: 3</pre></div>
+
+    <p>ตอนทำ cast คุณใช้ casting operator <code>()</code> ครอบ data type แล้ววางไว้ข้างตัวแปรที่
+       ต้องการแปลง (ตัวอย่าง: <code>(int)myDecimal</code>) คุณกำลังทำ <b>explicit conversion</b>
+       ไปยัง data type ที่กำหนดไว้ (<code>int</code>)</p>
+
+    <p>บรรทัดสำคัญคือ <code>int myInt = (int)myDecimal;</code> — ตัวแปร <code>myDecimal</code>
+       เก็บค่าที่มีความละเอียดหลังจุดทศนิยม การเพิ่มคำสั่ง cast <code>(int)</code> เข้าไป คือการบอก
+       C# compiler ว่าคุณเข้าใจว่าอาจสูญเสียความละเอียดนั้น และในสถานการณ์นี้ก็ไม่เป็นไร คุณกำลัง
+       บอก compiler ว่าคุณตั้งใจแปลงแบบนี้ — เป็น <b>explicit conversion</b></p>
+
+    <p>คำว่า <b>narrowing conversion</b> (แปลงแบบย่อ) หมายถึงคุณกำลังแปลงค่าจาก data type ที่เก็บ
+       ข้อมูลได้<i>มากกว่า</i>ไปเป็น data type ที่เก็บข้อมูลได้<i>น้อยกว่า</i> คุณอาจสูญเสียข้อมูล
+       เช่น precision (จำนวนค่าหลังจุดทศนิยม) เมื่อคุณรู้ว่ากำลังทำ narrowing conversion คุณต้องทำ
+       <b>cast</b> — การ cast คือคำสั่งบอก C# compiler ว่าคุณรู้ว่า precision อาจสูญหาย แต่ยินดี
+       ยอมรับมัน</p>
+
+    <p>ถ้าไม่แน่ใจว่าจะสูญเสียข้อมูลหรือไม่ ให้เขียนโค้ดทดสอบทั้งสองแบบแล้วสังเกตความเปลี่ยนแปลง
+       นักพัฒนามักเขียน test เล็กๆ แบบนี้เพื่อเข้าใจพฤติกรรมให้ชัดขึ้น:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">decimal myDecimal = 1.23456789m;
+float myFloat = (float)myDecimal;
+
+Console.WriteLine($"Decimal: {myDecimal}");
+Console.WriteLine($"Float  : {myFloat}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Decimal: 1.23456789
+Float  : 1.2345679</pre></div>
+
+    <p>สังเกตจาก output ได้ว่าการ cast <code>decimal</code> เป็น <code>float</code> เป็น narrowing
+       conversion เพราะสูญเสียความละเอียดไปบางส่วน (ทศนิยมตำแหน่งสุดท้ายถูกปัดหายไป)</p>
+
+    <div class="quiz" data-q="22-2">
+      <p class="q"><span class="num">Check ★</span> การแปลงข้อใดปัดเศษ (round) แทนที่จะตัดทิ้ง
+        (truncate)?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>int cost = (int)3.75m;</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>int cost = Convert.ToInt32(3.75m);</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>uint cost = (uint)3.75m;</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> cast operator <code>()</code> ตัดทศนิยมทิ้งเสมอ
+        (truncate) ไม่ว่าจะ cast เป็น int หรือ uint ก็ตาม มีแค่ <code>Convert.ToInt32()</code>
+        เท่านั้นที่ปัดเศษให้</div>
+    </div>
+
+    <h3 id="s03c">3 เทคนิคของ Data Conversion</h3>
+
+    <p><b>1) ToString() — helper method บนตัวแปร:</b> ทุกตัวแปร data type มีเมธอด
+       <code>ToString()</code> พฤติกรรมของมันขึ้นอยู่กับว่า type นั้น implement ยังไง แต่กับ
+       primitive ส่วนใหญ่ มันทำ widening conversion แม้จะไม่จำเป็นเสมอไป (เพราะพึ่ง implicit
+       conversion ได้ในกรณีส่วนใหญ่) แต่การเขียน <code>ToString()</code> ชัดๆ ช่วยสื่อสารกับนัก
+       พัฒนาคนอื่นว่าคุณเข้าใจว่ากำลังทำอะไรและตั้งใจทำ</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int first = 5;
+int second = 7;
+string message = first.ToString() + second.ToString();
+Console.WriteLine(message);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+57</pre></div>
+
+    <p><b>2) Parse() — helper method บน data type:</b> numeric data type ส่วนใหญ่มีเมธอด
+       <code>Parse()</code> ที่แปลง string เป็น data type นั้นได้</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string first = "5";
+string second = "7";
+int sum = int.Parse(first) + int.Parse(second);
+Console.WriteLine(sum);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+12</pre></div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ปัญหาที่ซ่อนอยู่ของ Parse()</span>
+      ลองคิดดูสักครู่ว่ามีปัญหาอะไรซ่อนอยู่ในตัวอย่างข้างบน — ถ้า <code>first</code> หรือ
+      <code>second</code> มีค่าที่แปลงเป็น <code>int</code> ไม่ได้ล่ะ? จะเกิด exception ทันทีตอน
+      รันจริง C# compiler และ runtime คาดหวังให้คุณวางแผนล่วงหน้าและป้องกัน "การแปลงที่ผิดกฎ" แบบนี้
+      วิธีที่ง่ายที่สุดในการบรรเทาปัญหานี้คือใช้ <code>TryParse()</code> ซึ่งเป็นเวอร์ชันที่ดีกว่า
+      ของ <code>Parse()</code> (ดูหัวข้อ 22.4)
+    </div>
+
+    <p><b>3) Convert class — ใช้เมธอดของ Convert class:</b> <code>Convert</code> class มี helper
+       method จำนวนมากสำหรับแปลงค่าจาก type หนึ่งเป็นอีก type</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string value1 = "5";
+string value2 = "7";
+int result = Convert.ToInt32(value1) * Convert.ToInt32(value2);
+Console.WriteLine(result);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+35</pre></div>
+
+    <div class="note tip">
+      <span class="lbl">💡 ทำไมต้องชื่อ ToInt32() ไม่ใช่ ToInt()</span>
+      <code>System.Int32</code> คือชื่อ data type จริงใน .NET Class Library ที่ภาษา C# แมปมาเป็น
+      คีย์เวิร์ด <code>int</code> (ทบทวนจาก <a href="ch21.html#s02">บทที่ 21 หัวข้อ 21.2c</a>) เพราะ
+      <code>Convert</code> class เป็นส่วนหนึ่งของ .NET Class Library เช่นกัน มันถูกเรียกด้วยชื่อเต็ม
+      ไม่ใช่ชื่อย่อของ C# — การกำหนด data type ไว้ใน .NET Class Library แบบนี้ทำให้หลายภาษาบน .NET
+      (Visual Basic, F#, IronPython ฯลฯ) ใช้ data type และ class เดียวกันร่วมกันได้ เมธอด
+      <code>ToInt32()</code> มี overload ถึง 19 แบบ รับ data type ได้แทบทุกชนิด — แต่เมื่อใช้กับ
+      string โดยเฉพาะ ควรพิจารณาใช้ <code>TryParse()</code> แทนเมื่อทำได้ (ปลอดภัยกว่า)
+    </div>
+
+    <p>แล้วเมื่อไรควรใช้ <code>Convert</code> class? <code>Convert</code> เหมาะที่สุดสำหรับแปลง
+       ตัวเลขมีเศษให้เป็นจำนวนเต็ม (<code>int</code>) เพราะมันปัดเศษตามที่คาดหวัง</p>
+
+    <h3 id="s03d">เปรียบเทียบ Cast กับ Convert ตอนแปลง decimal เป็น int</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int value = (int)1.5m; // casting truncates
+Console.WriteLine(value);
+
+int value2 = Convert.ToInt32(1.5m); // converting rounds up
+Console.WriteLine(value2);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+1
+2</pre></div>
+
+    <p>ตอน cast <code>int value = (int)1.5m;</code> ค่าทศนิยมถูก<b>ตัดทิ้ง</b> (truncate) ผลลัพธ์
+       จึงเป็น <code>1</code> หมายความว่าค่าหลังจุดทศนิยมถูกละเลยไปเลย ต่อให้เปลี่ยน literal เป็น
+       <code>1.999m</code> ผลลัพธ์ของการ cast ก็ยังเป็น <code>1</code> เหมือนเดิม</p>
+
+    <p>ตอนแปลงด้วย <code>Convert.ToInt32()</code> ค่า literal ถูก<b>ปัดขึ้น</b>อย่างถูกต้องเป็น
+       <code>2</code> ถ้าเปลี่ยนค่า literal เป็น <code>1.499m</code> ผลลัพธ์จะถูกปัด<b>ลง</b>เป็น
+       <code>1</code></p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ สรุป: cast ตัดทิ้ง, convert ปัดเศษ</span>
+      จำง่ายๆ: <code>()</code> cast operator = ตัดทิ้งเสมอ (ไม่สนใจกฎการปัดเศษใดๆ) —
+      <code>Convert.ToXxx()</code> = ปัดเศษตามกฎมาตรฐาน (0.5 ขึ้นไปปัดขึ้น ต่ำกว่าปัดลง)
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch22-a"><span>แยกแยะ widening กับ narrowing conversion ได้</span></label></li>
+      <li><label><input type="checkbox" id="ch22-b"><span>ใช้ทั้ง 3 เทคนิค (ToString, Parse, Convert) ได้</span></label></li>
+      <li><label><input type="checkbox" id="ch22-c"><span>อธิบายความต่างระหว่าง cast (ตัดทิ้ง) กับ Convert (ปัดเศษ) ได้ พร้อมตัวอย่าง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">22.4 TryParse() และ out Parameter</h2>
+
+    <p>เวลาทำงานกับข้อมูล บางครั้งคุณต้องแปลงข้อมูล string เป็น numeric data type อย่างที่เรียนไปใน
+       หัวข้อก่อน เพราะ <code>string</code> data type เก็บค่าที่ไม่ใช่ตัวเลขได้ด้วย การแปลงจาก
+       <code>string</code> เป็น numeric data type จึงอาจทำให้เกิด runtime error ได้</p>
+
+    <p>ตัวอย่างเช่น โค้ดนี้:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string name = "Bob";
+Console.WriteLine(int.Parse(name));</code></pre>
+    </div>
+    <div class="out err"><div class="out-bar">Output</div><pre>
+System.FormatException: 'Input string was not in a correct format.'</pre></div>
+
+    <p>ทำให้เกิด exception ตามนี้ — เพื่อหลีกเลี่ยง format exception แบบนี้ ให้ใช้เมธอด
+       <code>TryParse()</code> บน data type เป้าหมายแทน</p>
+
+    <h3 id="s04a">TryParse() ทำ 3 อย่างพร้อมกัน</h3>
+    <ul>
+      <li>พยายาม parse string เป็น numeric data type ที่กำหนด</li>
+      <li>ถ้าสำเร็จ เก็บค่าที่แปลงแล้วไว้ใน <b>out parameter</b></li>
+      <li>คืนค่า <code>bool</code> บอกว่าการทำงานสำเร็จหรือล้มเหลว</li>
+    </ul>
+    <p>คุณใช้ค่า Boolean ที่คืนกลับมาตัดสินใจต่อได้ (เช่น คำนวณต่อ) หรือแสดงข้อความถ้าการ parse
+       ไม่สำเร็จ</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 out Parameter คืออะไร</span>
+      เมธอดคืนค่าได้หนึ่งค่า หรือคืน "void" (ไม่คืนค่าเลย) แต่เมธอดยังคืนค่าผ่าน <code>out</code>
+      parameter ได้ด้วย — นิยามคล้าย input parameter ปกติ แต่มีคีย์เวิร์ด <code>out</code> กำกับ
+      เป็นกลไกที่ให้เมธอดหนึ่ง "คืนค่า" ได้มากกว่าหนึ่งทาง (ทั้ง return value ปกติ + ค่าผ่าน
+      out parameter)
+    </div>
+
+    <h3 id="s04b">TryParse() String เป็น int</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string value = "102";
+int result = 0;
+if (int.TryParse(value, out result))
+{
+   Console.WriteLine($"Measurement: {result}");
+}
+else
+{
+   Console.WriteLine("Unable to report the measurement.");
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Measurement: 102</pre></div>
+
+    <p>ตอนเรียกเมธอดที่มี <code>out</code> parameter คุณต้องใส่คีย์เวิร์ด <code>out</code> ไว้หน้า
+       ตัวแปรที่จะเก็บค่า — ใน <code>int.TryParse(value, out result)</code> ค่าจาก out parameter
+       ถูกกำหนดให้ตัวแปร <code>result</code> คุณใช้ค่าที่ <code>result</code> เก็บอยู่ต่อในโค้ดที่
+       เหลือได้เลย</p>
+
+    <p><code>int.TryParse()</code> คืนค่า <code>true</code> ถ้าแปลงตัวแปร <code>value</code> เป็น
+       <code>int</code> สำเร็จ ไม่งั้นคืน <code>false</code> — ครอบ statement ด้วย <code>if</code>
+       แล้วจัดการตรรกะการตัดสินใจตามนั้น</p>
+
+    <p>ค่าที่แปลงแล้วถูกเก็บในตัวแปร <code>int</code> ชื่อ <code>result</code> — ตัวแปร
+       <code>result</code> ถูกประกาศและกำหนดค่าเริ่มต้นไว้<b>ก่อน</b>บรรทัดนี้ จึงเข้าถึงได้ทั้ง
+       <i>ข้างใน</i> code block ของ <code>if</code> และ <code>else</code> และ<i>ข้างนอก</i>ทั้งสอง
+       ด้วย</p>
+
+    <h3 id="s04c">ใช้ค่าที่ Parse แล้วต่อในโค้ดถัดไป</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string value = "102";
+int result = 0;
+if (int.TryParse(value, out result))
+{
+   Console.WriteLine($"Measurement: {result}");
+}
+else
+{
+   Console.WriteLine("Unable to report the measurement.");
+}
+Console.WriteLine($"Measurement (w/ offset): {50 + result}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Measurement: 102
+Measurement (w/ offset): 152</pre></div>
+
+    <p>เพราะตัวแปร <code>result</code> ถูกประกาศไว้นอก <code>if</code> statement มันจึงถูกเข้าถึง
+       ได้ต่อในโค้ดที่ตามมาทีหลัง</p>
+
+    <h3 id="s04d">กรณี Parse ไม่สำเร็จ</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string value = "bad";
+int result = 0;
+if (int.TryParse(value, out result))
+{
+   Console.WriteLine($"Measurement: {result}");
+}
+else
+{
+   Console.WriteLine("Unable to report the measurement.");
+}
+
+if (result > 0)
+   Console.WriteLine($"Measurement (w/ offset): {50 + result}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Unable to report the measurement.</pre></div>
+
+    <p>เพราะ <code>result</code> ถูกประกาศนอก <code>if</code> statement จึงเข้าถึงได้จากภายนอก
+       code block ด้วย โค้ดจึงเช็คว่า <code>result</code> มีค่ามากกว่าศูนย์ก่อนถึงจะยอมให้พิมพ์ค่า
+       <code>result</code> + offset ออกมา การเช็คค่า <code>result</code> ว่ามากกว่าศูนย์แบบนี้
+       ป้องกันไม่ให้พิมพ์ค่า offset ต่อท้ายข้อความ "Unable to report the measurement." โดยไม่
+       ตั้งใจ</p>
+
+    <div class="quiz" data-q="22-3">
+      <p class="q"><span class="num">Check ★</span> ควรใช้เทคนิคไหนแปลง <code>myInput</code>
+        ซึ่งเป็น string ค่า <code>"2.71828"</code> ให้เป็นตัวแปร <code>decimal</code> ชื่อ
+        <code>myInputDecimal</code>?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>decimal myInputDecimal = (decimal)(myInput);</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>decimal myInputDecimal = myInput + 0;</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>decimal.TryParse(myInput, out myInputDecimal);</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ข้อ A ไม่ compile เพราะ cast operator ใช้แปลง string
+        เป็น decimal ตรงๆ ไม่ได้ (ไม่มี built-in cast ระหว่างสอง type นี้) ข้อ B ก็ไม่ compile
+        ด้วยเหตุผลคล้ายกัน (บวก string กับ int ตรงๆ ไม่ได้) มีแค่ TryParse() เท่านั้นที่ใช้แปลง
+        string เป็น decimal ได้อย่างปลอดภัยและถูกไวยากรณ์</div>
+    </div>
+
+    <div class="quiz" data-q="22-4">
+      <p class="q"><span class="num">Check ★</span> พิจารณาโค้ด
+        <code>bool success = decimal.TryParse(input, out decimal number);</code> — ข้อใดอธิบาย
+        return type ของ <code>decimal.TryParse()</code> ได้ถูกต้องที่สุด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>decimal</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>bool</span></li>
+        <li class="opt"><span class="k">C</span><span>out</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> TryParse() คืนค่า bool เสมอ บอกว่าสำเร็จหรือไม่ — ค่า
+        decimal ที่แปลงได้ถูกส่งผ่าน out parameter (พารามิเตอร์) ไม่ใช่ return value ปกติ</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch22-d"><span>ใช้ TryParse() กับ out parameter สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch22-e"><span>เข้าใจว่า out parameter คืนค่าได้ต่างจาก return value ปกติยังไง</span></label></li>
+      <li><label><input type="checkbox" id="ch22-f"><span>ทดสอบทั้งกรณี parse สำเร็จและล้มเหลว เห็นพฤติกรรมต่างกันจริง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">22.5 ท้าทาย 1: รวม String Array เป็นข้อความและตัวเลข</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl m">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>ใช้ array ตั้งต้นนี้:</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">ข้อมูลตั้งต้น</span></div>
+          <pre><code class="lang-cs">string[] values = { "12.3", "45", "ABC", "11", "DEF" };</code></pre>
+        </div>
+        <p>สร้าง loop วนผ่านแต่ละ string ใน <code>values</code> แล้ว implement กฎธุรกิจต่อไปนี้:</p>
+        <ul>
+          <li><b>กฎ 1:</b> ถ้าค่านั้นเป็นตัวอักษร (alphabetical) ให้ต่อ (concatenate) เข้าเป็น
+              ข้อความ</li>
+          <li><b>กฎ 2:</b> ถ้าค่านั้นเป็นตัวเลข (numeric) ให้บวกเข้ากับผลรวม</li>
+          <li><b>กฎ 3:</b> ผลลัพธ์ต้องตรงกับ output นี้:</li>
+        </ul>
+        <div class="out auto"><pre>
+Message: ABCDEF
+Total: 68.3</pre></div>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>ทบทวนหัวข้อ 22.4 — เมธอดไหนที่บอกคุณได้ว่า string หนึ่งค่าเป็นตัวเลขหรือไม่ พร้อมแปลง
+             ให้เสร็จในตัว โดยไม่ throw exception เวลาเจอค่าที่ไม่ใช่ตัวเลข?</p>
+        </div>
+      </details>
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย (เฉลยทางการจาก Microsoft Learn)</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">string[] values = { "12.3", "45", "ABC", "11", "DEF" };
+
+decimal total = 0m;
+string message = "";
+
+foreach (var value in values)
+{
+    decimal number; // stores the TryParse "out" value
+    if (decimal.TryParse(value, out number))
+    {
+        total += number;
+    } else
+    {
+        message += value;
+    }
+}
+
+Console.WriteLine($"Message: {message}");
+Console.WriteLine($"Total: {total}");</code></pre>
+        </div>
+        <div class="out"><div class="out-bar">Output</div><pre>
+Message: ABCDEF
+Total: 68.3</pre></div>
+        <p>นี่เป็น<i>เพียงหนึ่งในหลายวิธี</i>ที่แก้โจทย์นี้ได้ เฉลยนี้พึ่งพา <code>TryParse()</code>
+           เป็นแกนหลัก — ใช้ค่า Boolean ที่คืนกลับมาตัดสินใจโดยตรงว่าจะบวกเข้าผลรวมหรือต่อเข้าข้อความ
+           โดยไม่ต้องเขียนโค้ดตรวจสอบชนิดของอักขระเองเลย เป็นตัวอย่างที่ดีว่า <code>TryParse()</code>
+           มีประโยชน์แค่ไหนเวลาข้อมูลมีชนิดปะปนกันแบบนี้</p>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch22-g"><span>แก้โจทย์ท้าทาย 1 สำเร็จ ได้ผลลัพธ์ตรงตามที่กำหนด</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">22.6 ท้าทาย 2: แสดงผลการคำนวณเป็น Type ที่กำหนด</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl h">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>ใช้ตัวแปรตั้งต้นนี้:</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">ข้อมูลตั้งต้น</span></div>
+          <pre><code class="lang-cs">int value1 = 11;
+decimal value2 = 6.2m;
+float value3 = 4.3f;</code></pre>
+        </div>
+        <p>เขียนโค้ดแก้โจทย์ 3 ข้อนี้:</p>
+        <ul>
+          <li><b>result1:</b> เอา <code>value1</code> หาร <code>value2</code> แสดงผลลัพธ์เป็น
+              <code>int</code> (ต้องปัดเศษเป็นจำนวนเต็มที่ใกล้ที่สุด <b>ห้ามแค่ตัดทิ้ง</b>)</li>
+          <li><b>result2:</b> เอา <code>value2</code> หาร <code>value3</code> แสดงผลลัพธ์เป็น
+              <code>decimal</code></li>
+          <li><b>result3:</b> เอา <code>value3</code> หาร <code>value1</code> แสดงผลลัพธ์เป็น
+              <code>float</code></li>
+        </ul>
+        <p>ผลลัพธ์ที่ต้องได้:</p>
+        <div class="out auto"><pre>
+Divide value1 by value2, display the result as an int: 2
+Divide value2 by value3, display the result as a decimal: 1.4418604651162790697674418605
+Divide value3 by value1, display the result as a float: 0.3909091</pre></div>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>result1 ต้อง<b>ปัดเศษ</b> ไม่ใช่ตัดทิ้ง — ทบทวนหัวข้อ 22.3d ว่าเทคนิคไหนปัดเศษให้
+             ส่วน result2 ต้องหาร <code>decimal</code> ด้วย <code>float</code> ตรงๆ ไม่ได้ (คนละ
+             ประเภท ต้อง cast ตัวใดตัวหนึ่งก่อน) และ result3 เป็นการหาร <code>float</code> ด้วย
+             <code>int</code> — ผลลัพธ์ที่ได้เป็น type ไหนโดย default?</p>
+        </div>
+      </details>
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย (เฉลยทางการจาก Microsoft Learn)</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">int value1 = 11;
+decimal value2 = 6.2m;
+float value3 = 4.3f;
+
+// Convert class เหมาะที่สุดสำหรับแปลงตัวเลขมีเศษให้เป็นจำนวนเต็ม
+// Convert.ToInt32() ปัดเศษตามที่คาดหวัง
+int result1 = Convert.ToInt32(value1 / value2);
+Console.WriteLine($"Divide value1 by value2, display the result as an int: {result1}");
+
+decimal result2 = value2 / (decimal)value3;
+Console.WriteLine($"Divide value2 by value3, display the result as a decimal: {result2}");
+
+float result3 = value3 / value1;
+Console.WriteLine($"Divide value3 by value1, display the result as a float: {result3}");</code></pre>
+        </div>
+        <div class="out"><div class="out-bar">Output</div><pre>
+Divide value1 by value2, display the result as an int: 2
+Divide value2 by value3, display the result as a decimal: 1.4418604651162790697674418605
+Divide value3 by value1, display the result as a float: 0.3909091</pre></div>
+        <p>นี่เป็น<i>เพียงหนึ่งในหลายวิธี</i>ที่แก้โจทย์นี้ได้ เฉลยนี้ใช้ cast หลายจุด (และเรียก
+           convert หนึ่งครั้ง) แต่วิธีอื่นก็อาจใช้ได้ผลดีเท่ากัน ประเด็นสำคัญที่ควรสังเกต:</p>
+        <ul>
+          <li><code>value1 / value2</code> คือ <code>int</code> หาร <code>decimal</code> — C#
+              ยกระดับ (promote) <code>int</code> เป็น <code>decimal</code> โดยอัตโนมัติก่อนหาร
+              (widening conversion) ผลลัพธ์เป็น <code>decimal</code> จึงต้องใช้
+              <code>Convert.ToInt32()</code> ครอบเพื่อปัดเศษเป็น <code>int</code> อีกที</li>
+          <li><code>value2 / (decimal)value3</code> — <code>decimal</code> กับ <code>float</code>
+              หารกันตรงๆ ไม่ได้ (compile error) ต้อง cast <code>value3</code> เป็น
+              <code>decimal</code> ก่อนเสมอ</li>
+          <li><code>value3 / value1</code> คือ <code>float</code> หาร <code>int</code> — C#
+              ยกระดับ <code>int</code> เป็น <code>float</code> ให้อัตโนมัติ ผลลัพธ์จึงเป็น
+              <code>float</code> อยู่แล้วโดยไม่ต้อง cast เพิ่ม</li>
+        </ul>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch22-h"><span>แก้โจทย์ท้าทาย 2 สำเร็จ เข้าใจว่าทำไมแต่ละ result ต้อง cast ต่างกัน</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s07">22.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>compile error "Cannot implicitly convert type 'string' to 'int'"</td>
+          <td>พยายามบวก string เข้ากับ int แล้วเก็บผลลัพธ์เป็น int ตรงๆ — ต้องแปลง string เป็น
+              ตัวเลขก่อนด้วย Parse()/TryParse()/Convert ไม่ใช่พึ่ง implicit conversion</td>
+        </tr>
+        <tr>
+          <td>ผลลัพธ์การคำนวณผิดแบบ "24" แทนที่จะเป็น "6"</td>
+          <td>ตัวแปรผลลัพธ์เป็น string โดยไม่ตั้งใจ ทำให้ + กลายเป็น concatenation แทน addition —
+              เช็คชนิดของตัวแปรทุกตัวในนิพจน์คณิตศาสตร์ให้แน่ใจว่าเป็นตัวเลขทั้งหมด</td>
+        </tr>
+        <tr>
+          <td>System.FormatException ตอนใช้ Parse()</td>
+          <td>ใช้ Parse() กับ string ที่อาจไม่ใช่ตัวเลขเสมอ (เช่น จาก user input) — เปลี่ยนไปใช้
+              TryParse() แทนเสมอเมื่อค่าที่รับมาไม่รับประกันความถูกต้อง</td>
+        </tr>
+        <tr>
+          <td>ผลลัพธ์ (int)3.99m ได้ 3 ทั้งที่คาดว่าจะได้ 4</td>
+          <td>ไม่ใช่บั๊ก — cast operator ตัดทศนิยมทิ้งเสมอ (truncate) ไม่ปัดเศษ ถ้าต้องการปัดเศษ
+              ต้องใช้ Convert.ToInt32() แทน</td>
+        </tr>
+        <tr>
+          <td>compile error ตอนหาร decimal กับ float ตรงๆ</td>
+          <td>C# ไม่ทำ implicit conversion ระหว่าง decimal กับ float/double ให้ (ต่างจากคู่ int↔decimal
+              หรือ int↔float) ต้อง cast ตัวใดตัวหนึ่งให้เป็นชนิดเดียวกันก่อนเสมอ</td>
+        </tr>
+        <tr>
+          <td>ใช้ out parameter ผิดจุด ลืมใส่คีย์เวิร์ด out ตอนเรียก</td>
+          <td>ต้องใส่ <code>out</code> ทั้งตอนประกาศพารามิเตอร์ในนิยามเมธอด และตอนเรียกใช้ เช่น
+              <code>int.TryParse(value, out result)</code> — ขาดคีย์เวิร์ด out ตอนเรียกจะเกิด
+              compile error</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">22.8 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment ของ Microsoft Learn</p>
+
+    <div class="quiz" data-q="22-5">
+      <p class="q"><span class="num">1.</span> เทคนิคไหนทำให้เกิด error ตอนใช้แปลงค่า string
+        <code>"4.123456789"</code> เป็น decimal?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>Convert.ToDecimal()</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>decimal.TryParse()</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>(decimal)</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> cast operator <code>(decimal)</code> ใช้แปลง string เป็น
+        decimal ตรงๆ ไม่ได้เลย — C# ไม่มี built-in cast ระหว่าง string กับ numeric type ต้องใช้
+        Convert หรือ Parse/TryParse เท่านั้น (ตรงกับที่เจอในคำถาม Check ★ ข้อ 22-3 ด้วย)</div>
+    </div>
+
+    <div class="quiz" data-q="22-6">
+      <p class="q"><span class="num">2.</span> การเปลี่ยนค่าจาก float เป็น int เป็นการดำเนินการ
+        ประเภทไหน?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>Narrowing conversion (แปลงแบบย่อ)</span></li>
+        <li class="opt"><span class="k">B</span><span>Widening conversion (แปลงแบบขยาย)</span></li>
+        <li class="opt"><span class="k">C</span><span>Illegal conversion (การแปลงที่ผิดกฎ)</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> float เก็บค่าทศนิยมได้ ส่วน int เก็บได้แค่จำนวนเต็ม —
+        แปลงจาก float ไป int จึงเสี่ยงสูญเสียข้อมูล (ส่วนทศนิยม) จัดเป็น narrowing conversion
+        ต้องทำ cast อย่างชัดเจนเสมอ ไม่ใช่ illegal (มันถูกกฎ แค่ต้อง explicit)</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">22.9 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ประกาศ <code>int</code> ค่า 7 แล้วแปลงเป็น <code>double</code> ด้วย implicit
+           conversion (ไม่ต้องเขียน cast) พิมพ์ทั้งสองค่าออกมา</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int myInt = 7;
+double myDouble = myInt;
+Console.WriteLine($"int: {myInt}");
+Console.WriteLine($"double: {myDouble}");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ใช้ <code>TryParse()</code> แปลง string <code>"25"</code> เป็น <code>int</code>
+           ถ้าสำเร็จ พิมพ์ค่าคูณ 2 ถ้าไม่สำเร็จ พิมพ์ "แปลงไม่สำเร็จ"</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string input = "25";
+int number;
+if (int.TryParse(input, out number))
+{
+    Console.WriteLine(number * 2);
+}
+else
+{
+    Console.WriteLine("แปลงไม่สำเร็จ");
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้ compile ไม่ผ่าน หาสาเหตุและแก้ไข:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">string age = "25";
+int nextYear = age + 1;
+Console.WriteLine(nextYear);</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>compiler ไม่ยอมแปลง <code>string</code> เป็น <code>int</code> แบบ implicit เพราะ
+             <code>age</code> อาจมีค่าที่ไม่ใช่ตัวเลขก็ได้ ต้องแปลงให้ชัดเจนก่อน:</p>
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (แก้แล้ว)</span></div>
+          <pre><code class="lang-cs">string age = "25";
+int nextYear = int.Parse(age) + 1;
+Console.WriteLine(nextYear);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดเปรียบเทียบผลลัพธ์ของ <code>(int)7.9</code> กับ <code>Convert.ToInt32(7.9)</code>
+           ทำนายผลลัพธ์ก่อนรันจริง แล้วเทียบว่าตรงกับที่เดาไหม</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">Console.WriteLine((int)7.9);
+Console.WriteLine(Convert.ToInt32(7.9));</code></pre></div>
+          <div class="out"><pre>
+7
+8</pre></div>
+          <p>cast ตัดทิ้งได้ 7, Convert ปัดขึ้นได้ 8 — ตรงตามกฎที่เรียนในหัวข้อ 22.3d ทุกประการ</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงเฉลยท้าทาย 1 (หัวข้อ 22.5) ให้แยกผลรวมเป็น "ผลรวมเลขคู่" กับ "ผลรวมเลขคี่" แทนที่
+           จะรวมเป็นก้อนเดียว (สมมติค่าทศนิยมอย่าง 12.3 ให้ปัดเป็น int ก่อนเช็คว่าคู่หรือคี่)
+           ทดสอบกับ array เดิม <code>{ "12.3", "45", "ABC", "11", "DEF" }</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string[] values = { "12.3", "45", "ABC", "11", "DEF" };
+
+decimal evenTotal = 0m;
+decimal oddTotal = 0m;
+string message = "";
+
+foreach (var value in values)
+{
+    decimal number;
+    if (decimal.TryParse(value, out number))
+    {
+        int rounded = Convert.ToInt32(number);
+        if (rounded % 2 == 0)
+        {
+            evenTotal += number;
+        }
+        else
+        {
+            oddTotal += number;
+        }
+    }
+    else
+    {
+        message += value;
+    }
+}
+
+Console.WriteLine($"Message: {message}");
+Console.WriteLine($"Even total: {evenTotal}");
+Console.WriteLine($"Odd total: {oddTotal}");</code></pre></div>
+          <p>12.3 ปัดเป็น 12 (คู่) → evenTotal, 45 เป็นคี่ → oddTotal, 11 เป็นคี่ → oddTotal —
+             ผลลัพธ์: Even total: 12.3, Odd total: 56</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>อธิบายว่าทำไม <code>decimal result = value2 / (decimal)value3;</code> ในเฉลยท้าทาย 2
+           (หัวข้อ 22.6) ต้อง cast แค่ <code>value3</code> (float) เป็น decimal แต่ไม่ต้อง cast
+           <code>value2</code> (ซึ่งเป็น decimal อยู่แล้ว) — แล้วถ้าเขียน
+           <code>(decimal)value2 / value3</code> แทน (cast ฝั่งซ้ายแทนฝั่งขวา) จะ compile ผ่านไหม?</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p><code>value2</code> เป็น <code>decimal</code> อยู่แล้ว ไม่ต้อง cast ซ้ำ — ปัญหาอยู่ที่
+             <code>value3</code> ซึ่งเป็น <code>float</code> C# ไม่มี implicit หรือแม้แต่ built-in
+             explicit conversion ระหว่าง <code>float</code> กับ <code>decimal</code> ที่ทำงานได้
+             ทั้งสองทิศทางแบบอัตโนมัติในนิพจน์เดียวกัน จึงต้อง cast operand ฝั่งใดฝั่งหนึ่งให้เป็น
+             decimal ก่อนหารเสมอ — ส่วน <code>(decimal)value2 / value3</code> จะ<b>ไม่ compile
+             ผ่าน</b> เพราะแม้ฝั่งซ้ายจะเป็น decimal แล้ว แต่ฝั่งขวา (<code>value3</code>) ยังเป็น
+             float อยู่ดี C# ยังหา decimal กับ float หารกันตรงๆ ไม่ได้อยู่ดี ต้อง cast ทั้งสองฝั่ง
+             ให้เป็น decimal เหมือนกัน (หรืออย่างน้อยฝั่งที่ไม่ใช่ decimal ต้องถูก cast เสมอ)</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 22</h2>
+
+    <p>เป้าหมายของคุณคือใช้เทคนิคต่างๆ เปลี่ยน data type ของค่าที่กำหนด คุณใช้ <b>implicit
+       conversion</b> โดยพึ่งพา C# compiler ทำ <b>widening conversion</b> ให้ เมื่อ compiler ทำ
+       implicit conversion ให้ไม่ได้ คุณใช้ <b>explicit conversion</b> แทน คุณใช้เมธอด
+       <code>ToString()</code> แปลง numeric data type เป็น <code>string</code> อย่างชัดเจน</p>
+
+    <p>เมื่อต้องทำ <b>narrowing conversion</b> คุณใช้เทคนิคต่างกันหลายแบบ คุณใช้ casting operator
+       <code>()</code> เมื่อการแปลงทำได้อย่างปลอดภัยและยินดียอมรับการตัดทศนิยมทิ้ง และคุณใช้เมธอด
+       <code>Convert()</code> เมื่อต้องการแปลงพร้อมใช้กฎการปัดเศษทั่วไปตอนทำ narrowing conversion</p>
+
+    <p>สุดท้าย คุณใช้เมธอด <code>TryParse()</code> เมื่อการแปลงจาก <code>string</code> เป็น
+       numeric data type อาจทำให้เกิด data type conversion exception ได้</p>
+
+    <p>ถ้าไม่มีตัวเลือกเหล่านี้มากมาย การเขียนโปรแกรมในภาษาที่มีระบบ type แบบเข้มงวดจะทำได้ยากมาก
+       โชคดีที่ระบบ type, conversion, และ casting ที่ออกแบบมาอย่างดีนี้ ช่วยให้คุณสร้างแอปพลิเคชัน
+       ที่ปราศจากข้อผิดพลาดได้</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 22</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">เทคนิค</th><th>ใช้เมื่อ</th></tr></thead>
+        <tbody>
+          <tr><td>Implicit (ไม่ต้องเขียนอะไร)</td><td>widening conversion — type เล็กไป type ใหญ่ ปลอดภัยเสมอ</td></tr>
+          <tr><td><code>(type)value</code></td><td>narrowing conversion ที่ปลอดภัย ยอมรับการตัดทิ้ง (truncate)</td></tr>
+          <tr><td><code>value.ToString()</code></td><td>แปลง numeric เป็น string อย่างชัดเจน</td></tr>
+          <tr><td><code>type.Parse(str)</code></td><td>แปลง string เป็นตัวเลข เมื่อมั่นใจ 100% ว่าค่าถูกต้อง</td></tr>
+          <tr><td><code>type.TryParse(str, out val)</code></td><td>แปลง string เป็นตัวเลขอย่างปลอดภัย เมื่อค่าอาจผิดรูปแบบ (เช่น user input)</td></tr>
+          <tr><td><code>Convert.ToXxx(value)</code></td><td>narrowing conversion ที่ต้องการปัดเศษ ไม่ใช่ตัดทิ้ง</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>data conversion</td><td>การแปลงข้อมูล</td><td>เปลี่ยน data type โดยมีความเสี่ยง exception ตอนรันจริง</td></tr>
+        <tr><td>implicit conversion</td><td>การแปลงแบบปริยาย</td><td>compiler แปลงให้อัตโนมัติ ใช้กับ widening conversion</td></tr>
+        <tr><td>explicit conversion / cast</td><td>การแปลงแบบชัดเจน</td><td>ผู้เขียนโค้ดสั่งแปลงเองด้วย () หรือเมธอด</td></tr>
+        <tr><td>widening conversion</td><td>การแปลงแบบขยาย</td><td>type เล็กไป type ใหญ่ ไม่เสียข้อมูล</td></tr>
+        <tr><td>narrowing conversion</td><td>การแปลงแบบย่อ</td><td>type ใหญ่ไป type เล็ก อาจเสียข้อมูล/precision</td></tr>
+        <tr><td>out parameter</td><td>พารามิเตอร์ out</td><td>พารามิเตอร์ที่ใช้คืนค่าออกจากเมธอด นอกเหนือจาก return value</td></tr>
+        <tr><td>truncate</td><td>ตัดทิ้ง</td><td>ตัดส่วนทศนิยมทิ้งโดยไม่ปัดเศษ (พฤติกรรมของ cast)</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch21.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 21 · Choose the Correct Data Type</span></a>
+      <a class="next" href="ch23.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 23 · Perform Operations on Arrays Using Helper Methods</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 34 · VS Code Debugging Tools — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="34">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 6 · Debug Console Applications / บทที่ 34</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 6 · โมดูล 2/6</span>
+      <h1>ใช้เครื่องมือ Debug ของ Visual Studio Code</h1>
+      <div class="en">Implement the Visual Studio Code Debugging Tools for C#</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>70–90 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>ตั้ง breakpoint, step ผ่านโค้ด, อ่านค่าตัวแปรและ call stack ได้จริงใน VS Code</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น–กลาง (ลงมือจริงเยอะ)</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ตั้งค่า debugger ของ VS Code สำหรับโปรแกรม C# ได้</li>
+        <li>สร้าง breakpoint และ step ผ่านโค้ดเพื่อแยกหาปัญหาได้</li>
+        <li>ตรวจสอบสถานะโปรแกรม (ค่าตัวแปร) ณ จุดใดก็ได้ระหว่าง debug ได้</li>
+        <li>ใช้ call stack หาต้นตอของ exception ได้</li>
+      </ul>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 ต้องเตรียมอะไรก่อน</span>
+      บทนี้ลงมือจริงทั้งบท ต้องมี Visual Studio Code + C# extension ที่ตั้งค่าไว้แล้ว (ทบทวนได้ที่
+      <a href="ch07.html">บทที่ 7</a>) เนื้อหาจะเยอะกว่าบทที่ 33 มาก เพราะเป็นบทที่สอนใช้เครื่องมือ
+      จริงล้วนๆ — อย่ากังวลถ้ารู้สึกข้อมูลเยอะ คุณไม่จำเป็นต้องจำทุกปุ่มได้ในรอบเดียว
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">34.1 หน้าตาของ RUN AND DEBUG view</h2>
+
+    <p>VS Code มีส่วนติดต่อผู้ใช้หลายจุดที่ช่วยตั้งค่า เริ่ม และควบคุม debug session — มาทำความ
+       รู้จักทีละส่วนก่อนลงมือจริง</p>
+
+    <h3 id="s01a">เมนู Run</h3>
+    <p>เมนู <b>Run</b> บนแถบเมนูของ VS Code รวมคำสั่งที่ใช้บ่อยไว้ 6 หมวด:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:28%">หมวด</th><th>ใช้ทำอะไร</th></tr></thead>
+      <tbody>
+        <tr><td>Start / Stop Debugging</td><td>เริ่ม-หยุดรันโค้ด ทั้งแบบมีและไม่มี debugger แนบอยู่</td></tr>
+        <tr><td>Launch configurations</td><td>เปิดดูหรือสร้าง launch configuration (ไฟล์ <code>launch.json</code>)</td></tr>
+        <tr><td>Runtime control</td><td>สั่งเดินหน้าโค้ดระหว่าง execution ถูก pause อยู่</td></tr>
+        <tr><td>Set Breakpoints</td><td>สลับเปิด/ปิด breakpoint บนบรรทัดโค้ดที่ cursor อยู่</td></tr>
+        <tr><td>Manage Breakpoints</td><td>จัดการ breakpoint ทีเดียวหลายจุด (enable/disable/remove ทั้งหมด)</td></tr>
+        <tr><td>Install Debuggers</td><td>เปิดหน้า EXTENSIONS กรองเฉพาะ debugger</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 id="s01b">ส่วนต่างๆ ของ RUN AND DEBUG view</h3>
+    <p>เปิด RUN AND DEBUG view ได้จากไอคอนรูป "▷ กับจุดบัค" บน Activity Bar ด้านซ้าย ภายในมี
+       ส่วนสำคัญดังนี้:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">ส่วน</th><th>หน้าที่</th></tr></thead>
+      <tbody>
+        <tr><td><b>Controls panel</b></td><td>ปุ่ม Start Debugging (▶ สีเขียว) + dropdown เลือก
+            launch configuration + ปุ่มเฟือง (เปิด <code>launch.json</code>) + ปุ่ม ⋯ (ซ่อน/แสดง
+            ส่วนต่างๆ)</td></tr>
+        <tr><td><b>VARIABLES</b></td><td>ดูและจัดการค่าตัวแปรระหว่าง debug session</td></tr>
+        <tr><td><b>WATCH</b></td><td>เฝ้าดูตัวแปรหรือ expression ที่กำหนดเอง เช่น ตั้ง watch
+            ไว้ดูว่าเมื่อไหร่เงื่อนไขหนึ่งจะเป็นจริง</td></tr>
+        <tr><td><b>CALL STACK</b></td><td>ติดตามตำแหน่งการทำงานปัจจุบัน ตั้งแต่จุดเริ่มเข้าแอป
+            — บอกว่าตอนนี้อยู่ใน method ไหน และ method ไหนเรียกมันมาบ้าง</td></tr>
+        <tr><td><b>BREAKPOINTS</b></td><td>แสดงรายการ breakpoint ที่ตั้งไว้ทั้งหมด</td></tr>
+        <tr><td><b>Debug toolbar</b></td><td>แถบควบคุมการรัน แสดงเฉพาะตอนแอปกำลังรันอยู่</td></tr>
+        <tr><td><b>DEBUG CONSOLE</b></td><td>แสดงข้อความจาก debugger — เป็นคอนโซลเริ่มต้นของ
+            console app แสดงผลจาก <code>Console.WriteLine()</code> ได้ด้วย</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 id="s01c">Debug toolbar — 6 ปุ่มควบคุมการรัน</h3>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:22%">ปุ่ม</th><th>ทำอะไร</th></tr></thead>
+      <tbody>
+        <tr><td><b>Pause / Continue</b></td><td>หยุดการทำงานชั่วคราวตอนกำลังรัน หรือรันต่อ
+            ตอนถูก pause อยู่</td></tr>
+        <tr><td><b>Step Over</b></td><td>รัน method ถัดไปเป็นก้อนเดียว โดยไม่ลงไปดูข้างในทีละ
+            บรรทัด</td></tr>
+        <tr><td><b>Step Into</b></td><td>เข้าไปในบรรทัด/method ถัดไป เพื่อดูการทำงานทีละบรรทัด
+            ข้างใน</td></tr>
+        <tr><td><b>Step Out</b></td><td>ถ้ากำลังอยู่ใน method ให้รันทุกบรรทัดที่เหลือของ method
+            นั้นรวดเดียว แล้วกลับไปจุดที่เรียกมัน</td></tr>
+        <tr><td><b>Restart</b></td><td>ยกเลิกการรันปัจจุบัน แล้วเริ่ม debug session ใหม่ด้วย
+            configuration เดิม</td></tr>
+        <tr><td><b>Stop</b></td><td>ยกเลิกการรันปัจจุบันทั้งหมด</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <svg viewBox="0 0 720 150" role="img" aria-label="เปรียบเทียบ Step Over, Step Into, Step Out" style="margin:18px 0">
+      <defs>
+        <marker id="ar34a" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="var(--text-faint)"/>
+        </marker>
+      </defs>
+      <g font-family="var(--font-th)" font-size="12">
+        <rect x="10" y="15" width="220" height="120" rx="10" fill="var(--bg-soft)" stroke="var(--line)"/>
+        <text x="120" y="40" text-anchor="middle" font-family="var(--font-code)" font-weight="700" fill="var(--text)">Step Over</text>
+        <text x="120" y="62" text-anchor="middle" fill="var(--text-soft)">เรียก method แล้ว</text>
+        <text x="120" y="80" text-anchor="middle" fill="var(--text-soft)">"ข้าม" ไปเลย</text>
+        <text x="120" y="98" text-anchor="middle" fill="var(--text-soft)">ไม่ดูข้างใน</text>
+        <text x="120" y="118" text-anchor="middle" fill="var(--text-soft)">(รันเป็นก้อนเดียว)</text>
+
+        <rect x="250" y="15" width="220" height="120" rx="10" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="360" y="40" text-anchor="middle" font-family="var(--font-code)" font-weight="700" fill="var(--brand-text)">Step Into</text>
+        <text x="360" y="62" text-anchor="middle" fill="var(--text-soft)">เดินเข้าไปข้างใน</text>
+        <text x="360" y="80" text-anchor="middle" fill="var(--text-soft)">method ที่เรียก</text>
+        <text x="360" y="98" text-anchor="middle" fill="var(--text-soft)">ดูทีละบรรทัด</text>
+        <text x="360" y="118" text-anchor="middle" fill="var(--text-soft)">ข้างในเลย</text>
+
+        <rect x="490" y="15" width="220" height="120" rx="10" fill="var(--warn-soft)" stroke="var(--warn)"/>
+        <text x="600" y="40" text-anchor="middle" font-family="var(--font-code)" font-weight="700" fill="var(--warn)">Step Out</text>
+        <text x="600" y="62" text-anchor="middle" fill="var(--text-soft)">อยู่ข้างใน method</text>
+        <text x="600" y="80" text-anchor="middle" fill="var(--text-soft)">แล้วอยากออกเร็วๆ</text>
+        <text x="600" y="98" text-anchor="middle" fill="var(--text-soft)">รันที่เหลือรวด</text>
+        <text x="600" y="118" text-anchor="middle" fill="var(--text-soft)">แล้วกลับจุดเดิม</text>
+      </g>
+    </svg>
+
+    <div class="quiz" data-q="34-1">
+      <p class="q"><span class="num">Check ★</span> ส่วนใดของ RUN AND DEBUG view ใช้ติดตามตำแหน่งการทำงานปัจจุบันของโปรแกรม ตั้งแต่จุดเริ่มเข้าแอป?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>VARIABLES section</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>CALL STACK section</span></li>
+        <li class="opt"><span class="k">C</span><span>WATCH section</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> CALL STACK แสดงว่าตอนนี้กำลังอยู่ใน method ไหน และ
+        method ไหนเรียกต่อกันมาจนถึงจุดปัจจุบัน ส่วน VARIABLES ดูค่าตัวแปร และ WATCH เฝ้าดู
+        expression ที่ตั้งเอง</div>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s02">34.2 ลงมือ: รันโค้ดในโหมด Debug ครั้งแรก</h2>
+
+    <h3 id="s02a">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch34-debugger</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <p>เปิดโฟลเดอร์ <code>ch34-debugger</code> ด้วย VS Code แล้วแทนที่เนื้อหาใน
+       <code>Program.cs</code> ด้วยโค้ดนี้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int score = 0;
+
+for (int round = 1; round <= 3; round++)
+{
+    score += round * 10;
+    Console.WriteLine($"รอบที่ {round}: คะแนนสะสม {score}");
+}
+
+Console.WriteLine($"คะแนนรวมสุดท้าย: {score}");</code></pre>
+    </div>
+
+    <p>ตั้ง breakpoint บนบรรทัด <code>score += round * 10;</code> โดยคลิกที่ช่องว่างด้านซ้าย
+       ของเลขบรรทัดนั้น (จะมี "จุดสีแดง" ขึ้นมา) จากนั้นเปิด RUN AND DEBUG view แล้วกด
+       <b>Start Debugging</b> (หรือกด <code>F5</code>)</p>
+
+    <p>โปรแกรมจะรันไปหยุดที่ breakpoint พอดี — สังเกตส่วน VARIABLES ทางซ้าย จะเห็นค่าปัจจุบัน
+       ของ <code>score</code> และ <code>round</code> ตอนนั้น ลองกด <b>Step Over</b> ดูหลายๆ
+       ครั้ง แล้วสังเกตว่าค่า <code>score</code> เปลี่ยนไปทีละรอบตามที่คาดไว้ไหม จากนั้นกด
+       <b>Continue</b> ให้โปรแกรมรันจนจบ</p>
+
+    <div class="quiz" data-q="34-2">
+      <p class="q"><span class="num">Check ★</span> ปุ่มใดบน Debug toolbar ใช้ "รันต่อ" หลังจากโค้ดถูก pause ไว้ที่ breakpoint?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>Pause / Continue</span></li>
+        <li class="opt"><span class="k">B</span><span>Step Over</span></li>
+        <li class="opt"><span class="k">C</span><span>Restart</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ปุ่มเดียวกันสลับหน้าที่ตามสถานะ: Pause ตอนกำลังรัน
+        และ Continue ตอนถูก pause อยู่ — Step Over รันทีละก้อนโค้ด ไม่ใช่ "รันต่อจนจบหรือจน
+        breakpoint ถัดไป"</div>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s03">34.3 ตั้งค่า Breakpoint: Set / Remove / Disable / Enable</h2>
+
+    <p>ตั้ง breakpoint ได้สองทาง: คลิกที่ช่องด้านซ้ายของเลขบรรทัดใน Editor หรือใช้คำสั่ง
+       <b>Toggle Breakpoint</b> จากเมนู Run (ใช้กับบรรทัดที่ cursor อยู่) เมื่อโค้ดรันมาถึง
+       breakpoint การทำงานจะหยุดพัก</p>
+
+    <p>ลบ breakpoint ได้โดยทำซ้ำวิธีเดิมที่ใช้ตั้งมัน (คลิกจุดแดงอีกครั้ง หรือ Toggle
+       Breakpoint ซ้ำ) แต่ถ้าอยากเก็บตำแหน่ง breakpoint ไว้แต่ไม่ให้ทำงานรอบนี้ ให้
+       "ปิดใช้งาน (disable)" แทนการลบ — คลิกขวาที่จุดแดง แล้วเลือก <b>Disable Breakpoint</b>
+       จุดจะเปลี่ยนจากสีแดงเป็นสีเทา</p>
+
+    <p>นอกจากจัดการทีละจุด เมนู Run ยังมีคำสั่งจัดการทั้งหมดพร้อมกัน:</p>
+
+    <ul>
+      <li><b>Enable All Breakpoints</b> — เปิดใช้งาน breakpoint ที่ถูกปิดไว้ทั้งหมด</li>
+      <li><b>Disable All Breakpoints</b> — ปิดใช้งาน breakpoint ทั้งหมด</li>
+      <li><b>Remove All Breakpoints</b> — ลบ breakpoint ทั้งหมด (ทั้งที่เปิดและปิดใช้งานอยู่)</li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">34.4 Breakpoint แบบมีเงื่อนไข, Hit Count และ Logpoint</h2>
+
+    <p><b>Conditional breakpoint</b> คือ breakpoint พิเศษที่หยุดโค้ดเฉพาะเมื่อเงื่อนไขที่
+       กำหนดเป็นจริงเท่านั้น ตั้งได้โดยคลิกขวา (ไม่ใช่คลิกซ้าย) ที่ช่องด้านซ้ายเลขบรรทัด
+       แล้วเลือก <b>Add Conditional Breakpoint</b> — หรือคลิกขวาที่ breakpoint ที่มีอยู่แล้ว
+       เลือก <b>Edit Breakpoint</b> เพื่อเปลี่ยนมันให้มีเงื่อนไข</p>
+
+    <p>ทุกครั้งที่ debugger เจอ conditional breakpoint จะประเมิน expression ที่กำหนดไว้ — ถ้า
+       ได้ <code>true</code> จะหยุด ถ้าได้ <code>false</code> จะข้ามไปเหมือนไม่มี breakpoint
+       เลย เช่น ถ้ากำลัง debug โค้ดข้างใน <code>for</code> loop และสงสัยว่าปัญหาเกิดหลัง
+       วนไปแล้วหลายรอบ ก็ตั้งเงื่อนไขเป็น <code>round > 2</code> — debugger จะข้าม breakpoint
+       ไปจนกว่า <code>round</code> จะมากกว่า 2 จริงๆ ถึงจะหยุด</p>
+
+    <p>C# debugger ของ VS Code ยังรองรับสองแบบเพิ่มเติม:</p>
+
+    <ul>
+      <li><b>Hit Count breakpoint</b> — กำหนดจำนวนครั้งที่ breakpoint ต้องถูกเจอ ก่อนจะ
+          "หยุด" จริงๆ (เช่นตั้งไว้ 5 ก็จะหยุดเฉพาะครั้งที่ 5)</li>
+      <li><b>Logpoint</b> — breakpoint ที่ "ไม่หยุด" การทำงาน แต่พิมพ์ข้อความ log ออกไปแทน
+          มีประโยชน์มากตอน debug ระบบที่ pause ไม่ได้ (เช่นระบบ production) หน้าตาเป็นไอคอน
+          รูป "เพชร" แทนวงกลมทึบ ข้อความ log เป็นข้อความธรรมดาแต่ใส่ expression ในวงเล็บปีกกา
+          <code>{}</code> ได้ เช่น <code>round = {round}</code> ผสมกับเงื่อนไข hit count
+          <code>&gt;4</code> ก็จะได้ log เฉพาะตั้งแต่ครั้งที่ 5 เป็นต้นไป</li>
+    </ul>
+
+    <div class="quiz" data-q="34-3">
+      <p class="q"><span class="num">Check ★</span> conditional breakpoint คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>breakpoint ที่หยุดการทำงานเฉพาะเมื่อเงื่อนไขที่กำหนดเป็นจริง</span></li>
+        <li class="opt"><span class="k">B</span><span>breakpoint ที่หยุดทุกครั้งที่รันโค้ด ไม่มีข้อยกเว้น</span></li>
+        <li class="opt"><span class="k">C</span><span>breakpoint ที่มองเห็นได้เฉพาะใน Editor แต่ไม่มีผลต่อการ debug จริง</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ต่างจาก breakpoint ปกติที่หยุดทุกครั้งไม่มีเงื่อนไข —
+        conditional breakpoint จะประเมิน expression ก่อน หยุดเฉพาะตอนได้ <code>true</code></div>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s05">34.5 ไฟล์ launch.json: ตั้งค่าการรันดีบักเอง</h2>
+
+    <p>VS Code ใช้ไฟล์ <code>launch.json</code> (อยู่ในโฟลเดอร์ <code>.vscode</code>) เก็บ
+       ค่า config ของ debugger สำหรับโปรเจกต์ console แบบง่ายๆ VS Code มักสร้างไฟล์นี้ให้
+       อัตโนมัติจนครบพร้อมใช้เลย แต่บางสถานการณ์ก็ต้องแก้เอง — ควรรู้จัก attribute หลักๆ ไว้</p>
+
+    <p>ไฟล์ <code>launch.json</code> มี list ชื่อ <code>configurations</code> แต่ละ
+       configuration ต้องมี 3 attribute นี้เสมอ:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:22%">Attribute</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td><code>name</code></td><td>ชื่อที่อ่านง่ายของ configuration นี้ — ไปโผล่ใน
+            dropdown เลือก configuration</td></tr>
+        <tr><td><code>type</code></td><td>ชนิดของ debugger — สำหรับแอป .NET/C# ใช้ค่า
+            <code>coreclr</code></td></tr>
+        <tr><td><code>request</code></td><td>ชนิดคำขอ — รองรับ <code>launch</code> (เปิดโปรแกรม
+            ใหม่) กับ <code>attach</code> (แนบเข้าโปรเซสที่รันอยู่แล้ว)</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>attribute อื่นๆ ที่พบบ่อย:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:22%">Attribute</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td><code>preLaunchTask</code></td><td>ชื่อ task ที่ต้องรันก่อน debug (นิยามใน
+            <code>tasks.json</code>) — ปกติตั้งเป็นงาน <code>dotnet build</code></td></tr>
+        <tr><td><code>program</code></td><td>path ไปยังไฟล์ .dll ที่จะรัน รูปแบบทั่วไปคือ
+            <code>${workspaceFolder}/bin/Debug/&lt;target-framework&gt;/&lt;ชื่อโปรเจกต์&gt;.dll</code></td></tr>
+        <tr><td><code>cwd</code></td><td>working directory ของโปรเซสเป้าหมาย</td></tr>
+        <tr><td><code>args</code></td><td>argument ที่ส่งให้โปรแกรมตอนเริ่มรัน (ค่าเริ่มต้นคือ
+            ไม่มี)</td></tr>
+        <tr><td><code>console</code></td><td>ชนิดคอนโซลที่ใช้รัน — <code>internalConsole</code>
+            (ค่าเริ่มต้น), <code>integratedTerminal</code>, หรือ <code>externalTerminal</code></td></tr>
+        <tr><td><code>stopAtEntry</code></td><td>ตั้งเป็น <code>true</code> ถ้าอยากให้หยุด
+            ที่จุดเริ่มต้นโปรแกรมทันที</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ กับดักสำคัญ: แอปที่มี Console.ReadLine() debug ไม่ได้ถ้าใช้ค่า default</span>
+      แผง <b>DEBUG CONSOLE</b> (ค่า <code>console</code> เริ่มต้น <code>internalConsole</code>)
+      <b>ไม่รองรับ</b> การรับ input จากผู้ใช้ — ถ้าโปรเจกต์ของคุณมี
+      <code>Console.ReadLine()</code> (เช่นแอป Contoso Pets ใน<a href="ch19.html">บทที่ 19</a>
+      หรือสวนสัตว์เลี้ยงใน<a href="ch31.html">บทที่ 31</a>) ต้องแก้ค่า <code>console</code>
+      ใน <code>launch.json</code> เป็น <code>integratedTerminal</code> หรือ
+      <code>externalTerminal</code> ก่อน ไม่งั้น debug session จะค้างหรือรับค่าไม่ได้
+    </div>
+
+    <p>อีกสถานการณ์ที่ต้องแก้ไฟล์เอง คือเวิร์กスペースมีมากกว่าหนึ่งโปรเจกต์ที่รันได้ — ต้อง
+       สร้าง configuration แยกให้แต่ละแอป พร้อม <code>preLaunchTask</code> ของตัวเองใน
+       <code>tasks.json</code> ตัวอย่างเช่น เวิร์กスペースชื่อ <code>SpecialProjects</code>
+       ที่มีสองแอปคือ <code>Project123</code> และ <code>Project456</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">.vscode/launch.json</span></div>
+      <pre><code class="lang-cs">"configurations": [
+    {
+        "name": "Launch Project123",
+        "type": "coreclr",
+        "request": "launch",
+        "preLaunchTask": "buildProject123",
+        "program": "${workspaceFolder}/Project123/bin/Debug/net10.0/Project123.dll",
+        "cwd": "${workspaceFolder}/Project123",
+        "console": "internalConsole"
+    },
+    {
+        "name": "Launch Project456",
+        "type": "coreclr",
+        "request": "launch",
+        "preLaunchTask": "buildProject456",
+        "program": "${workspaceFolder}/Project456/bin/Debug/net10.0/Project456.dll",
+        "cwd": "${workspaceFolder}/Project456",
+        "console": "internalConsole"
+    }
+]</code></pre>
+    </div>
+
+    <p>เมื่อตั้งค่าครบ dropdown บน Controls panel ของ RUN AND DEBUG view จะให้เลือกได้ว่าจะ
+       debug แอปไหน</p>
+
+    <div class="quiz" data-q="34-4">
+      <p class="q"><span class="num">Check ★</span> ต้องแก้ attribute ไหนใน launch.json ถ้าแอป console ของคุณมี <code>Console.ReadLine()</code> รับ input จากผู้ใช้?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>program</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>preLaunchTask</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>console</code> — เปลี่ยนเป็น integratedTerminal หรือ externalTerminal</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ค่าเริ่มต้น <code>internalConsole</code> (DEBUG
+        CONSOLE) ไม่รองรับ input — ต้องเปลี่ยนเป็น <code>integratedTerminal</code> หรือ
+        <code>externalTerminal</code> เพื่อให้ <code>Console.ReadLine()</code> ทำงานได้ตอน
+        debug</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch34-a"><span>ตั้งและลบ breakpoint ด้วยการคลิกได้</span></label></li>
+      <li><label><input type="checkbox" id="ch34-b"><span>ใช้ Step Over / Step Into / Step Out แยกความต่างกันได้</span></label></li>
+      <li><label><input type="checkbox" id="ch34-c"><span>ตั้ง conditional breakpoint ได้</span></label></li>
+      <li><label><input type="checkbox" id="ch34-d"><span>รู้ว่าต้องแก้ console ใน launch.json ตอนแอปมี Console.ReadLine()</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">34.6 ลงมือ: ติดตามตัวแปรด้วย VARIABLES, WATCH, CALL STACK</h2>
+
+    <p>ลองเขียนโค้ดนี้ทับ <code>Program.cs</code> เดิม เป็นเมธอดคำนวณราคาสินค้าหลังลด แล้ว
+       ตั้งใจ debug หาว่าทำไมราคาสุดท้ายไม่ตรงกับที่คาด:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">decimal price = 250m;
+decimal discountRate = 0.1m;
+
+decimal finalPrice = ApplyDiscount(price, discountRate);
+
+Console.WriteLine($"ราคาสุทธิ: {finalPrice:C}");
+
+decimal ApplyDiscount(decimal original, decimal rate)
+{
+    decimal discount = original * rate;
+    decimal result = original - discount;
+    return result;
+}</code></pre>
+    </div>
+
+    <p>ตั้ง breakpoint บนบรรทัด <code>decimal discount = original * rate;</code> แล้วเริ่ม
+       debug (F5) — เมื่อโปรแกรมหยุดตรง breakpoint:</p>
+
+    <ul>
+      <li>ดูที่ <b>VARIABLES</b> — จะเห็นค่า <code>original</code> และ <code>rate</code> ที่
+          method นี้ได้รับมา</li>
+      <li>เพิ่ม expression <code>original - discount</code> ลงใน <b>WATCH</b> — VS Code จะ
+          คำนวณและแสดงผลให้แบบสด แม้ <code>discount</code> ยังไม่ถูกคำนวณ (ตอนนั้นอาจขึ้น
+          error ชั่วคราว จนกว่าจะ step ผ่านบรรทัดที่กำหนดค่าให้)</li>
+      <li>ดูที่ <b>CALL STACK</b> — จะเห็นว่าตอนนี้กำลังอยู่ใน <code>ApplyDiscount</code>
+          ซึ่งถูกเรียกมาจาก scope หลักของโปรแกรม (แสดงลำดับการเรียกจากบนลงล่าง)</li>
+      <li>กด <b>Step Over</b> ผ่านทั้งสองบรรทัดในเมธอด แล้วสังเกตค่าใน WATCH และ VARIABLES
+          อัปเดตตามจริง</li>
+      <li>กด <b>Step Out</b> เพื่อกลับไปยังจุดที่เรียก <code>ApplyDiscount</code> ทันที</li>
+    </ul>
+
+    <p>เทคนิคนี้เป็นหัวใจของการ debug จริง: ตั้ง breakpoint ใกล้จุดที่สงสัย แล้วใช้ VARIABLES
+       + WATCH + CALL STACK ยืนยันว่าค่าที่ได้ตรงกับที่คาดไว้ทุกขั้นตอนหรือไม่ — พอเจอจุดที่
+       ค่าเริ่ม "ผิดไปจากที่ควรจะเป็น" นั่นแหละคือจุดเกิดบั๊ก</p>
+
+    <!-- ============================================ -->
+    <h2 id="s07">34.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:32%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>กด F5 แล้วโปรแกรมรันจบเลย ไม่หยุดที่ breakpoint</td>
+          <td>เช็คว่าจุดแดงยังอยู่ที่บรรทัดนั้นจริง (ไม่ได้เผลอปิด/ลบ) และเช็คว่ากำลังรันด้วย
+              configuration ที่ตรงกับไฟล์ที่แก้ไข</td>
+        </tr>
+        <tr>
+          <td>Debug session ค้างตอนโปรแกรมควรจะรอรับ input</td>
+          <td><code>console</code> ใน launch.json ยังเป็น <code>internalConsole</code> — เปลี่ยน
+              เป็น <code>integratedTerminal</code> หรือ <code>externalTerminal</code></td>
+        </tr>
+        <tr>
+          <td>ตั้ง conditional breakpoint แล้วไม่เคยหยุดเลย</td>
+          <td>expression อาจพิมพ์ผิด หรือเงื่อนไขไม่เคยเป็นจริงตามข้อมูลจริงที่ป้อนเข้าไป —
+              ลองพิมพ์ expression เดียวกันใน WATCH ดูค่าจริงเทียบกัน</td>
+        </tr>
+        <tr>
+          <td>สับสนระหว่าง Step Over กับ Step Into</td>
+          <td>Step Over = "ข้าม" รายละเอียดข้างในไปเลย (ใช้เมื่อมั่นใจว่า method นั้นไม่มีบั๊ก)
+              · Step Into = "เดินเข้าไปดู" ทีละบรรทัดข้างใน (ใช้เมื่อสงสัย method นั้นเอง)</td>
+        </tr>
+        <tr>
+          <td>แก้โค้ดแล้วกด debug แต่พฤติกรรมเหมือนโค้ดเก่า</td>
+          <td>ลืม build ใหม่ก่อน — เช็คว่า <code>preLaunchTask</code> ตั้งเป็นงาน build จริง
+              หรือสั่ง <code>dotnet build</code> เองก่อน</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">34.8 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Microsoft Learn (Check your knowledge ของแต่ละ unit)</p>
+
+    <div class="quiz" data-q="34-5">
+      <p class="q"><span class="num">1.</span> attribute <code>preLaunchTask</code> ใน launch configuration ใช้ทำอะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ระบุ path ของไฟล์ .dll ที่จะรัน</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>ระบุ task ที่ต้องรันก่อนเริ่ม debug โปรแกรม</span></li>
+        <li class="opt"><span class="k">C</span><span>ระบุชนิดคอนโซลที่ใช้ตอนรันแอป</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> <code>preLaunchTask</code> ชี้ไปยัง task ใน
+        <code>tasks.json</code> (โดยทั่วไปคืองาน build) ที่ต้องรันให้เสร็จก่อน debugger จะ
+        เริ่มทำงาน ส่วน <code>program</code> คือ path ของไฟล์ และ <code>console</code> คือ
+        ชนิดคอนโซล</div>
+    </div>
+
+    <div class="quiz" data-q="34-6">
+      <p class="q"><span class="num">2.</span> วิธีปิดใช้งาน (disable) breakpoint ใน VS Code ทำอย่างไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>คลิกซ้ายที่จุดแดงหนึ่งครั้ง</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>คลิกขวาที่จุดแดง แล้วเลือก Disable Breakpoint</span></li>
+        <li class="opt"><span class="k">C</span><span>เลือก Remove Breakpoint จากเมนู Run</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> คลิกซ้ายที่จุดแดงเป็นการ "ลบ" breakpoint ไม่ใช่ปิด
+        ใช้งาน ส่วน Remove Breakpoint บนเมนู Run ก็คือการลบเช่นกัน — ต้องคลิกขวาแล้วเลือก
+        Disable Breakpoint เท่านั้นถึงจะปิดใช้งานชั่วคราวโดยไม่ลบตำแหน่งทิ้ง</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">34.9 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p><b>Variable state challenge</b> (โจทย์ต้นฉบับจาก Microsoft Learn) — โค้ดต่อไปนี้
+           ตั้งใจจะเปลี่ยนค่า <code>x</code> เป็น 10 ผ่านเมธอด <code>ChangeValue</code> แล้ว
+           พิมพ์ผลออกมา แต่ผลลัพธ์ที่ได้ไม่ตรงกับที่คาด — ใช้ breakpoint และ VARIABLES section
+           หาสาเหตุ (ตั้ง breakpoint ที่บรรทัด <code>int x = 5;</code> แล้ว Step Into เข้าไปใน
+           <code>ChangeValue</code> สังเกตค่า <code>x</code> ตลอดทาง)</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+        <pre><code class="lang-cs">int x = 5;
+
+ChangeValue(x);
+
+Console.WriteLine(x);
+
+void ChangeValue(int value)
+{
+    value = 10;
+}</code></pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>สังเกตดีๆ ว่าค่า <code>x</code> เปลี่ยนไหมตอน execution
+           เข้า-ออกจาก <code>ChangeValue</code> — ทบทวนเรื่อง pass-by-value ที่
+           <a href="ch29.html">บทที่ 29</a></p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ค่า <code>x</code> ไม่เปลี่ยนเลยตลอดการ step เพราะ <code>ChangeValue</code> รับ
+             <b>ค่า (value)</b> ของ <code>x</code> ไปเท่านั้น ไม่ใช่ตัวแปร <code>x</code> ตัวจริง
+             — การแก้ <code>value</code> ข้างในเมธอดจึงไม่กระทบ <code>x</code> ที่เรียกมันมา
+             ถ้าอยากให้ผลลัพธ์เปลี่ยนจริง ต้องให้เมธอดคืนค่ากลับมา แล้วนำไป assign ทับ:</p>
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (แก้แล้ว)</span></div>
+          <pre><code class="lang-cs">int x = 5;
+x = ChangeValue(x);
+Console.WriteLine(x);
+
+int ChangeValue(int value)
+{
+    value = 10;
+    return value;
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียน array ของคะแนนสอบ <code>int[] scores = {55, 82, 90, 61, 77};</code> ตั้ง
+           conditional breakpoint บนบรรทัดที่พิมพ์ผลใน <code>foreach</code> loop ให้หยุด
+           เฉพาะตอนคะแนนมากกว่า 80 เท่านั้น — เขียน expression ที่ต้องใส่ในเงื่อนไข</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ถ้าตัวแปร loop ชื่อ <code>score</code> เงื่อนไขที่ใส่ในกล่อง conditional
+             breakpoint คือ <code>score > 80</code> — debugger จะข้ามค่า 55, 61, 77 ไป และหยุด
+             เฉพาะตอน <code>score</code> เป็น 82 กับ 90 เท่านั้น</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>โปรเจกต์ของคุณมี <code>Console.ReadLine()</code> รับชื่อผู้ใช้ แต่พอกด F5 เพื่อ
+           debug แล้วโปรแกรมไม่ยอมรับการพิมพ์อะไรเลย ค้างอยู่แบบนั้น — ระบุว่าต้องแก้ไฟล์ไหน
+           แก้ attribute อะไร และแก้เป็นค่าอะไร</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ต้องแก้ไฟล์ <code>.vscode/launch.json</code> เปลี่ยน attribute
+             <code>"console"</code> จากค่าเริ่มต้น <code>"internalConsole"</code> เป็น
+             <code>"integratedTerminal"</code> (หรือ <code>"externalTerminal"</code>) เพราะ
+             DEBUG CONSOLE (internalConsole) ไม่รองรับการรับ input จากผู้ใช้</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 34</h2>
+
+    <p>บทนี้พาคุณลงมือใช้เครื่องมือ debug ตัวจริงของ VS Code ครบทุกส่วนสำคัญ: RUN AND DEBUG
+       view (VARIABLES, WATCH, CALL STACK, BREAKPOINTS), Debug toolbar (Pause/Continue, Step
+       Over, Step Into, Step Out, Restart, Stop), การตั้ง/ลบ/ปิดใช้งาน breakpoint, breakpoint
+       แบบมีเงื่อนไขและ logpoint, ไปจนถึงไฟล์ <code>launch.json</code> ที่ควบคุมพฤติกรรมการ
+       debug ทั้งหมด</p>
+
+    <p>ทักษะเหล่านี้คือรากฐานของนักพัฒนาทุกคน — ยิ่งโค้ดซับซ้อนขึ้นเท่าไหร่ debugger ยิ่งช่วย
+       คุณประหยัดเวลาได้มากขึ้นเท่านั้น เทียบกับการเดาหรือแปะ <code>Console.WriteLine("here")</code>
+       ไล่ทีละจุดแบบที่พูดถึงในบทที่แล้ว บทถัดไปคุณจะเอาความรู้เรื่อง exception จากบทที่ 33 มา
+       เขียนเป็นโค้ดจริงด้วย <code>try-catch</code></p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 34</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:32%">รายการ</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td>ตั้ง breakpoint</td><td>คลิกช่องซ้ายของเลขบรรทัด (จุดแดง)</td></tr>
+          <tr><td>Disable breakpoint</td><td>คลิกขวาที่จุดแดง → Disable Breakpoint (จุดเป็นสีเทา)</td></tr>
+          <tr><td>Conditional breakpoint</td><td>คลิกขวา → Add/Edit Breakpoint → ใส่ expression</td></tr>
+          <tr><td>Step Over / Into / Out</td><td>ข้ามทั้งก้อน / เข้าไปดูข้างใน / ออกจาก method ปัจจุบัน</td></tr>
+          <tr><td>VARIABLES / WATCH / CALL STACK</td><td>ดูค่าตัวแปร / เฝ้าดู expression เอง / ดูลำดับการเรียก method</td></tr>
+          <tr><td><code>console</code> ใน launch.json</td><td>ต้องเป็น integratedTerminal/externalTerminal ถ้าแอปมี Console.ReadLine()</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>breakpoint</td><td>จุดพัก</td><td>จุดที่สั่งให้โปรแกรมหยุดชั่วคราวตอน debug</td></tr>
+        <tr><td>conditional breakpoint</td><td>จุดพักแบบมีเงื่อนไข</td><td>หยุดเฉพาะเมื่อ expression ที่กำหนดเป็นจริง</td></tr>
+        <tr><td>hit count</td><td>จำนวนครั้งที่ชน</td><td>หยุดเมื่อ breakpoint ถูกเจอครบจำนวนที่ตั้งไว้</td></tr>
+        <tr><td>logpoint</td><td>จุดบันทึกล็อก</td><td>breakpoint ที่พิมพ์ log แทนการหยุดโปรแกรม</td></tr>
+        <tr><td>step over / into / out</td><td>ข้าม / เข้าไปดู / ออกจาก</td><td>วิธีเดินหน้าโค้ดทีละขั้นระหว่าง debug</td></tr>
+        <tr><td>call stack</td><td>ลำดับการเรียก</td><td>ลำดับ method ที่เรียกต่อกันมาจนถึงจุดปัจจุบัน</td></tr>
+        <tr><td>watch expression</td><td>นิพจน์ที่เฝ้าดู</td><td>ตัวแปร/expression ที่ตั้งให้ debugger แสดงค่าสดตลอด</td></tr>
+        <tr><td>launch configuration</td><td>ค่าตั้งต้นการรัน</td><td>ชุดคำสั่งใน launch.json ที่บอก debugger ว่าจะรันอะไรและอย่างไร</td></tr>
+        <tr><td>DEBUG CONSOLE</td><td>คอนโซลดีบัก</td><td>แผงแสดงผล/รับข้อความของ debugger — ไม่รองรับ input จากผู้ใช้</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch33.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 33 · ทบทวนหลักการ Debug และ Exception</span></a>
+      <a class="next" href="ch35.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 35 · จัดการ Exception ด้วย try-catch</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

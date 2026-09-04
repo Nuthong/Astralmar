@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 3 · String Formatting — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="3">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 1 · Write Your First Code / บทที่ 3</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 1 · โมดูล 3/7</span>
+      <h1>จัดรูปแบบสตริงขั้นพื้นฐาน</h1>
+      <div class="en">Perform Basic String Formatting in C#</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>55–75 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>ต่อข้อความ + จัดรูปแบบ + ใส่ Unicode ได้</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>สร้างสตริงที่มี tab, ขึ้นบรรทัดใหม่ และอักขระพิเศษอื่นๆ ได้</li>
+        <li>สร้างสตริงที่มีอักขระ Unicode (ภาษาอื่นๆ เช่น ญี่ปุ่น รัสเซีย) ได้</li>
+        <li>รวมสตริงเป็นค่าใหม่ด้วยเทคนิค <b>concatenation</b> (เครื่องหมาย +)</li>
+        <li>รวมสตริงเป็นค่าใหม่ด้วยเทคนิค <b>interpolation</b> (เครื่องหมาย $)</li>
+      </ul>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ความรู้ที่ต้องมีมาก่อน</span>
+      ใช้ <code>Console.WriteLine()</code>/<code>Console.Write()</code> เป็น และเข้าใจเรื่อง
+      ตัวแปรจาก <a href="ch02.html">บทที่ 2</a> แล้ว
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">3.1 ทำไมต้องจัดรูปแบบสตริง</h2>
+
+    <p>ในฐานะนักพัฒนา คุณจะต้องเขียนโค้ด C# เพื่อรวมและจัดรูปแบบข้อมูลทั้งแบบ literal และตัวแปร
+       ให้กลายเป็นค่าใหม่ ค่านั้นอาจถูกแสดงผล บันทึกลงไฟล์ หรือส่งผ่านเครือข่าย โชคดีที่ C#
+       มีวิธีรวมและจัดรูปแบบข้อมูลให้เลือกหลายแบบ</p>
+
+    <p>สมมติคุณอยากแสดงผลลัพธ์ของแอปพลิเคชันแบบ command-line ที่กำลังเขียนอยู่ โดยต้องแสดงทั้ง
+       ข้อความ literal ข้อความในตัวแปร ข้อมูลตัวเลข และข้อความภาษาอื่นๆ จะจัดรูปแบบให้ผู้ใช้เข้าใจ
+       ได้ถูกต้องยังไง?</p>
+
+    <p>ในบทนี้ คุณจะใช้ <b>character escape sequence</b> จัดรูปแบบสตริงให้มีอักขระพิเศษ เช่น tab
+       และการขึ้นบรรทัดใหม่ — รวมถึงอักขระจากภาษาอื่นอย่างคันจิหรือซีริลลิก! คุณจะได้เรียนวิธี
+       <b>concatenate</b> (ต่อ) สตริงสองอันเข้าด้วยกัน และใช้ <b>string interpolation</b> สร้าง
+       เทมเพลตสตริงที่มีส่วนที่แทนที่ได้</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">3.2 ลงมือ: Escape Sequence, Verbatim String และ Unicode</h2>
+
+    <p>สมมติสถานการณ์: หัวหน้าให้คุณทำ mockup เครื่องมือ command-line สำหรับออกใบแจ้งหนี้
+       ทั้งภาษาอังกฤษและญี่ปุ่น ยังไม่ต้องสร้างฟังก์ชันจริง แค่ทำหน้าตา command-line ให้ทีมบิลลิ่ง
+       ดูอนุมัติก่อน</p>
+
+    <h3 id="s02a">Character Escape Sequence คืออะไร</h3>
+    <p><b>escape character sequence</b> คือคำสั่งบอก runtime ให้แทรกอักขระพิเศษที่มีผลต่อผลลัพธ์
+       ของสตริง ใน C# escape sequence เริ่มด้วย backslash <code>\</code> ตามด้วยอักขระที่ต้องการ
+       escape เช่น <code>\n</code> เพิ่มบรรทัดใหม่ และ <code>\t</code> เพิ่ม tab</p>
+
+    <svg viewBox="0 0 720 150" role="img" aria-label="Escape sequence ที่ใช้บ่อย" style="margin:18px 0">
+      <g font-family="var(--font-th)">
+        <rect x="4"   y="10" width="140" height="128" rx="11" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text x="74" y="34" text-anchor="middle" font-family="var(--font-code)" font-size="16" font-weight="700" fill="var(--ok)">\n</text>
+        <text x="74" y="58" text-anchor="middle" font-size="11.5" fill="var(--text)">new line</text>
+        <text x="74" y="80" text-anchor="middle" font-size="11.5" fill="var(--text-soft)">ขึ้นบรรทัดใหม่</text>
+
+        <rect x="152" y="10" width="140" height="128" rx="11" fill="var(--info-soft)" stroke="var(--info)"/>
+        <text x="222" y="34" text-anchor="middle" font-family="var(--font-code)" font-size="16" font-weight="700" fill="var(--info)">\t</text>
+        <text x="222" y="58" text-anchor="middle" font-size="11.5" fill="var(--text)">tab</text>
+        <text x="222" y="80" text-anchor="middle" font-size="11.5" fill="var(--text-soft)">เว้นแท็บ</text>
+
+        <rect x="300" y="10" width="140" height="128" rx="11" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="370" y="34" text-anchor="middle" font-family="var(--font-code)" font-size="16" font-weight="700" fill="var(--brand-text)">\"</text>
+        <text x="370" y="58" text-anchor="middle" font-size="11.5" fill="var(--text)">quote</text>
+        <text x="370" y="80" text-anchor="middle" font-size="11.5" fill="var(--text-soft)">เครื่องหมายคำพูดคู่</text>
+
+        <rect x="448" y="10" width="140" height="128" rx="11" fill="var(--warn-soft)" stroke="var(--warn)"/>
+        <text x="518" y="34" text-anchor="middle" font-family="var(--font-code)" font-size="16" font-weight="700" fill="var(--warn)">\\</text>
+        <text x="518" y="58" text-anchor="middle" font-size="11.5" fill="var(--text)">backslash</text>
+        <text x="518" y="80" text-anchor="middle" font-size="11.5" fill="var(--text-soft)">ตัวเอง</text>
+
+        <rect x="576" y="10" width="140" height="128" rx="11" fill="var(--tip-soft)" stroke="var(--tip)"/>
+        <text x="646" y="34" text-anchor="middle" font-family="var(--font-code)" font-size="14" font-weight="700" fill="var(--tip)">\uXXXX</text>
+        <text x="646" y="58" text-anchor="middle" font-size="11.5" fill="var(--text)">Unicode</text>
+        <text x="646" y="80" text-anchor="middle" font-size="11.5" fill="var(--text-soft)">อักขระภาษาอื่น</text>
+      </g>
+    </svg>
+
+    <p>โค้ดนี้ใช้ escape sequence เพิ่มบรรทัดใหม่และ tab:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Hello\nWorld!");
+Console.WriteLine("Hello\tWorld!");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Hello
+World!
+Hello	World!</pre></div>
+
+    <h3 id="s02b">Escape เครื่องหมายคำพูดคู่</h3>
+    <p>ถ้าอยากแทรกเครื่องหมายคำพูดคู่ลงในสตริง literal ล่ะ? ถ้าไม่ escape คอมไพเลอร์จะงง
+       เพราะคิดว่าคุณจะปิดสตริงก่อนกำหนด:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">Console.WriteLine("Hello "World"!");</code></pre>
+    </div>
+    <div class="out err auto"><div class="out-bar">Output</div><pre>
+Error summary:
+  CS1003: Syntax error, ',' expected
+  CS0103: The name 'World' does not exist in the current context
+  CS1003: Syntax error, ',' expected</pre></div>
+
+    <p>ใช้ escape sequence <code>\"</code> แทน:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Hello \"World\"!");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Hello "World"!</pre></div>
+
+    <h3 id="s02c">Escape เครื่องหมาย backslash</h3>
+    <p>แล้วถ้าอยากใช้ backslash เพื่อจุดประสงค์อื่น เช่น แสดง path ของไฟล์ล่ะ?</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">Console.WriteLine("c:\source\repos");</code></pre>
+    </div>
+    <div class="out err auto"><div class="out-bar">Output</div><pre>
+(1,22): error CS1009: Unrecognized escape sequence</pre></div>
+
+    <p>C# สงวน backslash ไว้สำหรับ escape sequence เท่านั้น ปัญหาอยู่ที่ลำดับ <code>\s</code> —
+       ส่วน <code>\r</code> ไม่ error เพราะมันเป็น escape sequence ที่ถูกต้อง (carriage return)
+       แต่ในบริบทนี้เราไม่ได้ต้องการ carriage return แก้ปัญหาด้วยการใช้ <code>\\</code> เพื่อ
+       แสดง backslash ตัวเดียว:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("c:\\source\\repos");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+c:\source\repos</pre></div>
+
+    <h3 id="s02d">สร้าง mockup command-line ด้วย escape sequence</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Generating invoices for customer \"Contoso Corp\" ... \n");
+Console.WriteLine("Invoice: 1021\t\tComplete!");
+Console.WriteLine("Invoice: 1022\t\tComplete!");
+Console.Write("\nOutput Directory:\t");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Generating invoices for customer "Contoso Corp" ...
+
+Invoice: 1021		Complete!
+Invoice: 1022		Complete!
+
+Output Directory:	</pre></div>
+
+    <h3 id="s02e">Verbatim String Literal</h3>
+    <p><b>verbatim string literal</b> จะคงช่องว่างและอักขระทุกตัวไว้ตามที่พิมพ์ โดยไม่ต้อง escape
+       backslash เลย สร้างด้วยการใส่ directive <code>@</code> ไว้หน้าสตริง literal:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine(@"    c:\source\repos    
+        (this is where your code goes)");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+    c:\source\repos    
+        (this is where your code goes)</pre></div>
+
+    <p>สังเกตว่าสตริงนี้ยาวคร่อม 2 บรรทัด และช่องว่างที่เกิดจากคำสั่งนี้ถูกคงไว้ในผลลัพธ์ทุกตัว</p>
+
+    <p>เพิ่มบรรทัดโค้ดนี้ต่อจากของเดิม:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Console.Write(@"c:\invoices");</code></pre>
+    </div>
+    <div class="out auto"><div class="out-bar">Output รวมกับโค้ดก่อนหน้า</div><pre>
+Generating invoices for customer "Contoso Corp" ...
+
+Invoice: 1021		Complete!
+Invoice: 1022		Complete!
+
+Output Directory:	c:\invoices</pre></div>
+
+    <h3 id="s02f">Unicode Escape Character</h3>
+    <p>คุณสามารถเพิ่มอักขระที่เข้ารหัสไว้ในสตริง literal ด้วย escape sequence <code>\u</code>
+       ตามด้วยรหัส 4 ตัวอักษรแทนอักขระใน Unicode (UTF-16):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">// Kon'nichiwa World
+Console.WriteLine("\u3053\u3093\u306B\u3061\u306F World!");</code></pre>
+    </div>
+    <div class="out auto"><div class="out-bar">Output (ถ้าคอนโซลรองรับ Unicode)</div><pre>
+こんにちは World!</pre></div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ข้อควรระวัง</span>
+      คอนโซลบางตัว เช่น Windows Command Prompt แบบเดิม อาจแสดง Unicode บางตัวไม่ได้ และจะแทนที่
+      ด้วยเครื่องหมายคำถาม <code>?</code> แทน อีกอย่างคือตัวอย่างนี้เป็น UTF-16 อักขระบางตัวต้องใช้
+      UTF-32 ซึ่งต้องใช้ escape sequence ต่างออกไป — เรื่อง Unicode เป็นหัวข้อที่ลึกมาก
+      บทนี้แค่แสดงให้เห็นว่าทำอะไรได้บ้างเท่านั้น
+    </div>
+
+    <p>ทำ mockup ให้จบ โดยเพิ่มวลีภาษาญี่ปุ่นที่แปลว่า "วิธีออกใบแจ้งหนี้ภาษาญี่ปุ่น":</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Generating invoices for customer \"Contoso Corp\" ... \n");
+Console.WriteLine("Invoice: 1021\t\tComplete!");
+Console.WriteLine("Invoice: 1022\t\tComplete!");
+Console.Write("\nOutput Directory:\t");
+Console.Write(@"c:\invoices");
+
+// To generate Japanese invoices:
+// Nihon no seikyū-sho o seisei suru ni wa:
+Console.Write("\n\n\u65e5\u672c\u306e\u8acb\u6c42\u66f8\u3092\u751f\u6210\u3059\u308b\u306b\u306f\uff1a\n\t");
+// User command to run an application
+Console.WriteLine(@"c:\invoices\app.exe -j");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Generating invoices for customer "Contoso Corp" ...
+
+Invoice: 1021		Complete!
+Invoice: 1022		Complete!
+
+Output Directory:	c:\invoices
+
+日本の請求書を生成するには：
+	c:\invoices\app.exe -j</pre></div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch3-a"><span>ทดลอง \n และ \t จนเห็นผลต่างชัดเจน</span></label></li>
+      <li><label><input type="checkbox" id="ch3-b"><span>เจอ error จากลืม escape เครื่องหมายคำพูดด้วยตัวเอง</span></label></li>
+      <li><label><input type="checkbox" id="ch3-c"><span>แก้ path ให้ใช้ได้ทั้งแบบ \\ และแบบ @"..."</span></label></li>
+      <li><label><input type="checkbox" id="ch3-d"><span>ลองพิมพ์ข้อความ Unicode ภาษาญี่ปุ่นด้วย \u</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">3.3 ลงมือ: ต่อสตริงด้วย Concatenation</h2>
+
+    <p>บ่อยครั้งคุณต้องรวมข้อมูลจากหลายแหล่ง ทั้งสตริง literal และตัวแปรที่มีทั้งข้อความและตัวเลข
+       ในหัวข้อนี้ คุณจะใช้ <b>string concatenation</b> รวมสองค่าขึ้นไปเป็นสตริงใหม่</p>
+
+    <h3 id="s03a">String Concatenation คืออะไร</h3>
+    <p>"Concatenation" เป็นศัพท์เฉพาะของโปรแกรมเมอร์ หมายถึงการรวมค่า <code>string</code>
+       สองค่าขึ้นไปให้กลายเป็นค่า <code>string</code> ใหม่ ต่างจากการบวกเลข ค่าที่สองจะถูกต่อท้าย
+       ค่าแรกไปเรื่อยๆ</p>
+
+    <p>การต่อสตริงใช้ <b>string concatenation operator</b> คือเครื่องหมายบวก <code>+</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string firstName = "Bob";
+string message = "Hello " + firstName;
+Console.WriteLine(message);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Hello Bob</pre></div>
+
+    <p>สังเกตลำดับ — สตริงแรก <code>"Hello "</code> อยู่ก่อนในสตริงใหม่ และค่าในตัวแปร
+       <code>firstName</code> ถูกต่อท้ายเข้าไป</p>
+
+    <h3 id="s03b">ต่อหลายตัวแปรและสตริง literal พร้อมกัน</h3>
+    <p>ทำการต่อสตริงหลายครั้งในบรรทัดเดียวได้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string firstName = "Bob";
+string greeting = "Hello";
+string message = greeting + " " + firstName + "!";
+Console.WriteLine(message);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Hello Bob!</pre></div>
+
+    <h3 id="s03c">เลี่ยงตัวแปรกลาง</h3>
+    <p>ในขั้นตอนก่อนหน้า คุณใช้ตัวแปรเสริมเก็บสตริงใหม่ที่ได้จากการต่อ นอกจากมีเหตุผลจำเป็นจริงๆ
+       คุณควรเลี่ยงตัวแปรกลางแบบนี้ และทำการต่อสตริงตรงจุดที่ต้องใช้เลย:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string firstName = "Bob";
+string greeting = "Hello";
+Console.WriteLine(greeting + " " + firstName + "!");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Hello Bob!</pre></div>
+
+    <div class="note tip">
+      <span class="lbl">💡 หลักการ</span>
+      ตัวแปรกลาง (intermediate variable) ไม่ผิด แต่ถ้าไม่ได้ช่วยให้โค้ดอ่านง่ายขึ้นจริงๆ
+      ก็ไม่จำเป็นต้องมี — ยิ่งโค้ดสั้นและตรงประเด็น ยิ่งดูแลรักษาง่าย
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s04">3.4 ลงมือ: ต่อสตริงด้วย Interpolation</h2>
+
+    <p>Concatenation ง่ายและสะดวก แต่ <b>string interpolation</b> กำลังได้รับความนิยมมากขึ้นเรื่อยๆ
+       โดยเฉพาะเมื่อต้องรวมสตริง literal และตัวแปรจำนวนมากเข้าเป็นข้อความเดียว</p>
+
+    <h3 id="s04a">String Interpolation คืออะไร</h3>
+    <p>String interpolation รวมหลายค่าเป็นสตริง literal เดียว โดยใช้ "เทมเพลต" และ
+       <b>interpolation expression</b> ตั้งแต่ 1 ชุดขึ้นไป — interpolation expression คือ
+       ปีกกาเปิด-ปิด <code>{ }</code> ข้างในใส่ expression C# อะไรก็ได้ที่คืนค่าออกมา
+       สตริง literal จะกลายเป็นเทมเพลตเมื่อมี <code>$</code> นำหน้า</p>
+
+    <p>แทนที่จะเขียนแบบนี้:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">string message = greeting + " " + firstName + "!";</code></pre>
+    </div>
+    <p>เขียนแบบนี้กระชับกว่า:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">string message = $"{greeting} {firstName}!";</code></pre>
+    </div>
+
+    <p>ในตัวอย่างง่ายๆ นี้ ประหยัดไปไม่กี่ตัวอักษร แต่ลองนึกภาพเวลามีการรวมค่าที่ซับซ้อนกว่านี้
+       string interpolation จะกระชับกว่ามาก และหลายคนมองว่าไวยากรณ์นี้อ่านง่ายกว่าด้วย</p>
+
+    <h3 id="s04b">ใช้ Interpolation รวมสตริงกับตัวแปร</h3>
+    <p>สร้างสตริง literal แล้วเติม <code>$</code> นำหน้า ข้างในสตริงต้องมีปีกกา <code>{}</code>
+       อย่างน้อย 1 ชุด ข้างในปีกกาใส่ชื่อตัวแปร:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string firstName = "Bob";
+string message = $"Hello {firstName}!";
+Console.WriteLine(message);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Hello Bob!</pre></div>
+
+    <h3 id="s04c">Interpolation กับหลายตัวแปร</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int version = 11;
+string updateText = "Update to Windows";
+string message = $"{updateText} {version}";
+Console.WriteLine(message);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Update to Windows 11</pre></div>
+
+    <p>เลี่ยงตัวแปรกลางได้เหมือนกับ concatenation:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int version = 11;
+string updateText = "Update to Windows";
+Console.WriteLine($"{updateText} {version}!");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Update to Windows 11!</pre></div>
+
+    <h3 id="s04d">ผสม Verbatim กับ Interpolation</h3>
+    <p>ถ้าอยากใช้ verbatim literal ในเทมเพลตของคุณ ใช้ทั้งสัญลักษณ์ <code>@</code> และ
+       <code>$</code> พร้อมกันได้เลย:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string projectName = "First-Project";
+Console.WriteLine($@"C:\Output\{projectName}\Data");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+C:\Output\First-Project\Data</pre></div>
+
+    <p><code>$</code> ทำให้อ้างอิงตัวแปร <code>projectName</code> ในปีกกาได้ ส่วน <code>@</code>
+       ทำให้ใช้ <code>\</code> โดยไม่ต้อง escape</p>
+
+    <svg viewBox="0 0 720 220" role="img" aria-label="เปรียบเทียบ concatenation กับ interpolation ที่ให้ผลลัพธ์เดียวกัน" style="margin:18px 0">
+      <defs>
+        <marker id="ar3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="var(--text-faint)"/>
+        </marker>
+      </defs>
+      <g font-family="var(--font-th)" font-size="12.5">
+        <rect x="16"  y="16" width="330" height="88" rx="11" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="181" y="40" text-anchor="middle" font-weight="700" fill="var(--brand-text)">String Concatenation ( + )</text>
+        <text x="181" y="68" text-anchor="middle" font-family="var(--font-code)" font-size="12" fill="var(--text)">greeting + " " + firstName + "!"</text>
+        <text x="181" y="90" text-anchor="middle" fill="var(--text-soft)">ต่อทีละชิ้นด้วยเครื่องหมาย +</text>
+
+        <rect x="374" y="16" width="330" height="88" rx="11" fill="var(--tip-soft)" stroke="var(--tip)"/>
+        <text x="539" y="40" text-anchor="middle" font-weight="700" fill="var(--tip)">String Interpolation ( $ )</text>
+        <text x="539" y="68" text-anchor="middle" font-family="var(--font-code)" font-size="12" fill="var(--text)">$"{greeting} {firstName}!"</text>
+        <text x="539" y="90" text-anchor="middle" fill="var(--text-soft)">ใส่ตัวแปรในเทมเพลตด้วย { }</text>
+
+        <line x1="181" y1="104" x2="330" y2="150" stroke="var(--text-faint)" stroke-width="1.6" marker-end="url(#ar3)"/>
+        <line x1="539" y1="104" x2="390" y2="150" stroke="var(--text-faint)" stroke-width="1.6" marker-end="url(#ar3)"/>
+
+        <rect x="185" y="150" width="350" height="56" rx="11" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text x="360" y="172" text-anchor="middle" font-weight="700" fill="var(--ok)">ผลลัพธ์เดียวกันเป๊ะ</text>
+        <text x="360" y="194" text-anchor="middle" font-family="var(--font-code)" font-size="13" fill="var(--ok)">Hello Bob!</text>
+      </g>
+    </svg>
+
+    <!-- ============================================ -->
+    <h2 id="s05">3.5 ท้าทาย: ข้อความสองภาษา</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl h">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>เริ่มจากโค้ด 2 บรรทัดนี้ (ห้ามแก้ไข 2 บรรทัดนี้ แต่เพิ่มโค้ดก่อน/หลังได้):</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs — บังคับใช้</span></div>
+        <pre><code class="lang-cs">string projectName = "ACME";
+
+string russianMessage = "\u041f\u043e\u0441\u043c\u043e\u0442\u0440\u0435\u0442\u044c \u0440\u0443\u0441\u0441\u043a\u0438\u0439 \u0432\u044b\u0432\u043e\u0434";</code></pre></div>
+        <p>ตัวแปร <code>projectName</code> ต้องถูกใช้ 2 ครั้งในผลลัพธ์ ตัวแปร <code>russianMessage</code>
+           เก็บข้อความ "View Russian output" ภาษารัสเซีย ต้องใช้ตัวแปรนี้ในโค้ดที่พิมพ์ข้อความด้วย</p>
+        <p><b>กฎ:</b> ใช้ <code>Console.WriteLine()</code> หรือ <code>Console.Write()</code>
+           ได้แค่ <b>2 ครั้งเท่านั้น</b> — ถ้าต้องขึ้นบรรทัดใหม่หรือจัดรูปแบบเพิ่ม ต้องใช้เทคนิคที่
+           เรียนในบทนี้ (escape sequence, verbatim, interpolation) จัดการเอง</p>
+        <div class="out auto"><div class="out-bar">ผลลัพธ์ที่ต้องได้</div><pre>
+View English output:
+  c:\Exercise\ACME\data.txt
+
+Посмотреть русский вывод:
+  c:\Exercise\ACME\ru-RU\data.txt
+</pre></div>
+        <p>สังเกตการขึ้นบรรทัดใหม่ ระยะเว้น และวิธีใช้โค้ด 2 บรรทัดที่บังคับให้ใช้ด้วย</p>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p><b>คำใบ้ 1:</b> รวม <code>$</code> (interpolation) กับ <code>@</code> (verbatim)
+             เข้าด้วยกันเป็น <code>$@"..."</code> จะช่วยเรื่อง path ที่มี <code>\</code> ได้มาก</p>
+          <p><b>คำใบ้ 2:</b> ใช้ <code>\n</code> และ <code>\t</code> ภายในสตริง interpolation
+             เพื่อจัดบรรทัดใหม่และย่อหน้า โดยไม่ต้องเรียก WriteLine เพิ่ม</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">3.6 เฉลยและวิเคราะห์</h2>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เฉลยตัวอย่าง</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string projectName = "ACME";
+string englishLocation = $@"c:\Exercise\{projectName}\data.txt";
+Console.WriteLine($"View English output:\n\t{englishLocation}\n");
+
+string russianMessage = "\u041f\u043e\u0441\u043c\u043e\u0442\u0440\u0435\u0442\u044c \u0440\u0443\u0441\u0441\u043a\u0438\u0439 \u0432\u044b\u0432\u043e\u0434";
+string russianLocation = $@"c:\Exercise\{projectName}\ru-RU\data.txt";
+Console.WriteLine($"{russianMessage}:\n\t{russianLocation}\n");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+View English output:
+	c:\Exercise\ACME\data.txt
+
+Посмотреть русский вывод:
+	c:\Exercise\ACME\ru-RU\data.txt
+</pre></div>
+
+    <p>นี่เป็น<i>เพียงหนึ่ง</i>ในหลายวิธีที่แก้โจทย์นี้ได้ อาจตั้งชื่อตัวแปรต่างไป หรือใช้ escape
+       sequence ต่างไปก็ได้ อาจใช้ <code>Console.Write</code> แทน <code>Console.WriteLine</code>
+       หรือรวมค่าต่างไปก็ได้ ขอแค่ทำตามกฎของโจทย์และได้ผลลัพธ์ตรงตามที่กำหนด</p>
+
+    <p>เทคนิคสำคัญของเฉลยนี้คือ <code>$@"..."</code> — ผสม interpolation กับ verbatim ในตัวเดียว
+       ทำให้ใส่ตัวแปร <code>{projectName}</code> ได้ และใช้ <code>\</code> ใน path ได้โดยไม่ต้อง
+       escape เป็น <code>\\</code></p>
+
+    <!-- ============================================ -->
+    <h2 id="s07">3.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">พิมพ์ผิดแบบนี้</th><th style="width:22%">error</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>"Hello "World"!"</code></td>
+          <td><code>CS1003</code>, <code>CS0103</code></td>
+          <td>ลืม escape เครื่องหมายคำพูดข้างใน คอมไพเลอร์คิดว่าสตริงจบแล้ว ต้องใช้ <code>\"</code></td>
+        </tr>
+        <tr>
+          <td><code>"c:\source\repos"</code></td>
+          <td><code>CS1009</code></td>
+          <td><code>\s</code> ไม่ใช่ escape sequence ที่รู้จัก ต้องใช้ <code>\\</code> หรือเปลี่ยนไปใช้ verbatim <code>@"..."</code></td>
+        </tr>
+        <tr>
+          <td>ข้อความ Unicode ขึ้นเป็น <code>?????</code></td>
+          <td>ไม่ใช่ error แต่แสดงผลผิด</td>
+          <td>คอนโซลที่ใช้ไม่รองรับอักขระ Unicode ชุดนั้น (ไม่ใช่ปัญหาที่โค้ด)</td>
+        </tr>
+        <tr>
+          <td><code>@"My value: {value}"</code> แล้วคาดว่าจะแทนค่า</td>
+          <td>ไม่ error แต่ผลลัพธ์ผิด</td>
+          <td><code>@</code> คือ verbatim ไม่ใช่ interpolation จะไม่แทนค่าตัวแปรให้ ต้องใช้ <code>$</code></td>
+        </tr>
+        <tr>
+          <td><code>directory + "\";</code></td>
+          <td>syntax error</td>
+          <td><code>\"</code> ถูกตีความเป็น escape ทำให้สตริงไม่ปิด ต้องใช้ verbatim <code>@"\"</code> แทน</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">3.8 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment จริงของบทนี้ใน Microsoft Learn</p>
+
+    <div class="quiz" data-q="3-1">
+      <p class="q"><span class="num">1.</span> ควรใช้ escape sequence ใดเพื่อใส่เครื่องหมายคำพูดคู่ลงในสตริง literal ของ C#?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>\q</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>\'</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>\"</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> <code>\"</code> คือ escape sequence สำหรับเครื่องหมาย
+        คำพูดคู่โดยเฉพาะ ข้อ A ไม่ใช่ escape sequence ที่มีอยู่จริง ข้อ B ใช้กับเครื่องหมาย
+        คำพูดเดี่ยว (ซึ่งใน string ปกติไม่จำเป็นต้อง escape อยู่แล้ว)</div>
+    </div>
+
+    <div class="quiz" data-q="3-2">
+      <p class="q"><span class="num">2.</span> โค้ดข้อใดใช้ string interpolation ได้ถูกต้อง (สมมติตัวแปร <code>value</code> เป็น string)?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>Console.WriteLine(@"My value: {value}");</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>Console.WriteLine($"My value: {value}");</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>Console.WriteLine(@"My value: [value]");</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> interpolation ต้องขึ้นต้นด้วย <code>$</code> และใช้ปีกกา
+        <code>{}</code> ข้อ A ใช้ <code>@</code> (verbatim) จึงพิมพ์ <code>{value}</code>
+        ตามตัวอักษร ไม่แทนค่าให้ ข้อ C ทั้งสัญลักษณ์และวงเล็บผิดทั้งคู่</div>
+    </div>
+
+    <div class="quiz" data-q="3-3">
+      <p class="q"><span class="num">3.</span> ฝัง Unicode สำหรับข้อความทักทายภาษาไทยไว้ในสตริง แต่พอรันแล้วเห็นแต่เครื่องหมายคำถาม
+        เป็นไปได้ว่าเกิดจากอะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ลืมใส่ escape sequence \u</span></li>
+        <li class="opt"><span class="k">B</span><span>ใช้รหัส Unicode ผิดตัว</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>คอนโซลของผู้ใช้ไม่รองรับอักขระ Unicode ชุดนั้น</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> คอนโซลบางตัวแสดง Unicode บางชุดไม่ได้ และจะแทนที่ด้วย
+        <code>?</code> โดยอัตโนมัติ — ถ้าลืม <code>\u</code> โค้ดจะ error ตอนคอมไพล์เลย ไม่ใช่
+        แสดงผลเป็น <code>?</code> และถ้าใช้รหัสผิดตัว จะได้อักขระอื่นที่ถูกต้องแต่ไม่ใช่ตัวที่ต้องการ
+        ไม่ใช่เครื่องหมายคำถาม</div>
+    </div>
+
+    <div class="quiz" data-q="3-4">
+      <p class="q"><span class="num">4.</span> โค้ดข้อใดต่อ <code>\</code> เพียงตัวเดียวเข้ากับสตริง <code>directory</code> ได้ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>directory = directory + "\";</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>directory = directory + '\';</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>directory = directory + @"\";</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ในสตริงแบบ verbatim <code>@"\"</code> เครื่องหมาย
+        backslash ไม่ถูกตีความเป็นตัวเริ่ม escape จึงได้ backslash ตัวเดียวตรงๆ ข้อ A ทำให้สตริง
+        ไม่ปิดสมบูรณ์ (syntax error) ข้อ B ใช้เครื่องหมายคำพูดเดี่ยวแบบ char literal ผิดวิธี</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">3.9 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดให้ได้ผลลัพธ์นี้ (2 บรรทัด) ด้วย <code>Console.WriteLine()</code> ครั้งเดียว
+           โดยใช้ <code>\n</code>:</p>
+        <div class="out auto"><pre>
+บรรทัดที่หนึ่ง
+บรรทัดที่สอง</pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Console.WriteLine("บรรทัดที่หนึ่ง\nบรรทัดที่สอง");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดพิมพ์ค่าตัวแปร <code>name</code> และ <code>age</code> ด้วย string interpolation
+           ให้ได้ผลลัพธ์: <code>ฉันชื่อ ปาล์ม อายุ 20 ปี</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string name = "ปาล์ม";
+int age = 20;
+Console.WriteLine($"ฉันชื่อ {name} อายุ {age} ปี");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้ error เพราะลืม escape อะไรบางอย่าง หาให้เจอและแก้ไข:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">Console.WriteLine("เขาพูดว่า "สวัสดี" ครับ");</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ถูก)</span></div>
+          <pre><code class="lang-cs">Console.WriteLine("เขาพูดว่า \"สวัสดี\" ครับ");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดต่อสตริง (concatenation ด้วย <code>+</code>) แสดง path ไฟล์นี้ให้ตรงเป๊ะ
+           โดยห้ามใช้ verbatim <code>@</code> — ต้อง escape เอง:</p>
+        <div class="out auto"><pre>
+ไฟล์อยู่ที่: D:\Photos\2026\summer.jpg</pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>backslash แต่ละตัวต้องเขียนเป็น <code>\\</code></p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string path = "D:\\Photos\\2026\\summer.jpg";
+Console.WriteLine("ไฟล์อยู่ที่: " + path);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดข้อ 4 ใหม่ แต่คราวนี้ใช้ <code>$@"..."</code> (interpolation + verbatim
+           ผสมกัน) แทน ให้ผลลัพธ์เหมือนเดิมทุกตัวอักษร แต่โค้ดต้องสั้นและอ่านง่ายกว่าเดิม</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string path = @"D:\Photos\2026\summer.jpg";
+Console.WriteLine($"ไฟล์อยู่ที่: {path}");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>เขียนโปรแกรมพิมพ์ใบเสร็จสั้นๆ ให้ตรงเป๊ะทุกตัวอักษร (สังเกต tab หลังเครื่องหมาย ":"
+           และบรรทัดว่างก่อนคำว่า "ขอบคุณ") ใช้ตัวแปรอย่างน้อย 2 ตัว (ชื่อร้าน, ยอดรวม)
+           ผสมกับ escape sequence และ interpolation ตามที่เรียนมาทั้งหมด:</p>
+        <div class="out auto"><pre>
+ร้าน:	กาแฟดีดี
+ยอดรวม:	150 บาท
+
+ขอบคุณที่ใช้บริการ "กาแฟดีดี" ครับ</pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ใช้ <code>\t</code> คั่นระหว่างหัวข้อกับค่า และ <code>\n\n</code>
+           สร้างบรรทัดว่างก่อนข้อความสุดท้าย ส่วนชื่อร้านในบรรทัดสุดท้ายต้อง escape ด้วย <code>\"</code></p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string shopName = "กาแฟดีดี";
+int total = 150;
+
+Console.WriteLine($"ร้าน:\t{shopName}\nยอดรวม:\t{total} บาท\n");
+Console.WriteLine($"ขอบคุณที่ใช้บริการ \"{shopName}\" ครับ");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 3</h2>
+
+    <p>เป้าหมายของบทนี้คือให้คุณเขียนโค้ดจัดรูปแบบสตริงที่มีอักขระพิเศษ เช่น เครื่องหมายคำพูดคู่
+       บรรทัดใหม่ tab และช่องว่างอื่นๆ รวมถึงอักขระ Unicode คุณยังได้รวมสตริงด้วยสองเทคนิค
+       ด้วย character escape sequence คุณเพิ่มอักขระพิเศษในสตริง literal ได้ทั้งแบบ escape ตรงๆ
+       หรือแบบ verbatim string คุณเพิ่มอักขระ Unicode จากภาษาอื่นอย่างคันจิญี่ปุ่นและซีริลลิก
+       รัสเซียได้ คุณใช้ string concatenation ง่ายๆ ด้วยเครื่องหมาย <code>+</code> และอัปเกรดไปใช้
+       string interpolation เพื่อรวมค่าเข้ากับเทมเพลต</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 3</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:30%">ไวยากรณ์</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>\n</code></td><td>ขึ้นบรรทัดใหม่</td></tr>
+          <tr><td><code>\t</code></td><td>เว้นแท็บ</td></tr>
+          <tr><td><code>\"</code></td><td>เครื่องหมายคำพูดคู่ในสตริง</td></tr>
+          <tr><td><code>\\</code></td><td>backslash ตัวเดียว</td></tr>
+          <tr><td><code>\uXXXX</code></td><td>อักขระ Unicode (UTF-16) 4 หลัก</td></tr>
+          <tr><td><code>@"..."</code></td><td>verbatim string — ไม่ต้อง escape backslash</td></tr>
+          <tr><td><code>a + b</code></td><td>string concatenation — ต่อสตริง</td></tr>
+          <tr><td><code>$"...{ตัวแปร}..."</code></td><td>string interpolation — แทรกค่าตัวแปรในเทมเพลต</td></tr>
+          <tr><td><code>$@"...\{ตัวแปร}..."</code></td><td>ผสม interpolation + verbatim ในตัวเดียว</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">English</th><th style="width:22%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>escape character sequence</td><td>ลำดับอักขระหลีก</td><td>คำสั่งแทรกอักขระพิเศษในสตริง เริ่มด้วย \</td></tr>
+        <tr><td>verbatim string literal</td><td>สตริงตามตัวอักษร</td><td>สตริงที่คงช่องว่าง/backslash ไว้ตามที่พิมพ์ ใช้ @ นำหน้า</td></tr>
+        <tr><td>Unicode</td><td>ยูนิโค้ด</td><td>มาตรฐานเข้ารหัสอักขระของทุกภาษาทั่วโลก</td></tr>
+        <tr><td>string concatenation</td><td>การต่อสตริง</td><td>รวมสตริงหลายค่าเป็นค่าเดียวด้วย +</td></tr>
+        <tr><td>string interpolation</td><td>การแทรกค่าในสตริง</td><td>รวมค่าตัวแปรเข้าในเทมเพลตด้วย $ และ { }</td></tr>
+        <tr><td>interpolation expression</td><td>นิพจน์แทรกค่า</td><td>โค้ดในปีกกา {} ที่คืนค่ามาแทรกในเทมเพลต</td></tr>
+        <tr><td>intermediate variable</td><td>ตัวแปรกลาง</td><td>ตัวแปรชั่วคราวที่เก็บผลลัพธ์ระหว่างทาง</td></tr>
+        <tr><td>carriage return</td><td>การรีเทิร์นแคร่</td><td>escape sequence \r ย้อนตัวชี้ไปต้นบรรทัด</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch02.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 2 · Store and Retrieve Data</span></a>
+      <a class="next" href="ch04.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 4 · Perform Basic Operations on Numbers</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

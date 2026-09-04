@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 20 · Challenge Project: Contoso Pets — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="20">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 3 · Add Logic to Console Apps / บทที่ 20</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 3 · โมดูล 7/7 · ⚔️ Challenge Project</span>
+      <h1>Challenge Project — Contoso Pets ภาคจบ</h1>
+      <div class="en">Challenge Project - Develop Branching and Looping Structures in C#</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>60–90 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เมนู 3 กับ 4 ของ Contoso Pets ทำงานสมบูรณ์</b></span>
+        <span>🎯 ความยาก <b>สูง (โจทย์เปิด ไม่มีคำแนะนำทีละขั้น)</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ใช้ Visual Studio Code พัฒนา console application ที่ผสม selection กับ iteration statement
+            เข้าด้วยกัน เพื่อ implement logical workflow ตามสเปกที่กำหนด</li>
+        <li>ประเมินเงื่อนไขในแอปของคุณ แล้วตัดสินใจเลือกระหว่าง selection statement ตัวเลือกต่างๆ</li>
+        <li>ประเมินเงื่อนไขในแอปของคุณ แล้วตัดสินใจเลือกระหว่าง iteration statement ตัวเลือกต่างๆ</li>
+        <li>กำหนด scope ของตัวแปรในระดับที่เหมาะสมภายในแอปพลิเคชัน</li>
+      </ul>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ นี่คือ Challenge Project — ไม่มีคำแนะนำทีละขั้นตอน</span>
+      โมดูลต้นฉบับของ Microsoft Learn บอกไว้ตรงๆ ว่า "This module is intended to be a test of your
+      skills; there's little guidance and no step-by-step instructions." — ต่างจาก
+      <a href="ch19.html">บทที่ 19</a> ที่จูงมือทำทีละบรรทัด บทนี้ให้แค่ <b>สเปก</b> กับ
+      <b>ผลลัพธ์ที่ต้องได้</b> แล้วให้คุณออกแบบโค้ดเอง ขอแนะนำให้ลองเขียนเองก่อนเปิดดูเฉลย — เฉลยที่
+      ให้ในบทนี้เป็น<b>คำตอบของผมเอง ไม่ใช่เฉลยทางการจาก Microsoft</b> (เพราะ Microsoft ไม่ได้เผยแพร่
+      เฉลยของ Challenge Project ไว้แบบเปิดเผย) มีหลายวิธีที่แก้โจทย์นี้ได้ถูกต้องเช่นกัน
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">20.1 สถานการณ์และสเปก</h2>
+
+    <p>แอปพลิเคชันมักใช้ selection และ iteration statement ผสมกันเพื่อสร้าง path การทำงานของโค้ด
+       นอกจากนี้ input จากผู้ใช้และการคำนวณต่างๆ ยังส่งผลต่อ flow ของแอปด้วย การสร้าง user
+       interface ที่ implement ตามสเปกที่กำหนดไว้อาจเป็นเรื่องท้าทาย</p>
+
+    <p>สมมติคุณเป็นนักพัฒนาที่กำลังทำงานต่อบนแอป Contoso Pets ที่ใช้หาบ้านใหม่ให้สัตว์จรจัดหรือถูก
+       ทอดทิ้ง งานพัฒนาบางส่วนเสร็จไปแล้ว (จากบทที่ 19) — เมนูหลักของแอปและโค้ดที่ใช้บันทึกข้อมูล
+       สัตว์ตัวใหม่พัฒนาเสร็จแล้ว อย่างไรก็ตาม ข้อมูลบางอย่างไม่ได้มีครบเสมอตอนสัตว์ตัวใหม่ถูกบันทึก
+       เข้าระบบ คุณต้องพัฒนาฟีเจอร์ที่ทำให้มั่นใจว่าชุดข้อมูลของสัตว์แต่ละตัวในความดูแลสมบูรณ์
+       ครบถ้วน</p>
+
+    <p>ในบทนี้ คุณจะพัฒนาฟีเจอร์ต่อไปนี้ของแอป Contoso Pets:</p>
+    <ul>
+      <li>ฟีเจอร์ที่ทำให้มั่นใจว่าอายุและคำอธิบายทางกายภาพของสัตว์สมบูรณ์ครบถ้วน (<b>เมนู 3</b>)</li>
+      <li>ฟีเจอร์ที่ทำให้มั่นใจว่าชื่อเล่นและคำอธิบายนิสัยของสัตว์สมบูรณ์ครบถ้วน (<b>เมนู 4</b>)</li>
+    </ul>
+
+    <p>จบบทนี้ แอป Contoso Pets ของคุณจะรับประกันว่าทุก element ใน array <code>ourAnimals</code>
+       สมบูรณ์ครบถ้วน</p>
+
+    <h3 id="s01a">สเปกของเมนู 3 — ตรวจอายุและลักษณะทางกายภาพ</h3>
+    <p>ฟีเจอร์นี้ต้อง:</p>
+    <ul>
+      <li>ทำงานอยู่ใน code branch ที่ถูกต้อง (<b>ห้ามเขียนทับ</b>โค้ดใน code branch ของเมนู 2)</li>
+      <li>ข้ามสัตว์ตัวใดๆ ใน <code>ourAnimals</code> ที่ยังมีค่า pet ID เป็นค่า default</li>
+      <li>แสดงค่า pet ID และถามผู้ใช้ให้กรอกค่าอัปเดต ถ้าข้อมูลใน <code>ourAnimals</code> ขาดหายหรือ
+          ไม่สมบูรณ์</li>
+      <li>รับประกันว่า <code>animalAge</code> ของสัตว์ทุกตัวที่มีข้อมูลแล้วเป็นค่าตัวเลขที่ถูกต้อง</li>
+      <li>รับประกันว่า <code>animalPhysicalDescription</code> ของสัตว์ทุกตัวที่มีข้อมูลแล้วเป็น
+          string ที่ถูกต้อง</li>
+      <li>กฎตรวจสอบของ <code>animalAge</code>: ต้องแปลงเป็นชนิดตัวเลขได้</li>
+      <li>กฎตรวจสอบของ <code>animalPhysicalDescription</code>: ห้ามเป็น null, ห้ามมีความยาวศูนย์
+          ตัวอักษร (ข้อจำกัดเพิ่มเติมแล้วแต่ผู้พัฒนา)</li>
+      <li>แจ้งผู้ใช้เมื่อข้อมูลครบตามที่กำหนดทุกอย่างแล้ว พร้อมหยุดแอปไว้ให้เห็นข้อความนั้น</li>
+    </ul>
+
+    <h3 id="s01b">สเปกของเมนู 4 — ตรวจชื่อเล่นและนิสัย</h3>
+    <p>ฟีเจอร์นี้ต้อง:</p>
+    <ul>
+      <li>ทำงานอยู่ใน code branch ที่ถูกต้อง (ห้ามเขียนทับโค้ดของเมนู 2)</li>
+      <li>ข้ามสัตว์ตัวใดๆ ที่ยังมีค่า pet ID เป็นค่า default</li>
+      <li>แสดงค่า pet ID และถามผู้ใช้ให้กรอกค่าอัปเดต ถ้าข้อมูลขาดหายหรือไม่สมบูรณ์</li>
+      <li>รับประกันว่า <code>animalNickname</code> ของสัตว์ทุกตัวที่มีข้อมูลแล้วเป็น string ที่
+          ถูกต้อง</li>
+      <li>รับประกันว่า <code>animalPersonalityDescription</code> ของสัตว์ทุกตัวที่มีข้อมูลแล้วเป็น
+          string ที่ถูกต้อง</li>
+      <li>กฎตรวจสอบ: ห้ามเป็น null, ห้ามมีความยาวศูนย์ตัวอักษร (ข้อจำกัดเพิ่มเติมแล้วแต่ผู้พัฒนา)</li>
+      <li>แจ้งผู้ใช้เมื่อข้อมูลครบตามที่กำหนดทุกอย่างแล้ว พร้อมหยุดแอปไว้ให้เห็นข้อความนั้น</li>
+    </ul>
+
+    <div class="note tip">
+      <span class="lbl">💡 ก่อนดูเฉลย ลองเองก่อน!</span>
+      หยิบ Program.cs จาก<a href="ch19.html#s07">บทที่ 19 หัวข้อ 19.7</a> มาต่อยอด แล้วลองเติมโค้ด
+      ให้ <code>case "3":</code> และ <code>case "4":</code> เองตามสเปกข้างบน — ให้เวลาตัวเอง 20-30
+      นาทีต่อเมนู ก่อนเลื่อนไปดูเฉลยในหัวข้อถัดไป การลองผิดลองถูกด้วยตัวเองคือส่วนสำคัญที่สุดของ
+      Challenge Project แบบนี้
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch20-a"><span>อ่านและเข้าใจสเปกของเมนู 3 และเมนู 4 ครบถ้วน</span></label></li>
+      <li><label><input type="checkbox" id="ch20-b"><span>ลองออกแบบและเขียนโค้ดเมนู 3 ด้วยตัวเองก่อนดูเฉลย</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s02">20.2 🔓 เฉลยของผม — เมนู 3 (อายุ + ลักษณะทางกายภาพ)</h2>
+
+    <p>แนวคิดหลัก: วนผ่านสัตว์ทุกตัวใน <code>ourAnimals</code> ด้วย <code>for</code> (เหมือนที่ทำใน
+       <a href="ch19.html#s04">บทที่ 19 หัวข้อ 19.4</a>) ข้ามตัวที่ยังไม่มีข้อมูล แล้วสำหรับสัตว์
+       แต่ละตัวที่เหลือ เช็คว่าฟิลด์ <code>Age</code> ยังเป็นเครื่องหมาย <code>"?"</code> (ค่า
+       default ที่บอกว่า "ยังไม่รู้อายุ" จาก <a href="ch19.html#s06">หัวข้อ 19.6b</a>) หรือฟิลด์
+       <code>Physical description</code> ยังว่างเปล่าอยู่หรือไม่ ถ้าใช่ ก็วน <code>do-while</code>
+       ถามผู้ใช้จนกว่าจะได้ค่าที่ถูกต้อง — แพทเทิร์นเดียวกับที่ใช้ตอนกรอกข้อมูลสัตว์ตัวใหม่ในเมนู 2
+       เป๊ะ แค่เปลี่ยนจาก "กรอกใหม่ทั้งหมด" เป็น "เติมเฉพาะช่องที่ขาด"</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ใน case "3":)</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">case "3":
+    // Ensure animal ages and physical descriptions are complete
+    for (int i = 0; i < maxPets; i++)
+    {
+        if (ourAnimals[i, 0] == "ID #: ")
+        {
+            continue;
+        }
+
+        string petID = ourAnimals[i, 0];
+
+        // ensure animalAge is a valid numeric value
+        if (ourAnimals[i, 2] == "Age: ?")
+        {
+            bool validAge = false;
+            int petAge = 0;
+            do
+            {
+                Console.WriteLine($"Enter an age for {petID}");
+                readResult = Console.ReadLine();
+                if (readResult != null)
+                {
+                    validAge = int.TryParse(readResult, out petAge);
+                }
+            } while (validAge == false);
+
+            ourAnimals[i, 2] = "Age: " + petAge.ToString();
+        }
+
+        // ensure animalPhysicalDescription is a valid non-empty string
+        if (ourAnimals[i, 4] == "Physical description: ")
+        {
+            string petPhysicalDescription = "";
+            do
+            {
+                Console.WriteLine($"Enter a physical description for {petID} (size, color, breed, gender, weight, housebroken)");
+                readResult = Console.ReadLine();
+                if (readResult != null)
+                {
+                    petPhysicalDescription = readResult;
+                }
+            } while (petPhysicalDescription == "");
+
+            ourAnimals[i, 4] = "Physical description: " + petPhysicalDescription;
+        }
+    }
+
+    Console.WriteLine("Age and physical description fields are complete for all of our friends.");
+    Console.WriteLine("Press the Enter key to continue");
+    readResult = Console.ReadLine();
+    break;</code></pre>
+    </div>
+
+    <div class="out auto"><div class="out-bar">ทดสอบรัน (เลือกเมนู 3 — c4 ยังไม่มีอายุและลักษณะทางกายภาพ)</div><pre>
+Enter an age for ID #: c4
+one
+Enter an age for ID #: c4
+1
+Enter a physical description for ID #: c4 (size, color, breed, gender, weight, housebroken)
+
+Enter a physical description for ID #: c4 (size, color, breed, gender, weight, housebroken)
+small white siamese cat weighing about 8 pounds. litter box trained.
+Age and physical description fields are complete for all of our friends.
+Press the Enter key to continue</pre></div>
+
+    <p>ทดสอบตามสเปก: พิมพ์ <code>"one"</code> (ไม่ใช่ตัวเลข) → ระบบถามซ้ำ (เพราะ
+       <code>int.TryParse()</code> คืน <code>false</code>) พิมพ์ <code>1</code> → ยอมรับ ต่อด้วย
+       กด Enter เฉยๆ (ค่าว่าง) สำหรับลักษณะทางกายภาพ → ระบบถามซ้ำ (เพราะเงื่อนไข
+       <code>petPhysicalDescription == ""</code>) พิมพ์คำอธิบายจริง → ยอมรับและจบด้วยข้อความ
+       ยืนยัน — ตรงกับพฤติกรรมที่สเปกต้องการทุกจุด</p>
+
+    <h3 id="s02a">ทำไมต้องเช็ค "Age: ?" แบบตรงตัว (exact match)</h3>
+    <p>สังเกตว่าเงื่อนไข <code>if (ourAnimals[i, 2] == "Age: ?")</code> ใช้เทียบ string ทั้งก้อน
+       ตรงๆ ไม่ใช่ <code>int.TryParse()</code> กับ <code>ourAnimals[i, 2]</code> ตรงๆ — เพราะค่าที่
+       เก็บจริงในช่องนี้คือ <code>"Age: 2"</code> หรือ <code>"Age: ?"</code> (มี prefix
+       <code>"Age: "</code> ติดมาด้วยเสมอ) ถ้าเอาทั้งก้อนไปเข้า <code>TryParse()</code> ตรงๆ จะ
+       parse ไม่ผ่านเสมอ (เพราะมีตัวอักษร "Age: " ปนอยู่) เราจึงต้องอาศัยรู้ว่า
+       <code>"?"</code> คือ marker เดียวที่แอปนี้ใช้แทน "อายุยังไม่ทราบ" (ทบทวนจาก
+       <a href="ch19.html#s06">บทที่ 19 หัวข้อ 19.6b</a>) แล้วเช็คตรงๆ ว่า string เท่ากับ
+       <code>"Age: ?"</code> พอดีหรือไม่</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ continue กับ for-loop ในบริบทนี้</span>
+      <code>continue;</code> ที่ใช้ในหัวข้อนี้ทำงานเหมือนที่เรียนใน
+      <a href="ch18.html">บทที่ 18</a> ทุกประการ — ข้ามไปที่ iterator ของ <code>for</code> loop
+      (<code>i++</code>) ทันที โดยไม่รันโค้ดที่เหลือใน iteration นั้น เหมาะมากสำหรับ "ข้ามสัตว์ที่
+      ยังไม่มีข้อมูล" เพราะเขียนสั้นกว่าการครอบทุกอย่างที่เหลือด้วย <code>if { }</code> ก้อนใหญ่
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch20-c"><span>implement เมนู 3 สำเร็จ ตรงตามผลลัพธ์ที่สเปกกำหนด</span></label></li>
+      <li><label><input type="checkbox" id="ch20-d"><span>เข้าใจว่าทำไมต้องเช็ค "Age: ?" แบบ exact match แทนการใช้ TryParse ตรงๆ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">20.3 🔓 เฉลยของผม — เมนู 4 (ชื่อเล่น + นิสัย)</h2>
+
+    <p>โครงสร้างเหมือนเมนู 3 ทุกประการ ต่างแค่ 2 ฟิลด์ที่ตรวจ (<code>Nickname</code> กับ
+       <code>Personality</code>) และไม่มีการ validate เป็นตัวเลข — แค่ "ห้ามว่างเปล่า" เท่านั้น</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ใน case "4":)</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">case "4":
+    // Ensure animal nicknames and personality descriptions are complete
+    for (int i = 0; i < maxPets; i++)
+    {
+        if (ourAnimals[i, 0] == "ID #: ")
+        {
+            continue;
+        }
+
+        string petID = ourAnimals[i, 0];
+
+        // ensure animalNickname is a valid non-empty string
+        if (ourAnimals[i, 3] == "Nickname: ")
+        {
+            string petNickname = "";
+            do
+            {
+                Console.WriteLine($"Enter a nickname for {petID}");
+                readResult = Console.ReadLine();
+                if (readResult != null)
+                {
+                    petNickname = readResult;
+                }
+            } while (petNickname == "");
+
+            ourAnimals[i, 3] = "Nickname: " + petNickname;
+        }
+
+        // ensure animalPersonalityDescription is a valid non-empty string
+        if (ourAnimals[i, 5] == "Personality: ")
+        {
+            string petPersonalityDescription = "";
+            do
+            {
+                Console.WriteLine($"Enter a personality description for {petID} (likes or dislikes, tricks, energy level)");
+                readResult = Console.ReadLine();
+                if (readResult != null)
+                {
+                    petPersonalityDescription = readResult;
+                }
+            } while (petPersonalityDescription == "");
+
+            ourAnimals[i, 5] = "Personality: " + petPersonalityDescription;
+        }
+    }
+
+    Console.WriteLine("Nickname and personality description fields are complete for all of our friends.");
+    Console.WriteLine("Press the Enter key to continue");
+    readResult = Console.ReadLine();
+    break;</code></pre>
+    </div>
+
+    <div class="out auto"><div class="out-bar">ทดสอบรัน (เลือกเมนู 4 — c4 ยังไม่มีชื่อเล่นและนิสัย)</div><pre>
+Enter a nickname for ID #: c4
+
+Enter a nickname for ID #: c4
+snowflake
+Enter a personality description for ID #: c4 (likes or dislikes, tricks, energy level)
+
+Enter a personality description for ID #: c4 (likes or dislikes, tricks, energy level)
+loves to curl up in a warm spot
+Nickname and personality description fields are complete for all of our friends.
+Press the Enter key to continue</pre></div>
+
+    <p>สังเกตว่าโค้ดของเมนู 3 กับ 4 <b>ไม่แตะ</b> <code>case "2":</code> เลย — ตรงตามข้อกำหนด
+       "must not overwrite the code in the code branch for menu option 2" ทั้งสองเมนูอ่านและแก้ไข
+       เฉพาะ element ของ <code>ourAnimals</code> ที่มีอยู่แล้วเท่านั้น ไม่ได้เพิ่มแถวใหม่หรือยุ่ง
+       กับ <code>petCount</code> แต่อย่างใด</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 ทำไมสัตว์ตัวอย่าง d1, d2, c3 ไม่โดนถามอะไรเลย</span>
+      ทบทวนข้อมูลตัวอย่างจาก <a href="ch19.html#s03">บทที่ 19 หัวข้อ 19.3a</a>: d1, d2, c3 ถูกสร้าง
+      มาพร้อมอายุ ลักษณะทางกายภาพ นิสัย และชื่อเล่นครบทุกฟิลด์ตั้งแต่แรก มีแค่ c4 ตัวเดียวที่ตั้งใจ
+      เว้นข้อมูลไว้ไม่ครบ (อายุเป็น <code>"?"</code> ที่เหลือเป็นค่าว่าง) — ทั้งเมนู 3 และเมนู 4
+      จึงถามแค่ข้อมูลของ c4 เท่านั้น ตรงตามที่ Microsoft Learn ออกแบบไว้ในชุดข้อมูลตัวอย่าง
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch20-e"><span>implement เมนู 4 สำเร็จ ตรงตามผลลัพธ์ที่สเปกกำหนด</span></label></li>
+      <li><label><input type="checkbox" id="ch20-f"><span>ยืนยันว่าโค้ดเมนู 3-4 ไม่กระทบโค้ดของเมนู 2 เลย</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">20.4 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>เมนู 3 วนถามอายุของสัตว์ที่มีอายุอยู่แล้วด้วย</td>
+          <td>เช็คเงื่อนไขผิด เช่นเผลอใช้ <code>!=</code> แทน <code>==</code> หรือลืม prefix
+              <code>"Age: "</code> ตอนเทียบ string</td>
+        </tr>
+        <tr>
+          <td>เขียนทับโค้ดของเมนู 2 โดยไม่ตั้งใจ</td>
+          <td>วางโค้ดเมนู 3/4 ผิด <code>case</code> — ตรวจให้แน่ใจว่าอยู่ใน <code>case "3":</code>
+              และ <code>case "4":</code> เท่านั้น ไม่ใช่แทรกอยู่กลาง <code>case "2":</code></td>
+        </tr>
+        <tr>
+          <td>สัตว์ตัวใหม่จากเมนู 2 ที่มี "tbd" ไม่ถูกถามซ้ำในเมนู 4 ทั้งที่ยังไม่รู้นิสัยจริง</td>
+          <td>ไม่ใช่บั๊ก — เป็นไปตามสเปก ("ห้ามว่างเปล่า" เท่านั้น) <code>"tbd"</code> ถือว่าเป็น
+              string ที่ถูกต้องแล้ว ถ้าต้องการ validate เข้มกว่านี้ (เช่น ห้ามเป็น "tbd" ด้วย)
+              ต้องเพิ่มเงื่อนไขเอง — สเปกเปิดช่องให้ "Any further restriction is up to the developer"</td>
+        </tr>
+        <tr>
+          <td>infinite loop ตอนถามอายุ ถ้าผู้ใช้กด Enter เฉยๆ โดยไม่พิมพ์อะไร</td>
+          <td>ไม่ใช่บั๊ก — เป็นพฤติกรรมที่ถูกต้อง เพราะ string ว่างแปลงเป็น int ไม่ได้ (TryParse คืน
+              false) loop จึงถามซ้ำไปเรื่อยๆ จนกว่าจะได้ตัวเลขจริง ตรงตามสเปก "must be possible to
+              convert the value entered to numeric data type"</td>
+        </tr>
+        <tr>
+          <td>ทดสอบเมนู 3 ซ้ำสองรอบ (รันแอปใหม่ไม่ได้) แล้วเจอ error</td>
+          <td>อย่าลืมว่า <code>ourAnimals</code> เป็น runtime data ไม่ได้ persist ข้าม session
+              (ตามที่ comment ในโค้ดบอกไว้ตั้งแต่บทที่ 19) — ทุกครั้งที่ <code>dotnet run</code>
+              ใหม่ ข้อมูลจะรีเซ็ตกลับไปเป็นชุดตัวอย่างเดิมเสมอ เป็นเรื่องปกติ</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s05">20.5 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment ของ Microsoft Learn</p>
+
+    <div class="quiz" data-q="20-1">
+      <p class="q"><span class="num">1.</span> นักพัฒนากำลังเขียนแอปใน Visual Studio Code เซฟการ
+        เปลี่ยนแปลงในไฟล์ Program.cs แล้วรันคำสั่ง <code>dotnet build</code> ใน Terminal panel
+        ข้อความ Error และ Warning ที่รายงานกลับมาให้ข้อมูลอะไรบ้าง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>คำแนะนำหนึ่งอย่างหรือมากกว่าว่าจะแก้ปัญหา syntax ที่ตรวจพบได้อย่างไร</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>หมายเลขบรรทัดและข้อมูลว่าอะไรเป็นสาเหตุของ error</span></li>
+        <li class="opt"><span class="k">C</span><span>ลิงก์ไปยังเอกสารช่วยเหลือ (help documentation)</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนจาก <a href="ch19.html#s03">บทที่ 19 หัวข้อ 19.3a</a>:
+        build error บอกหมายเลขบรรทัดและประเภทของปัญหา (เช่น "error CS1002: ; expected") แต่<b>ไม่ได้</b>
+        แนะนำวิธีแก้ให้ตรงๆ และไม่มีลิงก์เอกสารแนบมาด้วย ผู้พัฒนาต้องตีความข้อความเองแล้วไปแก้ไข</div>
+    </div>
+
+    <div class="quiz" data-q="20-2">
+      <p class="q"><span class="num">2.</span> นักพัฒนาต้องสร้าง iteration statement ตัวหนึ่ง
+        ในเงื่อนไขแบบไหนที่ <code>while</code> statement เป็นตัวเลือกที่ดีกว่า <code>do</code>
+        statement?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เมื่อค่าของ expression ที่ iteration statement ประเมิน ยังไม่รู้ล่วงหน้าก่อนเข้า iteration code block</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>เมื่อค่าของ expression ที่ iteration statement ประเมิน รู้อยู่แล้วล่วงหน้าก่อนเข้า iteration code block</span></li>
+        <li class="opt"><span class="k">C</span><span>เมื่อนักพัฒนาสร้าง nested do หรือ while loop</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ตรงกับตัวอย่าง <code>while (anotherPet == "y" && petCount
+        < maxPets)</code> ใน <a href="ch19.html#s05">บทที่ 19 หัวข้อ 19.5c</a> — ตอนนั้นรู้ค่า
+        <code>petCount</code> อยู่แล้วก่อนเข้า loop (จากการนับล่วงหน้า) จึงเลือก <code>while</code>
+        ไม่ใช่ <code>do-while</code> ทบทวนหลักการเลือกเพิ่มเติมได้ที่
+        <a href="ch18.html#s04">บทที่ 18 หัวข้อ 18.4</a></div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">20.6 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ในเฉลยเมนู 3 ทำไมเราไม่ใช้ <code>if (ourAnimals[i, 2] == "Age: ?")</code> กับ
+           <code>else</code> block ที่ทำอะไรบางอย่างเมื่ออายุครบแล้ว? ลองอธิบายด้วยคำพูดตัวเอง</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>เพราะสเปกไม่ได้ต้องการให้ทำอะไรกับสัตว์ที่มีอายุครบแล้ว — แค่ "ข้าม" ไปเฉยๆ ก็พอ การไม่
+             ใช้ <code>else</code> (ปล่อยให้ไม่มีอะไรเกิดขึ้นถ้าเงื่อนไขเป็นเท็จ) คือพฤติกรรม
+             default ของ <code>if</code> อยู่แล้ว ไม่จำเป็นต้องเขียน <code>else { }</code> ว่างๆ
+             เพิ่ม (เพิ่มโค้ดที่ไม่มีประโยชน์ ขัดกับหลัก "ไม่เพิ่มโค้ดเกินจำเป็น")</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เพิ่มกฎ validate ให้เข้มขึ้นในเมนู 3: อายุที่กรอกต้องเป็นค่าระหว่าง 0-30 เท่านั้น (สัตว์
+           อายุติดลบหรือเกิน 30 ปีไม่สมเหตุสมผล) ถ้าไม่อยู่ในช่วงนี้ให้ถามใหม่ พร้อมข้อความแจ้งเตือน</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่แก้)</span></div>
+          <pre><code class="lang-cs">bool validAge = false;
+int petAge = 0;
+do
+{
+    Console.WriteLine($"Enter an age for {petID}");
+    readResult = Console.ReadLine();
+    if (readResult != null)
+    {
+        validAge = int.TryParse(readResult, out petAge);
+        if (validAge && (petAge < 0 || petAge > 30))
+        {
+            Console.WriteLine("Age must be between 0 and 30. Please try again.");
+            validAge = false;
+        }
+    }
+} while (validAge == false);</code></pre></div>
+          <p>ใช้ <code>&&</code> รวมเงื่อนไขว่า parse สำเร็จ<b>และ</b>อยู่นอกช่วงที่ยอมรับได้ ถ้าเข้า
+             เงื่อนไขนี้ ตั้ง <code>validAge = false</code> กลับ เพื่อบังคับให้ loop วนถามใหม่</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>สเปกบอกว่า physical description "ห้าม null" — แต่โค้ดเฉลยของเราดูจะไม่มีทางเป็น null
+           ได้เลยตั้งแต่แรก อธิบายว่าทำไม (คำใบ้: ดูตัวแปร <code>readResult</code> และ
+           <code>petPhysicalDescription</code> อีกที)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p><code>petPhysicalDescription</code> เริ่มต้นด้วยค่า <code>""</code> (ไม่ใช่
+             <code>null</code>) เสมอ และโค้ดใน <code>do</code> loop กำหนดค่าให้มันเฉพาะตอน
+             <code>readResult != null</code> เท่านั้น (ทบทวน nullable string pattern จาก
+             <a href="ch18.html">บทที่ 18</a>) ดังนั้น <code>petPhysicalDescription</code> จึงเป็น
+             <code>string</code> ปกติที่ไม่มีทาง null ได้เลยตลอดทั้งลูป — การเช็ค "ห้าม null"
+             ในสเปกจึงถูกป้องกันไว้แล้วโดยโครงสร้างโค้ด ไม่ต้องเขียนเช็คซ้ำอีกชั้น</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p><b>ท้าทายจริง</b> — implement เมนู 5 "Edit an animal's age" เอง: ให้ผู้ใช้พิมพ์ pet ID
+           ที่ต้องการแก้ (เช่น "d1") แล้วถามอายุใหม่ (ต้องเป็นตัวเลขที่ถูกต้อง) แล้วอัปเดตลง
+           <code>ourAnimals</code> ถ้าไม่เจอ pet ID ที่พิมพ์ ให้แจ้งเตือนแล้วกลับเมนูหลัก</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ใช้ <code>for</code> loop วนหา index ที่ <code>ourAnimals[i, 0]</code>
+           เท่ากับ <code>"ID #: " + ค่าที่ผู้ใช้พิมพ์</code> เก็บ index นั้นไว้ (เริ่มที่ -1 แทน
+           "ยังไม่เจอ") แล้วค่อยถามอายุใหม่ด้วยแพทเทิร์นเดียวกับเมนู 3</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ใน case "5":)</span></div>
+          <pre><code class="lang-cs">case "5":
+    // Edit an animal's age
+    Console.WriteLine("Enter the pet ID of the animal you want to edit (example: d1)");
+    readResult = Console.ReadLine();
+
+    int foundIndex = -1;
+    if (readResult != null)
+    {
+        string searchID = "ID #: " + readResult.ToLower();
+        for (int i = 0; i < maxPets; i++)
+        {
+            if (ourAnimals[i, 0] == searchID)
+            {
+                foundIndex = i;
+            }
+        }
+    }
+
+    if (foundIndex == -1)
+    {
+        Console.WriteLine("Sorry, we couldn't find that pet ID.");
+    }
+    else
+    {
+        bool validAge = false;
+        int newAge = 0;
+        do
+        {
+            Console.WriteLine($"Enter a new age for {ourAnimals[foundIndex, 0]}");
+            readResult = Console.ReadLine();
+            if (readResult != null)
+            {
+                validAge = int.TryParse(readResult, out newAge);
+            }
+        } while (validAge == false);
+
+        ourAnimals[foundIndex, 2] = "Age: " + newAge.ToString();
+        Console.WriteLine("Age updated successfully.");
+    }
+
+    Console.WriteLine("Press the Enter key to continue.");
+    readResult = Console.ReadLine();
+    break;</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>รวมเมนู 3 กับ 4 เข้าเป็น <code>case</code> เดียว (สมมติว่าออกแบบแอปใหม่ให้เป็นเมนู
+           "Complete all missing data" เมนูเดียว) โดยยังคงตรวจครบทั้ง 4 ฟิลด์ (age, physical,
+           nickname, personality) ในการวน loop รอบเดียว</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">for (int i = 0; i < maxPets; i++)
+{
+    if (ourAnimals[i, 0] == "ID #: ")
+    {
+        continue;
+    }
+
+    string petID = ourAnimals[i, 0];
+
+    if (ourAnimals[i, 2] == "Age: ?")
+    {
+        bool validAge = false;
+        int petAge = 0;
+        do
+        {
+            Console.WriteLine($"Enter an age for {petID}");
+            readResult = Console.ReadLine();
+            if (readResult != null) validAge = int.TryParse(readResult, out petAge);
+        } while (validAge == false);
+        ourAnimals[i, 2] = "Age: " + petAge.ToString();
+    }
+
+    if (ourAnimals[i, 4] == "Physical description: ")
+    {
+        string val = "";
+        do
+        {
+            Console.WriteLine($"Enter a physical description for {petID}");
+            readResult = Console.ReadLine();
+            if (readResult != null) val = readResult;
+        } while (val == "");
+        ourAnimals[i, 4] = "Physical description: " + val;
+    }
+
+    if (ourAnimals[i, 3] == "Nickname: ")
+    {
+        string val = "";
+        do
+        {
+            Console.WriteLine($"Enter a nickname for {petID}");
+            readResult = Console.ReadLine();
+            if (readResult != null) val = readResult;
+        } while (val == "");
+        ourAnimals[i, 3] = "Nickname: " + val;
+    }
+
+    if (ourAnimals[i, 5] == "Personality: ")
+    {
+        string val = "";
+        do
+        {
+            Console.WriteLine($"Enter a personality description for {petID}");
+            readResult = Console.ReadLine();
+            if (readResult != null) val = readResult;
+        } while (val == "");
+        ourAnimals[i, 5] = "Personality: " + val;
+    }
+}
+
+Console.WriteLine("All fields are complete for all of our friends.");
+Console.WriteLine("Press the Enter key to continue.");
+readResult = Console.ReadLine();</code></pre></div>
+          <p>สังเกตว่า <code>for</code> loop ชั้นนอกวนแค่รอบเดียวต่อสัตว์หนึ่งตัว แต่ข้างในตรวจครบ
+             ทั้ง 4 ฟิลด์ก่อนขยับไปสัตว์ตัวถัดไป — เป็นการรวม logic จากทั้งเมนู 3 และ 4 เข้าด้วยกัน
+             โดยไม่ต้องวน array ซ้ำสองรอบ (ประหยัดกว่าเรียกทั้งสอง case แยกกัน)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>วิเคราะห์: ถ้าลืมเขียน <code>ourAnimals[i, 2] = "Age: " + petAge.ToString();</code>
+           (บรรทัดบันทึกค่ากลับ) ในเฉลยเมนู 3 จะเกิดอะไรขึ้นถ้าผู้ใช้เลือกเมนู 3 สองครั้งติดกัน?</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ถ้าไม่มีการบันทึกค่ากลับลง <code>ourAnimals</code> ค่าที่ผู้ใช้กรอกจะหายไปทันทีที่
+             <code>case "3":</code> จบ (เพราะ <code>petAge</code> เป็นตัวแปรท้องถิ่นที่ scope
+             อยู่แค่ใน iteration นั้น) พอผู้ใช้เลือกเมนู 3 อีกครั้ง เงื่อนไข
+             <code>ourAnimals[i, 2] == "Age: ?"</code> จะยังเป็นจริงเหมือนเดิม (เพราะค่าจริงใน
+             array ไม่เคยถูกอัปเดต) ระบบจะถามอายุของ c4 <b>ซ้ำไปเรื่อยๆ ทุกครั้ง</b>ที่เลือกเมนู 3
+             ไม่มีวัน "จบสมบูรณ์" ได้จริง — นี่แสดงให้เห็นว่าทำไมการเขียนค่ากลับลง array (ไม่ใช่แค่
+             ตัวแปรชั่วคราว) เป็นขั้นตอนที่ขาดไม่ได้</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">📌 สรุปบทที่ 20</h2>
+
+    <p>เป้าหมายของคุณคือแสดงความสามารถในการพัฒนาฟีเจอร์ของแอปพลิเคชันให้บรรลุตามสเปกที่ออกแบบไว้
+       คุณต้องเลือกและ implement ชนิดของ iteration และ selection statement ที่เหมาะสม เพื่อให้ตรง
+       ตามข้อกำหนดที่ระบุไว้</p>
+
+    <p>ด้วยการสร้าง nested combination ของ iteration และ selection statement คุณสร้าง user
+       interface ที่ให้ผู้ใช้แอปกรอกข้อมูลสัตว์ที่ถูกต้อง เพื่อเติมช่องว่างที่ขาดหายใน array
+       <code>ourAnimals</code> ได้สำเร็จ</p>
+
+    <p>ความสามารถในการ implement ฟีเจอร์ของแอป Contoso Pets จากสเปกการออกแบบ แสดงให้เห็นว่าคุณเข้าใจ
+       iteration และ selection statement อย่างแท้จริงแล้ว</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 20</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">แพทเทิร์น</th><th>ใช้เมื่อ</th></tr></thead>
+        <tbody>
+          <tr><td><code>if (arr[i,0] == default) continue;</code></td><td>ข้าม element ที่ยังไม่มีข้อมูล ใน for loop</td></tr>
+          <tr><td>เช็ค marker แบบ exact string match</td><td>ตรวจว่าฟิลด์ยังเป็นค่า "ยังไม่ทราบ" (เช่น "Age: ?") หรือไม่</td></tr>
+          <tr><td>do-while + TryParse</td><td>validate ว่า input แปลงเป็นตัวเลขได้ก่อนยอมรับ</td></tr>
+          <tr><td>do-while + เช็ค == ""</td><td>validate ว่า input ไม่ว่างเปล่า</td></tr>
+          <tr><td>เขียนค่ากลับลง array เสมอ</td><td>ค่าที่ validate แล้วต้องบันทึกกลับ ไม่งั้นหายเมื่อจบ case</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s08">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>challenge project</td><td>โปรเจกต์ท้าทาย</td><td>โมดูลที่ให้แค่สเปก ไม่มีคำแนะนำทีละขั้นตอน</td></tr>
+        <tr><td>data completeness</td><td>ความสมบูรณ์ของข้อมูล</td><td>สถานะที่ทุกฟิลด์ที่จำเป็นมีค่าแล้ว</td></tr>
+        <tr><td>default value marker</td><td>ตัวบ่งชี้ค่าเริ่มต้น</td><td>ค่าคงที่ที่ใช้แทน "ยังไม่ได้กรอก" เช่น "?" หรือ ""</td></tr>
+        <tr><td>specification</td><td>ข้อกำหนด / สเปก</td><td>รายการเงื่อนไขที่ฟีเจอร์ต้องทำตามให้ครบ</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="trophy">🏆 Trophy — สรุปรวบยอด Part 3</h2>
+    <p>ยินดีด้วย! คุณเรียนจบ <b>Part 3 · Add Logic to Console Apps</b> ครบทั้ง 7 โมดูลแล้ว
+       (Boolean expressions, code blocks/scope, switch-case, for, do-while/while, Guided Project,
+       Challenge Project) ก่อนไปต่อ Part 4 มาทบทวนแนวคิดสำคัญที่สุดของ Part นี้กันอีกรอบ:</p>
+
+    <div class="quiz" data-q="t3-1">
+      <p class="q"><span class="num">Trophy 1</span> ข้อใดเทียบเท่ากับ <code>!(a && b)</code>
+        ตามกฎ De Morgan?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>!a || !b</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>!a && !b</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>a || b</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนจาก <a href="ch14.html">บทที่ 14</a></div>
+    </div>
+
+    <div class="quiz" data-q="t3-2">
+      <p class="q"><span class="num">Trophy 2</span> ตัวแปรที่ประกาศข้างในปีกกาของ if statement
+        เข้าถึงได้จากข้างนอกปีกกานั้นหรือไม่?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ได้ ถ้าประกาศด้วย var</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>ไม่ได้ — ตัวแปรถูก scope อยู่แค่ใน code block นั้น</span></li>
+        <li class="opt"><span class="k">C</span><span>ได้เสมอ ไม่ว่าประกาศแบบไหน</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนจาก <a href="ch15.html">บทที่ 15</a></div>
+    </div>
+
+    <div class="quiz" data-q="t3-3">
+      <p class="q"><span class="num">Trophy 3</span> การไม่ใส่ <code>break;</code> ท้าย switch
+        section ใน C# ทำให้เกิดอะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>fall through ไป section ถัดไปเงียบๆ เหมือน C/Java</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>compile-time error</span></li>
+        <li class="opt"><span class="k">C</span><span>runtime exception</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนจาก <a href="ch16.html">บทที่ 16</a> — จุดต่างสำคัญของ C# จากภาษาตระกูล C อื่นๆ</div>
+    </div>
+
+    <div class="quiz" data-q="t3-4">
+      <p class="q"><span class="num">Trophy 4</span> ต้องการวน array ย้อนกลับ (จากท้ายไปหน้า) ควรใช้
+        iteration statement ตัวไหน?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>foreach</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>for</span></li>
+        <li class="opt"><span class="k">C</span><span>while</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนจาก <a href="ch17.html">บทที่ 17</a></div>
+    </div>
+
+    <div class="quiz" data-q="t3-5">
+      <p class="q"><span class="num">Trophy 5</span> รู้แน่ชัดว่าต้องรัน code block อย่างน้อยหนึ่ง
+        ครั้งเสมอ (เช่น ต้องรับ input ก่อนถึงจะตรวจสอบได้) ควรเลือก iteration statement ตัวไหน?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>while</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>do-while</span></li>
+        <li class="opt"><span class="k">C</span><span>foreach</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนจาก <a href="ch18.html">บทที่ 18</a></div>
+    </div>
+
+    <div class="quiz" data-q="t3-6">
+      <p class="q"><span class="num">Trophy 6</span> ทำไมต้องใช้ nested for แทน foreach ตอนวน
+        multidimensional (rectangular) array?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>foreach ช้ากว่า for เสมอ</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>foreach มองเห็น array เป็นลิสต์แบนๆ ไม่แยกมิติ ส่วน for แยกควบคุมแต่ละมิติได้</span></li>
+        <li class="opt"><span class="k">C</span><span>C# ไม่อนุญาตให้ใช้ foreach กับ array เลย</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนจาก <a href="ch19.html">บทที่ 19</a></div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <div class="pager">
+      <a href="ch19.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 19 · Guided Project — Contoso Pets</span></a>
+      <a class="next" href="ch21.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 21 · Part 4: Choose the Correct Data Type</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

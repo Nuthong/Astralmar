@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 30 · Method ที่คืนค่า Return Value — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="30">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 5 · Create Methods / บทที่ 30</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 5 · โมดูล 3/5</span>
+      <h1>สร้าง Method ที่คืนค่า Return Value</h1>
+      <div class="en">Create C# Methods that Return Values</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>75–95 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เขียน method คืนค่าตัวเลข string bool และ array ได้ครบ</b></span>
+        <span>🎯 ความยาก <b>กลาง–สูง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>เข้าใจ return type</li>
+        <li>เรียนรู้คีย์เวิร์ด return เชิงลึกขึ้น</li>
+        <li>เรียนรู้การรับค่าที่ method คืนกลับมาใช้งานต่อ</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">30.1 ทำไมต้องมี Return Value</h2>
+
+    <p>method ให้ return value ได้หลังทำงานเสร็จ ด้วยการใช้พารามิเตอร์และ return type ร่วมกัน คุณ
+       สร้าง method ที่กระชับ รับ input ทำงาน แล้วให้ output ได้ รูปแบบนี้ทำให้คุณสร้างฟีเจอร์ให้
+       โปรแกรมได้อย่างมีประสิทธิภาพ ในขณะที่ยังรักษาโค้ดให้สะอาดและอ่านง่าย</p>
+
+    <p>สมมติคุณต้องสร้างแอปที่ใช้ method จำนวนมากคำนวณค่าจาก input ต่างๆ คุณต้องการวิธีดึงผลลัพธ์
+       ของการคำนวณมาใช้ต่อทั่วทั้งโปรแกรม คุณทำแบบนี้ได้ด้วยการสร้าง method ที่มี return value</p>
+
+    <p>ลองพิจารณาเกมที่ผู้เล่นต้องต่อสู้กับศัตรู เกมมีโค้ดที่ตัดสินว่าตัวละครโดนโจมตีหรือไม่ทุกครั้งที่
+       method <code>Update()</code> ถูกเรียก โค้ดอาจมี method แบบนี้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง (แค่ signature)</span></div>
+      <pre><code class="lang-cs">void Update();
+
+int[] GetEnemyCoordinates(string enemyId);
+int[] GetDistanceFromHero(string enemyId);
+int[] GetHeroCoordinates();
+
+bool EnemyCanHitHero(string enemyId);
+int GetEnemyDamageOutput(string enemyId);
+void UpdateHeroHP(int damage);</code></pre>
+    </div>
+
+    <p>เมื่อดู method signature เหล่านี้ คุณจะเห็นภาพว่า input และ output ของแต่ละ method ถูกใช้ทั่ว
+       ทั้งโปรแกรมได้ยังไง method เหล่านี้ยังทำให้โค้ดของเกมแข็งแกร่งขึ้น เพราะแต่ละตัวมี return value
+       ที่ใช้กับสถานการณ์ต่างๆ ได้</p>
+
+    <p>การรับค่าที่ method คืนกลับมาเป็นประโยชน์อย่างมากกับแอปพลิเคชันหลากหลายประเภท ในบทนี้ คุณจะ
+       เรียนรู้เกี่ยวกับการทำงานของ method และการทำงานกับ method return type เพิ่มเติม</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">30.2 ลงมือ: ไวยากรณ์ของ Return Type</h2>
+
+    <p>method ไม่ได้แค่ทำการดำเนินการเท่านั้น มันคืนค่าได้ด้วย method คืนค่าได้ด้วยการระบุ return
+       type ใน method signature method คืนค่า data type ไหนก็ได้ หรือไม่คืนอะไรเลยก็ได้ return
+       type ต้องระบุไว้ก่อนชื่อ method เสมอ</p>
+
+    <p>การใช้ <code>void</code> เป็น return type หมายความว่า method แค่ทำการดำเนินการ ไม่คืนค่าเลย
+       ตัวอย่างเช่น:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">syntax</span></div>
+      <pre><code class="lang-cs">void PrintMessage(string message)</code></pre>
+    </div>
+
+    <p>เมื่อใช้ data type (เช่น <code>int</code>, <code>string</code>, <code>bool</code> ฯลฯ) method
+       จะทำการดำเนินการแล้วคืนค่าชนิดที่ระบุไว้เมื่อทำงานเสร็จ ข้างในตัว method คีย์เวิร์ด
+       <code>return</code> ใช้คืนผลลัพธ์ ใน <code>void</code> method คุณใช้คีย์เวิร์ด
+       <code>return</code> จบการทำงานของ method ได้เช่นกัน (ทบทวนจาก <a href="ch28.html">บทที่
+       28</a>)</p>
+
+    <h3 id="s02a">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch30-returns</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <h3 id="s02b">คำนวณราคารวมด้วย Method</h3>
+    <p>ศูนย์การค้า Contoso กำลังจัดเซลใหญ่! สินค้าหลายอย่างลดราคา คุณได้รับรายการราคาสินค้าและส่วนลด
+       ที่สอดคล้องกัน ส่วนลดแสดงเป็นเปอร์เซ็นต์ เช่น 50% = 0.5 ถ้าลูกค้าซื้อมากกว่า $30.00 จะได้ลด
+       $5.00 จากยอดรวม ในขั้นตอนนี้ คุณจะเขียนโค้ดคำนวณยอดรวมของลูกค้า</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">double total = 0;
+double minimumSpend = 30.00;
+
+double[] items = {15.97, 3.50, 12.25, 22.99, 10.98};
+double[] discounts = {0.30, 0.00, 0.10, 0.20, 0.50};
+
+Console.WriteLine($"Total: ${total}");
+
+void GetDiscountedPrice(int itemIndex)
+{
+    // Calculate the discounted price of the item
+}
+
+void TotalMeetsMinimum()
+{
+    // Check if the total meets the minimum
+}
+
+void FormatDecimal(double input)
+{
+    // Format the double so only 2 decimal places are displayed
+}</code></pre>
+    </div>
+
+    <p>ในขั้นตอนนี้ คุณตั้งตัวแปรที่โปรแกรมต้องการ และสร้าง placeholder method (ทบทวนจาก
+       <a href="ch28.html">บทที่ 28</a>) ที่จะใช้ทำงานคำนวณยอดรวม</p>
+
+    <p>เปลี่ยน <code>GetDiscountedPrice</code> ให้คืนค่า <code>double</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">double GetDiscountedPrice(int itemIndex)
+{
+    // Calculate the discounted price of the item
+}</code></pre>
+    </div>
+
+    <div class="out err"><pre>
+error CS0161: 'GetDiscountedPrice(int)': not all code paths return a value</pre></div>
+
+    <p>สังเกตว่าโค้ดนี้ให้ compile error: <code>not all code paths return a value</code> — method
+       ที่มี return type ต้องคืนค่าของ type นั้นเสมอ มาแก้ error นี้กัน</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">double GetDiscountedPrice(int itemIndex)
+{
+    double result = items[itemIndex] * (1 - discounts[itemIndex]);
+    return result;
+}</code></pre>
+    </div>
+
+    <p>ในการคืนค่าจาก method เติมค่าหรือ expression หลังคีย์เวิร์ด <code>return</code> ค่าที่คืนต้อง
+       ตรงกับ data type ที่ระบุไว้ใน method signature ในโค้ดนี้ คุณคำนวณราคาหลังลดของสินค้าที่
+       <code>itemIndex</code> แล้วคืนผลลัพธ์ อย่างไรก็ตาม คีย์เวิร์ด <code>return</code> ไม่ได้จำกัด
+       แค่คืนตัวแปรหรือ literal เท่านั้น มาข้ามตัวแปรแล้วคืน expression โดยตรงกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">double GetDiscountedPrice(int itemIndex)
+{
+    return items[itemIndex] * (1 - discounts[itemIndex]);
+}</code></pre>
+    </div>
+
+    <p>เพราะโค้ด <code>items[itemIndex] * (1 - discounts[itemIndex])</code> ประเมินค่าออกมาเป็น
+       <code>double</code> statement <code>return</code> นี้จึงถูกต้อง</p>
+
+    <p>เปลี่ยน <code>TotalMeetsMinimum</code> ให้คืนค่า <code>bool</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">bool TotalMeetsMinimum()
+{
+    return total >= minimumSpend;
+}</code></pre>
+    </div>
+
+    <p>ในโค้ดนี้ คุณคืนผลลัพธ์ของการเปรียบเทียบที่ประเมินออกมาเป็น <code>bool</code> การคืนค่า
+       expression จาก method เป็นวิธีที่ดีมากในการจัดระเบียบโค้ดและเพิ่มความอ่านง่าย</p>
+
+    <p>เปลี่ยน <code>FormatDecimal</code> ให้คืนค่า <code>string</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string FormatDecimal(double input)
+{
+    return input.ToString().Substring(0, 5);
+}</code></pre>
+    </div>
+
+    <p>สังเกตว่าคุณเรียก method อื่นได้ใน expression ของ <code>return</code> statement — ตอน method
+       นี้ถูกเรียก control การทำงานจะประเมิน <code>input.ToString</code> ก่อน แล้วค่อยประเมินและคืน
+       ค่า substring ความยืดหยุ่นของคีย์เวิร์ด <code>return</code> ทำให้คุณสร้างโค้ดสั้นๆ ที่แน่นด้วย
+       ฟังก์ชันการทำงานได้</p>
+
+    <h3 id="s02c">รับค่าที่ Method คืนกลับมาใช้งาน</h3>
+    <p>ตอนนี้ method ของคุณคืนค่าแล้ว คุณรับค่าเหล่านี้มาใช้ในโค้ดที่เหลือได้ การใช้ผลลัพธ์ที่คืนมา
+       จาก method เป็นวิธีที่ดีมากในการรักษาโค้ดให้มีโครงสร้างและอ่านง่าย</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">for (int i = 0; i < items.Length; i++)
+{
+    total += GetDiscountedPrice(i);
+}
+
+Console.WriteLine($"Total: ${total}");</code></pre>
+    </div>
+
+    <p>ในโค้ดนี้ คุณใช้ <code>for</code> loop หาผลรวมของราคาสินค้าหลังลดราคาทุกชิ้น เพราะ
+       <code>GetDiscountedPrice</code> คืนค่า <code>double</code> คุณใช้ method นี้ initialize
+       หรือดำเนินการกับตัวแปร <code>double</code> อื่นได้เลย ในกรณีนี้ คุณใช้ผลลัพธ์ของ
+       <code>GetDiscountedPrice</code> เพิ่มค่า <code>total</code></p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">if (TotalMeetsMinimum())
+{
+    total -= 5.00;
+}</code></pre>
+    </div>
+
+    <p>เพราะ <code>TotalMeetsMinimum</code> คืนค่า <code>bool</code> คุณเรียก method นี้ข้างใน
+       เงื่อนไข <code>if</code> ได้เลย คุณยังใช้ method นี้ใน ternary expression ได้เหมือนกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">total -= TotalMeetsMinimum() ? 5.00 : 0.00;</code></pre>
+    </div>
+
+    <p>ใช้ <code>FormatDecimal</code> จัดรูปแบบราคาที่แสดงผล:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ฉบับสมบูรณ์)</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">double total = 0;
+double minimumSpend = 30.00;
+
+double[] items = {15.97, 3.50, 12.25, 22.99, 10.98};
+double[] discounts = {0.30, 0.00, 0.10, 0.20, 0.50};
+
+for (int i = 0; i < items.Length; i++)
+{
+    total += GetDiscountedPrice(i);
+}
+
+total -= TotalMeetsMinimum() ? 5.00 : 0.00;
+
+Console.WriteLine($"Total: ${FormatDecimal(total)}");
+
+double GetDiscountedPrice(int itemIndex)
+{
+    return items[itemIndex] * (1 - discounts[itemIndex]);
+}
+
+bool TotalMeetsMinimum()
+{
+    return total >= minimumSpend;
+}
+
+string FormatDecimal(double input)
+{
+    return input.ToString().Substring(0, 5);
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Total: $44.58</pre></div>
+
+    <p>คล้ายกับโค้ดก่อนหน้า <code>FormatDecimal</code> คืนค่า <code>string</code> ดังนั้นคุณเรียก
+       method นี้แทนที่ตัวแปรหรือ literal string ได้เลย ในโค้ดนี้ control การทำงานถูกส่งไปที่
+       <code>FormatDecimal</code> เพื่อประเมินผลลัพธ์ก่อนถึงจะประเมิน <code>Console.WriteLine</code></p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch30-a"><span>เข้าใจว่า return type ต้องระบุก่อนชื่อ method เสมอ</span></label></li>
+      <li><label><input type="checkbox" id="ch30-b"><span>สร้าง method ที่คืนค่า double, bool, string ครบทั้ง 3 ตัวสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch30-c"><span>เรียก method ที่คืนค่าแทนที่ตัวแปร/literal ได้โดยตรง (ใน if, ternary, string interpolation)</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">30.3 ลงมือ: คืนค่าตัวเลขจาก Method</h2>
+
+    <p>คุณอาจต้องคืนค่าตัวเลขจาก method บ่อยๆ แล้วใช้ผลลัพธ์นั้นทำงานอื่นต่อ ในแบบฝึกหัดสั้นๆ นี้ คุณ
+       จะฝึกคืนค่า <code>int</code> และ <code>double</code> พร้อมรับค่าที่คืนมาใช้งาน</p>
+
+    <h3 id="s03a">สร้าง Method ที่คืนค่า Integer</h3>
+    <p>สมมติคุณกำลังไปเที่ยวเวียดนามและอยากสร้างโปรแกรมสั้นๆ แปลงสกุลเงิน สมมติอัตราแลกเปลี่ยน
+       ปัจจุบันคือ 1 USD = 23500 VND ในขั้นตอนนี้ คุณจะเขียน method แปลง USD เป็น VND</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">double usd = 23.73;
+int vnd = UsdToVnd(usd);
+
+Console.WriteLine($"${usd} USD = ${vnd} VND");
+
+int UsdToVnd(double usd)
+{
+
+}</code></pre>
+    </div>
+
+    <p>ในขั้นตอนนี้ คุณ initialize ตัวแปร 2 ตัวเก็บค่า USD และ VND สังเกตว่า <code>vnd</code>
+       ถูก initialize ด้วยผลลัพธ์ของ method <code>UsdToVnd</code> — method คืนค่า integer เพราะ VND
+       มักแทนด้วยจำนวนเต็ม</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int UsdToVnd(double usd)
+{
+    int rate = 23500;
+    return (int) (rate * usd);
+}</code></pre>
+    </div>
+
+    <p>ถ้าไม่ cast ผลลัพธ์ที่คืนมา คุณจะเห็น error นี้:</p>
+
+    <div class="out err"><pre>
+Cannot implicitly convert type 'double' to 'int'.</pre></div>
+
+    <p>เกิดขึ้นเพราะ compiler พยายาม cast ค่าที่คืนกลับให้ตรงกับ data type ที่ระบุใน method
+       signature แต่ implicit casting ใช้ได้แค่ตอนไม่มีข้อมูลสูญหายจากการแปลง (ทบทวน widening vs
+       narrowing conversion จาก <a href="ch22.html">บทที่ 22</a>) ค่าที่คืนต้องตรงกับ data type ที่
+       ระบุใน method signature เสมอ ดังนั้นในกรณีนี้ คุณต้อง cast ผลลัพธ์เอง</p>
+
+    <h3 id="s03b">สร้าง Method ที่คืนค่า Double</h3>
+    <p>ต่อไป สร้าง method แปลง VND กลับเป็น USD:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">double VndToUsd(int vnd)
+{
+    double rate = 23500;
+    return vnd / rate;
+}</code></pre>
+    </div>
+
+    <p>ในกรณีนี้ <code>rate</code> ต้องเป็น <code>double</code> ไม่งั้น compiler จะใช้ integer
+       division และคืนค่า <code>int</code> ที่ถูกตัดทศนิยมทิ้ง เพราะ USD ต้องแทนด้วยตัวเลขทศนิยม</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ทำไมต้องระวัง data type ในการคำนวณข้าง method</span>
+      ถ้าตั้ง <code>rate</code> เป็น <code>int</code> แทน คุณจะสังเกตว่า compiler ไม่แจ้ง error
+      ใดๆ เลย เพราะค่า <code>vnd / rate</code> ถูก implicit cast เป็น <code>double</code> ตามที่
+      ระบุใน method signature โดยอัตโนมัติ — <b>แต่</b> ถ้า <code>rate</code> เป็น <code>int</code>
+      การหาร <code>vnd / rate</code> จะเป็น integer division (ตัดทศนิยมทิ้ง) <b>ก่อน</b>ที่จะถูก
+      cast เป็น double ผลลัพธ์จึงผิดเพี้ยนไปจากที่ตั้งใจ (ทบทวนแนวคิด operator ตัวเลขจาก
+      <a href="ch04.html">บทที่ 4</a>) — ตอนสร้าง method ที่คืนค่าตัวเลข สำคัญมากที่ต้องพิจารณา
+      data type ในทุกการดำเนินการที่ method ทำ ไม่ใช่แค่ return type สุดท้ายเท่านั้น
+    </div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ฉบับสมบูรณ์)</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">double usd = 23.73;
+int vnd = UsdToVnd(usd);
+
+Console.WriteLine($"${usd} USD = ${vnd} VND");
+Console.WriteLine($"${vnd} VND = ${VndToUsd(vnd)} USD");
+
+int UsdToVnd(double usd)
+{
+    int rate = 23500;
+    return (int) (rate * usd);
+}
+
+double VndToUsd(int vnd)
+{
+    double rate = 23500;
+    return vnd / rate;
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+$23.73 USD = $557655 VND
+$557655 VND = $23.73 USD</pre></div>
+
+    <div class="quiz" data-q="30-1">
+      <p class="q"><span class="num">Check ★</span> statement <code>return 100 * 0.5;</code>
+        คืนค่าเป็น data type อะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>int</span></li>
+        <li class="opt"><span class="k">B</span><span>decimal</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>double</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> <code>0.5</code> เป็น floating-point literal ที่ C#
+        ตีความเป็น <code>double</code> เป็นค่า default เสมอ (ไม่ใช่ decimal เว้นแต่มี suffix
+        <code>m</code>) เมื่อ <code>int</code> คูณกับ <code>double</code> ผลลัพธ์จะถูกยกระดับ
+        (promote) เป็น <code>double</code> เสมอ (ทบทวนจาก <a href="ch22.html">บทที่ 22</a>)</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch30-d"><span>สร้าง method คืนค่า int พร้อม cast ที่จำเป็นสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch30-e"><span>สร้าง method คืนค่า double ระวังเรื่อง integer division สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">30.4 ลงมือ: คืนค่า String จาก Method</h2>
+
+    <p>คุณอาจพบว่าต้องเขียน method ที่คืนค่า string บ่อยๆ เช่น อาจต้องการดึง string จากชุดข้อมูล
+       หรือแก้ไข string บางแบบ ในแบบฝึกหัดนี้ คุณจะได้ประสบการณ์ทำงานกับ string ใน method พร้อมฝึก
+       คำถามสัมภาษณ์งานยอดนิยม</p>
+
+    <h3 id="s04a">สร้าง Method ที่คืนค่า String</h3>
+    <p>สมมติคุณเป็นผู้สมัครในการสัมภาษณ์งานเขียนโค้ด ผู้สัมภาษณ์ขอให้คุณเขียน method กลับด้าน string
+       โดยห้ามใช้ <code>string.Reverse</code> ลองคิดสักครู่ว่าจะทำยังไง</p>
+
+    <p>คุณอาจตัดสินใจว่ากลับด้าน string ได้ด้วยการวนจากท้าย string ใช้ string ชั่วคราวเก็บตัวอักษร
+       แต่ละตัวจากท้ายไปหน้า</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string ReverseWord(string word)
+{
+    string result = "";
+
+    return result;
+}</code></pre>
+    </div>
+
+    <p>method ต้องวนผ่านคำที่ให้มาและอัปเดต result:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string ReverseWord(string word)
+{
+    string result = "";
+    for (int i = word.Length - 1; i >= 0; i--)
+    {
+        result += word[i];
+    }
+    return result;
+}</code></pre>
+    </div>
+
+    <p>ใน code block นี้ คุณเริ่มจากท้าย word ด้วย <code>word.Length - 1</code> — ลบ 1 ออกจากความ
+       ยาว เพราะ array index เริ่มที่ 0 และคุณต้องการหลีกเลี่ยงการเข้าถึง element เกินขอบเขต จากนั้น
+       เพิ่มตัวอักษรที่ index ปัจจุบันเข้า string <code>result</code> แล้วเลื่อน index ถอยหลัง คุณใช้
+       <code>i >= 0</code> เพราะ <code>i</code> ถูกอัปเดตหลังโค้ดใน loop ทำงาน และต้องมั่นใจว่ารวม
+       index ที่ 0 ด้วย</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string input = "snake";
+
+Console.WriteLine(input);
+Console.WriteLine(ReverseWord(input));
+
+string ReverseWord(string word)
+{
+    string result = "";
+    for (int i = word.Length - 1; i >= 0; i--)
+    {
+        result += word[i];
+    }
+    return result;
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+snake
+ekans</pre></div>
+
+    <h3 id="s04b">กลับด้านทุกคำในประโยค</h3>
+    <p>สมมติผู้สัมภาษณ์ถามคำถามต่อยอด ต้องการให้คุณกลับด้านแต่ละคำในประโยคที่กำหนด โดยคงตำแหน่งเดิม
+       ของแต่ละคำไว้ สมมติแต่ละคำคั่นด้วยช่องว่าง เช่น "string return type" จะกลายเป็น "gnirts
+       nruter epyt" ลองคิดสักครู่ว่าจะทำงานนี้ยังไง</p>
+
+    <p>ถ้าใช้ method ที่เขียนไว้แล้ว คุณอาจสังเกตว่าใช้มันกลับด้านแต่ละคำแยกกันได้ สร้างประโยคใหม่
+       แล้วเพิ่มแต่ละคำเข้าไปตอนกลับด้านเสร็จ</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string ReverseSentence(string input)
+{
+    string result = "";
+    string[] words = input.Split(" ");
+
+    foreach(string word in words)
+    {
+        result += ReverseWord(word) + " ";
+    }
+
+    return result.Trim();
+}</code></pre>
+    </div>
+
+    <p>สังเกตว่าคุณเรียก method <code>ReverseWord</code> ข้างในตัวดำเนินการ compound assignment
+       (<code>+=</code>) ได้ ในโค้ดนี้ ค่าที่คืนมาจาก <code>ReverseWord</code> ถูกรับมาเพิ่มเข้า
+       <code>result</code> method ที่มี return value ใช้ที่ไหนก็ได้ที่คุณต้องการ ตราบใดที่ data
+       type ตรงกับที่ต้องการ — ในโค้ดนี้ แต่ละคำที่กลับด้านแล้วถูกต่อเข้า result พร้อมช่องว่างเพิ่ม
+       ท้าย แต่จะเหลือช่องว่างเกินท้ายประโยคที่กลับด้านแล้ว ใช้ <code>string.Trim</code> ตัดช่องว่าง
+       ส่วนเกินท้ายสุดออก (ทบทวนจาก <a href="ch18.html">บทที่ 18</a>)</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ฉบับสมบูรณ์)</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string input = "there are snakes at the zoo";
+
+Console.WriteLine(input);
+Console.WriteLine(ReverseSentence(input));
+
+string ReverseSentence(string input)
+{
+    string result = "";
+    string[] words = input.Split(" ");
+    foreach(string word in words)
+    {
+        result += ReverseWord(word) + " ";
+    }
+    return result.Trim();
+}
+
+string ReverseWord(string word)
+{
+    string result = "";
+    for (int i = word.Length - 1; i >= 0; i--)
+    {
+        result += word[i];
+    }
+    return result;
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+there are snakes at the zoo
+ereht era sekans ta eht ooz</pre></div>
+
+    <p>สังเกตว่า method หนึ่งใช้ method อื่นในกระบวนการทำงานได้ แม้แต่ใน return statement เอง ตราบใด
+       ที่ data type ตรงกัน</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch30-f"><span>สร้าง ReverseWord() สำเร็จ ไม่ใช้ string.Reverse()</span></label></li>
+      <li><label><input type="checkbox" id="ch30-g"><span>สร้าง ReverseSentence() ที่เรียกใช้ ReverseWord() ข้างในสำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">30.5 ลงมือ: คืนค่า Boolean จาก Method</h2>
+
+    <p>method ที่คืนค่า Boolean เขียนง่ายแต่มีประโยชน์มากในการรวบรวมโค้ด method ที่คืนค่า
+       <code>bool</code> เรียกใช้ประเมินข้อมูล input ได้ทุกที่ ทั้งใน <code>if</code> statement,
+       ตอนประกาศตัวแปร และอื่นๆ ในแบบฝึกหัดนี้ คุณจะได้ประสบการณ์สร้างและใช้ method ที่คืนค่า
+       Boolean</p>
+
+    <h3 id="s05a">สร้าง Method ที่คืนค่า Boolean</h3>
+    <p>สมมติคุณเป็นผู้สมัครในการสัมภาษณ์งานเขียนโค้ด ผู้สัมภาษณ์ต้องการให้คุณเช็คว่าคำหลายคำเป็น
+       palindrome หรือไม่ — คำหนึ่งเป็น palindrome ถ้าอ่านจากหน้าไปหลังหรือหลังไปหน้าเหมือนกัน
+       ตัวอย่างเช่น คำว่า <code>racecar</code> เป็น palindrome</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[] words = {"racecar" ,"talented", "deified", "tent", "tenet"};
+
+Console.WriteLine("Is it a palindrome?");
+foreach (string word in words)
+{
+    Console.WriteLine($"{word}: {IsPalindrome(word)}");
+}</code></pre>
+    </div>
+
+    <p>โค้ดนี้กำหนด test case และอ้างอิงถึง method ชื่อ <code>IsPalindrome</code></p>
+
+    <p>ลองคิดว่าจะเช็คว่าคำหนึ่งเป็น palindrome หรือไม่ยังไง — วิธีหนึ่งคือเทียบตัวอักษรแรกกับ
+       ตัวอักษรสุดท้ายของคำ ถ้าตรงกัน เทียบตัวอักษรที่สองกับตัวอักษรที่สองจากท้ายต่อ ถ้าถึงกลางคำแล้ว
+       แปลว่าเทียบครบและตรงกันหมด ถ้ามีตัวอักษรไหนไม่ตรง แปลว่าไม่ใช่ palindrome</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">bool IsPalindrome(string word)
+{
+    int start = 0;
+    int end = word.Length - 1;
+
+    while (start < end)
+    {
+        if (word[start] != word[end])
+        {
+            return false;
+        }
+        start++;
+        end--;
+    }
+
+    return true;
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Is it a palindrome?
+racecar: True
+talented: False
+deified: True
+tent: False
+tenet: True</pre></div>
+
+    <p>สังเกตตัวแปร <code>start</code> และ <code>end</code> ที่ชี้ไปยังตัวอักษรแรกและตัวอักษรสุดท้าย
+       ใน string loop จะหยุดเมื่อถึงกลางคำ — เมื่อ <code>start</code> และ <code>end</code> ชี้ไปยัง
+       ตัวอักษรเดียวกัน หรือข้ามกันไปแล้ว ตัวชี้ทั้งสองถูกเลื่อนเข้าหากันทุกครั้งที่ตรงกัน ถ้าไม่ตรง
+       method จะจบทำงานทันทีและคืน <code>false</code></p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch30-h"><span>สร้าง IsPalindrome() สำเร็จ ใช้เทคนิค two-pointer เช็คจากสองปลายเข้าหากลาง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">30.6 ลงมือ: คืนค่า Array จาก Method</h2>
+
+    <p>ตอนพัฒนาแอปพลิเคชัน คุณมักต้องสร้างและแก้ไขชุดข้อมูล method มีประโยชน์มากสำหรับการดำเนินการ
+       กับข้อมูล และเป็นเครื่องมือทรงพลังเป็นพิเศษสำหรับการสร้างชุดข้อมูลเอง การพัฒนา method ที่สร้าง
+       array แทนชุดข้อมูลของคุณ ช่วยให้โค้ดใช้ซ้ำได้ จัดระเบียบ และเรียบง่ายขึ้น ในแบบฝึกหัดนี้ คุณจะ
+       ฝึกคืนค่า array จาก method</p>
+
+    <h3 id="s06a">หาเหรียญที่รวมกันเป็นเงินทอน</h3>
+    <p>สมมติคุณมีเหรียญหลายมูลค่า คุณต้องหาเหรียญ 2 เหรียญที่ผลรวมเท่ากับค่าเป้าหมาย ในแบบฝึกหัดนี้
+       เหรียญที่มีแทนด้วย integer array คุณต้องคืน index ของเหรียญทั้งสองใน array ใหม่</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int[] TwoCoins(int[] coins, int target)
+{
+    return  new int[0];
+}</code></pre>
+    </div>
+
+    <p>ในกรณีที่หาเหรียญ 2 เหรียญไม่เจอ method คืน array ว่างเปล่า ลองสังเกต syntax ของผลลัพธ์ที่
+       คืนมา — แม้คุณสร้างตัวแปรเก็บ <code>int[]</code> array ใหม่แล้วคืนตัวแปรนั้นได้ แต่
+       <code>return</code> statement ให้คุณสร้างและคืนค่าไปพร้อมกันได้เลย</p>
+
+    <p>มีหลายวิธีแก้โจทย์นี้ ลองคิดสักครู่ว่าจะค้นหาตัวเลข 2 ตัวใน array ที่ผลรวมเท่ากับค่าที่กำหนด
+       ยังไง — ในแบบฝึกหัดนี้ ใช้แนวทางนี้: (1) เลือกตัวเลขหนึ่งตัวจาก array (2) เช็คตัวเลขอื่นทีละ
+       ตัวว่ารวมกันได้ค่าเป้าหมายไหม (3) คืนผลลัพธ์ทันทีที่เจอที่ตรงกัน</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int[] TwoCoins(int[] coins, int target)
+{
+    for (int curr = 0; curr < coins.Length; curr++)
+    {
+        for (int next = curr + 1; next < coins.Length; next++)
+        {
+            if (coins[curr] + coins[next] == target)
+            {
+                return new int[]{curr, next};
+            }
+        }
+    }
+
+    return  new int[0];
+}</code></pre>
+    </div>
+
+    <p>ที่นี่ <code>curr</code> แทนเหรียญที่ตรึงไว้ 1 เหรียญ และ <code>next</code> แทน index เหรียญ
+       ถัดไป คุณลองบวกแต่ละเหรียญ <code>next</code> เข้ากับเหรียญ <code>curr</code> ที่ตรึงไว้ ดูว่า
+       เท่ากับค่าเป้าหมายไหม — ถ้าผลรวมเท่ากัน คุณสร้าง array เก็บ index เหล่านั้นแล้วคืนค่าทันที
+       ถ้าไม่เท่ากัน ก็ข้ามไปเช็คคู่ถัดไป</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int target = 60;
+int[] coins = new int[] {5, 5, 50, 25, 25, 10, 5};
+int[] result = TwoCoins(coins, target);
+
+if (result.Length == 0)
+{
+    Console.WriteLine("No two coins make change");
+}
+else
+{
+    Console.WriteLine($"Change found at positions {result[0]} and {result[1]}");
+}
+
+int[] TwoCoins(int[] coins, int target)
+{
+    for (int curr = 0; curr < coins.Length; curr++)
+    {
+        for (int next = curr + 1; next < coins.Length; next++)
+        {
+            if (coins[curr] + coins[next] == target)
+            {
+                return new int[]{curr, next};
+            }
+        }
+    }
+
+    return  new int[0];
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Change found at positions 2 and 5</pre></div>
+
+    <h3 id="s06b">หาเหรียญหลายคู่ที่รวมเป็นเงินทอน</h3>
+    <p>ต่อไปขยาย method <code>TwoCoins</code> ให้หาคู่เหรียญที่ผลรวมเท่ากับค่าเป้าหมายได้หลายคู่ —
+       ในแบบฝึกหัดนี้ หาสูงสุด 5 คู่ หมายความว่า return type ต้องเป็น 2D array แทนที่จะเป็น 1D
+       array และต้องปรับวิธีที่โค้ดคืนผลลัพธ์ด้วย</p>
+
+    <p>เปลี่ยน return type จาก <code>int[]</code> เป็น <code>int[,]</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int[,] TwoCoins(int[] coins, int target)
+{
+    int[,] result = {{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1}};
+    int count = 0;
+
+    for (int curr = 0; curr < coins.Length; curr++)
+    {
+        for (int next = curr + 1; next < coins.Length; next++)
+        {
+            if (coins[curr] + coins[next] == target)
+            {
+                result[count, 0] = curr;
+                result[count, 1] = next;
+                count++;
+            }
+            if (count == result.GetLength(0))
+            {
+                return result;
+            }
+        }
+    }
+    return (count == 0) ? new int[0,0] : result;
+}</code></pre>
+    </div>
+
+    <p>สังเกตว่า element ของ array <code>result</code> ถูก initialize เป็น <code>-1</code> ไว้ก่อน
+       — ช่วยตอนที่ต้องพิมพ์คู่ที่เจอทีหลัง ตัวแปร <code>count</code> เพิ่มขึ้นทุกครั้งที่เจอคู่ที่
+       ตรงกัน ซึ่งอาจทำให้เกิด index out of bounds error ถ้าเจอมากกว่า 5 คู่ เพื่อป้องกัน error นี้
+       จึงเช็คค่า <code>count</code> แล้วคืนผลลัพธ์ทันทีถ้า array <code>result</code> เต็มแล้ว</p>
+
+    <p>สุดท้าย ต้องปรับ <code>return</code> statement ท้ายสุดให้คืนผลลัพธ์ที่ถูกต้อง ทั้งกรณีไม่เจอ
+       คู่ที่ตรงกันเลย หรือเจอน้อยกว่า 5 คู่ — ใช้ ternary operator ย่อโค้ดได้: <code>return
+       (count == 0) ? new int[0,0] : result;</code></p>
+
+    <div class="note tip">
+      <span class="lbl">💡 ความยืดหยุ่นของ return</span>
+      คีย์เวิร์ด <code>return</code> ยืดหยุ่นพอที่จะคืนค่าของ expression ได้ ตราบใดที่ผลลัพธ์ตรงกับ
+      return type ที่ระบุไว้ของ method — นี่คือเหตุผลที่ <code>return (count == 0) ? new int[0,0]
+      : result;</code> ใช้ได้เลย ไม่ต้องแยกเขียน <code>if-else</code> เพิ่ม
+    </div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ฉบับสมบูรณ์)</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int target = 30;
+int[] coins = new int[] {5, 5, 50, 25, 25, 10, 5};
+int[,] result = TwoCoins(coins, target);
+
+if (result.Length == 0)
+{
+    Console.WriteLine("No two coins make change");
+}
+else
+{
+    Console.WriteLine("Change found at positions:");
+    for (int i = 0; i < result.GetLength(0); i++)
+    {
+        if (result[i,0] == -1)
+        {
+            break;
+        }
+        Console.WriteLine($"{result[i,0]},{result[i,1]}");
+    }
+}
+
+int[,] TwoCoins(int[] coins, int target)
+{
+    int[,] result = {{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1}};
+    int count = 0;
+
+    for (int curr = 0; curr < coins.Length; curr++)
+    {
+        for (int next = curr + 1; next < coins.Length; next++)
+        {
+            if (coins[curr] + coins[next] == target)
+            {
+                result[count, 0] = curr;
+                result[count, 1] = next;
+                count++;
+            }
+            if (count == result.GetLength(0))
+            {
+                return result;
+            }
+        }
+    }
+    return (count == 0) ? new int[0,0] : result;
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output (target = 30)</div><pre>
+Change found at positions:
+0,3
+0,4
+1,3
+1,4
+3,6</pre></div>
+
+    <p>ลองเปลี่ยนค่า <code>target</code> เป็น 80 (ไม่มีคู่เหรียญไหนรวมได้เลย):</p>
+    <div class="out auto"><div class="out-bar">Output (target = 80)</div><pre>
+No two coins make change</pre></div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch30-i"><span>สร้าง TwoCoins() คืนค่า 1D array (คู่เดียว) สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch30-j"><span>ขยายเป็น TwoCoins() คืนค่า 2D array (หลายคู่) สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch30-k"><span>ทดสอบทั้งกรณีเจอผลลัพธ์และไม่เจอเลยสำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s07">30.7 ท้าทาย: เกมทอยลูกเต๋า</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl m">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>โจทย์ของคุณคือออกแบบมินิเกม เกมต้องเลือกเลขเป้าหมายแบบสุ่มระหว่าง 1 ถึง 5 (รวมทั้งสองค่า)
+           ผู้เล่นต้องทอยลูกเต๋า 6 หน้า เพื่อชนะ ผู้เล่นต้องทอยได้เลขมากกว่าเลขเป้าหมาย เมื่อจบแต่ละ
+           รอบ ต้องถามผู้เล่นว่าอยากเล่นต่อไหม แล้วเกมดำเนินต่อหรือจบตามคำตอบ</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">ข้อมูลตั้งต้น (ห้ามลบ)</span></div>
+          <pre><code class="lang-cs">Random random = new Random();
+
+Console.WriteLine("Would you like to play? (Y/N)");
+if (ShouldPlay())
+{
+    PlayGame();
+}
+
+void PlayGame()
+{
+    var play = true;
+
+    while (play)
+    {
+        var target;
+        var roll;
+
+        Console.WriteLine($"Roll a number greater than {target} to win!");
+        Console.WriteLine($"You rolled a {roll}");
+        Console.WriteLine(WinOrLose());
+        Console.WriteLine("\nPlay again? (Y/N)");
+
+        play = ShouldPlay();
+    }
+}</code></pre>
+        </div>
+        <p>มี method 2 ตัวที่ยังไม่มีให้: <code>ShouldPlay</code> (รับ input ผู้ใช้ ตัดสินว่าอยากเล่น
+           ต่อไหม) และ <code>WinOrLose</code> (ตัดสินว่าผู้เล่นชนะหรือแพ้) และมีตัวแปร 2 ตัวที่ยังไม่
+           initialize: <code>target</code> (เลขเป้าหมายสุ่มระหว่าง 1-5) และ <code>roll</code>
+           (ผลทอยลูกเต๋า 6 หน้าแบบสุ่ม)</p>
+        <p>โจทย์คือสร้าง method <code>ShouldPlay</code> และ <code>WinOrLose</code> และสร้าง method
+           ที่ตั้งค่า <code>target</code> กับ <code>roll</code> เป็นค่าสุ่มในช่วงที่ถูกต้อง</p>
+        <p>ตัวอย่างผลลัพธ์:</p>
+        <div class="out auto"><pre>
+Would you like to play? (Y/N)
+Y
+Roll a number greater than 1 to win!
+You rolled a 2
+You win!
+
+Play again? (Y/N)
+Y
+Roll a number greater than 4 to win!
+You rolled a 6
+You win!
+
+Play again? (Y/N)
+Y
+Roll a number greater than 1 to win!
+You rolled a 1
+You lose!
+
+Play again? (Y/N)
+N</pre></div>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>สร้าง method แยกสำหรับสุ่ม target (1-5) และสุ่ม roll (1-6) — ทั้งสองคืนค่า
+             <code>int</code> ใช้ <code>random.Next(min, maxExclusive)</code> (ทบทวนจาก
+             <a href="ch18.html">บทที่ 18</a>) ระวังขอบเขต exclusive ของ <code>Next()</code>
+             ให้ดี</p>
+        </div>
+      </details>
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย (เฉลยทางการจาก Microsoft Learn)</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button></div>
+          <pre><code class="lang-cs">Random random = new Random();
+
+Console.WriteLine("Would you like to play? (Y/N)");
+if (ShouldPlay())
+{
+    PlayGame();
+}
+
+bool ShouldPlay()
+{
+    string response = Console.ReadLine();
+    return response.ToLower().Equals("y");
+}
+
+void PlayGame()
+{
+    var play = true;
+
+    while (play) {
+        var target = GetTarget();
+        var roll = RollDice();
+
+        Console.WriteLine($"Roll a number greater than {target} to win!");
+        Console.WriteLine($"You rolled a {roll}");
+        Console.WriteLine(WinOrLose(roll, target));
+        Console.WriteLine("\nPlay again? (Y/N)");
+
+        play = ShouldPlay();
+    }
+}
+
+int GetTarget()
+{
+    return random.Next(1, 6);
+}
+
+int RollDice()
+{
+    return random.Next(1, 7);
+}
+
+string WinOrLose(int roll, int target)
+{
+    if (roll > target)
+    {
+        return "You win!";
+    }
+    return "You lose!";
+}</code></pre>
+        </div>
+        <div class="out auto"><div class="out-bar">Output ตัวอย่าง</div><pre>
+Would you like to play? (Y/N)
+Y
+Roll a number greater than 2 to win!
+You rolled a 1
+You lose!
+
+Play again? (Y/N)
+Y
+Roll a number greater than 3 to win!
+You rolled a 5
+You win!
+
+Play again? (Y/N)
+N</pre></div>
+        <p>นี่เป็น<i>เพียงหนึ่งในหลายวิธี</i>ที่แก้โจทย์นี้ได้ — คุณอาจใส่การขึ้นบรรทัดใหม่ต่างจุด
+           คืนค่าต่างวิธี หรือจัดรูปแบบโค้ดต่างออกไปก็ได้</p>
+        <p>สังเกตจุดสำคัญ: <code>GetTarget()</code> ใช้ <code>random.Next(1, 6)</code> — ขอบเขตบน
+           เป็น exclusive จึงได้ค่า 1-5 ตามสเปก ส่วน <code>RollDice()</code> ใช้
+           <code>random.Next(1, 7)</code> ได้ค่า 1-6 (ลูกเต๋า 6 หน้าจริง) และ <code>WinOrLose()</code>
+           รับ <code>roll</code> กับ <code>target</code> เป็นพารามิเตอร์ แทนที่จะพึ่ง global
+           variable — เป็นแพทเทิร์นที่ดีกว่า เพราะ method บอกชัดเจนในตัวเองว่าต้องการข้อมูลอะไรบ้าง
+           ถึงจะทำงานได้ (ทบทวนหลักการนี้จาก <a href="ch29.html">บทที่ 29</a>)</p>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch30-l"><span>แก้โจทย์ท้าทายสำเร็จ เกมเล่นได้จริงครบทุกฟีเจอร์</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s08">30.8 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>compile error "not all code paths return a value"</td>
+          <td>method มี return type ที่ไม่ใช่ void แต่บางเส้นทางของโค้ด (เช่น กิ่ง else ที่ไม่มี
+              return) ไม่ได้คืนค่าเลย — ทุกเส้นทางที่เป็นไปได้ใน method ต้องจบด้วย return ค่าที่
+              ถูกชนิดเสมอ</td>
+        </tr>
+        <tr>
+          <td>Cannot implicitly convert type 'double' to 'int'</td>
+          <td>ค่าที่ return เป็น double/decimal แต่ method ประกาศ return type เป็น int (narrowing
+              conversion) ต้อง cast ค่าก่อนคืนเสมอ เช่น <code>return (int)(rate * usd);</code>
+              (ทบทวนจาก <a href="ch22.html">บทที่ 22</a>)</td>
+        </tr>
+        <tr>
+          <td>method ที่ควรคืนค่าทศนิยม กลับได้ค่าที่ถูกตัดทศนิยมทิ้งอย่างเงียบๆ</td>
+          <td>ตัวแปรที่ใช้คำนวณข้างในเป็น int ทำให้เกิด integer division ก่อนจะถูก implicit cast
+              เป็น double ตอน return — ต้องเปลี่ยนตัวแปรที่ใช้คำนวณให้เป็น double/decimal ตั้งแต่ต้น
+              (ทบทวนหัวข้อ 30.3b)</td>
+        </tr>
+        <tr>
+          <td>IndexOutOfRangeException ตอนเก็บผลลัพธ์หลายรายการลง array ที่ขนาดคงที่</td>
+          <td>ลืมเช็คว่า counter ถึงขนาดสูงสุดของ array ผลลัพธ์แล้วหรือยัง ก่อนเขียนเพิ่ม — ต้องเช็ค
+              เงื่อนไข (เช่น <code>count == result.GetLength(0)</code>) แล้ว return ออกทันทีถ้าเต็ม
+              (ทบทวนหัวข้อ 30.6b)</td>
+        </tr>
+        <tr>
+          <td>method คืนค่า array ว่างเปล่า แต่โค้ดที่เรียกใช้พยายามเข้าถึง element โดยไม่เช็คก่อน</td>
+          <td>ต้องเช็ค <code>result.Length == 0</code> (หรือเทียบเท่า) ก่อนเข้าถึง element ของ
+              array ที่ได้จาก method เสมอ โดยเฉพาะ method ที่อาจคืน array ว่างเปล่าได้ตามสเปก</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">30.9 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment ของ Microsoft Learn</p>
+
+    <div class="quiz" data-q="30-2">
+      <p class="q"><span class="num">1.</span> ข้อใดคืนค่า string ได้อย่างถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>return "";</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>return 'a';</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>return 5;</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> <code>""</code> (เครื่องหมายคำพูดคู่) คือ string
+        literal — <code>'a'</code> (เครื่องหมายคำพูดเดี่ยว) คือ <code>char</code> literal ไม่ใช่
+        string และ <code>5</code> คือ <code>int</code> literal ทั้งสองข้อหลังไม่ใช่ string</div>
+    </div>
+
+    <div class="quiz" data-q="30-3">
+      <p class="q"><span class="num">2.</span> ข้อใดถูกต้องเกี่ยวกับคีย์เวิร์ด <code>return</code>?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>มันเริ่ม iteration ใหม่ของ method</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>มันหยุดการทำงานของ method</span></li>
+        <li class="opt"><span class="k">C</span><span>ต้องใช้คู่กับค่าหรือ expression เสมอ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ตรงกับที่เรียนใน <a href="ch28.html">บทที่ 28</a> —
+        return จบการทำงานของ method ทันที ไม่ใช่เริ่ม iteration ใหม่ (นั่นคือหน้าที่ของ continue)
+        และใน void method ใช้ return เปล่าๆ ได้โดยไม่ต้องมีค่า (ข้อ C ผิด)</div>
+    </div>
+
+    <div class="quiz" data-q="30-4">
+      <p class="q"><span class="num">3.</span> ข้อใดเป็น return statement ที่ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>return void;</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>return 5 % 2;</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>return Console.WriteLine();</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> <code>5 % 2</code> เป็น expression ที่ถูกต้องและประเมิน
+        ออกมาเป็น <code>int</code> ได้ — <code>return void;</code> ไม่ใช่ syntax ที่ถูกต้อง (void
+        ไม่ใช่ค่า) ส่วน <code>Console.WriteLine()</code> คืนค่า <code>void</code> เอง จึงใช้เป็นค่า
+        ใน return statement ของ method ที่คืนค่าจริงไม่ได้</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">30.10 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>สร้าง method <code>int Square(int n)</code> ที่คืนค่ากำลังสองของ n เรียกใช้กับเลข 1-5
+           แล้วพิมพ์ผลลัพธ์</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">for (int i = 1; i <= 5; i++)
+{
+    Console.WriteLine(Square(i));
+}
+
+int Square(int n)
+{
+    return n * n;
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>สร้าง method <code>bool IsEven(int n)</code> ที่คืนค่า <code>true</code> ถ้า n เป็นเลขคู่
+           แล้วทดสอบกับเลข 3 และ 8</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Console.WriteLine(IsEven(3));
+Console.WriteLine(IsEven(8));
+
+bool IsEven(int n)
+{
+    return n % 2 == 0;
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้ compile ไม่ผ่าน หาสาเหตุและแก้ไข:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">int Classify(int score)
+{
+    if (score >= 50)
+    {
+        return "Pass";
+    }
+}</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>2 ปัญหา: (1) return type ประกาศเป็น <code>int</code> แต่คืนค่า <code>string</code>
+             "Pass" — ชนิดไม่ตรงกัน (2) ถ้า score น้อยกว่า 50 ไม่มี return เลย เป็น "not all code
+             paths return a value" ต้องแก้ทั้งสองจุด:</p>
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (แก้แล้ว)</span></div>
+          <pre><code class="lang-cs">string Classify(int score)
+{
+    if (score >= 50)
+    {
+        return "Pass";
+    }
+    return "Fail";
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>สร้าง method <code>string[] SplitVowelsConsonants(string word)</code> ที่คืน array 2
+           ช่อง — ช่องแรกเป็น string ของสระทั้งหมดในคำ (a, e, i, o, u) ช่องที่สองเป็น string ของ
+           พยัญชนะทั้งหมด ทดสอบกับคำว่า "hello"</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string[] result = SplitVowelsConsonants("hello");
+Console.WriteLine($"Vowels: {result[0]}");
+Console.WriteLine($"Consonants: {result[1]}");
+
+string[] SplitVowelsConsonants(string word)
+{
+    string vowels = "";
+    string consonants = "";
+    string vowelChars = "aeiou";
+
+    foreach (char c in word)
+    {
+        if (vowelChars.Contains(c))
+        {
+            vowels += c;
+        }
+        else
+        {
+            consonants += c;
+        }
+    }
+
+    return new string[] { vowels, consonants };
+}</code></pre></div>
+          <p>ผลลัพธ์: Vowels: eo, Consonants: hll</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลง <code>IsPalindrome()</code> จากหัวข้อ 30.5 ให้ไม่สนตัวพิมพ์ใหญ่-เล็กและช่องว่าง
+           (เช่น "A man a plan a canal Panama" ควรนับเป็น palindrome) — ทดสอบกับ input นั้น</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ก่อนเข้า two-pointer loop ให้ทำความสะอาด string ก่อน:
+           <code>ToLower()</code> แล้วลบช่องว่างทั้งหมดด้วย <code>Replace(" ", "")</code> (ทบทวน
+           จาก <a href="ch25.html">บทที่ 25</a>)</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Console.WriteLine(IsPalindrome("A man a plan a canal Panama"));
+
+bool IsPalindrome(string word)
+{
+    word = word.ToLower().Replace(" ", "");
+
+    int start = 0;
+    int end = word.Length - 1;
+
+    while (start < end)
+    {
+        if (word[start] != word[end])
+        {
+            return false;
+        }
+        start++;
+        end--;
+    }
+
+    return true;
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงเกมทอยลูกเต๋าจากหัวข้อ 30.7 ให้เพิ่มระบบคะแนนสะสม — สร้างตัวแปร global
+           <code>int score = 0;</code> ที่บวก 1 ทุกครั้งที่ชนะ ลบ 1 ทุกครั้งที่แพ้ แสดงคะแนนสะสม
+           หลังจบทุกรอบ (สร้าง method <code>void UpdateScore(bool won)</code> แยกจัดการเรื่องนี้)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่เพิ่ม)</span></div>
+          <pre><code class="lang-cs">int score = 0;
+
+void PlayGame()
+{
+    var play = true;
+
+    while (play)
+    {
+        var target = GetTarget();
+        var roll = RollDice();
+        bool won = roll > target;
+
+        Console.WriteLine($"Roll a number greater than {target} to win!");
+        Console.WriteLine($"You rolled a {roll}");
+        Console.WriteLine(WinOrLose(roll, target));
+
+        UpdateScore(won);
+        Console.WriteLine($"Score: {score}");
+
+        Console.WriteLine("\nPlay again? (Y/N)");
+        play = ShouldPlay();
+    }
+}
+
+void UpdateScore(bool won)
+{
+    score += won ? 1 : -1;
+}</code></pre></div>
+          <p>สังเกตว่า <code>WinOrLose()</code> ยังคงคำนวณ <code>roll > target</code> ซ้ำอยู่ข้างใน
+             ตัวเอง — ในโค้ดนี้เราคำนวณ <code>won</code> แยกไว้ก่อนแล้วส่งต่อให้ทั้ง
+             <code>WinOrLose()</code> (ทางอ้อมผ่าน roll/target) และ <code>UpdateScore()</code>
+             เพื่อไม่ต้องคำนวณเงื่อนไขเดิมซ้ำสองที่</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s11">📌 สรุปบทที่ 30</h2>
+
+    <p>เป้าหมายของคุณในโมดูลนี้คือเข้าใจว่าคีย์เวิร์ด <code>return</code> ส่งผลต่อการทำงานของ method
+       ยังไง และฝึกใช้ expression หลายแบบใน <code>return</code> statement คุณยังเรียนวิธีรับค่าที่
+       method คืนกลับมาใช้งาน คุณได้ประสบการณ์ใช้ return type หลากหลายแบบ พร้อมฝึกคำถามสัมภาษณ์งาน
+       เขียนโค้ดยอดนิยมหลายข้อไปด้วย</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 30</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">Syntax</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>void M() { }</code></td><td>ไม่คืนค่า — return type ต้อง void</td></tr>
+          <tr><td><code>int M() { return 5; }</code></td><td>คืนค่าตรง type ที่ประกาศเสมอ</td></tr>
+          <tr><td><code>return expr;</code></td><td>คืนค่าของ expression ได้ ไม่ใช่แค่ตัวแปร/literal</td></tr>
+          <tr><td>ทุก code path ต้อง return</td><td>ไม่งั้น compile error "not all code paths return a value"</td></tr>
+          <tr><td><code>M()</code> ในนิพจน์</td><td>เรียก method ที่คืนค่าแทนตัวแปร/literal ได้โดยตรง</td></tr>
+          <tr><td>return type ผิดชนิด</td><td>ต้อง cast ให้ตรงก่อนคืนค่าเสมอ (narrowing conversion)</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s12">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>return type</td><td>ชนิดค่าที่คืน</td><td>data type ที่ระบุใน method signature ว่า method คืนค่าอะไร</td></tr>
+        <tr><td>return value</td><td>ค่าที่คืนกลับ</td><td>ค่าจริงที่ method ส่งกลับไปให้ผู้เรียก</td></tr>
+        <tr><td>code path</td><td>เส้นทางของโค้ด</td><td>เส้นทางการทำงานที่เป็นไปได้เส้นหนึ่งในฟังก์ชัน (เช่น กิ่ง if/else)</td></tr>
+        <tr><td>two-pointer</td><td>ตัวชี้คู่</td><td>เทคนิคใช้ตัวแปร index สองตัวชี้จากปลายทั้งสองเข้าหากัน</td></tr>
+        <tr><td>interview question</td><td>คำถามสัมภาษณ์งาน</td><td>โจทย์เขียนโค้ดยอดนิยมที่ใช้ทดสอบทักษะพื้นฐาน</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch29.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 29 · Method พร้อม Parameter</span></a>
+      <a class="next" href="ch31.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 31 · Guided Project — พาเที่ยวสวนสัตว์เลี้ยง</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

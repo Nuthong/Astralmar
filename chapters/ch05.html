@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 5 · Guided Project: Student Grades — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="5">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 1 · Write Your First Code / บทที่ 5</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 1 · โมดูล 5/7 · 🧩 Guided Project</span>
+      <h1>โปรเจกต์นำทาง: คำนวณและแสดงเกรดนักเรียน</h1>
+      <div class="en">Guided Project — Calculate and Print Student Grades</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>40–60 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>แอปคำนวณเกรดนักเรียนที่ทำงานได้จริง ครบวงจร</b></span>
+        <span>🎯 ความยาก <b>ประยุกต์บทที่ 1–4</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ฝึกแตกโจทย์ใหญ่เป็นขั้นตอนย่อยๆ แบบที่นักพัฒนาจริงทำ</li>
+        <li>ใช้ตัวแปรเก็บและเรียกคืนข้อมูลได้คล่องขึ้น</li>
+        <li>ทำการคำนวณทางคณิตศาสตร์พื้นฐานกับข้อมูลจริง</li>
+        <li>จัดรูปแบบผลลัพธ์ให้ตรงตามสเปกที่กำหนดมาให้</li>
+      </ul>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 บทนี้ต่างจากบทก่อนๆ ยังไง</span>
+      บทที่ 1–4 แยกเป็น "ท้าทาย" กับ "เฉลย" ให้ลองเองก่อนดูคำตอบ แต่บทนี้เป็น <b>Guided Project</b>
+      คุณจะ<b>เขียนโค้ดต่อยอดไปเรื่อยๆ ทีละขั้น</b> จนได้แอปที่ทำงานได้จริงครบวงจร — เหมือนวิธีที่
+      นักพัฒนาตัวจริงทำงาน คือแตกปัญหาใหญ่เป็นชิ้นเล็กๆ แล้วเช็คผลทีละก้าว
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">5.1 สถานการณ์: ผู้ช่วยครูที่ต้องเขียนโปรแกรมตัดเกรด</h2>
+
+    <p>นักพัฒนาต้องทำงานประจำแบบนี้แทบทุกวัน: ประกาศตัวแปร string และตัวเลข กำหนด/ดึงค่า
+       และคำนวณ — เป็นงานประจำแต่สำคัญมาก พอๆ กับการสื่อสารผลลัพธ์ให้ผู้ใช้เข้าใจ การนำทักษะเหล่านี้
+       มาแก้โจทย์จริงได้คือสิ่งที่นักพัฒนาทุกคนต้องฝึก</p>
+
+    <p>สมมติคุณเป็นผู้ช่วยครูในโรงเรียน ได้รับมอบหมายให้เขียนแอปช่วยตัดเกรดนักเรียนอัตโนมัติ
+       แอปจะใช้คะแนนงานที่ให้คะแนนแล้วทุกชิ้นของนักเรียนแต่ละคน มาคำนวณเกรด/คะแนนรวมปัจจุบัน
+       ของวิชานั้น ครูยังกำหนดรูปแบบการรายงานผลที่ต้องการมาให้ด้วย</p>
+
+    <p>บทนี้จะพาคุณทำโปรเจกต์ Student Grading แบบครบวงจร โค้ดของคุณจะประกาศและกำหนดค่าตัวแปร
+       ตามชื่อนักเรียน คำนวณตัวเลขหลายแบบ และแสดงผลลัพธ์ การคำนวณรวมถึงหาผลรวมคะแนนงาน และ
+       คำนวณเกรดปัจจุบันของนักเรียนแต่ละคน เพื่อแสดงผลตามฟอร์แมตที่กำหนด คุณจะใช้
+       <code>Console.WriteLine()</code> ร่วมกับ character escape sequence ที่ช่วยจัดรูปแบบผลลัพธ์</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">5.2 เตรียมพร้อม: โจทย์และข้อมูลตั้งต้น</h2>
+
+    <h3 id="s02a">ภาพรวมโปรเจกต์</h3>
+    <p>คุณกำลังพัฒนาแอป Student Grading ที่คำนวณเกรดปัจจุบันของนักเรียนแต่ละคนในชั้นอัตโนมัติ
+       ข้อกำหนดของแอปมีดังนี้:</p>
+    <ul>
+      <li>มีรายชื่อนักเรียน 4 คน แต่ละคนมีคะแนนงาน 5 ชิ้น</li>
+      <li>คะแนนแต่ละชิ้นเป็นจำนวนเต็ม 0–100 (100 คือถูกทั้งหมด)</li>
+      <li>คะแนนสุดท้ายคำนวณจาก<b>ค่าเฉลี่ย</b>ของคะแนนงานทั้ง 5 ชิ้น</li>
+      <li>แอปต้องคำนวณทางคณิตศาสตร์พื้นฐานเพื่อหาเกรดสุดท้ายของแต่ละคน</li>
+      <li>แอปต้องแสดงชื่อและคะแนนสุดท้ายของนักเรียนแต่ละคน</li>
+    </ul>
+
+    <p>สมุดคะแนนของครูตอนนี้มีข้อมูลดังนี้ (คะแนนงาน 5 ชิ้นของแต่ละคน):</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>นักเรียน</th><th>งาน 1</th><th>งาน 2</th><th>งาน 3</th><th>งาน 4</th><th>งาน 5</th></tr></thead>
+      <tbody>
+        <tr><td><b>Sophia</b></td><td>93</td><td>87</td><td>98</td><td>95</td><td>100</td></tr>
+        <tr><td><b>Nicolas</b></td><td>80</td><td>83</td><td>82</td><td>88</td><td>85</td></tr>
+        <tr><td><b>Zahirah</b></td><td>84</td><td>96</td><td>73</td><td>85</td><td>79</td></tr>
+        <tr><td><b>Jeong</b></td><td>90</td><td>92</td><td>98</td><td>100</td><td>97</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>ครูกำหนดให้แสดงผลคะแนนของนักเรียนแต่ละคนตามรูปแบบนี้:</p>
+    <div class="out auto"><div class="out-bar">ผลลัพธ์ที่ครูต้องการ</div><pre>
+Student     Grade
+Sophia      94.6  A
+Nicolas     83.6  B
+Zahirah     83.4  B
+Jeong       95.4  A</pre></div>
+
+    <svg viewBox="0 0 720 150" role="img" aria-label="ขั้นตอนของโปรเจกต์ตั้งแต่ข้อมูลดิบจนถึงผลลัพธ์ที่จัดรูปแบบแล้ว" style="margin:18px 0">
+      <defs>
+        <marker id="ar5" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="var(--text-faint)"/>
+        </marker>
+      </defs>
+      <g font-family="var(--font-th)" font-size="12">
+        <rect x="6"   y="30" width="168" height="90" rx="10" fill="var(--bg-soft)" stroke="var(--line)"/>
+        <text x="90" y="54" text-anchor="middle" font-weight="700" fill="var(--text)">1. ข้อมูลดิบ</text>
+        <text x="90" y="76" text-anchor="middle" fill="var(--text-soft)">คะแนนงาน 5 ชิ้น</text>
+        <text x="90" y="92" text-anchor="middle" fill="var(--text-soft)">ต่อนักเรียน 1 คน</text>
+
+        <rect x="192" y="30" width="168" height="90" rx="10" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="276" y="54" text-anchor="middle" font-weight="700" fill="var(--brand-text)">2. ผลรวม (sum)</text>
+        <text x="276" y="76" text-anchor="middle" fill="var(--text-soft)">5.3 บวกคะแนน</text>
+        <text x="276" y="92" text-anchor="middle" fill="var(--text-soft)">ทั้ง 5 ชิ้นเข้าด้วยกัน</text>
+
+        <rect x="378" y="30" width="168" height="90" rx="10" fill="var(--warn-soft)" stroke="var(--warn)"/>
+        <text x="462" y="54" text-anchor="middle" font-weight="700" fill="var(--warn)">3. ค่าเฉลี่ย (score)</text>
+        <text x="462" y="76" text-anchor="middle" fill="var(--text-soft)">5.4 หาร + cast</text>
+        <text x="462" y="92" text-anchor="middle" fill="var(--text-soft)">เป็น decimal</text>
+
+        <rect x="564" y="30" width="150" height="90" rx="10" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text x="639" y="54" text-anchor="middle" font-weight="700" fill="var(--ok)">4. ผลลัพธ์</text>
+        <text x="639" y="76" text-anchor="middle" fill="var(--text-soft)">5.5 จัดรูปแบบ</text>
+        <text x="639" y="92" text-anchor="middle" fill="var(--text-soft)">ด้วย \t \n</text>
+
+        <line x1="174" y1="75" x2="188" y2="75" stroke="var(--text-faint)" marker-end="url(#ar5)"/>
+        <line x1="360" y1="75" x2="374" y2="75" stroke="var(--text-faint)" marker-end="url(#ar5)"/>
+        <line x1="546" y1="75" x2="560" y2="75" stroke="var(--text-faint)" marker-end="url(#ar5)"/>
+      </g>
+    </svg>
+
+    <h3 id="s02b">เตรียมข้อมูลตั้งต้น</h3>
+    <p>สร้างโปรเจกต์ใหม่ แล้วพิมพ์โค้ดนี้ — เป็นค่าคะแนนงานของนักเรียนแต่ละคน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// initialize variables - graded assignments
+int currentAssignments = 5;
+
+int sophia1 = 93;
+int sophia2 = 87;
+int sophia3 = 98;
+int sophia4 = 95;
+int sophia5 = 100;
+
+int nicolas1 = 80;
+int nicolas2 = 83;
+int nicolas3 = 82;
+int nicolas4 = 88;
+int nicolas5 = 85;
+
+int zahirah1 = 84;
+int zahirah2 = 96;
+int zahirah3 = 73;
+int zahirah4 = 85;
+int zahirah5 = 79;
+
+int jeong1 = 90;
+int jeong2 = 92;
+int jeong3 = 98;
+int jeong4 = 100;
+int jeong5 = 97;</code></pre>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ อย่าลบโค้ดนี้</span>
+      โค้ดชุดนี้เป็นฐานของทั้งโปรเจกต์ในบทนี้ ห้ามลบทิ้งเด็ดขาด — ทุกหัวข้อถัดจากนี้จะ<b>ต่อท้าย</b>
+      โค้ดชุดนี้ไปเรื่อยๆ
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch5-a"><span>สร้างโปรเจกต์ใหม่และพิมพ์ข้อมูลตั้งต้นครบ 21 บรรทัด</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">5.3 ขั้นที่ 1: คำนวณผลรวมคะแนนของแต่ละคน</h2>
+
+    <p>ในหัวข้อนี้ คุณจะสร้างตัวแปรแทนผลรวมคะแนนงานของนักเรียนแต่ละคน แล้วแสดงผลรวมนั้นคู่กับชื่อ
+       ในคอนโซล เนื่องจากคะแนนงานเป็นเลขจำนวนเต็ม จึงใช้ตัวแปรชนิด <code>int</code> เก็บผลรวม</p>
+
+    <h3 id="s03a">สร้างตัวแปรเก็บผลรวม</h3>
+    <p>เลื่อนไปท้ายโค้ด เว้นบรรทัดว่างไว้ แล้วพิมพ์:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — ต่อท้าย</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int sophiaSum = 0;
+int nicolasSum = 0;
+int zahirahSum = 0;
+int jeongSum = 0;</code></pre>
+    </div>
+
+    <p>สังเกตว่ากำหนดค่า <code>0</code> ให้ตอนประกาศเลย (initialize) แม้การกำหนดค่าตอนประกาศจะไม่
+       บังคับ แต่ช่วยให้โค้ดมีประสิทธิภาพกว่า — ขั้นถัดไปคือแสดงผลลัพธ์ ซึ่งจะอ้างอิงตัวแปรพวกนี้
+       จึงต้องกำหนดค่าไว้ก่อน</p>
+
+    <p>เพิ่ม <code>Console.WriteLine()</code> แสดงชื่อคู่กับผลรวม:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — ต่อท้าย</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Sophia: " + sophiaSum);
+Console.WriteLine("Nicolas: " + nicolasSum);
+Console.WriteLine("Zahirah: " + zahirahSum);
+Console.WriteLine("Jeong: " + jeongSum);</code></pre>
+    </div>
+
+    <p>รันโค้ดตอนนี้ดู — จะเห็นค่า <code>0</code> ทั้งหมด (ยังไม่ error อะไร เพราะเราแค่ยังไม่ได้
+       คำนวณจริง) วิธีนี้คือการเช็คว่าโค้ดพื้นฐานยังทำงานถูกต้อง ก่อนเพิ่มความซับซ้อน</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 เคล็ดลับมืออาชีพ</span>
+      เครื่องมือพัฒนาระดับสูงอย่าง Visual Studio Code มี debugger ให้ดูค่าตัวแปรระหว่างโปรแกรม
+      กำลังรันได้ ช่วยประหยัดเวลามาก (จะเรียนใน Part 6 ของเล่มนี้) แต่ตอนนี้ใช้
+      <code>Console.WriteLine()</code> ช่วยตรวจสอบไปก่อนก็เพียงพอ
+    </div>
+
+    <div class="note bad">
+      <span class="lbl">🛑 สำคัญมาก</span>
+      โค้ดที่<b>คำนวณ</b>ต้องอยู่<b>เหนือ</b>โค้ดที่<b>แสดงผล</b>เสมอ — ลำดับการทำงานของ C# ไล่จาก
+      บนลงล่าง ถ้าสลับลำดับ ตัวแปรจะยังเป็นค่าเดิมตอนถูกพิมพ์ออกมา
+    </div>
+
+    <h3 id="s03b">เขียนสูตรคำนวณผลรวมจริง</h3>
+    <p>หาบรรทัด <code>int sophiaSum = 0;</code> แล้วแก้เป็น:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int sophiaSum = sophia1 + sophia2 + sophia3 + sophia4 + sophia5;</code></pre>
+    </div>
+
+    <p>รันดู — ผลรวมของ Sophia ควรเป็น <code>473</code> ส่วนคนอื่นยังเป็น <code>0</code> อยู่
+       เติมสูตรให้ครบทุกคน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int nicolasSum = nicolas1 + nicolas2 + nicolas3 + nicolas4 + nicolas5;
+int zahirahSum = zahirah1 + zahirah2 + zahirah3 + zahirah4 + zahirah5;
+int jeongSum = jeong1 + jeong2 + jeong3 + jeong4 + jeong5;</code></pre>
+    </div>
+
+    <h3 id="s03c">ตรวจงาน</h3>
+    <p>โค้ดทั้งหมดตอนนี้ควรเป็นแบบนี้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — สถานะปัจจุบัน</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int currentAssignments = 5;
+
+int sophia1 = 93;
+int sophia2 = 87;
+int sophia3 = 98;
+int sophia4 = 95;
+int sophia5 = 100;
+
+int nicolas1 = 80;
+int nicolas2 = 83;
+int nicolas3 = 82;
+int nicolas4 = 88;
+int nicolas5 = 85;
+
+int zahirah1 = 84;
+int zahirah2 = 96;
+int zahirah3 = 73;
+int zahirah4 = 85;
+int zahirah5 = 79;
+
+int jeong1 = 90;
+int jeong2 = 92;
+int jeong3 = 98;
+int jeong4 = 100;
+int jeong5 = 97;
+
+int sophiaSum = sophia1 + sophia2 + sophia3 + sophia4 + sophia5;
+int nicolasSum = nicolas1 + nicolas2 + nicolas3 + nicolas4 + nicolas5;
+int zahirahSum = zahirah1 + zahirah2 + zahirah3 + zahirah4 + zahirah5;
+int jeongSum = jeong1 + jeong2 + jeong3 + jeong4 + jeong5;
+
+Console.WriteLine("Sophia: " + sophiaSum);
+Console.WriteLine("Nicolas: " + nicolasSum);
+Console.WriteLine("Zahirah: " + zahirahSum);
+Console.WriteLine("Jeong: " + jeongSum);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Sophia: 473
+Nicolas: 418
+Zahirah: 417
+Jeong: 477</pre></div>
+
+    <p>ถ้าผลลัพธ์ไม่ตรง กลับไปหาจุดผิดในโค้ด แก้แล้วรันใหม่ ทำแบบนี้ไปเรื่อยๆ จนกว่าผลลัพธ์จะตรง</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch5-b"><span>เขียนสูตรผลรวมครบทั้ง 4 คน และผลลัพธ์ตรงกับที่กำหนด</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">5.4 ขั้นที่ 2: คำนวณค่าเฉลี่ยของแต่ละคน</h2>
+
+    <p>ในหัวข้อนี้ คุณจะคำนวณและเก็บค่าเฉลี่ยของคะแนนงาน เนื่องจากรู้จำนวนงานที่ให้คะแนนแล้ว
+       (5 ชิ้น) ค่าเฉลี่ยคำนวณได้จากผลรวมหารด้วยจำนวนงาน คุณจะใช้ชนิดข้อมูล <code>decimal</code>
+       เก็บค่าเฉลี่ยนี้</p>
+
+    <h3 id="s04a">สร้างตัวแปรเก็บค่าเฉลี่ย</h3>
+    <p>หาบรรทัด <code>Console.WriteLine()</code> ที่แสดงผลรวม เว้นบรรทัดว่างไว้เหนือมัน
+       แล้วประกาศตัวแปร <code>decimal</code> (ยังไม่ต้องกำหนดค่า):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">decimal sophiaScore;
+decimal nicolasScore;
+decimal zahirahScore;
+decimal jeongScore;</code></pre>
+    </div>
+
+    <p>เหตุผลที่เลือกใช้ <code>decimal</code> เพราะกำลังแทนค่าคะแนนเฉลี่ยที่ต้องมีทศนิยม
+       (ซึ่ง <code>int</code> ทำไม่ได้) — ถ้านักเรียนได้คะแนน 89.9 คุณจะเห็นความต่างจาก B
+       เป็น A ได้ชัดเจน</p>
+
+    <p>กำหนดค่าให้ Sophia ก่อน: เอาผลรวมหารด้วยจำนวนงาน</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">decimal sophiaScore = sophiaSum / currentAssignments;</code></pre>
+    </div>
+
+    <p>เติมให้ครบทุกคน:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">decimal nicolasScore = nicolasSum / currentAssignments;
+decimal zahirahScore = zahirahSum / currentAssignments;
+decimal jeongScore = jeongSum / currentAssignments;</code></pre>
+    </div>
+
+    <p>แก้ <code>Console.WriteLine()</code> ให้แสดงคะแนนเฉลี่ยแทนผลรวม:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Sophia: " + sophiaScore);
+Console.WriteLine("Nicolas: " + nicolasScore);
+Console.WriteLine("Zahirah: " + zahirahScore);
+Console.WriteLine("Jeong: " + jeongScore);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Sophia: 94
+Nicolas: 83
+Zahirah: 83
+Jeong: 95</pre></div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ สังเกตให้ดี — นี่คือจุดที่คนพลาดบ่อยที่สุดในโปรเจกต์นี้</span>
+      คะแนนออกมาเป็นเลขจำนวนเต็ม ไม่มีทศนิยมเลย ทั้งที่ตัวแปรรับผลลัพธ์เป็น <code>decimal</code>!
+      สาเหตุคือ <code>sophiaSum</code> และ <code>currentAssignments</code> ทั้งคู่เป็น
+      <code>int</code> — การหาร int/int ถูกตัดเศษทิ้งไปตั้งแต่ก่อนกำหนดค่าให้ตัวแปร decimal
+      แล้ว (ทบทวนเรื่องนี้ได้ที่ <a href="ch04.html">บทที่ 4 หัวข้อ 4.3</a>)
+    </div>
+
+    <h3 id="s04b">แก้ปัญหาด้วยการ Cast</h3>
+    <p>ต้องการผลหารเป็น decimal จึงต้อง cast ตัวตั้งหรือตัวหารตัวใดตัวหนึ่งเป็น <code>decimal</code>
+       ก่อนหาร — ในที่นี้จะ cast ตัวแปรผลรวม (dividend):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        </div>
+      <pre><code class="lang-cs">decimal sophiaScore = (decimal) sophiaSum / currentAssignments;
+decimal nicolasScore = (decimal) nicolasSum / currentAssignments;
+decimal zahirahScore = (decimal) zahirahSum / currentAssignments;
+decimal jeongScore = (decimal) jeongSum / currentAssignments;</code></pre>
+    </div>
+
+    <p>แค่ต้องมีข้างใดข้างหนึ่งของการหารเป็น decimal เท่านั้น ที่นี่เลือก cast แค่ตัวตั้ง (ผลรวม)</p>
+
+    <h3 id="s04c">อ้างอิงเกณฑ์เกรดของครู</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>ช่วงคะแนน</th><th>เกรด</th></tr></thead>
+      <tbody>
+        <tr><td>97 – 100</td><td>A+</td></tr>
+        <tr><td>93 – 96</td><td>A</td></tr>
+        <tr><td>90 – 92</td><td>A-</td></tr>
+        <tr><td>87 – 89</td><td>B+</td></tr>
+        <tr><td>83 – 86</td><td>B</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>รันโค้ดดูค่าคะแนนของแต่ละคนก่อน แล้วเทียบกับตารางนี้ด้วยตาเปล่าเพื่อกำหนดเกรด (ขั้นตอนนี้
+       ทำด้วยมือ ยังไม่ใช้ if/else — เรื่องนั้นจะเรียนใน Part 3 ของเล่ม) แล้วต่อท้ายตัวอักษรเกรด
+       เข้าไปในผลลัพธ์:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Sophia: " + sophiaScore + " A");
+Console.WriteLine("Nicolas: " + nicolasScore + " B");
+Console.WriteLine("Zahirah: " + zahirahScore + " B");
+Console.WriteLine("Jeong: " + jeongScore + " A");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Sophia: 94.6 A
+Nicolas: 83.6 B
+Zahirah: 83.4 B
+Jeong: 95.4 A</pre></div>
+
+    <p>เทียบผลลัพธ์กับด้านบนให้ตรงเป๊ะก่อนไปขั้นถัดไป</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch5-c"><span>เห็นปัญหาผลหารกลายเป็น int ล้วนด้วยตาตัวเอง</span></label></li>
+      <li><label><input type="checkbox" id="ch5-d"><span>ใช้ (decimal) cast แก้ปัญหาจนได้ทศนิยมถูกต้อง</span></label></li>
+      <li><label><input type="checkbox" id="ch5-e"><span>เทียบคะแนนกับตารางเกรดและต่อท้ายตัวอักษรเกรดครบ 4 คน</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">5.5 ขั้นที่ 3: จัดรูปแบบผลลัพธ์ด้วย Escape Sequence</h2>
+
+    <p>หัวข้อนี้จะปรับผลลัพธ์ให้ตรงตามฟอร์แมตที่ครูกำหนด เริ่มจากเพิ่มหัวตาราง แล้วใช้
+       escape sequence เพิ่มระยะห่างระหว่างคอลัมน์</p>
+
+    <h3 id="s05a">เพิ่มหัวตาราง</h3>
+    <p>เว้นบรรทัดว่างเหนือ <code>Console.WriteLine()</code> ชุดที่แสดงคะแนน แล้วเพิ่มหัวตาราง:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Student Grade\n");</code></pre>
+    </div>
+
+    <p><code>\n</code> ท้ายข้อความ จะเพิ่มบรรทัดว่างหลัง "Student Grade" (ทบทวนได้ที่
+       <a href="ch03.html">บทที่ 3</a>) ตำแหน่งของ escape sequence สำคัญมาก — ในที่นี้อยู่ท้ายสุด
+       บรรทัดใหม่จึงเกิดขึ้นหลังข้อความนั้น</p>
+
+    <h3 id="s05b">ใช้ Tab จัดคอลัมน์</h3>
+    <p>แทนที่ช่องว่างระหว่างคำด้วย <code>\t</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Student\tGrade\n");
+Console.WriteLine("Sophia:\t" + sophiaScore + "\tA");
+Console.WriteLine("Nicolas:\t" + nicolasScore + "\tB");
+Console.WriteLine("Zahirah:\t" + zahirahScore + "\tB");
+Console.WriteLine("Jeong:\t" + jeongScore + "\tA");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Student	Grade
+
+Sophia: 94.6	A
+Nicolas:	83.6	B
+Zahirah:	83.4	B
+Jeong:	95.4	A</pre></div>
+
+    <p>สังเกตว่าแม้ใช้ tab แล้ว บางบรรทัดก็ยังมีช่องว่างระหว่างชื่อกับคะแนนน้อยผิดปกติ (เช่น
+       "Sophia:" กับคะแนนแทบชิดกัน)</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ทำไมถึงเป็นแบบนั้น — เรื่อง tab stop</span>
+      ตำแหน่ง tab stop ถูกกำหนดไว้ทุกๆ 4 ตัวอักษร แต่ละ tab จะเลื่อนไปยัง tab stop ถัดไป
+      ถ้าสตริงมี 5 ตัวอักษรแล้วตามด้วย tab มันจะเลื่อนไปที่ตำแหน่งตัวอักษรที่ 8 (เติมช่องว่างให้เต็ม)
+      แต่ถ้าสตริงมี 7 ตัวอักษรแล้วตามด้วย tab ก็เลื่อนไปตำแหน่งเดียวกันคือ 8 — ทำให้ tab
+      ที่อยู่ใกล้ tab stop ถัดไปแสดงช่องว่างน้อยกว่า tab ที่อยู่ไกลจาก tab stop ถัดไป
+      "Sophia:" มี 7 ตัวอักษร ใกล้ตำแหน่ง tab stop มาก ช่องว่างที่ได้จึงน้อย
+    </div>
+
+    <h3 id="s05c">เพิ่ม Tab อีกตัวให้ชื่อสั้น</h3>
+    <p>เติม <code>\t</code> อีกตัวหลังชื่อที่สั้นกว่า (Sophia, Jeong):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        </div>
+      <pre><code class="lang-cs">Console.WriteLine("Student\t\tGrade\n");
+Console.WriteLine("Sophia:\t\t" + sophiaScore + "\tA");
+Console.WriteLine("Nicolas:\t" + nicolasScore + "\tB");
+Console.WriteLine("Zahirah:\t" + zahirahScore + "\tB");
+Console.WriteLine("Jeong:\t\t" + jeongScore + "\tA");</code></pre>
+    </div>
+
+    <h3 id="s05d">ตรวจงานสุดท้าย</h3>
+    <p>โค้ดทั้งหมดของโปรเจกต์นี้ (ครบทุกขั้น):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — ฉบับสมบูรณ์</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int currentAssignments = 5;
+
+int sophia1 = 93;
+int sophia2 = 87;
+int sophia3 = 98;
+int sophia4 = 95;
+int sophia5 = 100;
+
+int nicolas1 = 80;
+int nicolas2 = 83;
+int nicolas3 = 82;
+int nicolas4 = 88;
+int nicolas5 = 85;
+
+int zahirah1 = 84;
+int zahirah2 = 96;
+int zahirah3 = 73;
+int zahirah4 = 85;
+int zahirah5 = 79;
+
+int jeong1 = 90;
+int jeong2 = 92;
+int jeong3 = 98;
+int jeong4 = 100;
+int jeong5 = 97;
+
+int sophiaSum = sophia1 + sophia2 + sophia3 + sophia4 + sophia5;
+int nicolasSum = nicolas1 + nicolas2 + nicolas3 + nicolas4 + nicolas5;
+int zahirahSum = zahirah1 + zahirah2 + zahirah3 + zahirah4 + zahirah5;
+int jeongSum = jeong1 + jeong2 + jeong3 + jeong4 + jeong5;
+
+decimal sophiaScore = (decimal) sophiaSum / currentAssignments;
+decimal nicolasScore = (decimal) nicolasSum / currentAssignments;
+decimal zahirahScore = (decimal) zahirahSum / currentAssignments;
+decimal jeongScore = (decimal) jeongSum / currentAssignments;
+
+Console.WriteLine("Student\t\tGrade\n");
+Console.WriteLine("Sophia:\t\t" + sophiaScore + "\tA");
+Console.WriteLine("Nicolas:\t" + nicolasScore + "\tB");
+Console.WriteLine("Zahirah:\t" + zahirahScore + "\tB");
+Console.WriteLine("Jeong:\t\t" + jeongScore + "\tA");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Student		Grade
+
+Sophia:		94.6	A
+Nicolas:	83.6	B
+Zahirah:	83.4	B
+Jeong:		95.4	A</pre></div>
+
+    <div class="note ok">
+      <span class="lbl">✅ เสร็จแล้ว!</span>
+      คุณเพิ่งสร้างแอปคำนวณเกรดที่ทำงานได้จริงครบวงจร — ตั้งแต่รับข้อมูลดิบ คำนวณผลรวม
+      คำนวณค่าเฉลี่ยแบบแม่นยำ ไปจนถึงจัดรูปแบบผลลัพธ์ให้ตรงสเปกลูกค้า (ครู) นี่คือกระบวนการ
+      พัฒนาซอฟต์แวร์แบบย่อส่วน ที่นักพัฒนาจริงใช้ทุกวัน
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch5-f"><span>เพิ่มหัวตาราง "Student Grade" ได้ถูกต้อง</span></label></li>
+      <li><label><input type="checkbox" id="ch5-g"><span>เข้าใจหลักการ tab stop ทุก 4 ตัวอักษร</span></label></li>
+      <li><label><input type="checkbox" id="ch5-h"><span>ปรับ \t จนคอลัมน์ตรงกันสวยงาม</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">5.6 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:32%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>คำนวณผลรวมแล้วโค้ดแสดงผล 0 ตลอด</td>
+          <td>ลืมย้ายบรรทัดคำนวณให้อยู่<b>เหนือ</b>บรรทัดแสดงผล (โค้ดทำงานบนลงล่าง)</td>
+        </tr>
+        <tr>
+          <td>ตัวแปร decimal แต่ได้ผลลัพธ์เป็นเลขจำนวนเต็ม</td>
+          <td>ลืม cast — ทั้ง sum และ currentAssignments เป็น int ทั้งคู่ ต้อง (decimal) ข้างใดข้างหนึ่งก่อนหาร</td>
+        </tr>
+        <tr>
+          <td>คอลัมน์ไม่ตรงกันแม้ใช้ \t แล้ว</td>
+          <td>tab stop คำนวณทุก 4 ตัวอักษร ชื่อยาวไม่เท่ากันจึงต้องปรับจำนวน \t ต่างกัน</td>
+        </tr>
+        <tr>
+          <td>อ้างอิงตัวแปรที่ยังไม่กำหนดค่า</td>
+          <td>error CS0165 (ทบทวนที่ <a href="ch02.html">บทที่ 2</a>) — ต้อง initialize ก่อนใช้เสมอ</td>
+        </tr>
+        <tr>
+          <td>โค้ดยาวจนงงว่าตัวแปรไหนของใคร</td>
+          <td>นี่คือเหตุผลที่ชื่อตัวแปรต้องสื่อความหมาย (camelCase + ชื่อเต็ม) ตามที่เรียนในบทที่ 2</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">5.7 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment จริงของบทนี้ใน Microsoft Learn (บทนี้มี 3 ข้อ)</p>
+
+    <div class="quiz" data-q="5-1">
+      <p class="q"><span class="num">1.</span> โค้ดนี้ทำอะไร? <code>var value = (int) dividend / (int) divisor;</code></p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>cast ตัวถูกดำเนินการเพื่อให้ผลลัพธ์ถูกตัดเศษทิ้ง</span></li>
+        <li class="opt"><span class="k">B</span><span>ประกาศตัวแปร int แบบระบุชนิดชัดเจน</span></li>
+        <li class="opt"><span class="k">C</span><span>cast ตัวถูกดำเนินการเพื่อป้องกันไม่ให้ผลลัพธ์ถูกตัดเศษ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> การ cast ทั้งสองข้างเป็น <code>(int)</code> บังคับให้เป็น
+        การหารแบบ int ซึ่ง<b>ตัดเศษทิ้งเสมอ</b> — ตรงข้ามกับข้อ C ส่วนข้อ B ผิดเพราะ
+        <code>var</code> คือการอนุมานชนิดแบบปริยาย ไม่ใช่การระบุชนิดชัดเจน</div>
+    </div>
+
+    <div class="quiz" data-q="5-2">
+      <p class="q"><span class="num">2.</span> เครื่องหมาย <code>$</code> ในสตริงของ C# ทำหน้าที่อะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>ให้ใช้ string interpolation แทรกตัวแปรลงในสตริงได้</span></li>
+        <li class="opt"><span class="k">B</span><span>บอกว่าสตริงนี้เป็น regular expression</span></li>
+        <li class="opt"><span class="k">C</span><span>บอกว่าสตริงนี้เป็น verbatim string literal</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> <code>$</code> คือสัญลักษณ์ของ string interpolation
+        (ทบทวนที่ <a href="ch03.html">บทที่ 3</a>) ข้อ C สับสนกับ <code>@</code> ซึ่งเป็น
+        verbatim string ต่างหาก</div>
+    </div>
+
+    <div class="quiz" data-q="5-3">
+      <p class="q"><span class="num">3.</span> โค้ดนี้ผิดตรงไหน? <code>int sophiaSum; Console.WriteLine("Sophia: " + sophiaSum);</code></p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>sophiaSum ยังไม่ถูกกำหนดค่าก่อนถูกใช้งาน</span></li>
+        <li class="opt"><span class="k">B</span><span>sophiaSum ไม่ถูกอนุมานชนิดเป็น string โดยปริยาย</span></li>
+        <li class="opt"><span class="k">C</span><span>sophiaSum ควรใช้คีย์เวิร์ด var</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ตัวแปรถูกประกาศแต่ไม่มีค่าเริ่มต้น พอนำไปใช้ในบรรทัดถัดมา
+        จะเกิด error CS0165 "Use of unassigned local variable" — ทบทวนได้ที่
+        <a href="ch02.html">บทที่ 2 หัวข้อ 2.4</a></div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">5.8 ✍️ แบบฝึกหัดต่อยอดโปรเจกต์</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เพิ่มนักเรียนคนที่ 5 ชื่อ <code>Aiden</code> คะแนนงาน 5 ชิ้น: 88, 91, 79, 85, 94
+           ประกาศตัวแปรคะแนนดิบและคำนวณผลรวมตามรูปแบบเดียวกับ 4 คนแรก</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int aiden1 = 88;
+int aiden2 = 91;
+int aiden3 = 79;
+int aiden4 = 85;
+int aiden5 = 94;
+
+int aidenSum = aiden1 + aiden2 + aiden3 + aiden4 + aiden5;
+Console.WriteLine("Aiden: " + aidenSum);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ต่อจากข้อ 1 คำนวณคะแนนเฉลี่ยของ Aiden (ใช้ cast ให้ถูกต้อง) แล้วเทียบกับตารางเกรด
+           หัวข้อ 5.4 ว่าควรได้เกรดอะไร</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">decimal aidenScore = (decimal)aidenSum / currentAssignments;
+Console.WriteLine("Aiden: " + aidenScore);</code></pre></div>
+          <p>ผลรวม = 437, เฉลี่ย = 87.4 → อยู่ในช่วง 87–89 = เกรด <b>B+</b></p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>จากผลลัพธ์ในหัวข้อ 5.5 (Sophia 94.6, Nicolas 83.6, Zahirah 83.4, Jeong 95.4)
+           ใครได้คะแนนเฉลี่ยสูงสุด และใครได้ต่ำสุด?</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body"><p>สูงสุด: <b>Jeong</b> (95.4) — ต่ำสุด: <b>Zahirah</b> (83.4)</p></div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดคำนวณ<b>คะแนนเฉลี่ยรวมของทั้งชั้น</b> (ค่าเฉลี่ยของคะแนนเฉลี่ยทั้ง 4 คนเดิม)
+           แล้วพิมพ์ออกมาด้วย string interpolation</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>บวกตัวแปร <code>xxxScore</code> ทั้ง 4 ตัวเข้าด้วยกัน แล้วหารด้วย 4
+           (ทั้งหมดเป็น decimal อยู่แล้ว ไม่ต้อง cast เพิ่ม)</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">decimal classAverage = (sophiaScore + nicolasScore + zahirahScore + jeongScore) / 4;
+Console.WriteLine($"คะแนนเฉลี่ยรวมของทั้งชั้น: {classAverage}");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้พยายามคำนวณค่าเฉลี่ยแต่ error หาจุดผิดและอธิบายว่าทำไม (ใช้ความรู้จากบทที่ 2 และ 4):</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">decimal average;
+int total = 350;
+int count = 5;
+average = total / count;
+Console.WriteLine(average);</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ไม่ error แต่ได้ผลลัพธ์ผิด — <code>total / count</code> เป็น int/int ตัดเศษก่อน
+             (350/5=70 พอดี กรณีนี้บังเอิญลงตัว แต่ถ้าตัวเลขอื่นไม่ลงตัวจะเห็นปัญหาทันที)
+             ต้อง cast ให้ถูกต้อง:</p>
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ถูก)</span></div>
+          <pre><code class="lang-cs">decimal average;
+int total = 350;
+int count = 5;
+average = (decimal)total / count;
+Console.WriteLine(average);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>รวมทุกอย่างที่เรียนในบทนี้: เขียนโปรแกรมคำนวณเกรดนักเรียน 2 คนตั้งแต่ต้นจนจบ
+           (ข้อมูลดิบ → ผลรวม → ค่าเฉลี่ย cast → จัดรูปแบบด้วย \t \n) ให้ได้ผลลัพธ์ตรงเป๊ะ:</p>
+        <div class="out auto"><pre>
+Student		Grade
+
+Maya:		91.5	A-
+Kenji:		78.0	C+</pre></div>
+        <p>ข้อมูลดิบ: Maya คะแนน 88, 95, 90, 92, 93 · Kenji คะแนน 75, 80, 79, 76, 80</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int assignments = 5;
+
+int maya1 = 88, maya2 = 95, maya3 = 90, maya4 = 92, maya5 = 93;
+int kenji1 = 75, kenji2 = 80, kenji3 = 79, kenji4 = 76, kenji5 = 80;
+
+int mayaSum = maya1 + maya2 + maya3 + maya4 + maya5;
+int kenjiSum = kenji1 + kenji2 + kenji3 + kenji4 + kenji5;
+
+decimal mayaScore = (decimal)mayaSum / assignments;
+decimal kenjiScore = (decimal)kenjiSum / assignments;
+
+Console.WriteLine("Student\t\tGrade\n");
+Console.WriteLine("Maya:\t\t" + mayaScore + "\tA-");
+Console.WriteLine("Kenji:\t\t" + kenjiScore + "\tC+");</code></pre></div>
+          <p><small>หมายเหตุ: บรรทัด <code>int maya1 = 88, maya2 = 95, ...;</code> ประกาศตัวแปร
+             หลายตัวชนิดเดียวกันในบรรทัดเดียวด้วยจุลภาค — เป็นไวยากรณ์ที่ถูกต้อง ย่อโค้ดให้สั้นลงได้</small></p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">📌 สรุปบทที่ 5</h2>
+
+    <p>เป้าหมายของบทนี้คือสร้างแอปที่รับคะแนนงานของนักเรียนในชั้น คำนวณเกรด แล้วแสดงผลลัพธ์
+       เพื่อให้สำเร็จ คุณประกาศและกำหนดค่าตัวแปรหลายชนิดข้อมูล ทำการคำนวณทางตัวเลข และใช้เทคนิค
+       การ cast เพื่อให้ได้ผลลัพธ์แม่นยำ คุณยังใช้ <code>Console.WriteLine()</code> ร่วมกับ
+       character escape sequence จัดรูปแบบผลลัพธ์ให้ตรงสเปก ด้วยการแตกปัญหาใหญ่เป็นชิ้นเล็กๆ
+       คุณสร้างโซลูชันได้จากทักษะที่เรียนมาในโมดูลก่อนหน้าทั้งหมด ยินดีด้วยที่พัฒนาแอปพลิเคชัน
+       แบบมีโครงสร้างสำเร็จ!</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 5</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:34%">เทคนิค</th><th>ใช้ตอนไหน</th></tr></thead>
+        <tbody>
+          <tr><td>ตัวแปร int เก็บผลรวม</td><td>ข้อมูลดิบเป็นจำนวนเต็ม บวกกันตรงๆ</td></tr>
+          <tr><td><code>(decimal)</code> cast</td><td>ก่อนหารตัวแปร int สองตัว ถ้าต้องการเศษทศนิยม</td></tr>
+          <tr><td>เขียนคำนวณเหนือแสดงผล</td><td>โค้ดทำงานบนลงล่างเสมอ</td></tr>
+          <tr><td>Console.WriteLine() ทวนผลระหว่างทาง</td><td>เช็คว่าแต่ละขั้นถูกต้องก่อนเพิ่มความซับซ้อน</td></tr>
+          <tr><td><code>\n</code> ท้ายข้อความ</td><td>เว้นบรรทัดว่างหลังหัวตาราง</td></tr>
+          <tr><td><code>\t</code> คั่นระหว่างคอลัมน์</td><td>จัดคอลัมน์ให้ตรงกัน (ปรับจำนวนตามความยาวชื่อ)</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s10">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">English</th><th style="width:22%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>guided project</td><td>โปรเจกต์นำทาง</td><td>โมดูลที่พาทำโปรเจกต์จริงทีละขั้นแบบต่อเนื่อง</td></tr>
+        <tr><td>tab stop</td><td>ตำแหน่งหยุดแท็บ</td><td>ตำแหน่งที่ \t เลื่อนไปหยุด (ทุก 4 ตัวอักษร)</td></tr>
+        <tr><td>dividend</td><td>ตัวตั้งหาร</td><td>ตัวเลขที่ถูกหาร (ฝั่งซ้ายของ /)</td></tr>
+        <tr><td>divisor</td><td>ตัวหาร</td><td>ตัวเลขที่ใช้หาร (ฝั่งขวาของ /)</td></tr>
+        <tr><td>incremental development</td><td>การพัฒนาแบบค่อยเป็นค่อยไป</td><td>สร้างโค้ดทีละชิ้น เช็คผลบ่อยๆ ระหว่างทาง</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch04.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 4 · Basic Operations on Numbers</span></a>
+      <a class="next" href="ch06.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 6 · Guided Project — Calculate Final GPA</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

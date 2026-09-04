@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 29 · Method พร้อม Parameter — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="29">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 5 · Create Methods / บทที่ 29</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 5 · โมดูล 2/5</span>
+      <h1>สร้าง Method ที่รับ Parameter</h1>
+      <div class="en">Create C# Methods with Parameters</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>65–80 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>ใช้พารามิเตอร์ เข้าใจ scope, pass-by-value/reference, named/optional argument</b></span>
+        <span>🎯 ความยาก <b>กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>เรียนรู้การใช้พารามิเตอร์เชิงลึกขึ้น</li>
+        <li>เข้าใจ method scope</li>
+        <li>เข้าใจพารามิเตอร์ชนิด pass-by-reference กับ pass-by-value</li>
+        <li>ใช้ named argument และ optional argument ได้</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">29.1 ทำไมต้องมี Parameter</h2>
+
+    <p>method มีความสามารถทำการดำเนินการกับ input ได้ การส่งพารามิเตอร์เข้า method ทำให้คุณทำงาน
+       เดียวกันกับค่า input ที่ต่างกันได้ การใช้พารามิเตอร์ทำให้คุณขยายโค้ดได้ในขณะที่ยังจัดระเบียบ
+       และอ่านง่ายอยู่ ถ้าคิดว่า method เป็นกล่องดำที่รับ input แล้วทำงานอย่างเดียว คุณแบ่งปัญหาใหญ่
+       เป็นชิ้นเล็กๆ ที่จัดการได้ง่ายขึ้นอย่างรวดเร็ว</p>
+
+    <p>สมมติคุณต้องเขียนโค้ดที่ทำการดำเนินการเดียวกันกับชุด input ที่ต่างกัน คุณอาจมี array 3 ชุด
+       และต้องแสดงเนื้อหาของแต่ละชุด คุณสร้าง method <code>DisplayArray</code> ที่รับ array เดียว
+       เป็น input แล้วแสดงเนื้อหาได้ แทนที่จะเขียนโค้ดแสดงแต่ละ array แยกกัน คุณเรียก method เดียวกัน
+       แล้วส่ง array ที่ต่างกันเป็น input ได้เลย</p>
+
+    <p>พารามิเตอร์ทำให้ method ของคุณแข็งแกร่งขึ้นในขณะที่ยังทำงานหลักเดิมอยู่ ในบทนี้ คุณจะเรียนรู้
+       การทำงานกับพารามิเตอร์เชิงลึกขึ้น และทำความเข้าใจ method ให้แน่นยิ่งขึ้น</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">29.2 ลงมือ: ใช้ Parameter ใน Method</h2>
+
+    <p>ตอนสร้าง method คุณมักต้องการให้ข้อมูลบางอย่างแก่ method เพื่อใช้งาน ข้อมูลที่ method ใช้
+       เรียกว่า <b>parameter</b> (พารามิเตอร์) คุณกำหนดพารามิเตอร์ได้เท่าที่จำเป็นต่องาน หรือไม่มี
+       เลยก็ได้</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 Parameter กับ Argument ต่างกันยังไง</span>
+      คำว่า "parameter" และ "argument" มักถูกใช้แทนกันได้ แต่จริงๆ แล้วมีความหมายต่างกัน:
+      <b>parameter</b> หมายถึงตัวแปรใน<i>method signature</i> ส่วน <b>argument</b> คือ<i>ค่าที่
+      ส่งเข้าไป</i>ตอนเรียก method — เช่น ใน <code>void CountTo(int max)</code> — <code>max</code>
+      คือ parameter แต่ตอนเรียก <code>CountTo(5)</code> — <code>5</code> คือ argument
+    </div>
+
+    <h3 id="s02a">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch29-parameters</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <h3 id="s02b">เพิ่ม Parameter ให้ Method</h3>
+    <p>พารามิเตอร์ใน method ทำงานคล้ายตัวแปรมาก — parameter นิยามด้วยการระบุ data type ตามด้วยชื่อ
+       ของพารามิเตอร์ parameter ถูกประกาศใน method signature และค่าของพารามิเตอร์ถูกให้โดยผู้เรียก
+       method แทนที่จะ initialize ข้างในตัว method เอง พิจารณาโค้ดนี้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">CountTo(5);
+
+void CountTo(int max)
+{
+    for (int i = 0; i < max; i++)
+    {
+        Console.Write($"{i}, ");
+    }
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+0, 1, 2, 3, 4, </pre></div>
+
+    <p>ในตัวอย่างนี้ method <code>CountTo</code> รับพารามิเตอร์ชนิด integer ชื่อ <code>max</code>
+       — พารามิเตอร์นี้ถูกอ้างอิงใน <code>for</code> loop ของ method ตอนเรียก <code>CountTo</code>
+       ค่า integer <code>5</code> ถูกส่งเป็น argument</p>
+
+    <p>ในแบบฝึกหัดนี้ คุณจะสร้าง method ที่ปรับเวลาตารางนัดให้ตรงกับโซนเวลา GMT ที่ต่างกัน method
+       ควรรับรายการเวลา โซนเวลาปัจจุบัน และโซนเวลาใหม่</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int[] schedule = {800, 1200, 1600, 2000};</code></pre>
+    </div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void DisplayAdjustedTimes(int[] times, int currentGMT, int newGMT)
+{
+
+}</code></pre>
+    </div>
+
+    <p>สังเกตว่าพารามิเตอร์ถูกประกาศคล้ายกับตอนคุณประกาศตัวแปร — ใช้ data type ตามด้วยชื่อตัวแปร
+       คุณใช้พารามิเตอร์ data type ไหนก็ได้ เช่น <code>string</code>, <code>bool</code>,
+       <code>int</code>, array และอื่นๆ! พารามิเตอร์หลายตัวใน method ต้องคั่นด้วยจุลภาคเสมอ</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int diff = 0;
+if (Math.Abs(newGMT) > 12 || Math.Abs(currentGMT) > 12)
+{
+    Console.WriteLine("Invalid GMT");
+}</code></pre>
+    </div>
+
+    <p>สังเกตว่าคุณไม่ต้องประกาศตัวแปร <code>newGMT</code> และ <code>currentGMT</code> เพราะมัน
+       ถูกประกาศไว้แล้วใน method signature คุณยังไม่ต้อง initialize ตัวแปรเหล่านั้นด้วย เพราะ method
+       สมมติว่าผู้เรียกจะส่ง argument ที่มีค่ากำหนดไว้แล้วมาให้เสมอ</p>
+
+    <p>ในขั้นตอนนี้ คุณสร้าง <code>int diff</code> เก็บส่วนต่างของเวลา แล้วเช็คว่าค่า GMT ที่ให้มา
+       อยู่ระหว่าง -12 ถึง 12 — ใช้ <code>Math.Abs</code> หาค่าสัมบูรณ์ของตัวเลข ดังนั้นค่า GMT จะ
+       ไม่ถูกต้องถ้ามากกว่า 12</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int diff = 0;
+if (Math.Abs(newGMT) > 12 || Math.Abs(currentGMT) > 12)
+{
+    Console.WriteLine("Invalid GMT");
+}
+else if (newGMT <= 0 && currentGMT <= 0 || newGMT >= 0 && currentGMT >= 0)
+{
+    diff = 100 * (Math.Abs(newGMT) - Math.Abs(currentGMT));
+}
+else
+{
+    diff = 100 * (Math.Abs(newGMT) + Math.Abs(currentGMT));
+}
+
+for (int i = 0; i < times.Length; i++)
+{
+    int newTime = (times[i] + diff) % 2400;
+    Console.WriteLine($"{times[i]} -> {newTime}");
+}</code></pre>
+    </div>
+
+    <p>เรียก method:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int[] schedule = {800, 1200, 1600, 2000};
+DisplayAdjustedTimes(schedule, 6, -6);
+
+void DisplayAdjustedTimes(int[] times, int currentGMT, int newGMT)
+{
+    int diff = 0;
+    if (Math.Abs(newGMT) > 12 || Math.Abs(currentGMT) > 12)
+    {
+        Console.WriteLine("Invalid GMT");
+    }
+    else if (newGMT <= 0 && currentGMT <= 0 || newGMT >= 0 && currentGMT >= 0)
+    {
+        diff = 100 * (Math.Abs(newGMT) - Math.Abs(currentGMT));
+    }
+    else
+    {
+        diff = 100 * (Math.Abs(newGMT) + Math.Abs(currentGMT));
+    }
+
+    for (int i = 0; i < times.Length; i++)
+    {
+        int newTime = (times[i] + diff) % 2400;
+        Console.WriteLine($"{times[i]} -> {newTime}");
+    }
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+800 -> 2000
+1200 -> 0
+1600 -> 400
+2000 -> 800</pre></div>
+
+    <p>สังเกตว่าทั้งตัวแปรและ literal ส่งเป็น argument ให้ method ได้ ด้วยการใช้พารามิเตอร์
+       method จึงไม่ถูกจำกัดให้ใช้แค่ค่าของตัวแปร global เท่านั้น</p>
+
+    <div class="quiz" data-q="29-1">
+      <p class="q"><span class="num">Check ★</span> ข้อใดนิยามพารามิเตอร์ชนิด integer 3 ตัวได้
+        ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>void Multiply(int a, b, c)</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>void Multiply(int a, int b, int c)</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>void Multiply(int a; int b; int c)</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> แต่ละพารามิเตอร์ต้องระบุ data type ของตัวเองเสมอ ไม่ใช่
+        ใช้ type เดียวครอบคลุมทุกตัวแบบข้อ A และต้องคั่นด้วยจุลภาค ไม่ใช่เซมิโคลอนแบบข้อ C</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch29-a"><span>แยกความหมายของ parameter กับ argument ได้</span></label></li>
+      <li><label><input type="checkbox" id="ch29-b"><span>สร้าง method ที่รับหลายพารามิเตอร์สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">29.3 ลงมือ: ทำความเข้าใจ Method Scope</h2>
+
+    <p><code>for</code> loop, <code>if-else</code> statement, และ method ล้วนเป็น code block คนละ
+       ชนิดกัน แต่ละ code block มี "scope" ของตัวเอง — "scope" คือขอบเขตของโปรแกรมที่ข้อมูลบางอย่าง
+       เข้าถึงได้ ตัวแปรที่ประกาศข้างใน method หรือ code block ใดๆ เข้าถึงได้แค่ในขอบเขตนั้นเท่านั้น
+       เมื่อโปรแกรมซับซ้อนขึ้น แพทเทิร์นนี้ช่วยให้นักพัฒนาใช้ชื่อตัวแปรที่ชัดเจนสม่ำเสมอ และดูแล
+       รักษาโค้ดให้อ่านง่ายได้</p>
+
+    <h3 id="s03a">ทดสอบ Scope ของตัวแปร</h3>
+    <p>statement ที่ประกาศนอก code block ใดๆ เรียกว่า top-level statement ตัวแปรที่ประกาศใน
+       top-level statement เรียกว่า "<b>global variable</b>" global variable ไม่ถูกจำกัดด้วย scope
+       ใดๆ ใช้ที่ไหนก็ได้ตลอดทั้งโปรแกรม global variable มีประโยชน์สำหรับ method ต่างๆ ที่ต้องเข้าถึง
+       ข้อมูลเดียวกัน อย่างไรก็ตาม สำคัญมากที่ต้องระวังชื่อตัวแปรใน scope ต่างกัน</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] students = {"Jenna", "Ayesha", "Carlos", "Viktor"};
+
+DisplayStudents(students);
+DisplayStudents(new string[] {"Robert","Vanya"});
+
+void DisplayStudents(string[] students)
+{
+    foreach (string student in students)
+    {
+        Console.Write($"{student}, ");
+    }
+    Console.WriteLine();
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Jenna, Ayesha, Carlos, Viktor, 
+Robert, Vanya, </pre></div>
+
+    <p>ในโค้ดนี้ คุณสร้าง global array <code>students</code> และ method <code>DisplayStudents</code>
+       ที่รับพารามิเตอร์ชื่อเดียวกัน สังเกตว่าพารามิเตอร์ <code>students</code> ของ method มีความ
+       สำคัญเหนือกว่า global array <code>students</code> — สำคัญมากที่ต้องระมัดระวังและตั้งใจว่า
+       method ของคุณจะใช้ global variable ตัวไหนบ้าง</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ตัวแปรใน method หนึ่งเข้าไม่ถึงจาก method อื่น</span>
+      พิจารณาโค้ดนี้:
+      <div class="code">
+        <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด — compile error)</span></div>
+        <pre><code class="lang-cs">PrintCircleArea(12);
+double circumference = 2 * pi * radius;
+
+void PrintCircleArea(int radius)
+{
+    double pi = 3.14159;
+    double area = pi * (radius * radius);
+    Console.WriteLine($"Area = {area}");
+}</code></pre>
+      </div>
+      โค้ดนี้จะแสดง error บอกว่าชื่อ <code>pi</code> และ <code>radius</code> ไม่มีอยู่ใน scope
+      ปัจจุบัน เพราะตัวแปรเหล่านั้นมีอยู่แค่ใน scope ของ method <code>PrintCircleArea</code>
+      เท่านั้น
+    </div>
+
+    <h3 id="s03b">แชร์ตัวแปรระหว่าง Method ด้วย Global Variable</h3>
+    <p>สร้าง method อีกตัวที่คำนวณเส้นรอบวง:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void PrintCircleCircumference(int radius)
+{
+    double pi = 3.14159;
+    double circumference = 2 * pi * radius;
+    Console.WriteLine($"Circumference = {circumference}");
+}</code></pre>
+    </div>
+
+    <p>เพราะตัวแปร <code>pi</code> ถูกตั้งค่าคงที่เท่ากันเสมอ และใช้ในทั้งสอง method ค่านี้จึงเหมาะ
+       สำหรับเป็น global variable ในตัวอย่างนี้ <code>radius</code> <b>ไม่ใช่</b> global variable
+       เพื่อให้คุณเรียก method ด้วยค่า <code>radius</code> ต่างกันได้โดยไม่ต้องอัปเดตตัวแปรทุกครั้ง</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">double pi = 3.14159;
+
+PrintCircleArea(12);
+PrintCircleCircumference(12);
+
+void PrintCircleArea(int radius)
+{
+    double area = pi * (radius * radius);
+    Console.WriteLine($"Area = {area}");
+}
+
+void PrintCircleCircumference(int radius)
+{
+    double circumference = 2 * pi * radius;
+    Console.WriteLine($"Circumference = {circumference}");
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Area = 452.38896
+Circumference = 75.39815999999999</pre></div>
+
+    <p>ตอนนี้ทั้งสอง method อ้างอิงค่า <code>pi</code> เดียวกันได้ โดยไม่ต้องนิยามซ้ำเลย</p>
+
+    <h3 id="s03c">Method เรียก Method อื่นได้</h3>
+    <p>คุณอาจเดาได้แล้วว่า method เรียก method อื่นได้ โดยทั่วไป ตราบใดที่ method ถูกนิยามอยู่ใน scope
+       ของโปรแกรมคุณ มันถูกเรียกจากที่ไหนก็ได้</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">double pi = 3.14159;
+PrintCircleInfo(12);
+PrintCircleInfo(24);
+
+void PrintCircleInfo(int radius)
+{
+    Console.WriteLine($"Circle with radius {radius}");
+    PrintCircleArea(radius);
+    PrintCircleCircumference(radius);
+}
+
+void PrintCircleArea(int radius)
+{
+    double area = pi * (radius * radius);
+    Console.WriteLine($"Area = {area}");
+}
+
+void PrintCircleCircumference(int radius)
+{
+    double circumference = 2 * pi * radius;
+    Console.WriteLine($"Circumference = {circumference}");
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Circle with radius 12
+Area = 452.38896
+Circumference = 75.39815999999999
+Circle with radius 24
+Area = 1809.55584
+Circumference = 150.79631999999998</pre></div>
+
+    <p>ในโค้ดนี้ คุณสร้าง method ใหม่ <code>PrintCircleInfo</code> ที่เรียก method ที่มีอยู่แล้ว
+       ค่า <code>radius</code> ถูกส่งต่อไปยังแต่ละ method ด้วย การสร้าง method ที่แยกเป็นโมดูลแบบนี้
+       ช่วยให้โค้ดของคุณจัดระเบียบและอ่านง่ายขึ้น</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch29-c"><span>เข้าใจว่าตัวแปรใน method หนึ่งเข้าไม่ถึงจาก method อื่น</span></label></li>
+      <li><label><input type="checkbox" id="ch29-d"><span>ใช้ global variable แชร์ค่าระหว่าง method สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch29-e"><span>สร้าง method ที่เรียก method อื่นสำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">29.4 ลงมือ: Value Type และ Reference Type Parameter</h2>
+
+    <p>ใน C# ตัวแปรแบ่งเป็น 2 ประเภทหลัก คือ value type และ reference type (ทบทวนจาก
+       <a href="ch21.html">บทที่ 21</a>) ประเภทเหล่านี้อธิบายว่าตัวแปรเก็บค่าของมันยังไง</p>
+
+    <p>value type อย่าง <code>int</code>, <code>bool</code>, <code>float</code>, <code>double</code>,
+       และ <code>char</code> เก็บค่าโดยตรง reference type อย่าง <code>string</code>, array, และ
+       object (เช่น instance ของ <code>Random</code>) ไม่ได้เก็บค่าของมันโดยตรง แต่เก็บ address ที่
+       ค่าของมันถูกเก็บอยู่แทน</p>
+
+    <h3 id="s04a">พารามิเตอร์แบบ Pass-by-value และ Pass-by-reference</h3>
+    <p>ตอนส่ง argument เข้า method ตัวแปรชนิด <i>value</i> จะถูกก็อปปี้ค่าเข้าไปใน method ตัวแปร
+       แต่ละตัวมีสำเนาของค่าเป็นของตัวเอง ดังนั้นตัวแปรต้นฉบับจึงไม่ถูกแก้ไข</p>
+
+    <p>สำหรับ reference type, address ของค่านั้นถูกส่งเข้า method ตัวแปรที่ส่งให้ method อ้างอิงไปยัง
+       ค่าที่ address นั้น ดังนั้นการดำเนินการกับตัวแปรนั้นส่งผลต่อค่าที่ถูกอ้างอิงโดยตัวแปรอื่นด้วย</p>
+
+    <h3 id="s04b">ทดสอบ Pass by Value</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int a = 3;
+int b = 4;
+int c = 0;
+
+Multiply(a, b, c);
+Console.WriteLine($"global statement: {a} x {b} = {c}");
+
+void Multiply(int a, int b, int c)
+{
+    c = a * b;
+    Console.WriteLine($"inside Multiply method: {a} x {b} = {c}");
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+inside Multiply method: 3 x 4 = 12
+global statement: 3 x 4 = 0</pre></div>
+
+    <p>ตัวแปร <code>a</code>, <code>b</code>, และ <code>c</code> ถูกส่งให้ method
+       <code>Multiply</code> ค่าของตัวแปรถูกพิมพ์ระหว่าง method ทำงาน แล้วพิมพ์อีกครั้งหลัง method
+       ทำงานเสร็จ — integer เป็น value type ซึ่งถูกก็อปปี้ค่าตอนส่งเข้า method สังเกตว่าค่าของ
+       <code>c</code> ถูกแก้ไขแค่ข้างใน method <code>Multiply</code> เท่านั้น นอกเหนือจากนั้น
+       <code>c</code> ยังคงค่าเดิมของมัน</p>
+
+    <h3 id="s04c">ทดสอบ Pass by Reference</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int[] array = {1, 2, 3, 4, 5};
+
+PrintArray(array);
+Clear(array);
+PrintArray(array);
+
+void PrintArray(int[] array)
+{
+    foreach (int a in array)
+    {
+        Console.Write($"{a} ");
+    }
+    Console.WriteLine();
+}
+
+void Clear(int[] array)
+{
+    for (int i = 0; i < array.Length; i++)
+    {
+        array[i] = 0;
+    }
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+1 2 3 4 5 
+0 0 0 0 0</pre></div>
+
+    <p>array เป็น reference type — reference type เก็บ address ของค่าในหน่วยความจำ สังเกตว่า array
+       ยังคงถูกแก้ไขอยู่นอก scope ของ method <code>Clear</code> เพราะ method <code>Clear</code>
+       อัปเดตค่าที่เก็บอยู่ที่แต่ละ address โดยตรง (ทบทวนแนวคิดนี้จาก <a href="ch21.html">บทที่
+       21 หัวข้อ 21.5c</a>)</p>
+
+    <h3 id="s04d">ทดสอบกับ String</h3>
+    <p>ก่อนหน้านี้คุณเรียนแล้วว่า string เป็นชนิด <i>immutable</i> (เปลี่ยนแปลงไม่ได้) แม้ string
+       จะเป็น reference type แต่ค่าของมันเปลี่ยนแปลงไม่ได้หลังถูกกำหนดค่า ต่างจาก array — คุณอาจ
+       สังเกตเห็นเรื่องนี้แล้วถ้าเคยใช้เมธอดอย่าง <code>string.Replace</code> หรือ
+       <code>string.ToUpper</code> ในหัวข้อนี้ คุณจะเรียนแก้ไข error ที่พบบ่อยเวลาทำงานกับ string</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string status = "Healthy";
+
+Console.WriteLine($"Start: {status}");
+SetHealth(status, false);
+Console.WriteLine($"End: {status}");
+
+void SetHealth(string status, bool isHealthy)
+{
+    status = (isHealthy ? "Healthy" : "Unhealthy");
+    Console.WriteLine($"Middle: {status}");
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Start: Healthy
+Middle: Unhealthy
+End: Healthy</pre></div>
+
+    <p>ถ้า method <code>SetHealth</code> ไม่ได้แสดงค่า status ออกมาด้วย คุณอาจคิดว่า method ทำงาน
+       ผิดพลาด แต่จริงๆ แล้ว string ใหม่ที่มีค่า "Unhealthy" ถูกสร้างขึ้น แล้วก็หายไปใน scope ของ
+       method นั้นเอง</p>
+
+    <p>แก้ปัญหานี้ได้ด้วยการเปลี่ยน <code>SetHealth</code> ให้ใช้ตัวแปร status แบบ global แทน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string status = "Healthy";
+
+Console.WriteLine($"Start: {status}");
+SetHealth(false);
+Console.WriteLine($"End: {status}");
+
+void SetHealth(bool isHealthy)
+{
+    status = (isHealthy ? "Healthy" : "Unhealthy");
+    Console.WriteLine($"Middle: {status}");
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Start: Healthy
+Middle: Unhealthy
+End: Unhealthy</pre></div>
+
+    <p>ในโค้ดนี้ คุณเขียนทับตัวแปร global <code>status</code> ด้วยค่า string ใหม่ ตอนนี้ค่าที่
+       อัปเดตแล้วถูกเก็บและบันทึกไว้อย่างถูกต้อง</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ สรุปตาราง value/reference type parameter</span>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Data Type</th><th>ประเภท</th><th>method แก้ไขค่าต้นฉบับได้ไหม</th></tr></thead>
+        <tbody>
+          <tr><td>int, bool, double, float, char</td><td>Value type</td><td>ไม่ได้ — ก็อปปี้ค่าเข้าไป</td></tr>
+          <tr><td>array</td><td>Reference type</td><td>ได้ — แก้ไขค่าที่ address เดียวกัน</td></tr>
+          <tr><td>string</td><td>Reference type แต่ immutable</td><td>ไม่ได้ — สร้าง string ใหม่แทนเสมอ</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="quiz" data-q="29-2">
+      <p class="q"><span class="num">Check ★</span> กำหนด method signature
+        <code>void SetHealth(string health)</code> — ทำไมการดำเนินการข้างใน method จึงไม่ส่งผลต่อ
+        string <code>health</code> ต้นฉบับ?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เพราะ string data type เป็น pass by value</span></li>
+        <li class="opt"><span class="k">B</span><span>เพราะโค้ดใน method ต้องผิดพลาดแน่นอน</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>string เปลี่ยนแปลงค่าไม่ได้หลังถูกกำหนดค่า มันแค่ถูกเขียนทับด้วยค่าใหม่เท่านั้น</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> string เป็น reference type (ไม่ใช่ pass by value ตามข้อ
+        A ที่ผิด) แต่เป็น <i>immutable</i> — การ "แก้ไข" string จริงๆ แล้วคือการสร้าง string ใหม่
+        ทั้งก้อนเสมอ ไม่ใช่แก้ไขของเดิม string ใหม่นั้นจึงหายไปเมื่อ method จบทำงาน ไม่ใช่ code ผิด
+        แต่อย่างใด</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch29-f"><span>ทดสอบ pass-by-value กับ int สำเร็จ เห็นว่าตัวแปรต้นฉบับไม่เปลี่ยน</span></label></li>
+      <li><label><input type="checkbox" id="ch29-g"><span>ทดสอบ pass-by-reference กับ array สำเร็จ เห็นว่าตัวแปรต้นฉบับเปลี่ยนตาม</span></label></li>
+      <li><label><input type="checkbox" id="ch29-h"><span>เข้าใจว่าทำไม string ถึงมีพฤติกรรมเหมือน pass-by-value ทั้งที่เป็น reference type</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">29.5 ลงมือ: Named และ Optional Parameter</h2>
+
+    <p>ภาษา C# รองรับ named parameter และ optional parameter — parameter ชนิดนี้ให้คุณเลือกได้ว่า
+       จะส่ง argument ตัวไหนให้ method บ้าง คุณจึงไม่ถูกจำกัดด้วยโครงสร้างที่กำหนดไว้ใน method
+       signature เท่านั้น</p>
+
+    <p><b>named argument</b> ให้คุณระบุค่าของพารามิเตอร์ด้วยชื่อของมัน แทนที่จะใช้ตำแหน่ง
+       <b>optional parameter</b> ให้คุณละเว้น argument นั้นตอนเรียก method ได้</p>
+
+    <h3 id="s05a">สร้างแอปตอบรับคำเชิญงานอีเวนต์ (RSVP)</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[] guestList = {"Rebecca", "Nadia", "Noor", "Jonte"};
+string[] rsvps = new string[10];
+int count = 0;
+
+void RSVP(string name, int partySize, string allergies, bool inviteOnly)
+{
+    if (inviteOnly)
+    {
+        // search guestList before adding rsvp
+    }
+
+    rsvps[count] = $"Name: {name}, \tParty Size: {partySize}, \tAllergies: {allergies}";
+    count++;
+}
+
+void ShowRSVPs()
+{
+    Console.WriteLine("\nTotal RSVPs:");
+    for (int i = 0; i < count; i++)
+    {
+        Console.WriteLine(rsvps[i]);
+    }
+}</code></pre>
+    </div>
+
+    <p>เพิ่มโค้ดค้นหา guest list ใน method <code>RSVP</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">if (inviteOnly)
+{
+    bool found = false;
+    foreach (string guest in guestList)
+    {
+        if (guest.Equals(name)) {
+            found = true;
+            break;
+        }
+    }
+    if (!found)
+    {
+        Console.WriteLine($"Sorry, {name} is not on the guest list");
+        return;
+    }
+}</code></pre>
+    </div>
+
+    <p>โค้ดนี้เช็คว่าชื่อที่ให้มาตรงกับชื่อในรายชื่อแขกไหม ถ้าเจอ ตั้ง <code>found</code> เป็น
+       <code>true</code> แล้ว break ออกจาก <code>foreach</code> loop ถ้า <code>found</code> เป็น
+       <code>false</code> แสดงข้อความ แล้วใช้คีย์เวิร์ด <code>return</code> จบการทำงานของ method</p>
+
+    <p>เรียก method:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">RSVP("Rebecca", 1, "none", true);
+RSVP("Nadia", 2, "Nuts", true);
+RSVP("Linh", 2, "none", false);
+RSVP("Tony", 1, "Jackfruit", true);
+RSVP("Noor", 4, "none", false);
+RSVP("Jonte", 2, "Stone fruit", false);
+ShowRSVPs();</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Sorry, Tony is not on the guest list
+
+Total RSVPs:
+Name: Rebecca,  Party Size: 1,  Allergies: none
+Name: Nadia,    Party Size: 2,  Allergies: Nuts
+Name: Linh,     Party Size: 2,  Allergies: none
+Name: Noor,     Party Size: 4,  Allergies: none
+Name: Jonte,    Party Size: 2,  Allergies: Stone fruit</pre></div>
+
+    <h3 id="s05b">ใช้ Named Argument</h3>
+    <p>ตอนเรียก method ที่รับพารามิเตอร์หลายตัว การเข้าใจว่า argument แต่ละตัวแทนอะไรอาจทำได้ยาก
+       การใช้ named argument ช่วยเพิ่มความอ่านง่ายของโค้ด ใช้ named argument ด้วยการระบุชื่อ
+       พารามิเตอร์ตามด้วยค่า argument</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">RSVP(name: "Linh", partySize: 2, allergies: "none", inviteOnly: false);</code></pre>
+    </div>
+
+    <p>สังเกตว่าคุณระบุชื่อพารามิเตอร์ตามด้วยเครื่องหมายทวิภาคและค่า — syntax นี้เรียกว่า named
+       argument ไม่จำเป็นต้องตั้งชื่อ argument ทุกตัว เช่น syntax ต่อไปนี้ก็ถูกต้องเหมือนกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">RSVP("Linh", 2, allergies: "none", inviteOnly: false);
+RSVP("Linh", partySize: 2, "none", false);</code></pre>
+    </div>
+
+    <p>named argument ที่ใช้ร่วมกับ positional argument ใช้ได้ถ้าอยู่ในตำแหน่งที่ถูกต้อง named
+       argument ยังใช้ได้ตราบใดที่ไม่ตามด้วย positional argument ตัวอย่างเช่น การใส่
+       <code>"Linh"</code> และ <code>2</code> ไว้ท้ายสุดจะผิด:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด — compile error)</span></div>
+      <pre><code class="lang-cs">RSVP(allergies: "none", inviteOnly: false, "Linh", 2);</code></pre>
+    </div>
+
+    <div class="out err"><pre>
+error CS1738: Named argument 'allergies' is used out-of-position but is followed by an unnamed argument</pre></div>
+
+    <p>named argument ไม่จำเป็นต้องเรียงตามลำดับเดิมด้วย:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">RSVP("Tony", inviteOnly: true, allergies: "Jackfruit", partySize: 1);</code></pre>
+    </div>
+
+    <p>สังเกตว่า argument ที่ตั้งชื่อไม่จำเป็นต้องเรียงตามลำดับต้นฉบับ แต่ argument ที่ไม่ตั้งชื่อ
+       อย่าง <code>"Tony"</code> เป็น positional argument จึงต้องอยู่ในตำแหน่งที่ตรงกันเสมอ</p>
+
+    <h3 id="s05c">ประกาศ Optional Parameter</h3>
+    <p>พารามิเตอร์กลายเป็น optional เมื่อมันถูกกำหนดค่า default ไว้ ถ้า optional parameter ถูกละไว้
+       จาก argument ค่า default จะถูกใช้ตอน method ทำงาน ในขั้นตอนนี้ คุณจะทำให้พารามิเตอร์
+       <code>partySize</code>, <code>allergies</code>, และ <code>inviteOnly</code> เป็น optional</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">void RSVP(string name, int partySize = 1, string allergies = "none", bool inviteOnly = true)</code></pre>
+    </div>
+
+    <p>สังเกต syntax นี้ — พารามิเตอร์ยังคั่นด้วยจุลภาคเหมือนเดิม แต่พารามิเตอร์
+       <code>partySize</code>, <code>allergies</code>, และ <code>inviteOnly</code> ถูกกำหนดค่าแต่ละ
+       ตัวไว้</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">RSVP("Rebecca");
+RSVP("Nadia", 2, "Nuts");
+RSVP(name: "Linh", partySize: 2, inviteOnly: false);
+RSVP("Tony", allergies: "Jackfruit", inviteOnly: true);
+RSVP("Noor", 4, inviteOnly: false);
+RSVP("Jonte", 2, "Stone fruit", false);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Sorry, Tony is not on the guest list
+
+Total RSVPs:
+Name: Rebecca,  Party Size: 1,  Allergies: none
+Name: Nadia,    Party Size: 2,  Allergies: Nuts
+Name: Linh,     Party Size: 2,  Allergies: none
+Name: Noor,     Party Size: 4,  Allergies: none
+Name: Jonte,    Party Size: 2,  Allergies: Stone fruit</pre></div>
+
+    <p>ในแต่ละการเรียก method สังเกตว่า <code>name</code> ไม่เคยถูกละเว้นเลย เวลาเรียก method
+       argument ที่จำเป็น (required) ต้องมีเสมอ แต่ argument ที่เป็น optional ละเว้นได้</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 ข้อจำกัด: required parameter ต้องมาก่อน optional เสมอ</span>
+      ใน method signature พารามิเตอร์ที่ไม่มีค่า default (required) ต้องอยู่<b>ก่อน</b>พารามิเตอร์
+      ที่มีค่า default (optional) เสมอ — เช่น <code>void RSVP(string name, int partySize = 1, ...)</code>
+      ถูกต้อง แต่ <code>void RSVP(int partySize = 1, string name, ...)</code> จะ compile ไม่ผ่าน
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch29-i"><span>ใช้ named argument เรียก method สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch29-j"><span>ประกาศและใช้ optional parameter สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch29-k"><span>เข้าใจกฎการผสม positional/named argument</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">29.6 ท้าทาย: แสดงที่อยู่อีเมล</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl m">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>โจทย์ของคุณคือสร้าง method ที่แสดงที่อยู่อีเมลที่ถูกต้องให้พนักงานทั้งภายในและภายนอกบริษัท
+           คุณได้รับรายชื่อพนักงานภายในและภายนอก ที่อยู่อีเมลของพนักงานประกอบด้วย username และชื่อ
+           โดเมนบริษัท</p>
+        <p>รูปแบบ username คือ ตัวอักษร 2 ตัวแรกของชื่อจริง ตามด้วยนามสกุลเต็ม เช่น พนักงานชื่อ
+           "Robert Bavin" จะได้ username "robavin" — โดเมนของพนักงานภายในคือ "contoso.com"</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">ข้อมูลตั้งต้น</span></div>
+          <pre><code class="lang-cs">string[,] corporate =
+{
+    {"Robert", "Bavin"}, {"Simon", "Bright"},
+    {"Kim", "Sinclair"}, {"Aashrita", "Kamath"},
+    {"Sarah", "Delucchi"}, {"Sinan", "Ali"}
+};
+
+string[,] external =
+{
+    {"Vinnie", "Ashton"}, {"Cody", "Dysart"},
+    {"Shay", "Lawrence"}, {"Daren", "Valdes"}
+};
+
+string externalDomain = "hayworth.com";
+
+for (int i = 0; i < corporate.GetLength(0); i++)
+{
+    // display internal email addresses
+}
+
+for (int i = 0; i < external.GetLength(0); i++)
+{
+    // display external email addresses
+}</code></pre>
+        </div>
+        <p>โจทย์คือสร้าง method ที่แสดงที่อยู่อีเมลของพนักงานทั้งภายในและภายนอก โดย method ต้องมี
+           optional parameter สำหรับชื่อโดเมนของพนักงานภายนอก</p>
+        <p>ผลลัพธ์ที่ต้องได้:</p>
+        <div class="out auto"><pre>
+robavin@contoso.com
+sibright@contoso.com
+kisinclair@contoso.com
+aakamath@contoso.com
+sadelucchi@contoso.com
+siali@contoso.com
+viashton@hayworth.com
+codysart@hayworth.com
+shlawrence@hayworth.com
+davaldes@hayworth.com</pre></div>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>สร้าง method <code>DisplayEmail(string first, string last, string domain = "contoso.com")</code>
+             — ใช้ <code>Substring(0, 2)</code> (ทบทวนจาก <a href="ch25.html">บทที่ 25</a>) ตัด
+             ตัวอักษร 2 ตัวแรกของชื่อจริง ต่อด้วยนามสกุลเต็ม แล้ว <code>ToLower()</code> ทั้งหมด</p>
+        </div>
+      </details>
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย (เฉลยทางการจาก Microsoft Learn)</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">string[,] corporate =
+{
+    {"Robert", "Bavin"}, {"Simon", "Bright"},
+    {"Kim", "Sinclair"}, {"Aashrita", "Kamath"},
+    {"Sarah", "Delucchi"}, {"Sinan", "Ali"}
+};
+
+string[,] external =
+{
+    {"Vinnie", "Ashton"}, {"Cody", "Dysart"},
+    {"Shay", "Lawrence"}, {"Daren", "Valdes"}
+};
+
+string externalDomain = "hayworth.com";
+
+for (int i = 0; i < corporate.GetLength(0); i++)
+{
+    DisplayEmail(first: corporate[i,0], last: corporate[i,1]);
+}
+
+for (int i = 0; i < external.GetLength(0); i++)
+{
+    DisplayEmail(first: external[i,0], last: external[i,1], domain: externalDomain);
+}
+
+void DisplayEmail(string first, string last, string domain = "contoso.com")
+{
+    string email = first.Substring(0, 2) + last;
+    email = email.ToLower();
+    Console.WriteLine($"{email}@{domain}");
+}</code></pre>
+        </div>
+        <div class="out"><div class="out-bar">Output</div><pre>
+robavin@contoso.com
+sibright@contoso.com
+kisinclair@contoso.com
+aakamath@contoso.com
+sadelucchi@contoso.com
+siali@contoso.com
+viashton@hayworth.com
+codysart@hayworth.com
+shlawrence@hayworth.com
+davaldes@hayworth.com</pre></div>
+        <p>นี่เป็น<i>เพียงหนึ่งในหลายวิธี</i>ที่แก้โจทย์นี้ได้ — คุณอาจใส่การขึ้นบรรทัดใหม่ในตำแหน่ง
+           ต่างออกไป ใช้ตัวแปรต่างกัน หรือจัดรูปแบบโค้ดต่างออกไปก็ได้ ไม่ว่าจะต่างกันแค่ไหน method
+           ของคุณควรใช้ค่า default ของ optional parameter แสดงผล <code>contoso.com</code> ให้ถูกต้อง</p>
+        <p>สังเกตว่าเฉลยนี้ใช้ <code>string[,]</code> 2 มิติ (ทบทวนจาก <a href="ch19.html">บทที่
+           19</a>) เก็บชื่อ-นามสกุลคู่กัน แล้วใช้ <code>GetLength(0)</code> หาจำนวนแถว — สำหรับ
+           พนักงานภายในเรียก <code>DisplayEmail()</code> โดยไม่ระบุ <code>domain</code> เลย (ใช้
+           ค่า default "contoso.com") ส่วนพนักงานภายนอกระบุ <code>domain: externalDomain</code>
+           ชัดเจน</p>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch29-l"><span>แก้โจทย์ท้าทายสำเร็จ ได้ผลลัพธ์ตรงตามที่กำหนดครบ 10 บรรทัด</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s07">29.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>แก้ไข string ข้างใน method แล้วค่าข้างนอกไม่เปลี่ยนตามที่คาดหวัง</td>
+          <td>ไม่ใช่บั๊ก — string เป็น immutable เสมอ การ "แก้ไข" คือสร้าง string ใหม่ทั้งก้อน ถ้า
+              ต้องการให้ค่าข้างนอกเปลี่ยน ต้องเขียนทับตัวแปร global โดยตรง (ทบทวนหัวข้อ 29.4d) ไม่ใช่
+              พึ่ง parameter</td>
+        </tr>
+        <tr>
+          <td>แก้ไข array ข้างใน method แล้วค่าข้างนอกเปลี่ยนตามโดยไม่ตั้งใจ</td>
+          <td>ไม่ใช่บั๊ก — array เป็น reference type การแก้ไข element ข้างใน method จะกระทบ array
+              ต้นฉบับเสมอ ถ้าไม่ต้องการพฤติกรรมนี้ ต้องก็อปปี้ array แยกก่อนส่งเข้า method (ทบทวน
+              เทคนิคจาก <a href="ch21.html">บทที่ 21 แบบฝึกหัดข้อ 3</a>)</td>
+        </tr>
+        <tr>
+          <td>compile error "Named argument ... is used out-of-position"</td>
+          <td>ใส่ named argument ไว้ก่อน positional argument — named argument ต้องไม่ตามด้วย
+              positional argument เสมอ (ทบทวนหัวข้อ 29.5b)</td>
+        </tr>
+        <tr>
+          <td>compile error ตอนประกาศ optional parameter ก่อน required parameter</td>
+          <td>required parameter (ไม่มีค่า default) ต้องอยู่<b>ก่อน</b> optional parameter (มีค่า
+              default) ใน method signature เสมอ</td>
+        </tr>
+        <tr>
+          <td>ตัวแปรใน method ทับชื่อ global variable แล้วงงว่าทำไมค่าไม่ตรงที่คิด</td>
+          <td>ไม่ใช่บั๊ก — พารามิเตอร์ที่ชื่อซ้ำกับ global variable จะมีความสำคัญเหนือกว่าเสมอ
+              ข้างในตัว method นั้น (ทบทวนหัวข้อ 29.3a) ถ้าต้องการหลีกเลี่ยงความสับสน ควรตั้งชื่อ
+              พารามิเตอร์ให้ต่างจาก global variable</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">29.8 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment ของ Microsoft Learn</p>
+
+    <div class="quiz" data-q="29-3">
+      <p class="q"><span class="num">1.</span> ข้อใดนิยามพารามิเตอร์ชนิด integer 3 ตัวได้ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>void Multiply(int a, b, c)</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>void Multiply(int a, int b, int c)</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>void Multiply(int a; int b; int c)</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ตรงกับที่เรียนในหัวข้อ 29.2 — แต่ละพารามิเตอร์ต้องระบุ
+        data type ของตัวเอง คั่นด้วยจุลภาค</div>
+    </div>
+
+    <div class="quiz" data-q="29-4">
+      <p class="q"><span class="num">2.</span> กำหนด method signature
+        <code>void Print(string name, string number = "", bool member = false)</code> ข้อใดใช้
+        named และ optional argument ได้ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>Print("Tony", member: true);</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>Print(number: "555", member: false)</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>Print("Tony", false)</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> "Tony" เป็น positional argument ให้ <code>name</code>
+        (required parameter — ต้องมีเสมอ) แล้วข้าม <code>number</code> (optional) ไปตั้งค่า
+        <code>member</code> ด้วย named argument — ถูกต้องตามกฎทั้งหมด ข้อ B ผิดเพราะไม่ได้ส่งค่า
+        <code>name</code> เลย (เป็น required parameter ละเว้นไม่ได้) ข้อ C ผิดเพราะ
+        <code>false</code> ในตำแหน่งที่สองจะถูกตีความเป็นค่าของ <code>number</code> ซึ่งเป็น
+        <code>string</code> ไม่ใช่ <code>bool</code> — ชนิดข้อมูลไม่ตรงกัน</div>
+    </div>
+
+    <div class="quiz" data-q="29-5">
+      <p class="q"><span class="num">3.</span> กำหนด method signature
+        <code>void SetHealth(string health)</code> ทำไมการดำเนินการข้างใน method จึงไม่ส่งผลต่อ
+        string <code>health</code> ต้นฉบับ?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>string data type เป็น pass by value</span></li>
+        <li class="opt"><span class="k">B</span><span>โค้ดใน method ต้องผิดพลาดแน่นอน</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>string เปลี่ยนแปลงค่าไม่ได้หลังถูกกำหนดค่า มันถูกเขียนทับด้วยค่าใหม่ได้เท่านั้น</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ตรงกับคำถาม Check ★ ข้อ 29-2 ทุกประการ — string เป็น
+        reference type ที่ immutable ไม่ใช่ pass by value</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">29.9 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>สร้าง method <code>PrintRepeated(string message, int times)</code> ที่พิมพ์
+           <code>message</code> ซ้ำตามจำนวน <code>times</code> ที่กำหนด แล้วเรียกใช้พิมพ์ "Hi!"
+           3 ครั้ง</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">PrintRepeated("Hi!", 3);
+
+void PrintRepeated(string message, int times)
+{
+    for (int i = 0; i < times; i++)
+    {
+        Console.WriteLine(message);
+    }
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>สร้าง method <code>Greet(string name, string greeting = "Hello")</code> ที่พิมพ์
+           <code>"{greeting}, {name}!"</code> เรียกใช้ทั้งแบบระบุ greeting และแบบไม่ระบุ (ใช้ค่า
+           default)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Greet("Somchai");
+Greet("Nina", "Welcome");
+
+void Greet(string name, string greeting = "Hello")
+{
+    Console.WriteLine($"{greeting}, {name}!");
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ทำนายผลลัพธ์ของโค้ดนี้ก่อนรันจริง (ทดสอบความเข้าใจเรื่อง pass-by-value):</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+        <pre><code class="lang-cs">int score = 10;
+AddBonus(score);
+Console.WriteLine(score);
+
+void AddBonus(int score)
+{
+    score += 50;
+    Console.WriteLine(score);
+}</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="out"><pre>
+60
+10</pre></div>
+          <p>ข้างใน method <code>score</code> ถูกก็อปปี้มา แก้เป็น 60 และพิมพ์ก่อน — แต่ตัวแปร
+             <code>score</code> ระดับ global ยังคงเป็น 10 เหมือนเดิม เพราะ int เป็น value type
+             (ทบทวนหัวข้อ 29.4b)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>สร้าง method <code>DoubleValues(int[] numbers)</code> ที่คูณค่าทุก element ใน array
+           ด้วย 2 (แก้ไข array ต้นฉบับโดยตรง เพราะเป็น reference type) ทดสอบกับ
+           <code>{1, 2, 3, 4}</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int[] numbers = {1, 2, 3, 4};
+DoubleValues(numbers);
+foreach (int n in numbers)
+{
+    Console.Write($"{n} ");
+}
+
+void DoubleValues(int[] numbers)
+{
+    for (int i = 0; i < numbers.Length; i++)
+    {
+        numbers[i] *= 2;
+    }
+}</code></pre></div>
+          <p>ผลลัพธ์: 2 4 6 8 — array ต้นฉบับถูกแก้ไขจริง เพราะ array เป็น reference type</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงแอป RSVP จากหัวข้อ 29.5 ให้เพิ่ม optional parameter ใหม่ชื่อ
+           <code>vip</code> (ค่า default <code>false</code>) — ถ้า <code>vip</code> เป็น
+           <code>true</code> ให้ข้ามการตรวจสอบ <code>guestList</code> ไปเลย (VIP เข้าได้เสมอไม่ว่า
+           จะอยู่ในรายชื่อหรือไม่) ทดสอบเรียก <code>RSVP("Tony", vip: true)</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่แก้)</span></div>
+          <pre><code class="lang-cs">void RSVP(string name, int partySize = 1, string allergies = "none", bool inviteOnly = true, bool vip = false)
+{
+    if (inviteOnly && !vip)
+    {
+        bool found = false;
+        foreach (string guest in guestList)
+        {
+            if (guest.Equals(name))
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        {
+            Console.WriteLine($"Sorry, {name} is not on the guest list");
+            return;
+        }
+    }
+
+    rsvps[count] = $"Name: {name}, \tParty Size: {partySize}, \tAllergies: {allergies}";
+    count++;
+}</code></pre></div>
+          <p>เปลี่ยนเงื่อนไขจาก <code>if (inviteOnly)</code> เป็น <code>if (inviteOnly && !vip)</code>
+             — ถ้า <code>vip</code> เป็น <code>true</code> เงื่อนไขทั้งก้อนเป็น <code>false</code>
+             ทันที ข้ามการตรวจสอบ guest list ไปเลย ไม่ว่า <code>inviteOnly</code> จะเป็นอะไร</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงเฉลยท้าทาย (หัวข้อ 29.6) ให้ตรวจสอบว่า username ที่ได้ (2 ตัวอักษรแรก + นามสกุล)
+           ซ้ำกับพนักงานคนอื่นในรายชื่อเดียวกันหรือไม่ ถ้าซ้ำ ให้เติมตัวเลขต่อท้าย (เช่น
+           "sibright2") — ทดสอบด้วยการเพิ่ม "Simone Bright" เข้าไปใน <code>corporate</code>
+           (จะได้ username "sibright" ซ้ำกับ "Simon Bright" พอดี)</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ต้องเก็บ username ที่สร้างไปแล้วไว้ใน array หรือ list แยกต่างหาก
+           แล้วเช็คก่อนแสดงผลทุกครั้งว่าเคยมี username นี้แล้วหรือยัง — ทบทวนแพทเทิร์น "นับก่อน
+           สร้างทีหลัง" จาก <a href="ch23.html">บทที่ 23</a></p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string[,] corporate =
+{
+    {"Robert", "Bavin"}, {"Simon", "Bright"},
+    {"Simone", "Bright"},
+    {"Kim", "Sinclair"}, {"Aashrita", "Kamath"},
+    {"Sarah", "Delucchi"}, {"Sinan", "Ali"}
+};
+
+string[] usedNames = new string[20];
+int usedCount = 0;
+
+for (int i = 0; i < corporate.GetLength(0); i++)
+{
+    DisplayEmail(first: corporate[i,0], last: corporate[i,1]);
+}
+
+void DisplayEmail(string first, string last, string domain = "contoso.com")
+{
+    string baseName = (first.Substring(0, 2) + last).ToLower();
+    string email = baseName;
+
+    int suffix = 2;
+    bool isDuplicate = true;
+    while (isDuplicate)
+    {
+        isDuplicate = false;
+        for (int i = 0; i < usedCount; i++)
+        {
+            if (usedNames[i] == email)
+            {
+                isDuplicate = true;
+                email = baseName + suffix;
+                suffix++;
+                break;
+            }
+        }
+    }
+
+    usedNames[usedCount] = email;
+    usedCount++;
+
+    Console.WriteLine($"{email}@{domain}");
+}</code></pre></div>
+          <p>"Simon Bright" ได้ username "sibright" ก่อน พอถึง "Simone Bright" ระบบเจอว่า
+             "sibright" ถูกใช้แล้ว จึงเติม suffix เป็น "sibright2" — ใช้ <code>while</code> loop
+             วนเช็คซ้ำเรื่อยๆ เผื่อกรณีชนกันหลายรอบ (เช่น "sibright2" ก็ถูกใช้แล้วด้วย จะขยับเป็น
+             "sibright3" ต่อ)</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 29</h2>
+
+    <p>เป้าหมายของคุณคือเรียนรู้การใช้พารามิเตอร์ใน method เชิงลึกขึ้น และทำความเข้าใจ method scope
+       คุณเรียนเรื่อง value type กับ reference type และข้อมูลถูกกระทบยังไงข้างใน method คุณยังเรียน
+       ใช้ named argument และ optional argument เพื่อขยายความสามารถของ method</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 29</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">Syntax</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>void M(int max) { }</code></td><td>พารามิเตอร์ = ตัวแปรใน signature</td></tr>
+          <tr><td><code>M(5);</code></td><td>argument = ค่าที่ส่งตอนเรียก</td></tr>
+          <tr><td>ตัวแปรนอกทุก method</td><td>global variable — เข้าถึงได้ทุกที่</td></tr>
+          <tr><td>ตัวแปรใน method</td><td>local — scope แค่ใน method นั้น</td></tr>
+          <tr><td>int/bool/double/char เป็น parameter</td><td>pass by value — ก็อปปี้ค่า ไม่กระทบต้นฉบับ</td></tr>
+          <tr><td>array เป็น parameter</td><td>pass by reference — แก้ไขกระทบต้นฉบับ</td></tr>
+          <tr><td>string เป็น parameter</td><td>reference แต่ immutable — พฤติกรรมเหมือน pass by value</td></tr>
+          <tr><td><code>M(name: value)</code></td><td>named argument</td></tr>
+          <tr><td><code>void M(string a, int b = 1)</code></td><td>optional parameter (ต้องมาหลัง required เสมอ)</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>parameter</td><td>พารามิเตอร์</td><td>ตัวแปรที่ประกาศใน method signature</td></tr>
+        <tr><td>argument</td><td>อาร์กิวเมนต์</td><td>ค่าจริงที่ส่งเข้า method ตอนเรียกใช้</td></tr>
+        <tr><td>scope</td><td>ขอบเขต</td><td>บริเวณของโปรแกรมที่ข้อมูลหนึ่งเข้าถึงได้</td></tr>
+        <tr><td>global variable</td><td>ตัวแปรระดับสากล</td><td>ตัวแปรที่ประกาศนอกทุก method เข้าถึงได้ทุกที่</td></tr>
+        <tr><td>pass by value</td><td>ส่งผ่านโดยค่า</td><td>ก็อปปี้ค่าเข้า method ไม่กระทบตัวแปรต้นฉบับ</td></tr>
+        <tr><td>pass by reference</td><td>ส่งผ่านโดยอ้างอิง</td><td>ส่ง address เข้า method แก้ไขกระทบตัวแปรต้นฉบับ</td></tr>
+        <tr><td>immutable</td><td>เปลี่ยนแปลงไม่ได้</td><td>คุณสมบัติของ string — แก้ไขคือสร้างใหม่เสมอ</td></tr>
+        <tr><td>named argument</td><td>อาร์กิวเมนต์ระบุชื่อ</td><td>ระบุค่าด้วยชื่อพารามิเตอร์ ไม่ใช่ตำแหน่ง</td></tr>
+        <tr><td>optional parameter</td><td>พารามิเตอร์ทางเลือก</td><td>พารามิเตอร์ที่มีค่า default ละเว้นตอนเรียกได้</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch28.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 28 · Method แรกของคุณ</span></a>
+      <a class="next" href="ch30.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 30 · Method ที่คืนค่า Return Value</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

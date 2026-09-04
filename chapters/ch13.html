@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 13 · Challenge Project: Arrays + Iteration + Selection — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="13">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 2 · Create and Run Simple Console Apps / บทที่ 13</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 2 · โมดูล 7/8 · 🏁 Challenge Project</span>
+      <h1>โปรเจกต์ท้าทาย: อัปเดตแอปตามสเปกใหม่</h1>
+      <div class="en">Challenge Project — Develop foreach and if-elseif-else Structures to Process Array Data</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>40–60 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>แก้โค้ดตามสเปกที่ "ลูกค้า" ขอมา โดยไม่ทำลายของเดิม</b></span>
+        <span>🎯 ความยาก <b>ท้าทาย — แทบไม่มีคำแนะนำทีละขั้น</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะพิสูจน์ได้ว่า...</h3>
+      <ul>
+        <li>ปรับปรุงแอป C# ที่ใช้ nested foreach เข้าถึงข้อมูลใน array ตามสเปกใหม่ได้</li>
+        <li>อัปเดตตัวแปรและ if statement เพื่อสร้าง code branch และการคำนวณตามสเปกใหม่ได้</li>
+      </ul>
+    </div>
+
+    <div class="note bad">
+      <span class="lbl">🛑 บทนี้ต่างจากทุกบทที่ผ่านมา</span>
+      Microsoft Learn ตั้งใจให้โมดูลนี้เป็น <b>Challenge Project</b> — ให้สเปกมาแล้วปล่อยให้คุณ
+      แก้เอง<b>โดยไม่มีคำแนะนำทีละขั้นตอน และไม่มีเฉลยอย่างเป็นทางการ</b> (ต่างจาก Guided Project
+      ในบทที่ 5, 6, 12 ที่จูงมือทุกก้าว) — นี่คือแบบทดสอบฝีมือจริงๆ ผมจะให้สเปกเหมือนต้นฉบับ
+      ก่อน แล้วซ่อนเฉลยของผมเองไว้ท้ายบท (ไม่ใช่เฉลยทางการจาก Microsoft) ให้คุณลองทำก่อนค่อยเปิดดู
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">13.1 สถานการณ์: คำขอฟีเจอร์ใหม่จากผู้ใช้</h2>
+
+    <p>ผู้ใช้มักขอให้นักพัฒนาเพิ่มฟีเจอร์ใหม่ให้แอปอยู่เสมอ คำขอแบบนี้บอกว่าแอปของคุณถูกใช้งานจริง
+       และที่สำคัญกว่านั้นคือลูกค้าตั้งใจจะใช้ต่อไป — แค่อยากให้ฟีเจอร์บางอย่างถูกปรับปรุง
+       ความสามารถในการอัปเดตแอปที่มีอยู่แล้วตามคำขอผู้ใช้เป็นเรื่องสำคัญมาก การอัปเดตที่ดีต้อง
+       รักษาความสมบูรณ์ของแอปเดิมไว้ พร้อมมอบประสบการณ์ที่ดีขึ้นตามที่ผู้ใช้ขอ</p>
+
+    <p>สมมติคุณยังเป็นผู้ช่วยครูคนเดิม แอปตัดเกรดที่คุณสร้างจากบทที่ 12 ใช้ array เก็บชื่อนักเรียนและ
+       คะแนนงาน ผสาน iteration กับ selection statement คำนวณและรายงานเกรดสุดท้าย แถมยังแยกคะแนน
+       สอบกับคะแนนพิเศษออกจากกันตอนคำนวณด้วย — แอปทำทุกอย่างที่ครูขอไว้ครบถ้วน แต่ตอนนี้ครูขอ
+       ฟีเจอร์ใหม่: <b>อยากให้รายงานคะแนนแสดงคะแนนสอบและคะแนนพิเศษแยกออกจากคะแนนรวมสุดท้าย
+       และเกรดตัวอักษรด้วย</b></p>
+
+    <p>โดยสรุป คุณต้องใช้สเปกรายงานคะแนนใหม่ของครูเพื่อ:</p>
+    <ul>
+      <li>อัปเดตโค้ด iteration และ selection ให้คำนวณคะแนนสอบ คะแนนพิเศษ และเกรดรวม แยกออกจากกัน</li>
+      <li>อัปเดตโค้ดที่เขียนรายงานคะแนนออกคอนโซล</li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s02">13.2 เตรียมพร้อม: สเปกใหม่จากครู</h2>
+
+    <p>แอปที่คุณมีอยู่แล้ว (จาก<a href="ch12.html">บทที่ 12</a>) มีคุณสมบัติครบ: ใช้ array เก็บชื่อ
+       และคะแนน ใช้ <code>foreach</code> ชั้นนอกวนชื่อนักเรียน ใช้ <code>if</code> ข้างในเลือก
+       array คะแนนที่ตรงกับชื่อ ใช้ <code>foreach</code> ชั้นในรวมคะแนน และใช้
+       <code>if-elseif-else</code> ตัดเกรดอัตโนมัติ พร้อมแยกคะแนนสอบกับคะแนนพิเศษตอนคำนวณแล้ว</p>
+
+    <p>รายงานคะแนน<b>เดิม</b>หน้าตาแบบนี้:</p>
+    <div class="out auto"><div class="out-bar">รายงานเดิม</div><pre>
+Student         Grade   Letter Grade
+
+Sophia          95.8    A
+Andrew          91.2    A-
+Emma            90.4    A-
+Logan           93      A</pre></div>
+
+    <p>ครูต้องการให้รายงานใหม่ แสดง<b>คะแนนสอบ</b>และ<b>ผลกระทบของคะแนนพิเศษ</b>ต่อคะแนนสุดท้าย
+       เพิ่มเข้าไปด้วย รูปแบบรายงานใหม่ที่ต้องการ:</p>
+
+    <div class="out auto"><div class="out-bar">รายงานเป้าหมาย (ผลลัพธ์สุดท้ายที่ต้องได้)</div><pre>
+Student         Exam Score      Overall Grade   Extra Credit
+
+Sophia          92.2            95.88   A       92 (3.68 pts)
+Andrew          89.6            91.38   A-      89 (1.78 pts)
+Emma            85.6            90.94   A-      89 (5.34 pts)
+Logan           91.2            93.12   A       96 (1.92 pts)</pre></div>
+
+    <h3 id="s02a">เตรียมโค้ดตั้งต้น</h3>
+    <p>ใช้โค้ดฉบับสมบูรณ์จากท้ายหัวข้อ 12.5 เป็นจุดตั้งต้น (ก่อนเพิ่มนักเรียน 4 คนพิเศษ —
+       ใช้แค่ 4 คนแรกพอ) สร้างโปรเจกต์ใหม่แล้ววาง:</p>
+
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch13-challenge</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — จุดตั้งต้น (จากบทที่ 12)</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int examAssignments = 5;
+
+int[] sophiaScores = new int[] { 90, 86, 87, 98, 100, 94, 90 };
+int[] andrewScores = new int[] { 92, 89, 81, 96, 90, 89 };
+int[] emmaScores = new int[] { 90, 85, 87, 98, 68, 89, 89, 89 };
+int[] loganScores = new int[] { 90, 95, 87, 88, 96, 96 };
+
+string[] studentNames = new string[] { "Sophia", "Andrew", "Emma", "Logan" };
+
+int[] studentScores = new int[10];
+
+string currentStudentLetterGrade = "";
+
+Console.WriteLine("Student\t\tGrade\tLetter Grade\n");
+
+foreach (string name in studentNames)
+{
+    string currentStudent = name;
+
+    if (currentStudent == "Sophia")
+        studentScores = sophiaScores;
+    else if (currentStudent == "Andrew")
+        studentScores = andrewScores;
+    else if (currentStudent == "Emma")
+        studentScores = emmaScores;
+    else if (currentStudent == "Logan")
+        studentScores = loganScores;
+
+    int sumAssignmentScores = 0;
+    decimal currentStudentGrade = 0;
+    int gradedAssignments = 0;
+
+    foreach (int score in studentScores)
+    {
+        gradedAssignments += 1;
+
+        if (gradedAssignments <= examAssignments)
+            sumAssignmentScores += score;
+        else
+            sumAssignmentScores += score / 10;
+    }
+
+    currentStudentGrade = (decimal)(sumAssignmentScores) / examAssignments;
+
+    if (currentStudentGrade >= 97)
+        currentStudentLetterGrade = "A+";
+    else if (currentStudentGrade >= 93)
+        currentStudentLetterGrade = "A";
+    else if (currentStudentGrade >= 90)
+        currentStudentLetterGrade = "A-";
+    else if (currentStudentGrade >= 87)
+        currentStudentLetterGrade = "B+";
+    else if (currentStudentGrade >= 83)
+        currentStudentLetterGrade = "B";
+    else if (currentStudentGrade >= 80)
+        currentStudentLetterGrade = "B-";
+    else if (currentStudentGrade >= 77)
+        currentStudentLetterGrade = "C+";
+    else if (currentStudentGrade >= 73)
+        currentStudentLetterGrade = "C";
+    else if (currentStudentGrade >= 70)
+        currentStudentLetterGrade = "C-";
+    else if (currentStudentGrade >= 67)
+        currentStudentLetterGrade = "D+";
+    else if (currentStudentGrade >= 63)
+        currentStudentLetterGrade = "D";
+    else if (currentStudentGrade >= 60)
+        currentStudentLetterGrade = "D-";
+    else
+        currentStudentLetterGrade = "F";
+
+    Console.WriteLine($"{currentStudent}\t\t{currentStudentGrade}\t{currentStudentLetterGrade}");
+}
+
+Console.WriteLine("\nPress the Enter key to continue");
+Console.ReadLine();</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output — ต้องตรงกับ "รายงานเดิม" ก่อนไปต่อ</div><pre>
+Student		Grade	Letter Grade
+
+Sophia		95.8	A
+Andrew		91.2	A-
+Emma		90.4	A-
+Logan		93	A</pre></div>
+
+    <p>ยืนยันว่ารันได้ผลตรงตาม "รายงานเดิม" ก่อน แล้วค่อยเริ่มลุยโจทย์ท้าทาย</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch13-a"><span>รันโค้ดตั้งต้นได้ผลลัพธ์ตรงกับ "รายงานเดิม"</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">13.3 ท้าทายที่ 1: ปรับ Output ให้มีคอลัมน์ใหม่</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl m">ตามต้นฉบับ MS Learn — ไม่มีคำแนะนำทีละขั้น</span></div>
+      <div class="ex-body">
+        <p>ในความท้าทายแรกนี้ ให้คุณสร้างตัวแปรที่จำเป็นสำหรับรายงานคะแนนแบบใหม่ แล้วอัปเดต
+           <code>Console.WriteLine()</code> ที่เขียนเกรดนักเรียนออกคอนโซล</p>
+        <p>แอปที่อัปเดตแล้วต้อง:</p>
+        <ul>
+          <li>ใช้ array และค่าใน array เดิมสำหรับการคำนวณเกรดนักเรียนทุกจุด</li>
+          <li>ใช้โครงสร้างซ้อนของ <code>foreach</code> และ <code>if</code> เดิมที่มีอยู่แล้ว</li>
+          <li>ประกาศและกำหนดค่าเริ่มต้นตัวแปร int เพิ่มเติมที่จำเป็นสำหรับคำนวณผลรวม</li>
+          <li>ประกาศและกำหนดค่าเริ่มต้นตัวแปร decimal เพิ่มเติมที่จำเป็นสำหรับการคำนวณและ/หรือ
+              ค่าที่แสดงในรายงาน</li>
+        </ul>
+        <p>รูปแบบรายงานที่ต้องได้ในขั้นนี้ (ยังไม่ต้องคำนวณค่าจริง ใส่ 0 ไปก่อนได้เลย):</p>
+        <div class="out auto"><div class="out-bar">เป้าหมายของขั้นนี้ (ฟิลด์ใหม่ยังเป็น 0 ได้)</div><pre>
+Student         Exam Score      Overall Grade   Extra Credit
+
+Sophia          0               95.8    A       0 (0 pts)
+Andrew          0               91.2    A-      0 (0 pts)
+Emma            0               90.4    A-      0 (0 pts)
+Logan           0               93      A       0 (0 pts)</pre></div>
+        <p>สังเกตว่า <b>Overall Grade ยังเป็นค่าเดิม</b>จากรายงานเก่า (95.8, 91.2, 90.4, 93)
+           — ขั้นนี้แค่เพิ่ม "ที่ว่าง" สำหรับฟิลด์ใหม่ในรายงาน ยังไม่ต้องคำนวณค่าจริงให้ครบ
+           (จะทำในหัวข้อ 13.4)</p>
+      </div>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 ลองทำเองก่อน!</span>
+      หยุดตรงนี้แล้วลองทำจริงๆ ก่อนเลื่อนลงไปดูเฉลย — key คือแค่<b>เพิ่มตัวแปร placeholder</b>
+      (เช่น <code>decimal examScore = 0;</code>) แล้วใส่ลงใน <code>Console.WriteLine()</code>
+      บรรทัดที่แสดงเกรด ยังไม่ต้องคิดสูตรคำนวณอะไรเลยในขั้นนี้
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลยของผม (ไม่ใช่เฉลยทางการจาก Microsoft — ต้นฉบับไม่มีเฉลยให้)</summary>
+      <div class="fold-body">
+        <p>เพิ่มตัวแปร placeholder หลังบรรทัด <code>currentStudentLetterGrade</code> เดิม แล้วแก้
+           บรรทัด header กับบรรทัดแสดงผลตอนท้าย:</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เพิ่มส่วนที่ขีดเส้นใต้</span>
+            <button data-act="copy" type="button">Copy</button></div>
+          <pre><code class="lang-cs">// ตัวแปร placeholder สำหรับรายงานใหม่ (ยังไม่คำนวณจริง)
+decimal examScore = 0;
+decimal extraCreditAverage = 0;
+decimal extraCreditPoints = 0;
+
+Console.WriteLine("Student\t\tExam Score\tOverall Grade\tExtra Credit\n");</code></pre>
+        </div>
+        <p>แก้บรรทัดแสดงผลท้าย loop:</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">Console.WriteLine($"{currentStudent}\t\t{examScore}\t\t{currentStudentGrade}\t{currentStudentLetterGrade}\t{extraCreditAverage} ({extraCreditPoints} pts)");</code></pre>
+        </div>
+        <div class="out"><div class="out-bar">Output</div><pre>
+Student		Exam Score	Overall Grade	Extra Credit
+
+Sophia		0		95.8	A	0 (0 pts)
+Andrew		0		91.2	A-	0 (0 pts)
+Emma		0		90.4	A-	0 (0 pts)
+Logan		0		93	A	0 (0 pts)</pre></div>
+        <p>ตรงตามเป้าหมายของขั้นนี้ — ยังไม่มีอะไรคำนวณจริง แค่ "เปิดที่ว่าง" ให้ฟิลด์ใหม่ในรายงาน</p>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch13-b"><span>เพิ่มคอลัมน์ใหม่ในรายงานได้ครบ (แม้ยังเป็น 0)</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">13.4 ท้าทายที่ 2: คำนวณค่าจริงแทนที่ 0</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl h">ตามต้นฉบับ MS Learn — ไม่มีคำแนะนำทีละขั้น</span></div>
+      <div class="ex-body">
+        <p>ความท้าทายที่สองนี้ ให้คุณคำนวณค่าจริงแทนที่ 0 ทั้งหมด แอปที่อัปเดตแล้วต้อง:</p>
+        <ul>
+          <li>ใช้ array และค่าใน array เดิมสำหรับการคำนวณเกรดนักเรียนทุกจุด</li>
+          <li>ใช้โครงสร้างซ้อนของ <code>foreach</code> และ <code>if</code> เดิม</li>
+          <li>คำนวณผลรวมคะแนนสอบและคะแนนพิเศษ แยกจากกัน โดยใช้ตัวแปรจากขั้นก่อนหรือโค้ดเดิม</li>
+          <li>คำนวณค่าเฉลี่ยของคะแนนสอบและคะแนนพิเศษ แยกจากกัน</li>
+          <li>คำนวณคะแนนตัวเลขสุดท้ายดังนี้: <b>เอา 10% ของผลรวมคะแนนพิเศษ บวกเข้ากับผลรวมคะแนนสอบ
+              แล้วหารด้วยจำนวนวิชาสอบ</b></li>
+          <li>คำนวณแต้มพิเศษที่ได้ดังนี้: <b>เอา 10% ของผลรวมคะแนนพิเศษ หารด้วยจำนวนวิชาสอบ</b></li>
+        </ul>
+        <div class="note">
+          <span class="lbl">ℹ️ คำใบ้จากต้นฉบับ</span>
+          ต้องใช้ <code>(decimal)</code> cast ในสมการเพื่อรักษาเศษทศนิยมไว้ (ทบทวนได้ที่
+          <a href="ch04.html">บทที่ 4</a>)
+        </div>
+        <p>รูปแบบรายงานสุดท้ายที่ต้องได้:</p>
+        <div class="out auto"><div class="out-bar">เป้าหมายสุดท้าย</div><pre>
+Student         Exam Score      Overall Grade   Extra Credit
+
+Sophia          92.2            95.88   A       92 (3.68 pts)
+Andrew          89.6            91.38   A-      89 (1.78 pts)
+Emma            85.6            90.94   A-      89 (5.34 pts)
+Logan           91.2            93.12   A       96 (1.92 pts)</pre></div>
+      </div>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 วิเคราะห์โจทย์ก่อนลงมือ</span>
+      สิ่งที่คุณรู้อยู่แล้วจากบทที่ 12: <code>foreach</code> วนตามลำดับเสมอ · มี
+      <code>gradedAssignments</code> นับลำดับที่วนอยู่ได้อยู่แล้ว · คะแนนพิเศษอยู่ท้าย array
+      เสมอ (หลังวิชาสอบ 5 วิชา) — สิ่งที่ต้องเพิ่ม: แยกผลรวมเป็น 2 ก้อนแทนที่จะรวมเป็นก้อนเดียว
+      (<code>sumAssignmentScores</code> เดิม) แล้วหาจำนวนคะแนนพิเศษที่แท้จริงด้วย (ใช้
+      <code>.Length</code> ของ array ลบด้วยจำนวนวิชาสอบ — ทบทวนได้ที่
+      <a href="ch10.html">บทที่ 10</a>)
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลยของผม (ไม่ใช่เฉลยทางการจาก Microsoft — ต้นฉบับไม่มีเฉลยให้)</summary>
+      <div class="fold-body">
+
+        <p>แยกผลรวมเป็นสองตัวแปร แทนที่ <code>sumAssignmentScores</code> ตัวเดียว:</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — แก้ foreach ชั้นใน</span>
+            <button data-act="copy" type="button">Copy</button></div>
+          <pre><code class="lang-cs">int examScoreSum = 0;
+int extraCreditSum = 0;
+int gradedAssignments = 0;
+
+foreach (int score in studentScores)
+{
+    gradedAssignments += 1;
+
+    if (gradedAssignments <= examAssignments)
+        examScoreSum += score;
+    else
+        extraCreditSum += score;
+}</code></pre>
+        </div>
+
+        <p>หาจำนวนคะแนนพิเศษจริงด้วย <code>.Length</code> แล้วคำนวณค่าทั้งหมดตามสูตรที่โจทย์กำหนด:</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — คำนวณค่าจริง</span>
+            <button data-act="copy" type="button">Copy</button></div>
+          <pre><code class="lang-cs">int extraCreditCount = studentScores.Length - examAssignments;
+
+decimal examScore = (decimal)examScoreSum / examAssignments;
+decimal extraCreditAverage = (decimal)extraCreditSum / extraCreditCount;
+decimal extraCreditPoints = (extraCreditSum * 0.1m) / examAssignments;
+decimal currentStudentGrade = (examScoreSum + (extraCreditSum * 0.1m)) / examAssignments;</code></pre>
+        </div>
+
+        <p>โค้ดฉบับสมบูรณ์ทั้งไฟล์:</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — ฉบับสมบูรณ์</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">int examAssignments = 5;
+
+int[] sophiaScores = new int[] { 90, 86, 87, 98, 100, 94, 90 };
+int[] andrewScores = new int[] { 92, 89, 81, 96, 90, 89 };
+int[] emmaScores = new int[] { 90, 85, 87, 98, 68, 89, 89, 89 };
+int[] loganScores = new int[] { 90, 95, 87, 88, 96, 96 };
+
+string[] studentNames = new string[] { "Sophia", "Andrew", "Emma", "Logan" };
+
+int[] studentScores = new int[10];
+
+string currentStudentLetterGrade = "";
+
+Console.WriteLine("Student\t\tExam Score\tOverall Grade\tExtra Credit\n");
+
+foreach (string name in studentNames)
+{
+    string currentStudent = name;
+
+    if (currentStudent == "Sophia")
+        studentScores = sophiaScores;
+    else if (currentStudent == "Andrew")
+        studentScores = andrewScores;
+    else if (currentStudent == "Emma")
+        studentScores = emmaScores;
+    else if (currentStudent == "Logan")
+        studentScores = loganScores;
+
+    int examScoreSum = 0;
+    int extraCreditSum = 0;
+    int gradedAssignments = 0;
+
+    foreach (int score in studentScores)
+    {
+        gradedAssignments += 1;
+
+        if (gradedAssignments <= examAssignments)
+            examScoreSum += score;
+        else
+            extraCreditSum += score;
+    }
+
+    int extraCreditCount = studentScores.Length - examAssignments;
+
+    decimal examScore = (decimal)examScoreSum / examAssignments;
+    decimal extraCreditAverage = (decimal)extraCreditSum / extraCreditCount;
+    decimal extraCreditPoints = (extraCreditSum * 0.1m) / examAssignments;
+    decimal currentStudentGrade = (examScoreSum + (extraCreditSum * 0.1m)) / examAssignments;
+
+    if (currentStudentGrade >= 97)
+        currentStudentLetterGrade = "A+";
+    else if (currentStudentGrade >= 93)
+        currentStudentLetterGrade = "A";
+    else if (currentStudentGrade >= 90)
+        currentStudentLetterGrade = "A-";
+    else if (currentStudentGrade >= 87)
+        currentStudentLetterGrade = "B+";
+    else if (currentStudentGrade >= 83)
+        currentStudentLetterGrade = "B";
+    else if (currentStudentGrade >= 80)
+        currentStudentLetterGrade = "B-";
+    else if (currentStudentGrade >= 77)
+        currentStudentLetterGrade = "C+";
+    else if (currentStudentGrade >= 73)
+        currentStudentLetterGrade = "C";
+    else if (currentStudentGrade >= 70)
+        currentStudentLetterGrade = "C-";
+    else if (currentStudentGrade >= 67)
+        currentStudentLetterGrade = "D+";
+    else if (currentStudentGrade >= 63)
+        currentStudentLetterGrade = "D";
+    else if (currentStudentGrade >= 60)
+        currentStudentLetterGrade = "D-";
+    else
+        currentStudentLetterGrade = "F";
+
+    Console.WriteLine($"{currentStudent}\t\t{examScore}\t\t{currentStudentGrade}\t{currentStudentLetterGrade}\t{extraCreditAverage} ({extraCreditPoints} pts)");
+}
+
+Console.WriteLine("\nPress the Enter key to continue");
+Console.ReadLine();</code></pre>
+        </div>
+        <div class="out"><div class="out-bar">Output — ตรงตามเป้าหมายเป๊ะ!</div><pre>
+Student		Exam Score	Overall Grade	Extra Credit
+
+Sophia		92.2		95.88	A	92 (3.68 pts)
+Andrew		89.6		91.38	A-	89 (1.78 pts)
+Emma		85.6		90.94	A-	89 (5.34 pts)
+Logan		91.2		93.12	A	96 (1.92 pts)</pre></div>
+
+        <p><b>ทำไมสูตรถึงได้ผลถูกต้อง</b> — ลองไล่ตรวจ Sophia: คะแนนสอบรวม =
+           90+86+87+98+100 = 461, คะแนนพิเศษรวม = 94+90 = 184<br>
+           <code>examScore</code> = 461/5 = <b>92.2</b> ✓<br>
+           <code>extraCreditAverage</code> = 184/2 = <b>92</b> ✓ (มีคะแนนพิเศษ 2 รายการ)<br>
+           <code>extraCreditPoints</code> = (184×0.1)/5 = 18.4/5 = <b>3.68</b> ✓<br>
+           <code>currentStudentGrade</code> = (461 + 18.4)/5 = 479.4/5 = <b>95.88</b> ✓ → เกรด A</p>
+
+        <div class="note tip">
+          <span class="lbl">💡 ทำไมใช้ 0.1m ไม่ใช่ 0.1</span>
+          <code>0.1m</code> คือ decimal literal (ทบทวนที่ <a href="ch02.html">บทที่ 2</a>)
+          decimal เก็บเลขฐาน 10 ได้แม่นยำเป๊ะ ไม่มีปัญหาเศษเล็กๆ คลาดเคลื่อนแบบ double —
+          184 × 0.1m ได้ 18.4 พอดีเป๊ะ ไม่ใช่ 18.399999... แบบที่อาจเกิดกับ floating-point ทั่วไป
+        </div>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch13-c"><span>แยกผลรวมคะแนนสอบ/พิเศษได้สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch13-d"><span>ผลลัพธ์ทั้ง 4 คนตรงกับเป้าหมายเป๊ะทุกตัวเลข</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">13.5 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>extraCreditAverage หารด้วย 0 ได้ error</td>
+          <td>ถ้านักเรียนบางคนไม่มีคะแนนพิเศษเลย <code>extraCreditCount</code> จะเป็น 0 —
+              ในโจทย์นี้ไม่มีเคสแบบนั้น (ทุกคนมีอย่างน้อย 1 รายการ) แต่ถ้าจะทำแอปจริงต้องเช็คก่อนหาร
+              เสมอ</td>
+        </tr>
+        <tr>
+          <td>ใช้ examScoreSum เดิม (รวมคะแนนพิเศษปนไปด้วย) แทนที่จะแยกก้อน</td>
+          <td>ลืมเปลี่ยนจากตัวแปรผลรวมก้อนเดียว (sumAssignmentScores) เป็นสองก้อนแยกกัน —
+              สเปกใหม่บังคับว่าต้องแยกคะแนนสอบกับคะแนนพิเศษออกจากกันตั้งแต่ตอนรวมผล ไม่ใช่แค่ตอน
+              แสดงผล</td>
+        </tr>
+        <tr>
+          <td>ลืม cast (decimal) แล้วได้ค่าผิดเพราะ int หารตัดเศษ</td>
+          <td>ทบทวนกับดักนี้ได้จากบทที่ 4 และ 6 — เกิดขึ้นซ้ำได้เสมอถ้าลืมตรวจสอบชนิดข้อมูลก่อนหาร</td>
+        </tr>
+        <tr>
+          <td>เปลี่ยน sumAssignmentScores เป็น examScoreSum แต่ลืมเปลี่ยนบรรทัด WriteLine เดิม</td>
+          <td>เหมือนกับดักตอนเปลี่ยนชื่อ currentAssignments→examAssignments ในบทที่ 12 — ใช้
+              Find &amp; Replace (Ctrl+H) แทนแก้มือทีละจุดเสมอ</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">13.6 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment จริงของบทนี้ใน Microsoft Learn</p>
+
+    <div class="quiz" data-q="13-1">
+      <p class="q"><span class="num">1.</span> นักพัฒนาสร้างโครงสร้าง foreach ซ้อนกัน วน array ข้อมูลของแอป
+        array แรกเก็บชื่อเขต 10 เขต ส่วน array ที่เหลือ (ตาม 10 เขตนั้น) แต่ละอันเก็บจำนวนประชากร
+        ของเมืองที่มีประชากรเกิน 1 ล้านคน โดยเรียงจากมากไปน้อย แอปต้องรวมเฉพาะ 25 เมืองที่มี
+        ประชากรมากที่สุดในแต่ละเขต นักพัฒนาควรทำยังไงให้แน่ใจว่าบวกแค่ 25 อันดับแรกเท่านั้น?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>แทรก "ค่าเครื่องหมาย" ไว้ที่ index ตำแหน่ง 25 ของ array ประชากร พอเจอค่านี้ให้หยุดบวก</span></li>
+        <li class="opt"><span class="k">B</span><span>เช็ค index number ของ element ปัจจุบันข้างใน foreach หยุดบวกเมื่อ index ถึง 25</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>เพิ่มค่าตัวนับข้างใน foreach ทีละ 1 หยุดบวกเมื่อตัวนับถึง 25</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ตรงกับเทคนิคที่ใช้ตลอดบทที่ 12–13 (ตัวแปร
+        <code>gradedAssignments</code>) — <code>foreach</code> แบบมาตรฐานไม่มีตัวแปร index
+        ให้เช็คตรงๆ ในตัวมันเอง (ข้อ B จึงทำไม่ได้ตรงๆ ต้องมีตัวนับเสริมอยู่ดี) ส่วนข้อ A เป็น
+        วิธีที่ซับซ้อนเกินจำเป็นและเสี่ยงบั๊กถ้าค่าจริงบังเอิญตรงกับ "ค่าเครื่องหมาย"</div>
+    </div>
+
+    <div class="quiz" data-q="13-2">
+      <p class="q"><span class="num">2.</span> นักพัฒนา 3 คนทำงานร่วมกันอัปเดตชุดแอปพลิเคชัน โดยใช้คอมเมนต์
+        ระหว่างกระบวนการอัปเดต ข้อใดอธิบายการใช้คอมเมนต์ที่เหมาะสม?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ใช้คอมเมนต์บรรทัด/บล็อกระบุทุกจุดที่แก้ไขทีละจุด</span></li>
+        <li class="opt"><span class="k">B</span><span>เก็บคอมเมนต์เดิมทั้งหมดไว้ แล้วเพิ่มคอมเมนต์ใหม่บอกว่าคอมเมนต์เก่าใช้ไม่ได้แล้ว</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>สรุปการเปลี่ยนแปลงด้วยคอมเมนต์บล็อก</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ตรงกับหลักการจาก<a href="ch11.html">บทที่ 11</a>:
+        คอมเมนต์บล็อกเหมาะกับการอธิบายภาพรวมระดับสูง ข้อ A ผิดเพราะคอมเมนต์ทุกจุดแก้ไขย่อยเกินไป
+        กลายเป็น low-quality comment ข้อ B ผิดเพราะปล่อยให้คอมเมนต์เก่าที่ล้าสมัยค้างอยู่ในโค้ด
+        อันตรายกว่าไม่มีคอมเมนต์เลย (บทที่ 11 เตือนไว้ว่า "อย่าเชื่อคอมเมนต์เสมอไป")</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">13.7 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>จากโค้ดฉบับสมบูรณ์ในหัวข้อ 13.4 ลองคำนวณด้วยมือว่า Emma ควรได้ค่าอะไรในแต่ละคอลัมน์
+           (examScore, extraCreditAverage, extraCreditPoints, currentStudentGrade) จาก
+           <code>emmaScores = { 90, 85, 87, 98, 68, 89, 89, 89 }</code> แล้วเทียบกับผลลัพธ์จริง</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>คะแนนสอบ = 90+85+87+98+68 = 428 → examScore = 428/5 = <b>85.6</b><br>
+             คะแนนพิเศษ = 89+89+89 = 267 (3 รายการ) → extraCreditAverage = 267/3 = <b>89</b><br>
+             extraCreditPoints = (267×0.1)/5 = 26.7/5 = <b>5.34</b><br>
+             currentStudentGrade = (428+26.7)/5 = 454.7/5 = <b>90.94</b> → เกรด A-<br>
+             ตรงกับผลลัพธ์จริงทุกค่า ✓</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ถ้าครูเปลี่ยนใจ อยากให้คะแนนพิเศษมีน้ำหนัก 15% แทน 10% ต้องแก้โค้ดกี่บรรทัด และบรรทัด
+           ไหนบ้าง?</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>แก้ 2 บรรทัด — เปลี่ยน <code>0.1m</code> เป็น <code>0.15m</code> ทั้งในสมการ
+             <code>extraCreditPoints</code> และ <code>currentStudentGrade</code>
+             (ไม่ต้องแก้ที่อื่น เพราะทั้งสองจุดอ้างอิงค่าน้ำหนักเดียวกัน)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้ error ตอนรัน หาสาเหตุ (สมมตินักเรียนคนนี้ไม่มีคะแนนพิเศษเลย มีแค่ 5 วิชาสอบ):</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+        <pre><code class="lang-cs">int extraCreditCount = studentScores.Length - examAssignments; // = 0
+decimal extraCreditAverage = (decimal)extraCreditSum / extraCreditCount;</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>หารด้วย 0 (<code>extraCreditCount</code> = 0) ทำให้เกิด
+             <code>DivideByZeroException</code> ตอนรัน (ต่างจากหารด้วย 0 แบบ int ที่บางกรณี C#
+             อนุญาต แต่ decimal หารด้วย 0 จะ throw exception เสมอ) ต้องเช็คก่อนด้วย
+             <code>if (extraCreditCount &gt; 0)</code> แล้วค่อยหาร ไม่งั้นกำหนดเป็น 0 ไปเลย</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เพิ่มการป้องกันจากข้อ 3 เข้าไปในโค้ดฉบับสมบูรณ์จริงๆ (ใช้ <code>if-else</code>
+           ป้องกันหารด้วย 0 สำหรับ <code>extraCreditAverage</code> โดยเฉพาะ)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">decimal extraCreditAverage;
+
+if (extraCreditCount > 0)
+    extraCreditAverage = (decimal)extraCreditSum / extraCreditCount;
+else
+    extraCreditAverage = 0;</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เพิ่มนักเรียนคนที่ 5 ชื่อ "Maya" คะแนนสอบ 88,90,92,85,89 และคะแนนพิเศษ 95,95 เข้าไปใน
+           แอปฉบับสมบูรณ์จากหัวข้อ 13.4 คำนวณด้วยมือว่าเธอควรได้ผลลัพธ์อะไรในแต่ละคอลัมน์
+           ก่อนรันจริงเพื่อตรวจคำตอบ</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>คะแนนสอบรวม = 88+90+92+85+89 = 444 → examScore = 444/5 = <b>88.8</b><br>
+             คะแนนพิเศษรวม = 95+95 = 190 (2 รายการ) → extraCreditAverage = 190/2 = <b>95</b><br>
+             extraCreditPoints = (190×0.1)/5 = 19/5 = <b>3.8</b><br>
+             currentStudentGrade = (444+19)/5 = 463/5 = <b>92.6</b> → เกรด <b>A-</b>
+             (อยู่ในช่วง 90–92)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>ครูขอฟีเจอร์เพิ่มอีกอย่าง: อยากรู้ว่าคะแนนพิเศษ "ช่วยดันเกรดตัวอักษรขึ้นจริง" กี่คน
+           (เทียบเกรดตัวอักษรที่คำนวณจากคะแนนสอบอย่างเดียว กับเกรดตัวอักษรสุดท้ายที่รวมคะแนนพิเศษแล้ว
+           ถ้าต่างกันแปลว่า "ขึ้นจริง") เขียนโค้ดเพิ่มจากฉบับสมบูรณ์ในหัวข้อ 13.4 พิมพ์สรุปท้ายรายงาน</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ต้องคำนวณเกรดตัวอักษร<b>สองรอบ</b>ต่อคนหนึ่ง: รอบแรกจาก
+           <code>examScore</code> อย่างเดียว (ไม่รวมคะแนนพิเศษ) ผ่านเชน if-elseif-else เดิม
+           รอบสองจาก <code>currentStudentGrade</code> ที่รวมแล้ว (ซึ่งมีอยู่แล้ว) — ต้องเขียน
+           เชน if-elseif-else ซ้ำ 2 รอบ หรือแยกเป็นค่าคงที่ตัดเกรดไว้ใช้ร่วมกันก็ได้</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>วิธีที่ตรงไปตรงมาที่สุด (แม้จะยาวหน่อย) คือคัดลอกเชน if-elseif-else มาอีกชุดสำหรับ
+             <code>examScore</code> อย่างเดียว:</p>
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่เพิ่ม)</span></div>
+          <pre><code class="lang-cs">int boostedCount = 0;  // ประกาศนอกสุด ก่อน foreach ชื่อ
+
+// ... ข้างในลูปชื่อ ต่อจากการตัดเกรดสุดท้ายเดิม ...
+string examOnlyLetterGrade;
+if (examScore >= 97) examOnlyLetterGrade = "A+";
+else if (examScore >= 93) examOnlyLetterGrade = "A";
+else if (examScore >= 90) examOnlyLetterGrade = "A-";
+else if (examScore >= 87) examOnlyLetterGrade = "B+";
+else if (examScore >= 83) examOnlyLetterGrade = "B";
+else if (examScore >= 80) examOnlyLetterGrade = "B-";
+else if (examScore >= 77) examOnlyLetterGrade = "C+";
+else if (examScore >= 73) examOnlyLetterGrade = "C";
+else if (examScore >= 70) examOnlyLetterGrade = "C-";
+else if (examScore >= 67) examOnlyLetterGrade = "D+";
+else if (examScore >= 63) examOnlyLetterGrade = "D";
+else if (examScore >= 60) examOnlyLetterGrade = "D-";
+else examOnlyLetterGrade = "F";
+
+if (examOnlyLetterGrade != currentStudentLetterGrade)
+{
+    boostedCount++;
+}
+
+// ... หลังจบ foreach ชื่อ ...
+Console.WriteLine($"\nคะแนนพิเศษช่วยดันเกรดขึ้นจริง {boostedCount} คน");</code></pre></div>
+          <p><small>สังเกตเครื่องหมาย <code>!=</code> ("ไม่เท่ากับ") — เป็นตัวดำเนินการเปรียบเทียบ
+             ที่ยังไม่เคยเจอในเล่มนี้มาก่อน แต่เดาความหมายได้ไม่ยากจากบริบท จะได้เรียนอย่างเป็น
+             ทางการในโมดูล Boolean expression ของ Part 3</small></p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">📌 สรุปบทที่ 13</h2>
+
+    <p>โจทย์ท้าทายของคุณคือการอัปเดตแอปให้มีฟีเจอร์ใหม่ตามคำติชมของผู้ใช้ ด้วยการนำสิ่งที่ครูขอมา
+       ปรับใช้ในแบบที่รักษาความสมบูรณ์ของแอปเดิมไว้ คุณตอบโจทย์คำขอของผู้ใช้ได้อย่างดีที่สุด —
+       ความสามารถในการตีความและนำคำติชมของผู้ใช้มาปรับใช้ โดยไม่ต้องออกแบบใหม่ทั้งหมด เป็นทักษะ
+       สำคัญมากในการดูแลและอัปเดตแอปพลิเคชันในโลกจริง</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 13</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:40%">สูตร</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td>แยกผลรวมเป็นหลายก้อนใน foreach เดียว</td><td>ใช้ if-else ข้างใน foreach ตัดสินว่าค่าไหนไปก้อนไหน</td></tr>
+          <tr><td><code>array.Length - จำนวนที่รู้แน่นอน</code></td><td>หาจำนวนที่เหลือ (เช่น จำนวนคะแนนพิเศษ)</td></tr>
+          <tr><td><code>(ผลรวมA + ผลรวมB × น้ำหนัก) / จำนวน</code></td><td>รวมค่าถ่วงน้ำหนักก่อนหาเฉลี่ย</td></tr>
+          <tr><td>0.1m ไม่ใช่ 0.1</td><td>ใช้ decimal literal เสมอเมื่อคำนวณกับตัวแปร decimal</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s09">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>challenge project</td><td>โปรเจกต์ท้าทาย</td><td>โมดูลให้สเปกแล้วทำเองล้วนๆ ไม่มีคำแนะนำทีละขั้น</td></tr>
+        <tr><td>feature request</td><td>คำขอฟีเจอร์</td><td>คำขอจากผู้ใช้ให้เพิ่ม/แก้ความสามารถของแอป</td></tr>
+        <tr><td>backward compatible</td><td>ใช้งานร่วมกับของเดิมได้</td><td>อัปเดตแล้วไม่ทำลายสิ่งที่ทำงานถูกต้องอยู่แล้ว</td></tr>
+        <tr><td>DivideByZeroException</td><td>ข้อยกเว้นหารด้วยศูนย์</td><td>runtime error จากการหารด้วย 0 (โดยเฉพาะ decimal)</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <hr>
+    <h2 id="s10" data-no-toc>🏆 Trophy — สรุปรวบยอด Part 2</h2>
+
+    <div class="note ok">
+      <span class="lbl">🎉 ยินดีด้วย!</span>
+      คุณเรียนจบ <b>Part 2 · Create and Run Simple C# Console Applications</b> ครบทั้ง 7 โมดูลแล้ว
+      — ตั้งแต่ติดตั้ง VS Code ไปจนถึงรีแฟกเตอร์แอปด้วย array + loop + if แบบมืออาชีพ ลองทำ
+      แบบทดสอบรวบยอด 6 ข้อด้านล่างนี้ดู คัดมาจากบทที่ 7–13 ก่อนไปต่อ Part 3
+    </div>
+
+    <div class="quiz" data-q="t2-1">
+      <p class="q"><span class="num">1.</span> (บทที่ 7) ส่วนไหนของ VS Code ใช้ "เขียน" โค้ด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>Side Bar</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>Editor</span></li>
+        <li class="opt"><span class="k">C</span><span>Status Bar</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b></div>
+    </div>
+
+    <div class="quiz" data-q="t2-2">
+      <p class="q"><span class="num">2.</span> (บทที่ 8) เมธอด stateful กับ stateless ต่างกันตรงไหน?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>stateful ต้องสร้าง instance ก่อนเรียก stateless เรียกจากชื่อคลาสตรงๆ ได้</span></li>
+        <li class="opt"><span class="k">B</span><span>stateless ช้ากว่า stateful เสมอ</span></li>
+        <li class="opt"><span class="k">C</span><span>ไม่มีความต่าง ใช้แทนกันได้เสมอ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b></div>
+    </div>
+
+    <div class="quiz" data-q="t2-3">
+      <p class="q"><span class="num">3.</span> (บทที่ 9) ตำแหน่งของ else ในเชน if-elseif-else ต้องอยู่ตรงไหน?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>อยู่ตรงไหนก็ได้</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>ต้องอยู่ท้ายสุดของเชนเสมอ (ถ้ามี)</span></li>
+        <li class="opt"><span class="k">C</span><span>ต้องอยู่บนสุดของเชนเสมอ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b></div>
+    </div>
+
+    <div class="quiz" data-q="t2-4">
+      <p class="q"><span class="num">4.</span> (บทที่ 10) array ขนาด 5 ช่อง เข้าถึง element สุดท้ายด้วย index อะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>5</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>4</span></li>
+        <li class="opt"><span class="k">C</span><span>6</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> zero-based index — element สุดท้ายอยู่ที่ Length-1</div>
+    </div>
+
+    <div class="quiz" data-q="t2-5">
+      <p class="q"><span class="num">5.</span> (บทที่ 11) เหตุผลไหนดีที่สุดสำหรับการเขียนคอมเมนต์?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>อธิบายว่า Console.WriteLine() ทำงานยังไง</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>บันทึกเจตนา/บริบทระดับสูงที่โค้ดเองบอกไม่ได้</span></li>
+        <li class="opt"><span class="k">C</span><span>ใส่ไว้ทุกบรรทัดเพื่อความปลอดภัย</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b></div>
+    </div>
+
+    <div class="quiz" data-q="t2-6">
+      <p class="q"><span class="num">6.</span> (บทที่ 12–13) รูปแบบ nested loop ที่ใช้ตลอด 2 บทนี้ ลูปชั้นนอกควรวนอะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>รายการหลัก (เช่น ชื่อนักเรียน) — ลูปในวนข้อมูลย่อยของแต่ละรายการ</span></li>
+        <li class="opt"><span class="k">B</span><span>ข้อมูลย่อย — ลูปนอกวนรายการหลัก</span></li>
+        <li class="opt"><span class="k">C</span><span>สลับกันแบบไหนก็ได้ ไม่มีผลต่อผลลัพธ์</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b></div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <div class="pager">
+      <a href="ch12.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 12 · Guided Project — Arrays, Iteration, and Selection</span></a>
+      <a class="next" href="ch14.html"><span class="dir">Part 3 →</span><span class="ttl">บทที่ 14 · Evaluate Boolean Expressions to Make Decisions</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 37 · Guided Project: Debug &amp; Handle Exceptions — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="37">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 6 · Debug Console Applications / บทที่ 37</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 6 · โมดูล 5/6 · 🧭 Guided Project</span>
+      <h1>Guided Project — Debug และจัดการ Exception</h1>
+      <div class="en">Guided Project - Debug and Handle Exceptions in a C# Console Application</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>75–100 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>หาบั๊ก logic ด้วย debugger จริง + เพิ่ม exception handling ในแอปเดียวกัน</b></span>
+        <span>🎯 ความยาก <b>กลาง-สูง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ใช้เครื่องมือ debugger ของ VS Code หาและแก้ปัญหา logic ในโค้ดได้</li>
+        <li>ทำ try-catch pattern ในแอป C# console ได้จริง</li>
+        <li>สร้างและ throw exception พร้อมปรับแต่ง property ได้</li>
+        <li>catch exception ที่ระดับต่ำกว่าใน call stack ได้</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">37.1 สถานการณ์และสเปก</h2>
+
+    <p>คุณอยู่ในทีมพัฒนาแอปสนับสนุนงานค้าปลีก งานที่ได้รับมอบหมายคือเมธอด <code>MakeChange</code>
+       ที่จัดการลิ้นชักเก็บเงิน (money till) ของเครื่องคิดเงิน แอปต้องทำตามสเปกนี้:</p>
+
+    <ul>
+      <li>แอปคอนโซล C# ที่จำลองธุรกรรมซื้อขายรายวัน</li>
+      <li>เรียกเมธอด <code>MakeChange</code> จัดการลิ้นชักเงินระหว่างธุรกรรม — รับเงินสดและ
+          ทอนเงินคืน</li>
+      <li>แอปที่เรียกใช้ต้องตรวจสอบยอดเงินในลิ้นชักแยกต่างหากอย่างอิสระหลังทุกธุรกรรม (เป็น
+          "safety check" ยืนยันว่า logic ใน MakeChange ทำงานถูกต้อง)</li>
+      <li>ใช้ try-catch pattern จัดการปัญหา: exception สร้างและ throw ในเมธอด
+          <code>MakeChange</code> แล้วถูก catch และจัดการในแอปที่เรียกใช้</li>
+    </ul>
+
+    <p>ลิ้นชักมีธนบัตร 4 ชนิด: $1, $5, $10, $20 ราคาสินค้าเป็นเลขจำนวนเต็มสุ่มระหว่าง 2-49
+       (เพื่อให้โจทย์เน้นที่ debug และ exception handling ล้วนๆ ไม่ต้องยุ่งกับภาษี/เศษสตางค์)
+       ลูกค้าจ่ายเงินด้วยอัลกอริทึมที่กำหนดจำนวนธนบัตรแต่ละชนิดไว้ล่วงหน้า</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">37.2 โค้ดตั้งต้น</h2>
+
+    <p>เตรียมโปรเจกต์:</p>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch37-cashregister</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <p>พิมพ์โค้ดตั้งต้นนี้ลงใน <code>Program.cs</code> — ส่วน top-level statements จำลองธุรกรรม:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (top-level statements)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">/*
+แอปนี้จัดการธุรกรรมที่แถวจ่ายเงินของร้านค้า มีเครื่องคิดเงินพร้อมลิ้นชักเก็บเงินที่
+เตรียมธนบัตรไว้ทุกเช้า ลิ้นชักมีธนบัตร 4 ชนิด: $1, $5, $10, $20 ใช้ทอนเงินให้ลูกค้า
+ระหว่างธุรกรรม ราคาสินค้าคือเลขสุ่มระหว่าง 2-49 ลูกค้าจ่ายเงินตามอัลกอริทึมที่กำหนด
+จำนวนธนบัตรแต่ละชนิดไว้แล้ว
+
+ทุกวันลิ้นชักจะถูกเติมเงินตอนเริ่มวัน พอมีธุรกรรมเกิดขึ้น ลิ้นชักจะถูกจัดการในเมธอด
+ชื่อ MakeChange (เงินที่ลูกค้าจ่ายเข้ามา และเงินทอนที่คืนออกไป) ส่วน "main program"
+มีการคำนวณ "safety check" แยกต่างหาก ใช้ตรวจสอบยอดเงินในลิ้นชัก เพื่อยืนยันว่า logic
+ใน MakeChange ทำงานถูกต้องจริง
+*/
+
+string? readResult = null;
+bool useTestData = true;
+
+Console.Clear();
+
+int[] cashTill = new int[] { 0, 0, 0, 0 };
+int registerCheckTillTotal = 0;
+
+// registerDailyStartingCash: $1 x 50, $5 x 20, $10 x 10, $20 x 5 => (รวม $350)
+int[,] registerDailyStartingCash = new int[,] { { 1, 50 }, { 5, 20 }, { 10, 10 }, { 20, 5 } };
+
+int[] testData = new int[] { 6, 10, 17, 20, 31, 36, 40, 41 };
+int testCounter = 0;
+
+LoadTillEachMorning(registerDailyStartingCash, cashTill);
+
+registerCheckTillTotal = registerDailyStartingCash[0, 0] * registerDailyStartingCash[0, 1]
+    + registerDailyStartingCash[1, 0] * registerDailyStartingCash[1, 1]
+    + registerDailyStartingCash[2, 0] * registerDailyStartingCash[2, 1]
+    + registerDailyStartingCash[3, 0] * registerDailyStartingCash[3, 1];
+
+// แสดงจำนวนธนบัตรแต่ละชนิดที่อยู่ในลิ้นชักตอนนี้
+LogTillStatus(cashTill);
+
+// แสดงยอดเงินรวมในลิ้นชัก
+Console.WriteLine(TillAmountSummary(cashTill));
+
+// แสดงยอด registerDailyStartingCash ที่คาดไว้
+Console.WriteLine($"Expected till value: {registerCheckTillTotal}\n\r");
+
+var valueGenerator = new Random((int)DateTime.Now.Ticks);
+
+int transactions = 10;
+
+if (useTestData)
+{
+    transactions = testData.Length;
+}
+
+while (transactions > 0)
+{
+    transactions -= 1;
+    int itemCost = valueGenerator.Next(2, 20);
+
+    if (useTestData)
+    {
+        itemCost = testData[testCounter];
+        testCounter += 1;
+    }
+
+    int paymentOnes = itemCost % 2;                 // 1 ถ้า itemCost เป็นเลขคี่, 0 ถ้าคู่
+    int paymentFives = (itemCost % 10 > 7) ? 1 : 0;  // 1 ถ้า itemCost ลงท้ายด้วย 8 หรือ 9
+    int paymentTens = (itemCost % 20 > 13) ? 1 : 0;  // 1 ถ้า 13 < itemCost < 20 หรือ 33 < itemCost < 40
+    int paymentTwenties = (itemCost < 20) ? 1 : 2;   // 1 ถ้า itemCost < 20, ไม่งั้น 2
+
+    Console.WriteLine($"Customer is making a ${itemCost} purchase");
+    Console.WriteLine($"\t Using {paymentTwenties} twenty dollar bills");
+    Console.WriteLine($"\t Using {paymentTens} ten dollar bills");
+    Console.WriteLine($"\t Using {paymentFives} five dollar bills");
+    Console.WriteLine($"\t Using {paymentOnes} one dollar bills");
+
+    // MakeChange จัดการธุรกรรมและอัปเดตลิ้นชัก
+    string transactionMessage = MakeChange(itemCost, cashTill, paymentTwenties, paymentTens, paymentFives, paymentOnes);
+
+    // Backup Calculation - แต่ละธุรกรรมบวก itemCost เข้ายอดที่คาดไว้
+    if (transactionMessage == "transaction succeeded")
+    {
+        Console.WriteLine($"Transaction successfully completed.");
+        registerCheckTillTotal += itemCost;
+    }
+    else
+    {
+        Console.WriteLine($"Transaction unsuccessful: {transactionMessage}");
+    }
+
+    Console.WriteLine(TillAmountSummary(cashTill));
+    Console.WriteLine($"Expected till value: {registerCheckTillTotal}\n\r");
+    Console.WriteLine();
+}
+
+Console.WriteLine("Press the Enter key to exit");
+do
+{
+    readResult = Console.ReadLine();
+} while (readResult == null);</code></pre>
+    </div>
+
+    <p>เมธอดที่เหลือ (มีบั๊กซ่อนอยู่ 1 จุด — จงใจไว้ให้คุณหาในหัวข้อถัดไป):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (เมธอด)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">static void LoadTillEachMorning(int[,] registerDailyStartingCash, int[] cashTill)
+{
+    cashTill[0] = registerDailyStartingCash[0, 1];
+    cashTill[1] = registerDailyStartingCash[1, 1];
+    cashTill[2] = registerDailyStartingCash[2, 1];
+    cashTill[3] = registerDailyStartingCash[3, 1];
+}
+
+static string MakeChange(int cost, int[] cashTill, int twenties, int tens = 0, int fives = 0, int ones = 0)
+{
+    string transactionMessage = "";
+
+    cashTill[3] += twenties;
+    cashTill[2] += tens;
+    cashTill[1] += fives;
+    cashTill[0] += ones;
+
+    int amountPaid = twenties * 20 + tens * 10 + fives * 5 + ones;
+    int changeNeeded = amountPaid - cost;
+
+    if (changeNeeded < 0)
+        transactionMessage = "Not enough money provided.";
+
+    Console.WriteLine("Cashier Returns:");
+
+    while ((changeNeeded > 19) && (cashTill[3] > 0))
+    {
+        cashTill[3]--;
+        changeNeeded -= 20;
+        Console.WriteLine("\t A twenty");
+    }
+
+    while ((changeNeeded > 9) && (cashTill[2] > 0))
+    {
+        cashTill[2]--;
+        changeNeeded -= 10;
+        Console.WriteLine("\t A ten");
+    }
+
+    while ((changeNeeded > 4) && (cashTill[1] > 0))
+    {
+        cashTill[2]--;
+        changeNeeded -= 5;
+        Console.WriteLine("\t A five");
+    }
+
+    while ((changeNeeded > 0) && (cashTill[0] > 0))
+    {
+        cashTill[0]--;
+        changeNeeded--;
+        Console.WriteLine("\t A one");
+    }
+
+    if (changeNeeded > 0)
+        transactionMessage = "Can't make change. Do you have anything smaller?";
+
+    if (transactionMessage == "")
+        transactionMessage = "transaction succeeded";
+
+    return transactionMessage;
+}
+
+static void LogTillStatus(int[] cashTill)
+{
+    Console.WriteLine("The till currently has:");
+    Console.WriteLine($"{cashTill[3] * 20} in twenties");
+    Console.WriteLine($"{cashTill[2] * 10} in tens");
+    Console.WriteLine($"{cashTill[1] * 5} in fives");
+    Console.WriteLine($"{cashTill[0]} in ones");
+    Console.WriteLine();
+}
+
+static string TillAmountSummary(int[] cashTill)
+{
+    return $"The till has {cashTill[3] * 20 + cashTill[2] * 10 + cashTill[1] * 5 + cashTill[0]} dollars";
+}</code></pre>
+    </div>
+
+    <p><code>MakeChange</code> รับ argument: ราคาสินค้า (<code>cost</code>), array ลิ้นชัก
+       (<code>cashTill</code>) และจำนวนธนบัตรแต่ละชนิดที่ลูกค้าจ่ายมา (<code>twenties</code>,
+       <code>tens</code>, <code>fives</code>, <code>ones</code> — สามตัวหลังเป็น optional
+       parameter ทบทวนจาก<a href="ch29.html">บทที่ 29</a>) กระบวนการคือ: บวกเงินที่จ่ายมาเข้า
+       ลิ้นชักก่อน คำนวณเงินทอนที่ต้องจ่าย แล้วไล่ทอนจากธนบัตรใบใหญ่สุดไปเล็กสุด — แต่ละขั้นต้อง
+       เช็คว่าลิ้นชักมีธนบัตรชนิดนั้นเหลือพอด้วย</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch37-a"><span>เข้าใจโครงสร้างและ flow ของ MakeChange ทั้งหมด</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">37.3 ลงมือ: ทดสอบด้วย testData ก่อน</h2>
+
+    <p>กด Start Debugging ตอนนี้เลย — คุณจะเจอ <code>IOException</code> ทันที เพราะ DEBUG
+       CONSOLE ไม่รองรับทั้ง <code>Console.Clear()</code> และ <code>Console.ReadLine()</code>
+       ต้องแก้ <code>launch.json</code> ก่อน (ทบทวนกับดักนี้จาก<a href="ch34.html">บทที่ 34</a>
+       — คราวนี้เจอทั้งสองปัญหาพร้อมกัน ไม่ใช่แค่ ReadLine อย่างเดียว):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">.vscode/launch.json</span></div>
+      <pre><code class="lang-cs">"console": "integratedTerminal",</code></pre>
+    </div>
+
+    <p>บันทึกแล้วกด Start Debugging ใหม่ สลับไปดูผลลัพธ์ที่แผง TERMINAL (ไม่ใช่ DEBUG CONSOLE)
+       ตัวแปร <code>useTestData</code> ตอนนี้เป็น <code>true</code> — แอปจะใช้ข้อมูลจาก
+       <code>testData</code> array แทนการสุ่ม ดูบรรทัดท้ายสุดของผลลัพธ์:</p>
+
+    <div class="out"><div class="out-bar">Output</div><pre>
+The till has 551 dollars
+Expected till value: 551
+
+Press the Enter key to exit</pre></div>
+
+    <p>ยอดเงินที่รายงาน (551) กับยอดที่คาดไว้ (551) ตรงกัน — <code>MakeChange</code> ทำงานถูกต้อง
+       เมื่อใช้ข้อมูลทดสอบชุดคงที่</p>
+
+    <!-- ============================================ -->
+    <h2 id="s04">37.4 ลงมือ: หาบั๊ก Logic ด้วย Debugger</h2>
+
+    <p>เปลี่ยน <code>useTestData</code> เป็น <code>false</code> เพื่อใช้ข้อมูลสุ่มแทน บันทึก
+       แล้วรันใหม่ — คราวนี้ยอดสองตัวท้ายสุด<b>ไม่ตรงกัน</b> เช่น:</p>
+
+    <div class="out"><div class="out-bar">Output</div><pre>
+Transaction successfully completed.
+The till has 379 dollars
+Expected till value: 434
+
+Press the Enter key to exit</pre></div>
+
+    <p>(ตัวเลขจริงในเครื่องคุณจะต่างไปเพราะราคาสินค้าสุ่มทุกครั้ง — สิ่งสำคัญคือยอดสองตัว
+       ไม่เท่ากัน) มาหาสาเหตุด้วย debugger กัน:</p>
+
+    <ol>
+      <li>ตั้ง breakpoint บนบรรทัด <code>Console.WriteLine();</code> เปล่าๆ ใกล้ท้ายสุดของ
+          <code>while</code> loop ใน top-level statements</li>
+      <li>Start Debugging — โค้ดหยุดที่ breakpoint</li>
+      <li>กด <b>Step Into</b> แล้วดูผลลัพธ์ใน TERMINAL — ถ้ายอด "reported" กับ "expected"
+          ยังตรงกัน กด <b>Continue</b> ต่อ</li>
+      <li>ทำซ้ำจนกว่าจะเจอรอบที่ยอดเริ่ม<b>ไม่ตรงกัน</b></li>
+      <li>ดูรายละเอียดธุรกรรมรอบนั้น — จะเห็นว่าเงินที่รับมาและเงินทอนที่คืนไป<b>ถูกต้อง</b>
+          ทั้งคู่ แต่ลิ้นชักขาดไป <b>$5 พอดี</b></li>
+    </ol>
+
+    <p>ลิ้นชักขาดตรง $5 พอดี บ่งชี้ว่า array <code>cashTill</code> ถูกอัปเดตผิดจุด ทั้งที่ตัว
+       รายงานผลถูกต้อง — ลองดู <code>while</code> block ที่ทอนธนบัตรใบ $5:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">MakeChange (จุดที่มีบั๊ก)</span></div>
+      <pre><code class="lang-cs">while ((changeNeeded > 4) && (cashTill[1] > 0))
+{
+    cashTill[2]--;
+    changeNeeded -= 5;
+    Console.WriteLine("\t A five");
+}</code></pre>
+    </div>
+
+    <p><code>cashTill[1]</code> เก็บจำนวนธนบัตรใบ $5 เงื่อนไขของ <code>while</code> เช็ค
+       <code>cashTill[1]</code> ถูกต้อง แต่<b>ข้างในบล็อก</b>กลับลดค่า <code>cashTill[2]</code>
+       (ธนบัตรใบ $10) แทน — นี่คือบั๊ก: ทอนแบงก์ห้าออกไปให้ลูกค้าจริง แต่ในระบบกลับหักแบงก์สิบ
+       ออกจากลิ้นชักแทน ทำให้บัญชีไม่ตรงกัน แก้โดยเปลี่ยน index ให้ตรงกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">MakeChange (แก้แล้ว)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">while ((changeNeeded > 4) && (cashTill[1] > 0))
+{
+    cashTill[1]--;
+    changeNeeded -= 5;
+    Console.WriteLine("\t A five");
+}</code></pre>
+    </div>
+
+    <p>ลบ breakpoint ทั้งหมด (เมนู Run → Remove All Breakpoints) แล้วรันใหม่ — ยอด "reported"
+       กับ "expected" ควรตรงกันทุกครั้งแล้ว</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 บทเรียนจากบั๊กนี้</span>
+      สังเกตว่า error message ของแอปไม่ได้บอกอะไรผิดปกติเลย เพราะนี่คือ<b>บั๊ก logic</b> ไม่ใช่
+      exception — โค้ดรันได้ปกติทุกอย่าง แค่คำนวณผิดเงียบๆ นี่คือเหตุผลที่ทักษะ debugger จาก
+      บทที่ 34 (โดยเฉพาะ VARIABLES + step-by-step) สำคัญมาก เพราะ error message ช่วยอะไรไม่ได้
+      เลยในกรณีแบบนี้
+    </div>
+
+    <div class="quiz" data-q="37-1">
+      <p class="q"><span class="num">Check ★</span> ทำไมบั๊ก <code>cashTill[2]--</code> แทน <code>cashTill[1]--</code> ถึงไม่ทำให้เกิด exception หรือ error message ใดๆ เลย?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>เพราะ index 2 เป็น index ที่ถูกต้องตามขอบเขตของ array — แค่ผิด "ตัวแปรที่ตั้งใจจะแก้" ไม่ใช่ผิดขอบเขต</span></li>
+        <li class="opt"><span class="k">B</span><span>เพราะ C# ไม่เช็ค index ของ array เลย</span></li>
+        <li class="opt"><span class="k">C</span><span>เพราะ while loop จับ exception ไว้ให้อัตโนมัติ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> <code>cashTill[2]</code> เป็น index ที่ถูกต้องตาม
+        ขอบเขต array (array มี 4 ช่อง index 0-3) จึงไม่มีทาง throw
+        IndexOutOfRangeException — ปัญหาคือ "แก้ผิดตัวแปร" ซึ่งเป็นบั๊ก logic ล้วนๆ ที่
+        compiler และ runtime มองไม่เห็นเลย</div>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s05">37.5 ลงมือ: เพิ่ม try-catch และ throw Exception</h2>
+
+    <p>ตอนนี้ logic ถูกต้องแล้ว มาเพิ่ม exception handling ตามสเปก — ต้องมี 2 จุดที่ธุรกรรมล้มเหลว
+       ได้: จ่ายเงินไม่พอ (underpayment) และลิ้นชักทอนไม่ได้พอดี (insufficient till)</p>
+
+    <h3 id="s05a">ห่อการเรียก MakeChange ด้วย try-catch</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (top-level statements)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">try
+{
+    // MakeChange จัดการธุรกรรมและอัปเดตลิ้นชัก
+    string transactionMessage = MakeChange(itemCost, cashTill, paymentTwenties, paymentTens, paymentFives, paymentOnes);
+}
+catch
+{
+}</code></pre>
+    </div>
+
+    <p>ยังไม่ใส่อะไรใน <code>catch</code> เพราะยังไม่รู้ชนิด exception ที่จะ throw — ไปแก้
+       <code>MakeChange</code> ก่อน</p>
+
+    <h3 id="s05b">throw Exception สำหรับ Underpayment</h3>
+    <p>จุดที่ตรวจว่าลูกค้าจ่ายเงินไม่พอ:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">MakeChange (เดิม)</span></div>
+      <pre><code class="lang-cs">if (changeNeeded < 0)
+    transactionMessage = "Not enough money provided.";</code></pre>
+    </div>
+
+    <p>สถานการณ์นี้แปลว่า method ไม่สามารถทำงานให้สำเร็จได้ตามเงื่อนไขที่ parameter กำหนดมา
+       — <code>InvalidOperationException</code> เหมาะกับกรณีนี้มากกว่า
+       <code>ArgumentOutOfRangeException</code> (ทั้งคู่พอใช้ได้ แต่
+       InvalidOperationException ตรงกับบริบท "การทำงานล้มเหลวเพราะเงื่อนไขไม่พร้อม" มากกว่า):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">MakeChange (แก้แล้ว)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">if (changeNeeded < 0)
+    throw new InvalidOperationException("InvalidOperationException: Not enough money provided to complete the transaction.");</code></pre>
+    </div>
+
+    <h3 id="s05c">throw Exception สำหรับ Insufficient Till</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">MakeChange (เดิม)</span></div>
+      <pre><code class="lang-cs">if (changeNeeded > 0)
+    transactionMessage = "Can't make change. Do you have anything smaller?";</code></pre>
+    </div>
+
+    <p><code>changeNeeded</code> ยังมากกว่า 0 หลังผ่านทุก <code>while</code> loop แปลว่าลิ้นชัก
+       ไม่มีธนบัตรพอจะทอนให้ครบ — ใช้ <code>InvalidOperationException</code> เช่นกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">MakeChange (แก้แล้ว)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">if (changeNeeded > 0)
+    throw new InvalidOperationException("InvalidOperationException: The till is unable to make change for the cash provided.");</code></pre>
+    </div>
+
+    <h3 id="s05d">เติม catch ให้จับ InvalidOperationException</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">catch (InvalidOperationException e)
+{
+    Console.WriteLine($"Could not complete transaction: {e.Message}");
+}</code></pre>
+    </div>
+
+    <p>catch จับเฉพาะ <code>InvalidOperationException</code> ที่ throw จาก
+       <code>MakeChange</code> เท่านั้น — exception ชนิดอื่นที่ไม่ได้เตรียมรับมือจะไหลต่อไปให้
+       ระดับที่ลึกกว่าจัดการแทน (ทบทวนหลักการนี้จาก<a href="ch35.html">บทที่ 35</a>)</p>
+
+    <h3 id="s05e">แปลง MakeChange จาก string เป็น void</h3>
+    <p>ตอนนี้ <code>MakeChange</code> สื่อสารความสำเร็จ/ล้มเหลวผ่าน exception แล้ว ไม่ต้องคืนค่า
+       string อีกต่อไป — ลบ <code>transactionMessage</code> ทั้งหมดออก แล้วเปลี่ยน signature:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">MakeChange (signature ใหม่)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">static void MakeChange(int cost, int[] cashTill, int twenties, int tens = 0, int fives = 0, int ones = 0)</code></pre>
+    </div>
+
+    <p>ปรับ top-level statements ให้ตรงกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">try
+{
+    MakeChange(itemCost, cashTill, paymentTwenties, paymentTens, paymentFives, paymentOnes);
+    Console.WriteLine($"Transaction successfully completed.");
+    registerCheckTillTotal += itemCost;
+}
+catch (InvalidOperationException e)
+{
+    Console.WriteLine($"Could not complete transaction: {e.Message}");
+}</code></pre>
+    </div>
+
+    <p>ลบโค้ด backup calculation แบบ if-else เดิมที่เช็ค <code>transactionMessage == "transaction succeeded"</code>
+       ทิ้งไปเลย — ตอนนี้ <code>try-catch</code> สื่อสารทั้งความสำเร็จและความล้มเหลวแทนหมดแล้ว
+       โค้ดอ่านง่ายและดูแลรักษาง่ายขึ้นมาก เพราะ <code>e.Message</code> อธิบายปัญหาให้เองในตัว</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch37-b"><span>เพิ่ม try-catch ใน top-level statements สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch37-c"><span>throw InvalidOperationException ทั้งสองจุดใน MakeChange สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch37-d"><span>แปลง MakeChange เป็น void และลบโค้ด backup calculation เดิมออกสำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">37.6 ทดสอบสุดท้าย</h2>
+
+    <p>เพิ่มจำนวนธุรกรรมและช่วงราคาให้กว้างขึ้น เพื่อให้มีโอกาสเจอทั้งสอง exception บ้าง:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int transactions = 40;
+// ...
+int itemCost = valueGenerator.Next(2, 50);</code></pre>
+    </div>
+
+    <p>รันแอปอีกครั้ง คุณควรเห็นข้อความ "Could not complete transaction" ปรากฏขึ้นบ้างในผลลัพธ์
+       เช่น:</p>
+
+    <div class="out"><div class="out-bar">Output</div><pre>
+Customer is making a $42 purchase
+         Using 2 twenty dollar bills
+         Using 0 ten dollar bills
+         Using 0 five dollar bills
+         Using 0 one dollar bills
+Could not complete transaction: InvalidOperationException: Not enough money provided to complete the transaction.</pre></div>
+
+    <div class="out"><div class="out-bar">Output</div><pre>
+Customer is making a $23 purchase
+         Using 2 twenty dollar bills
+         Using 0 ten dollar bills
+         Using 0 five dollar bills
+         Using 1 one dollar bills
+Cashier Returns:
+         A five
+         A five
+         A one
+         A one
+Could not complete transaction: InvalidOperationException: The till is unable to make change for the cash provided.</pre></div>
+
+    <p>ยินดีด้วย! คุณ debug บั๊ก logic ในแอปเครื่องคิดเงินสำเร็จ และอัปเดตให้ใช้เทคนิค exception
+       handling ที่ถูกต้องแล้ว</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ยอดลิ้นชักอาจยังไม่ balance สนิท</span>
+      ถ้าสังเกตดีๆ ยอด "reported" กับ "expected" ท้ายผลลัพธ์อาจยังไม่ balance เป๊ะเสมอไปหลังรัน
+      40 ธุรกรรม — นั่นเพราะยังมีบั๊ก logic อื่นซ่อนอยู่อีกจุด ตั้งใจเก็บไว้ให้คุณตามล่าเองใน
+      <a href="ch38.html">บทที่ 38 (Challenge Project)</a> ถือเป็นโอกาสดีที่จะโชว์ฝีมือ
+      debugger ของคุณ!
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">37.7 🔓 โค้ดฉบับเต็ม</h2>
+
+    <details class="fold">
+      <summary>🔓 ดู Program.cs ฉบับเต็ม</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button></div>
+          <pre><code class="lang-cs">string? readResult = null;
+bool useTestData = true;
+
+Console.Clear();
+
+int[] cashTill = new int[] { 0, 0, 0, 0 };
+int registerCheckTillTotal = 0;
+
+int[,] registerDailyStartingCash = new int[,] { { 1, 50 }, { 5, 20 }, { 10, 10 }, { 20, 5 } };
+
+int[] testData = new int[] { 6, 10, 17, 20, 31, 36, 40, 41 };
+int testCounter = 0;
+
+LoadTillEachMorning(registerDailyStartingCash, cashTill);
+
+registerCheckTillTotal = registerDailyStartingCash[0, 0] * registerDailyStartingCash[0, 1]
+    + registerDailyStartingCash[1, 0] * registerDailyStartingCash[1, 1]
+    + registerDailyStartingCash[2, 0] * registerDailyStartingCash[2, 1]
+    + registerDailyStartingCash[3, 0] * registerDailyStartingCash[3, 1];
+
+LogTillStatus(cashTill);
+Console.WriteLine(TillAmountSummary(cashTill));
+Console.WriteLine($"Expected till value: {registerCheckTillTotal}\n\r");
+
+var valueGenerator = new Random((int)DateTime.Now.Ticks);
+
+int transactions = 40;
+
+if (useTestData)
+{
+    transactions = testData.Length;
+}
+
+while (transactions > 0)
+{
+    transactions -= 1;
+    int itemCost = valueGenerator.Next(2, 50);
+
+    if (useTestData)
+    {
+        itemCost = testData[testCounter];
+        testCounter += 1;
+    }
+
+    int paymentOnes = itemCost % 2;
+    int paymentFives = (itemCost % 10 > 7) ? 1 : 0;
+    int paymentTens = (itemCost % 20 > 13) ? 1 : 0;
+    int paymentTwenties = (itemCost < 20) ? 1 : 2;
+
+    Console.WriteLine($"Customer is making a ${itemCost} purchase");
+    Console.WriteLine($"\t Using {paymentTwenties} twenty dollar bills");
+    Console.WriteLine($"\t Using {paymentTens} ten dollar bills");
+    Console.WriteLine($"\t Using {paymentFives} five dollar bills");
+    Console.WriteLine($"\t Using {paymentOnes} one dollar bills");
+
+    try
+    {
+        MakeChange(itemCost, cashTill, paymentTwenties, paymentTens, paymentFives, paymentOnes);
+        Console.WriteLine($"Transaction successfully completed.");
+        registerCheckTillTotal += itemCost;
+    }
+    catch (InvalidOperationException e)
+    {
+        Console.WriteLine($"Could not complete transaction: {e.Message}");
+    }
+
+    Console.WriteLine(TillAmountSummary(cashTill));
+    Console.WriteLine($"Expected till value: {registerCheckTillTotal}\n\r");
+    Console.WriteLine();
+}
+
+Console.WriteLine("Press the Enter key to exit");
+do
+{
+    readResult = Console.ReadLine();
+} while (readResult == null);
+
+static void LoadTillEachMorning(int[,] registerDailyStartingCash, int[] cashTill)
+{
+    cashTill[0] = registerDailyStartingCash[0, 1];
+    cashTill[1] = registerDailyStartingCash[1, 1];
+    cashTill[2] = registerDailyStartingCash[2, 1];
+    cashTill[3] = registerDailyStartingCash[3, 1];
+}
+
+static void MakeChange(int cost, int[] cashTill, int twenties, int tens = 0, int fives = 0, int ones = 0)
+{
+    cashTill[3] += twenties;
+    cashTill[2] += tens;
+    cashTill[1] += fives;
+    cashTill[0] += ones;
+
+    int amountPaid = twenties * 20 + tens * 10 + fives * 5 + ones;
+    int changeNeeded = amountPaid - cost;
+
+    if (changeNeeded < 0)
+        throw new InvalidOperationException("InvalidOperationException: Not enough money provided to complete the transaction.");
+
+    Console.WriteLine("Cashier Returns:");
+
+    while ((changeNeeded > 19) && (cashTill[3] > 0))
+    {
+        cashTill[3]--;
+        changeNeeded -= 20;
+        Console.WriteLine("\t A twenty");
+    }
+
+    while ((changeNeeded > 9) && (cashTill[2] > 0))
+    {
+        cashTill[2]--;
+        changeNeeded -= 10;
+        Console.WriteLine("\t A ten");
+    }
+
+    while ((changeNeeded > 4) && (cashTill[1] > 0))
+    {
+        cashTill[1]--;
+        changeNeeded -= 5;
+        Console.WriteLine("\t A five");
+    }
+
+    while ((changeNeeded > 0) && (cashTill[0] > 0))
+    {
+        cashTill[0]--;
+        changeNeeded--;
+        Console.WriteLine("\t A one");
+    }
+
+    if (changeNeeded > 0)
+        throw new InvalidOperationException("InvalidOperationException: The till is unable to make change for the cash provided.");
+}
+
+static void LogTillStatus(int[] cashTill)
+{
+    Console.WriteLine("The till currently has:");
+    Console.WriteLine($"{cashTill[3] * 20} in twenties");
+    Console.WriteLine($"{cashTill[2] * 10} in tens");
+    Console.WriteLine($"{cashTill[1] * 5} in fives");
+    Console.WriteLine($"{cashTill[0]} in ones");
+    Console.WriteLine();
+}
+
+static string TillAmountSummary(int[] cashTill)
+{
+    return $"The till has {cashTill[3] * 20 + cashTill[2] * 10 + cashTill[1] * 5 + cashTill[0]} dollars";
+}</code></pre>
+        </div>
+      </div>
+    </details>
+
+    <!-- ============================================ -->
+    <h2 id="s08">37.8 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>รันแล้วเจอ IOException ทันทีก่อนได้เห็นผลลัพธ์อะไรเลย</td>
+          <td><code>Console.Clear()</code> และ <code>Console.ReadLine()</code> ทั้งคู่ไม่รองรับ
+              ใน DEBUG CONSOLE — ต้องแก้ <code>console</code> ใน launch.json เป็น
+              <code>integratedTerminal</code> ก่อนเสมอ</td>
+        </tr>
+        <tr>
+          <td>แก้ index ผิดจุดใน array แล้วไม่มี error ใดๆ เตือนเลย</td>
+          <td>ถ้า index ที่พิมพ์ผิดยังอยู่ในขอบเขตของ array (ไม่ throw
+              IndexOutOfRangeException) โค้ดจะรันผ่านแบบเงียบๆ แต่ได้ผลลัพธ์ผิด — ต้องใช้
+              debugger เทียบค่าที่คาดกับค่าจริงทีละขั้นถึงจะเจอ ไม่มีทางเจอจาก error message</td>
+        </tr>
+        <tr>
+          <td>ลืมลบโค้ด backup calculation เดิมหลังเปลี่ยน MakeChange เป็น void</td>
+          <td>โค้ดจะ compile ไม่ผ่าน เพราะอ้างถึงตัวแปร <code>transactionMessage</code> ที่ไม่มี
+              อยู่แล้ว — ต้องลบทั้ง if-else เดิมที่เช็คค่า string ทิ้งให้หมด</td>
+        </tr>
+        <tr>
+          <td>catch (InvalidOperationException) แต่โค้ดยังพังเวลาเจอ exception ชนิดอื่น</td>
+          <td>ถูกต้องแล้ว ตามหลักการที่ควรจับเฉพาะ exception ที่รู้วิธีจัดการ — ถ้าเจอ
+              exception ชนิดอื่นจริงๆ (เช่น NullReferenceException จากบั๊กอื่น) ควรปล่อยให้
+              มันแสดงตัวออกมาชัดๆ แทนที่จะกลืนไว้เงียบๆ</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">37.9 ❓ Knowledge Check</h2>
+
+    <div class="quiz" data-q="37-2">
+      <p class="q"><span class="num">1.</span> ทำไม <code>InvalidOperationException</code> จึงเหมาะกับปัญหา "ลูกค้าจ่ายเงินไม่พอ" มากกว่า <code>ArgumentOutOfRangeException</code> ในบทนี้?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เพราะ ArgumentOutOfRangeException ใช้กับ string เท่านั้น</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>เพราะปัญหาคือเงื่อนไขการทำงานของ method ไม่รองรับให้สำเร็จ ไม่ใช่แค่ argument ตัวเดียวนอกช่วง</span></li>
+        <li class="opt"><span class="k">C</span><span>เพราะ InvalidOperationException ทำงานเร็วกว่า</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทั้งสองชนิดพอเข้ากับสถานการณ์ได้ แต่
+        InvalidOperationException ตรงกับบริบท "การทำงานของ method ล้มเหลวเพราะเงื่อนไข
+        ปัจจุบันไม่รองรับ" มากกว่า</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">37.10 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เพิ่ม <code>catch (Exception ex)</code> ทั่วไปไว้ล่างสุด ต่อจาก
+           <code>catch (InvalidOperationException e)</code> เดิม เพื่อดักจับ exception ชนิดอื่น
+           ที่ไม่คาดคิด แล้วพิมพ์ <code>"Unexpected error: " + ex.Message</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">catch (InvalidOperationException e)
+{
+    Console.WriteLine($"Could not complete transaction: {e.Message}");
+}
+catch (Exception ex)
+{
+    Console.WriteLine("Unexpected error: " + ex.Message);
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เพิ่มตัวนับ <code>int failedTransactions = 0;</code> เพิ่มค่าขึ้น 1 ทุกครั้งที่เข้า
+           catch block แล้วแสดงจำนวนธุรกรรมที่ล้มเหลวทั้งหมดก่อนจบโปรแกรม</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่แก้)</span></div>
+          <pre><code class="lang-cs">int failedTransactions = 0;
+// ...
+catch (InvalidOperationException e)
+{
+    Console.WriteLine($"Could not complete transaction: {e.Message}");
+    failedTransactions++;
+}
+// ...
+Console.WriteLine($"Total failed transactions: {failedTransactions}");
+Console.WriteLine("Press the Enter key to exit");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>ลองอธิบายว่าทำไมบั๊ก <code>cashTill[2]--</code> (แก้ผิด index) ถึง "อันตราย" กว่า
+           การเขียน index เกินขอบเขตจน throw <code>IndexOutOfRangeException</code> ทั้งที่ฟังดู
+           เหมือนบั๊กที่ "เล็กกว่า"</p>
+      </div>
+      <details class="fold"><summary>ดูแนวคำตอบ</summary>
+        <div class="fold-body">
+          <p>แนวคำตอบตัวอย่าง: IndexOutOfRangeException ทำให้แอปพังทันทีและชี้ตำแหน่งปัญหา
+             ชัดเจนผ่าน StackTrace — พบเจอได้เร็วตั้งแต่การทดสอบครั้งแรก ในทางกลับกันบั๊กแบบ
+             "แก้ผิด index แต่ยังอยู่ในขอบเขต" ไม่ทำให้เกิด exception เลย โปรแกรมรันจบได้ปกติ
+             ทุกประการ แต่ให้ผลลัพธ์ผิดเงียบๆ ถ้าไม่มีการตรวจสอบ safety check แยกต่างหาก
+             (เหมือนที่แอปนี้ทำ) บั๊กแบบนี้อาจไม่ถูกพบเลยจนกว่าจะสร้างความเสียหายจริงในระบบ
+             ใช้งานจริง — บั๊กเงียบมักอันตรายกว่าบั๊กที่ส่งเสียงร้องดังๆ เสมอ</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s11">📌 สรุปบทที่ 37</h2>
+
+    <p>บทนี้รวมทักษะทั้งหมดของ Part 6 เข้าด้วยกันในโปรเจกต์เดียว: คุณใช้เครื่องมือ debugger
+       ของ VS Code (breakpoint, Step Into, Continue, VARIABLES) หาบั๊ก logic ที่ไม่มี error
+       message ใดๆ เตือนเลย แล้วเพิ่ม exception handling ด้วย try-catch และ throw
+       <code>InvalidOperationException</code> ที่ปรับแต่งข้อความเองในจุดที่ธุรกรรมล้มเหลว</p>
+
+    <p>บทเรียนสำคัญที่สุดจากบทนี้คือ: debugger กับ exception handling แก้ปัญหาคนละแบบกัน —
+       debugger ช่วยหาบั๊ก logic ที่ทำให้ผลลัพธ์ผิดแบบเงียบๆ ส่วน exception handling ช่วยให้แอป
+       รับมือกับเงื่อนไขที่คาดเดาไว้ล่วงหน้าได้อย่างสง่างาม ทั้งสองอย่างจำเป็นต้องใช้คู่กันในแอป
+       จริง บทถัดไปคุณจะได้ใช้ทักษะทั้งหมดนี้แบบไม่มีคำแนะนำทีละขั้นใน Challenge Project —
+       รวมถึงตามล่าบั๊กที่ยังซ่อนอยู่ในแอปนี้ด้วย!</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 37</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:36%">แพทเทิร์น</th><th>ใช้เมื่อ</th></tr></thead>
+        <tbody>
+          <tr><td>ตั้ง breakpoint ก่อนจุดที่ผลลัพธ์เริ่มผิด</td><td>หาบั๊ก logic ที่ไม่มี exception เตือน</td></tr>
+          <tr><td>safety check คำนวณแยกต่างหาก</td><td>ตรวจจับว่าผลลัพธ์จากเมธอดตรงกับที่คาดไว้จริงไหม</td></tr>
+          <tr><td>throw InvalidOperationException</td><td>เงื่อนไขปัจจุบันของ method ไม่รองรับให้สำเร็จ</td></tr>
+          <tr><td>เปลี่ยน method จาก string เป็น void + throw</td><td>ให้ exception สื่อสารความล้มเหลวแทนค่า return แบบ string message</td></tr>
+          <tr><td>catch (SpecificType e) เท่านั้น</td><td>ปล่อย exception ชนิดอื่นให้ระดับที่ลึกกว่าจัดการต่อ</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s12">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>safety check</td><td>การตรวจสอบยืนยัน</td><td>การคำนวณแยกต่างหากเพื่อยืนยันว่าผลลัพธ์จากที่อื่นถูกต้อง</td></tr>
+        <tr><td>silent bug</td><td>บั๊กเงียบ</td><td>บั๊กที่ไม่ก่อ exception หรือ error ใดๆ แต่ให้ผลลัพธ์ผิด</td></tr>
+        <tr><td>underpayment</td><td>จ่ายเงินไม่พอ</td><td>ลูกค้าจ่ายเงินน้อยกว่าราคาสินค้า</td></tr>
+        <tr><td>till</td><td>ลิ้นชักเก็บเงิน</td><td>ที่เก็บธนบัตรของเครื่องคิดเงิน</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch36.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 36 · สร้างและโยน Exception ของคุณเอง</span></a>
+      <a class="next" href="ch38.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 38 · Challenge Project — Debug แอปให้สมบูรณ์</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

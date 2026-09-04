@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8" />
+    <title>C# Runner</title>
+    <base href="./" />
+    <link rel="preload" id="webassembly" />
+    <script type="importmap"></script>
+</head>
+
+<body>
+    <div id="app"></div>
+
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js" autostart="false"></script>
+    <script>
+        var pending = [];
+        var ready = false;
+
+        function handleRun(msg) {
+            DotNet.invokeMethodAsync('CSharpRunner', 'RunAsync', msg.code)
+                .then(function (output) {
+                    parent.postMessage({ type: 'result', id: msg.id, output: output }, '*');
+                })
+                .catch(function (err) {
+                    parent.postMessage({ type: 'result', id: msg.id, output: 'Runner error: ' + err }, '*');
+                });
+        }
+
+        window.addEventListener('message', function (ev) {
+            var msg = ev.data;
+            if (!msg || msg.type !== 'run') return;
+            if (ready) {
+                handleRun(msg);
+            } else {
+                pending.push(msg);
+            }
+        });
+
+        Blazor.start().then(function () {
+            ready = true;
+            parent.postMessage({ type: 'ready' }, '*');
+            pending.forEach(handleRun);
+            pending = [];
+        }).catch(function (err) {
+            parent.postMessage({ type: 'boot-error', error: String(err) }, '*');
+        });
+    </script>
+</body>
+
+</html>

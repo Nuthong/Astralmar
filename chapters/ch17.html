@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 17 · for Statement — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="17">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 3 · Add Logic to Console Apps / บทที่ 17</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 3 · โมดูล 4/7</span>
+      <h1>วนซ้ำ Code Block ด้วย for Statement</h1>
+      <div class="en">Iterate Through a Code Block Using the for Statement</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>45–65 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>ควบคุมการวนซ้ำได้ละเอียด + ทำโจทย์ FizzBuzz ได้</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น–กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ใช้ <code>for</code> statement วน code block ได้</li>
+        <li>ปรับแต่งวิธีที่ .NET Runtime รันตรรกะการวนซ้ำ ทั้งค่า iterator เงื่อนไข และรูปแบบการนับได้</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">17.1 ทำไมต้องมี for Statement</h2>
+
+    <p>การเพิ่มตรรกะวนซ้ำในแอปทำได้หลายวิธี แต่ละวิธีมีจุดเด่น-จุดด้อยต่างกันไปตามบริบท</p>
+
+    <p>สมมติคุณกำลังจะเริ่มทำงานกับแอปที่ประมวลผลข้อมูล string และตัวเลขด้วย array มิติเดียวและ
+       หลายมิติ พอทบทวนเบื้องต้น คุณพบว่า <code>foreach</code> statement ไม่รองรับตรรกะวนซ้ำที่
+       ต้องใช้ในหลายกรณี คุณต้องหาวิธีอื่นสำหรับวนผ่าน array หลายมิติ และสถานการณ์ที่
+       <code>foreach</code> ควบคุมการวนซ้ำได้ไม่ละเอียดพอ — คุณต้องมีประสบการณ์ใช้
+       <code>for</code> statement ถ้าจะทำโปรเจกต์นี้ให้สำเร็จ</p>
+
+    <p>ในบทนี้ คุณจะเริ่มจากเขียน <code>for</code> statement ที่วนซ้ำตามจำนวนรอบที่กำหนด หลังจาก
+       implement <code>for</code> statement พื้นฐานแล้ว คุณจะเรียนวิธีทำ <code>for</code>
+       statement ที่วนย้อนกลับผ่าน array ข้ามบาง element ระหว่างวนซ้ำ หรือประมวลผลเฉพาะ element
+       ที่กำหนด (ด้วยการปรับ initializer, condition, และ iterator ของ <code>for</code> statement)</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">17.2 ลงมือ: สร้างและปรับแต่ง for Loop</h2>
+
+    <h3 id="s02a"><code>for</code> Statement คืออะไร</h3>
+    <p><code>for</code> statement วน code block ตามจำนวนรอบที่กำหนดไว้แน่นอน — ความสามารถนี้ทำให้
+       <code>for</code> ต่างจาก iteration statement ตัวอื่น: <code>foreach</code> วน code block
+       ครั้งเดียวต่อแต่ละ item ในลำดับข้อมูลอย่าง array หรือ collection ส่วน <code>while</code>
+       วน code block จนกว่าเงื่อนไขจะเป็นจริง</p>
+
+    <p><code>for</code> statement ยังให้การควบคุมกระบวนการวนซ้ำมากกว่ามาก โดยเปิดเผยเงื่อนไขของ
+       การวนซ้ำให้ปรับแต่งได้โดยตรง</p>
+
+    <h3 id="s02b">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch17-for</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <h3 id="s02c">เขียน for Statement พื้นฐาน</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">for (int i = 0; i < 10; i++)
+{
+    Console.WriteLine(i);
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div>
+
+    <svg viewBox="0 0 720 200" role="img" aria-label="6 ส่วนประกอบของ for statement" style="margin:18px 0">
+      <g font-family="var(--font-th)" font-size="12">
+        <rect x="16"  y="14" width="215" height="80" rx="10" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="123" y="38" text-anchor="middle" font-weight="700" fill="var(--brand-text)">initializer</text>
+        <text x="123" y="60" text-anchor="middle" font-family="var(--font-code)" fill="var(--text)">int i = 0</text>
+        <text x="123" y="80" text-anchor="middle" fill="var(--text-soft)">ประกาศ+กำหนดค่าเริ่มต้น</text>
+
+        <rect x="248" y="14" width="215" height="80" rx="10" fill="var(--tip-soft)" stroke="var(--tip)"/>
+        <text x="355" y="38" text-anchor="middle" font-weight="700" fill="var(--tip)">condition</text>
+        <text x="355" y="60" text-anchor="middle" font-family="var(--font-code)" fill="var(--text)">i &lt; 10</text>
+        <text x="355" y="80" text-anchor="middle" fill="var(--text-soft)">เงื่อนไขวนต่อ</text>
+
+        <rect x="480" y="14" width="224" height="80" rx="10" fill="var(--warn-soft)" stroke="var(--warn)"/>
+        <text x="592" y="38" text-anchor="middle" font-weight="700" fill="var(--warn)">iterator</text>
+        <text x="592" y="60" text-anchor="middle" font-family="var(--font-code)" fill="var(--text)">i++</text>
+        <text x="592" y="80" text-anchor="middle" fill="var(--text-soft)">ทำหลังจบแต่ละรอบ</text>
+
+        <rect x="160" y="112" width="400" height="76" rx="10" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text x="360" y="136" text-anchor="middle" font-weight="700" fill="var(--ok)">body (code block)</text>
+        <text x="360" y="158" text-anchor="middle" font-family="var(--font-code)" fill="var(--text)">Console.WriteLine(i);</text>
+        <text x="360" y="176" text-anchor="middle" fill="var(--text-soft)">โค้ดที่รันทุกรอบ</text>
+      </g>
+    </svg>
+
+    <p><code>for</code> statement ประกอบด้วย 6 ส่วน: (1) คีย์เวิร์ด <code>for</code> (2) วงเล็บ
+       นิยามเงื่อนไขการวนซ้ำ ข้างในแบ่งเป็น 3 ส่วนคั่นด้วยเซมิโคลอน (3) <b>initializer</b> —
+       ประกาศและกำหนดค่าเริ่มต้นตัวแปร iterator (<code>int i = 0</code>) (4) <b>condition</b> —
+       เงื่อนไขจบ (<code>i &lt; 10</code> รันต่อไปตราบที่ <code>i</code> น้อยกว่า 10 พอ
+       <code>i</code> เท่ากับ 10 จะหยุดทำงาน) (5) <b>iterator</b> — การกระทำหลังจบแต่ละรอบ
+       (<code>i++</code> เพิ่มค่า <code>i</code> ทีละ 1) (6) <b>body</b> — code block ที่รันทุกรอบ</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ทำไมชื่อตัวแปรมักเป็น i</span>
+      <code>i</code> เป็นชื่อที่ถูกต้องตามกฎ (แม้จะสั้นผิดธรรมเนียมจากบทที่ 11) แต่เป็นธรรมเนียม
+      ที่ยอมรับกันกว้างขวางในวงการ ตัวเลือกยอดนิยมอื่นคือ <code>x</code> และ <code>counter</code>
+      ส่วน <code>j</code> มักใช้เมื่อมี <code>for</code> ชั้นนอกใช้ <code>i</code> อยู่แล้ว และ
+      ต้องการตัวแปรวนซ้ำใหม่สำหรับ <code>for</code> ชั้นใน — ทั้ง 3 ส่วน (initializer, condition,
+      iterator) เป็นตัวเลือกเสริมทั้งหมด แต่ในทางปฏิบัติมักใช้ครบทั้ง 3 ส่วนเสมอ
+    </div>
+
+    <h3 id="s02d">เปลี่ยนเงื่อนไขการวนซ้ำ</h3>
+    <p><code>for</code> statement มีคุณสมบัติเด่น 2 อย่าง: ใช้เมื่อรู้จำนวนรอบที่ต้องวนล่วงหน้า
+       และควบคุมวิธีจัดการแต่ละรอบได้ ลองวนนับถอยหลังแทนนับขึ้นดู:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">for (int i = 10; i >= 0; i--)
+{
+    Console.WriteLine(i);
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+0</pre></div>
+
+    <p>เปลี่ยน 3 ส่วนของ <code>for</code>: กำหนดค่าเริ่มต้นเป็น 10, เปลี่ยนเงื่อนไขจบเป็น
+       "ออกเมื่อ <code>i</code> น้อยกว่า 0", และเปลี่ยนรูปแบบ iterator เป็นลบ 1 ทุกรอบ</p>
+
+    <h3 id="s02e">ทดลองปรับรูปแบบของ Iterator</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">for (int i = 0; i < 10; i += 3)
+{
+    Console.WriteLine(i);
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+0
+3
+6
+9</pre></div>
+
+    <p>แทนที่จะเพิ่ม/ลด <code>i</code> ทีละ 1 ใช้ <code>i += 3</code> ข้าม 2 ค่าทุกรอบ — คุณอาจ
+       ไม่ค่อยได้ใช้แบบนี้บ่อยนัก แต่ก็เห็นได้ว่าคุณควบคุมการวนซ้ำได้ละเอียดมาก ถ้าจำเป็นต้องใช้</p>
+
+    <h3 id="s02f">ใช้ break หยุดการวนซ้ำก่อนกำหนด</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">for (int i = 0; i < 10; i++)
+{
+    Console.WriteLine(i);
+    if (i == 7) break;
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+0
+1
+2
+3
+4
+5
+6
+7</pre></div>
+
+    <p>คุณเจอ <code>break</code> ครั้งแรกในโมดูล "Branch the flow of code using the switch-case
+       construct" (<a href="ch16.html">บทที่ 16</a>) ปรากฏว่า <code>break</code> ใช้ออกจาก
+       iteration statement ได้ด้วยเหมือนกัน</p>
+
+    <h3 id="s02g">วน Array แบบย้อนกลับ</h3>
+    <p>การใช้งานทั่วไปของ <code>for</code> คือวนผ่าน array โดยเฉพาะถ้าต้องการควบคุมวิธีวนซ้ำ
+       — <code>foreach</code> วนทุก element ตามลำดับเสมอ แต่ <code>for</code> ปรับแต่งได้มากกว่า:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] names = { "Alex", "Eddie", "David", "Michael" };
+for (int i = names.Length - 1; i >= 0; i--)
+{
+    Console.WriteLine(names[i]);
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Michael
+David
+Eddie
+Alex</pre></div>
+
+    <p>สังเกตว่าใช้ property <code>Array.Length</code> (ทบทวนที่ <a href="ch10.html">บทที่ 10</a>)
+       หาจำนวน element แล้วเอามาตั้งค่าเริ่มต้นให้ตัวแปร iterator
+       (<code>int i = names.Length - 1</code>) ลบ 1 เพราะ index ของ array เริ่มนับจาก 0 (index
+       ของ 4 element คือ 0-3) และเลือกวนย้อนกลับ — สิ่งที่ <code>foreach</code> ทำไม่ได้
+       ใช้ค่าตัวแปร iterator ข้างใน code block ระบุ index ของ array (<code>names[i]</code>)</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 วนไปข้างหน้าก็ทำได้เหมือนเดิม</span>
+      ถ้าอยากวนไปข้างหน้าแบบปกติ ก็แค่เขียน
+      <code>for (int i = 0; i &lt; names.Length; i++)</code>
+    </div>
+
+    <h3 id="s02h">ข้อจำกัดของ foreach ที่ for แก้ได้</h3>
+    <p>ถ้าอยากอัปเดตค่าใน array ระหว่างวนด้วย <code>foreach</code> ล่ะ?</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">string[] names = { "Alex", "Eddie", "David", "Michael" };
+foreach (var name in names)
+{
+    // ทำแบบนี้ไม่ได้:
+    if (name == "David") name = "Sammy";
+}</code></pre>
+    </div>
+    <div class="out err auto"><div class="out-bar">Output</div><pre>
+Cannot assign to name because it is a 'foreach iteration variable'</pre></div>
+
+    <p>กำหนดค่าให้ <code>name</code> ใหม่ไม่ได้ เพราะมันเป็นส่วนหนึ่งของกลไกภายในของ
+       <code>foreach</code> — ลอง <code>for</code> แทน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] names = { "Alex", "Eddie", "David", "Michael" };
+
+for (int i = 0; i < names.Length; i++)
+{
+    if (names[i] == "David")
+    {
+        names[i] = "Sammy";
+    }
+}
+
+foreach (var name in names)
+{
+    Console.WriteLine(name);
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Alex
+Eddie
+Sammy
+Michael</pre></div>
+
+    <p>ทำงานได้ไม่มี error เพราะ array ไม่ได้เป็นส่วนหนึ่งของกลไกภายในตัว iteration statement
+       โดยตรง (ต่างจาก <code>foreach</code> ที่ตัวแปรชั่วคราวผูกติดกับกลไกวนซ้ำ) จึงเปลี่ยนค่าใน
+       array ได้อย่างอิสระ</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ตัดปีกกาได้เหมือนเดิม</span>
+      โค้ดข้างบนตัดปีกกาออกจาก code block บรรทัดเดียวได้ ตามหลักจาก
+      <a href="ch15.html">บทที่ 15</a>: <code>for (int i = 0; i &lt; names.Length; i++) if
+      (names[i] == "David") names[i] = "Sammy";</code> — บางคนมองว่าอ่านยาก บางคนชอบสไตล์แบบนี้
+      เพราะกระชับกว่า ถ้ารู้สึกว่าอ่านยาก ใส่ปีกกากลับก็ได้เสมอ ไม่ผิด
+    </div>
+
+    <div class="quiz" data-q="17-1">
+      <p class="q"><span class="num">Check ★</span> for statement ข้อใดถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>for (int x = 20: x &lt; 80: x++)</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>for (int j = 0; j &lt; 80; j + 1)</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>for (int counter = 20; counter &lt; 80; counter++)</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ข้อ A ใช้โคลอนแทนเซมิโคลอนผิดไวยากรณ์ ข้อ B ใช้
+        <code>j + 1</code> เป็นคำสั่งเดี่ยวๆ ซึ่งไม่ใช่รูปแบบที่ถูกต้อง (ไม่ใช่การกำหนดค่า
+        เรียกเมธอด หรือ increment/decrement) ต้องเป็น <code>j++</code> หรือ <code>j += 1</code>
+        หรือ <code>j = j + 1</code></div>
+    </div>
+
+    <div class="quiz" data-q="17-2">
+      <p class="q"><span class="num">Check ★</span> คำสั่งใดใช้ออกจาก for loop ก่อนวนซ้ำจบครบทุกรอบได้?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>exit;</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>break;</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>return;</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> <code>break;</code> คือคำสั่งที่ถูกต้องสำหรับออกจาก
+        loop เท่านั้น <code>exit</code> ไม่ใช่คีย์เวิร์ดของ C# ส่วน <code>return</code>
+        จะออกจากทั้งเมธอด ไม่ใช่แค่ loop</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch17-a"><span>เขียน for นับขึ้น นับลง และข้ามค่าได้สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch17-b"><span>ใช้ break หยุด for loop ก่อนกำหนดสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch17-c"><span>วน array ย้อนกลับด้วย for สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch17-d"><span>เจอข้อจำกัดของ foreach ด้วยตัวเอง แล้วแก้ด้วย for สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">17.3 ท้าทาย: FizzBuzz!</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl h">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p><b>FizzBuzz</b> เป็นโจทย์เขียนโค้ดและคำถามสัมภาษณ์งานที่โด่งดังมาก ใช้ทดสอบความเข้าใจ
+           เรื่อง <code>for</code> statement, <code>if</code> statement, ตัวดำเนินการเศษเหลือ
+           <code>%</code>, และตรรกะพื้นฐานของคุณ กฎที่ต้อง implement:</p>
+        <ul>
+          <li>แสดงค่าตั้งแต่ 1 ถึง 100 บรรทัดละ 1 ค่า ข้างใน code block ของ iteration statement</li>
+          <li>ถ้าค่านั้นหารด้วย 3 ลงตัว ให้พิมพ์คำว่า <code>Fizz</code> ต่อท้ายเลขนั้น</li>
+          <li>ถ้าค่านั้นหารด้วย 5 ลงตัว ให้พิมพ์คำว่า <code>Buzz</code> ต่อท้ายเลขนั้น</li>
+          <li>ถ้าค่านั้นหารด้วย<b>ทั้ง</b> 3 และ 5 ลงตัว ให้พิมพ์คำว่า <code>FizzBuzz</code>
+              ต่อท้ายเลขนั้น</li>
+        </ul>
+        <p>ผลลัพธ์บางส่วนที่ต้องได้ (ต้องไล่ไปจนถึง 100):</p>
+        <div class="out auto"><div class="out-bar">ผลลัพธ์เป้าหมาย (แสดงบางส่วน)</div><pre>
+1
+2
+3 - Fizz
+4
+5 - Buzz
+6 - Fizz
+7
+8
+9 - Fizz
+10 - Buzz
+11
+12 - Fizz
+13
+14
+15 - FizzBuzz
+16
+17
+18 - Fizz
+19
+20 - Buzz
+21 - Fizz
+22
+...</pre></div>
+        <p>สังเกตว่าเลข 15 หารทั้ง 3 และ 5 ลงตัว จึงพิมพ์ <code>FizzBuzz</code> ต่อท้าย</p>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>ทบทวน <code>%</code> จาก <a href="ch04.html">บทที่ 4</a> — ต้องเช็คเงื่อนไข "หารทั้ง
+             3 และ 5 ลงตัว" <b>ก่อน</b>เงื่อนไขอื่นเสมอ (ลำดับ if-elseif สำคัญ ทบทวนที่
+             <a href="ch09.html">บทที่ 9</a>) ไม่งั้นเลข 15 จะโดนจับเข้า "Fizz" หรือ "Buzz"
+             อย่างใดอย่างหนึ่งไปก่อน แล้วไม่มีวันไปถึงเงื่อนไข FizzBuzz</p>
+        </div>
+      </details>
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">for (int i = 1; i < 101; i++)
+{
+    if ((i % 3 == 0) && (i % 5 == 0))
+        Console.WriteLine($"{i} - FizzBuzz");
+    else if (i % 3 == 0)
+        Console.WriteLine($"{i} - Fizz");
+    else if (i % 5 == 0)
+        Console.WriteLine($"{i} - Buzz");
+    else
+        Console.WriteLine($"{i}");
+}</code></pre>
+        </div>
+        <div class="out auto"><div class="out-bar">Output (1-22 แสดงตัวอย่าง ไล่ต่อถึง 100)</div><pre>
+1
+2
+3 - Fizz
+4
+5 - Buzz
+6 - Fizz
+7
+8
+9 - Fizz
+10 - Buzz
+11
+12 - Fizz
+13
+14
+15 - FizzBuzz
+16
+17
+18 - Fizz
+19
+20 - Buzz
+21 - Fizz
+22</pre></div>
+
+        <p>นี่เป็น<i>เพียงหนึ่ง</i>ในหลายวิธีที่แก้โจทย์นี้ได้ องค์ประกอบสำคัญของเฉลยนี้:</p>
+        <ul>
+          <li><code>for</code> statement — วน code block ครบ 100 รอบ</li>
+          <li><code>if-elseif-else</code> — เช็คตัวหารทั้ง 3 และ 5</li>
+          <li><code>%</code> (modulus) — เช็คว่าหารลงตัวไม่มีเศษหรือไม่</li>
+          <li><code>&amp;&amp;</code> — ทำให้แน่ใจว่าตัวเลขต้องหารทั้ง 3 และ 5 ลงตัวพร้อมกัน
+              ถึงจะเข้าเงื่อนไข FizzBuzz</li>
+        </ul>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch17-e"><span>เขียน FizzBuzz ครบ 1-100 ได้ผลลัพธ์ถูกต้อง</span></label></li>
+      <li><label><input type="checkbox" id="ch17-f"><span>เข้าใจว่าทำไมต้องเช็คเงื่อนไข FizzBuzz ก่อนเงื่อนไขอื่น</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">17.4 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>loop วนไม่รู้จบ (infinite loop)</td>
+          <td>ลืมอัปเดตตัวแปร iterator ใน section ที่สาม หรือ condition ไม่มีวันเป็น false —
+              เช็คว่า iterator เปลี่ยนค่าไปในทิศทางที่ทำให้ condition เป็น false ได้จริงในที่สุด</td>
+        </tr>
+        <tr>
+          <td>FizzBuzz: เลข 15 ได้แค่ "Fizz" ไม่ใช่ "FizzBuzz"</td>
+          <td>ลำดับ if-elseif ผิด — ต้องเช็คเงื่อนไข "หารทั้ง 3 และ 5" (&amp;&amp;) เป็นอันดับแรก
+              เสมอ ก่อนเงื่อนไขเดี่ยวๆ</td>
+        </tr>
+        <tr>
+          <td><code>IndexOutOfRangeException</code> ตอนวน array ด้วย for</td>
+          <td>condition ผิด เช่นใช้ <code>i &lt;= names.Length</code> แทน
+              <code>i &lt; names.Length</code> (ทบทวน zero-based index จาก
+              <a href="ch10.html">บทที่ 10</a>)</td>
+        </tr>
+        <tr>
+          <td>error "Cannot assign to ... because it is a 'foreach iteration variable'"</td>
+          <td>พยายามกำหนดค่าใหม่ให้ตัวแปรชั่วคราวของ foreach โดยตรง — ถ้าต้องแก้ไขค่าใน array
+              ต้องใช้ <code>for</code> กับ index แทน</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s05">17.5 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Microsoft Learn (2 ข้อฝังในเนื้อหา + 2 ข้อ Module Assessment —
+       เนื้อหาคล้ายกัน เพราะทั้งสองชุดทดสอบแนวคิดเดียวกัน)</p>
+
+    <div class="quiz" data-q="17-3">
+      <p class="q"><span class="num">1.</span> for statement ข้อใดถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>for (int x = 20: x &lt; 80: x++)</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>for (int j = 0; j == 80; j + 1)</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>for (int counter = 20; counter &lt; 80; counter++)</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ข้อ A ใช้โคลอนผิด ข้อ B แม้ <code>j == 80</code>
+        จะเป็น Boolean expression ที่ถูกไวยากรณ์ แต่ <code>j + 1</code> ไม่ใช่รูปแบบคำสั่งที่ใช้
+        เป็น iterator ได้ (ไม่มีการกำหนดค่าเกิดขึ้นจริง)</div>
+    </div>
+
+    <div class="quiz" data-q="17-4">
+      <p class="q"><span class="num">2.</span> คำสั่งใดใช้ออกจาก for loop ได้?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>break;</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>exit;</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>return;</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ตรงกับที่เรียนในหัวข้อ 17.2</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">17.6 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียน for statement พิมพ์เลขคู่ตั้งแต่ 2 ถึง 20 (ใช้ iterator ที่เพิ่มทีละ 2 โดยไม่ใช้ if
+           เช็คเลขคู่เลย)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">for (int i = 2; i <= 20; i += 2)
+{
+    Console.WriteLine(i);
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียน for statement คำนวณผลรวมของเลข 1 ถึง 50 เก็บไว้ในตัวแปร แล้วพิมพ์ผลรวมออกมา</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int sum = 0;
+for (int i = 1; i <= 50; i++)
+{
+    sum += i;
+}
+Console.WriteLine(sum);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้วนไม่รู้จบ (infinite loop) หาสาเหตุและแก้ไข:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">for (int i = 0; i < 10; i--)
+{
+    Console.WriteLine(i);
+}</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p><code>i--</code> ทำให้ <code>i</code> ลดค่าลงเรื่อยๆ ห่างจาก 10 มากขึ้นทุกที
+             เงื่อนไข <code>i &lt; 10</code> จึงเป็นจริงตลอดไป ไม่มีวันหยุด ต้องแก้เป็น
+             <code>i++</code> เพื่อให้ <code>i</code> ไล่เข้าใกล้ 10 จนกระทั่งเงื่อนไขเป็น false</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ใช้ <code>for</code> วน array <code>int[] nums = { 5, 12, 8, 21, 3, 17 };</code>
+           หาผลรวมของเฉพาะ element ที่อยู่ตำแหน่ง<b>คู่</b> (index 0, 2, 4) โดยข้าม index คี่
+           ด้วยการปรับ iterator (ไม่ใช้ if เช็ค index)</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ปรับ iterator ให้เพิ่มทีละ 2 แทนที่จะเป็น 1 (คล้ายหัวข้อ 17.2e)</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int[] nums = { 5, 12, 8, 21, 3, 17 };
+int sum = 0;
+
+for (int i = 0; i < nums.Length; i += 2)
+{
+    sum += nums[i];
+}
+
+Console.WriteLine(sum);</code></pre></div>
+          <p>ผลรวมจาก index 0,2,4 คือ 5+8+3 = 16</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลง FizzBuzz จากหัวข้อ 17.3 ให้เพิ่มกฎที่ 4: ถ้าหารด้วย 7 ลงตัว (และไม่เข้าเงื่อนไข
+           อื่นเลย) ให้พิมพ์ "Bang" ต่อท้ายแทน ทดสอบตั้งแต่ 1-30 (เลข 7, 14 ควรได้ "Bang",
+           เลข 21 ควรยังได้ "Fizz" เพราะหารด้วย 3 ลงตัวด้วย ตามลำดับความสำคัญเดิม)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">for (int i = 1; i <= 30; i++)
+{
+    if ((i % 3 == 0) && (i % 5 == 0))
+        Console.WriteLine($"{i} - FizzBuzz");
+    else if (i % 3 == 0)
+        Console.WriteLine($"{i} - Fizz");
+    else if (i % 5 == 0)
+        Console.WriteLine($"{i} - Buzz");
+    else if (i % 7 == 0)
+        Console.WriteLine($"{i} - Bang");
+    else
+        Console.WriteLine($"{i}");
+}</code></pre></div>
+          <p>เพิ่ม <code>else if (i % 7 == 0)</code> ไว้<b>หลัง</b>เงื่อนไข Fizz/Buzz เดิม
+             ตามลำดับความสำคัญที่โจทย์กำหนด (21 หารด้วยทั้ง 3 และ 7 ลงตัว แต่เจอเงื่อนไข Fizz
+             ก่อน จึงได้ "Fizz" ไม่ใช่ "Bang")</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>ใช้ <code>for</code> วน array ของชื่อ <code>string[] team = { "Ann", "Bo", "Cee", "Dao" };</code>
+           แล้วต่อท้ายทุกชื่อด้วยหมายเลขลำดับ (เริ่มที่ 1) โดยตรง<b>เข้าไปในตัว array เดิม</b>
+           (ไม่สร้าง array ใหม่) ให้ได้ผลลัพธ์เมื่อ foreach พิมพ์ทีหลัง:</p>
+        <div class="out auto"><pre>
+1. Ann
+2. Bo
+3. Cee
+4. Dao</pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>เหมือนตัวอย่าง "David" → "Sammy" ในหัวข้อ 17.2h ทุกประการ
+           แค่เปลี่ยนเงื่อนไขเป็น "ทำกับทุก element" แทนที่จะเช็คชื่อเฉพาะ — ใช้ตัวแปร iterator
+           <code>i</code> ทั้งเป็น index และเป็นตัวเลขลำดับ (บวก 1 เพราะ index เริ่มที่ 0)</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string[] team = { "Ann", "Bo", "Cee", "Dao" };
+
+for (int i = 0; i < team.Length; i++)
+{
+    team[i] = $"{i + 1}. {team[i]}";
+}
+
+foreach (var member in team)
+{
+    Console.WriteLine(member);
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">📌 สรุปบทที่ 17</h2>
+
+    <p>เป้าหมายของบทนี้คือควบคุมกระบวนการวนซ้ำได้ละเอียดขึ้น ด้วยการ implement
+       <code>for</code> statement การปรับ <b>initializer</b>, <b>condition</b>, และ
+       <b>iterator</b> ของ <code>for</code> statement ให้การควบคุมตรรกะวนซ้ำที่แม่นยำ</p>
+
+    <p>คุณใช้ <code>for</code> statement วนตามจำนวนรอบที่กำหนดตายตัว และใช้ <code>Length</code>
+       บน array วน code block ครั้งเดียวต่อแต่ละ item ในนั้น คุณปรับ iterator เงื่อนไขจบ loop
+       และรูปแบบการวนซ้ำ คุณใช้คีย์เวิร์ด <code>break</code> ออกจาก body ของ loop ก่อนกำหนด
+       ถ้าไม่มีการควบคุมการวนซ้ำแบบที่ <code>for</code> statement ให้ คุณจะทำงานบางอย่างไม่สำเร็จ
+       เช่น วนผ่านข้อมูลใน array หลายมิติ</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 17</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">ไวยากรณ์</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>for (init; cond; iter) { }</code></td><td>โครงสร้างพื้นฐาน</td></tr>
+          <tr><td><code>int i = 0</code></td><td>initializer — ค่าเริ่มต้น</td></tr>
+          <tr><td><code>i &lt; n</code></td><td>condition — เงื่อนไขวนต่อ (false = หยุด)</td></tr>
+          <tr><td><code>i++ / i-- / i += n</code></td><td>iterator — ทำหลังจบแต่ละรอบ</td></tr>
+          <tr><td><code>for (int i = arr.Length-1; i&gt;=0; i--)</code></td><td>วน array ย้อนกลับ</td></tr>
+          <tr><td><code>break;</code></td><td>ออกจาก loop ก่อนกำหนด</td></tr>
+          <tr><td>for vs foreach</td><td>for แก้ไขค่าใน array ได้ระหว่างวน foreach ไม่ได้</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s08">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>for statement</td><td>คำสั่ง for</td><td>วน code block ตามจำนวนรอบที่กำหนด ควบคุมได้ละเอียด</td></tr>
+        <tr><td>initializer</td><td>ตัวกำหนดค่าเริ่มต้น</td><td>ส่วนแรกของ for — ประกาศ+กำหนดค่า iterator</td></tr>
+        <tr><td>condition</td><td>เงื่อนไข</td><td>ส่วนที่สอง — ตัดสินว่าวนต่อหรือหยุด</td></tr>
+        <tr><td>iterator</td><td>ตัวทำซ้ำ</td><td>ส่วนที่สาม — การกระทำหลังจบแต่ละรอบ</td></tr>
+        <tr><td>body</td><td>เนื้อหา / ตัว loop</td><td>code block ที่รันทุกรอบ</td></tr>
+        <tr><td>infinite loop</td><td>ลูปไม่รู้จบ</td><td>loop ที่ condition ไม่มีวันเป็น false</td></tr>
+        <tr><td>FizzBuzz</td><td>ฟิซซ์บัซซ์</td><td>โจทย์เขียนโค้ดคลาสสิกทดสอบ loop+if+modulus</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch16.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 16 · Branch the Flow of Code Using switch-case</span></a>
+      <a class="next" href="ch18.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 18 · Add Looping Logic Using do-while and while</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

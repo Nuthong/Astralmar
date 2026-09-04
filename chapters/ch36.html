@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 36 · Create and Throw Exceptions — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="36">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 6 · Debug Console Applications / บทที่ 36</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 6 · โมดูล 4/6</span>
+      <h1>สร้างและโยน Exception ของคุณเอง</h1>
+      <div class="en">Create and Throw Exceptions in C# Console Applications</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>60–80 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>throw exception ที่ตั้งชื่อและข้อความเองได้ + re-throw ต่อได้อย่างถูกวิธี</b></span>
+        <span>🎯 ความยาก <b>กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>สร้าง exception object และปรับแต่งค่า property ของมันได้</li>
+        <li>เขียนแอปที่สร้างและ throw exception object ที่ปรับแต่งเองได้</li>
+        <li>เขียนแอปที่ catch exception ของตัวเอง แล้วใช้ข้อมูลใน property จัดการปัญหาได้</li>
+      </ul>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 อีกฝั่งหนึ่งของเหรียญ</span>
+      บทที่ 35 คุณเรียน "จับ" (catch) exception ที่คนอื่นโยนมา — บทนี้คุณจะเป็นฝ่าย "โยน" (throw)
+      exception ของคุณเองเมื่อโค้ดของคุณตรวจพบปัญหาที่แก้ต่อไม่ได้
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">36.1 สร้าง Exception Object ของคุณเอง</h2>
+
+    <p>.NET มีลำดับชั้นคลาส exception ที่สืบทอดมาจาก <code>System.Exception</code> แอป C#
+       สร้างและ throw exception ชนิดไหนก็ได้ในลำดับชั้นนี้ นักพัฒนายังปรับแต่ง exception object
+       ด้วยข้อมูลเฉพาะแอปได้ โดยกำหนดค่า property ของมัน</p>
+
+    <p>ชนิด exception ที่คุณสร้างควรตรงกับปัญหาที่เกิดขึ้นให้ใกล้เคียงที่สุด ตัวอย่าง exception
+       ที่พบบ่อยเวลาสร้างเอง:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">Exception</th><th>ใช้เมื่อ</th></tr></thead>
+      <tbody>
+        <tr><td><code>ArgumentException</code> / <code>ArgumentNullException</code></td>
+            <td>method หรือ constructor ถูกเรียกด้วย argument ที่ไม่ถูกต้องหรือเป็น null</td></tr>
+        <tr><td><code>InvalidOperationException</code></td>
+            <td>เงื่อนไขการทำงานปัจจุบันของ method ไม่รองรับให้เรียกสำเร็จได้</td></tr>
+        <tr><td><code>NotSupportedException</code></td><td>การทำงานหรือฟีเจอร์นั้นไม่รองรับ</td></tr>
+        <tr><td><code>IOException</code></td><td>การอ่าน/เขียนไฟล์ล้มเหลว</td></tr>
+        <tr><td><code>FormatException</code></td><td>รูปแบบของ string หรือข้อมูลไม่ถูกต้อง</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>ใช้ <code>new</code> สร้าง instance ของ exception เหมือนสร้าง object ทั่วไป:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง</span></div>
+      <pre><code class="lang-cs">ArgumentException invalidArgumentException = new ArgumentException();</code></pre>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s02">36.2 ปรับแต่งและ throw Exception</h2>
+
+    <p>ขั้นตอนการ throw exception คือ: สร้าง instance ของคลาสที่สืบทอดจาก exception → ปรับแต่ง
+       property (ถ้าต้องการ) → ใช้ <code>throw</code> โยนมันออกไป การใส่ข้อความบริบทลงใน
+       exception ก่อน throw ช่วยได้มาก เช่น:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง</span></div>
+      <pre><code class="lang-cs">ArgumentException invalidArgumentException = new ArgumentException(
+    "ArgumentException: เมธอด 'GraphData' ได้รับข้อมูลนอกช่วงที่กำหนดไว้");
+throw invalidArgumentException;</code></pre>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ Message เป็น readonly</span>
+      property <code>Message</code> ของ exception เป็น readonly เขียนทับไม่ได้หลังสร้างแล้ว
+      ต้องกำหนดข้อความ custom ตอนสร้าง object เท่านั้น (ผ่าน constructor)
+    </div>
+
+    <p>สร้าง exception object แล้ว throw ทันทีในบรรทัดเดียวก็ได้เช่นกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง</span></div>
+      <pre><code class="lang-cs">throw new FormatException(
+    "FormatException: การคำนวณในกระบวนการ XYZ ถูกยกเลิกเพราะข้อมูลผิดรูปแบบ");</code></pre>
+    </div>
+
+    <p>ข้อควรระวังตอนใส่ข้อความลงใน exception: <code>Message</code> ควรอธิบายสาเหตุ แต่<b>ห้าม
+       ใส่ข้อมูลอ่อนไหวหรือเกี่ยวกับความปลอดภัย</b>ลงไป ส่วน <code>StackTrace</code> ใช้ตามหา
+       ต้นตอของ exception ได้ — CLR สร้าง <code>StackTrace</code> ให้อัตโนมัติจากจุดที่
+       <code>throw</code> ถูกเรียก ดังนั้น exception ต้องถูก throw จากจุดที่ต้องการให้
+       stack trace เริ่มนับจริงๆ</p>
+
+    <div class="quiz" data-q="36-1">
+      <p class="q"><span class="num">Check ★</span> ทำไมต้องตั้งค่า Message ตอน "สร้าง" exception object เท่านั้น ไม่ใช่ตอนหลัง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เพราะ C# ไม่รองรับการเขียนโค้ดหลายบรรทัดก่อน throw</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>เพราะ property Message เป็น readonly แก้ไขทีหลังไม่ได้</span></li>
+        <li class="opt"><span class="k">C</span><span>เพราะ throw ต้องอยู่บรรทัดแรกของ method เสมอ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> Message กำหนดได้ผ่าน constructor เท่านั้น จะมา
+        เขียนทับทีหลังไม่ได้</div>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s03">36.3 ลงมือ: throw Exception เมื่อ input ไม่ถูกต้อง</h2>
+
+    <h3 id="s03a">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch36-throw</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ อย่าลืมแก้ launch.json</span>
+      โปรเจกต์นี้ใช้ <code>Console.ReadLine()</code> รับค่าจากผู้ใช้ — ต้องแก้ attribute
+      <code>console</code> ใน <code>launch.json</code> เป็น <code>integratedTerminal</code>
+      ก่อน debug (ทบทวนกับดักนี้จากบทที่ 34)
+    </div>
+
+    <p>พิมพ์โค้ดนี้ลงใน <code>Program.cs</code> — เมธอดคำนวณค่าเฉลี่ยของเลขคู่ระหว่างขอบเขต
+       ที่กำหนด:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Console.Write("กรอกขอบเขตล่าง: ");
+int lowerBound = int.Parse(Console.ReadLine());
+
+Console.Write("กรอกขอบเขตบน: ");
+int upperBound = int.Parse(Console.ReadLine());
+
+decimal averageValue = AverageOfEvenNumbers(lowerBound, upperBound);
+Console.WriteLine($"ค่าเฉลี่ยเลขคู่ระหว่าง {lowerBound} ถึง {upperBound} คือ {averageValue}");
+
+static decimal AverageOfEvenNumbers(int lowerBound, int upperBound)
+{
+    int sum = 0;
+    int count = 0;
+
+    for (int i = lowerBound; i <= upperBound; i++)
+    {
+        if (i % 2 == 0)
+        {
+            sum += i;
+            count++;
+        }
+    }
+
+    return (decimal)sum / count;
+}</code></pre>
+    </div>
+
+    <p>ถ้าผู้ใช้กรอก lowerBound มากกว่าหรือเท่ากับ upperBound (เช่น 3 กับ 3) จะไม่มีเลขคู่ให้
+       นับเลย <code>count</code> จะเป็น 0 และเกิด <code>DivideByZeroException</code> ตอนคำนวณ
+       ค่าเฉลี่ย — วิธีที่ดีกว่าคือ<b>ตรวจสอบ parameter ก่อน</b>เริ่มคำนวณ แล้ว throw exception
+       ทันทีถ้าค่าที่ได้มาไม่สมเหตุสมผล แทนที่จะปล่อยให้คำนวณไปเจอปัญหาเอาทีหลัง</p>
+
+    <p>exception ชนิดที่เหมาะกับปัญหานี้มีสองตัวให้พิจารณา: <code>ArgumentOutOfRangeException</code>
+       (ขอบเขตของ argument ที่รับมาไม่ถูกต้อง) กับ <code>InvalidOperationException</code>
+       (เงื่อนไขการทำงานของ method ไม่รองรับ) — เมื่อทั้งคู่เข้ากับปัญหาพอๆ กัน หลักการคือ
+       <b>เลือกตัวที่ขอบเขตแคบกว่า</b> — <code>ArgumentOutOfRangeException</code> ผูกกับ
+       argument ที่รับมาโดยตรง จึงเหมาะกว่า</p>
+
+    <p>เพิ่มการตรวจสอบไว้ต้นเมธอด:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (เพิ่มการตรวจสอบ)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">static decimal AverageOfEvenNumbers(int lowerBound, int upperBound)
+{
+    if (lowerBound >= upperBound)
+    {
+        throw new ArgumentOutOfRangeException("upperBound",
+            "ArgumentOutOfRangeException: ขอบเขตบนต้องมากกว่าขอบเขตล่าง");
+    }
+
+    int sum = 0;
+    int count = 0;
+
+    for (int i = lowerBound; i <= upperBound; i++)
+    {
+        if (i % 2 == 0)
+        {
+            sum += i;
+            count++;
+        }
+    }
+
+    return (decimal)sum / count;
+}</code></pre>
+    </div>
+
+    <p><code>ArgumentOutOfRangeException</code> constructor แบบนี้รับสอง argument: ชื่อ
+       parameter ที่มีปัญหา (<code>"upperBound"</code>) และข้อความอธิบาย — ฝั่งเรียกใช้ควรดัก
+       ปัญหานี้ด้วย <code>try-catch</code> แล้วให้โอกาสผู้ใช้กรอกค่าใหม่ผ่าน loop
+       <code>do-while</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ฉบับสมบูรณ์)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Console.Write("กรอกขอบเขตล่าง: ");
+int lowerBound = int.Parse(Console.ReadLine());
+
+Console.Write("กรอกขอบเขตบน: ");
+int upperBound = int.Parse(Console.ReadLine());
+
+decimal averageValue = 0;
+bool exit = false;
+
+do
+{
+    try
+    {
+        averageValue = AverageOfEvenNumbers(lowerBound, upperBound);
+        Console.WriteLine($"ค่าเฉลี่ยเลขคู่ระหว่าง {lowerBound} ถึง {upperBound} คือ {averageValue}");
+        exit = true;
+    }
+    catch (ArgumentOutOfRangeException ex)
+    {
+        Console.WriteLine("เกิดข้อผิดพลาด");
+        Console.WriteLine(ex.Message);
+        Console.Write("กรอกขอบเขตบนใหม่ (หรือพิมพ์ exit เพื่อออก): ");
+        string? userResponse = Console.ReadLine();
+        if (userResponse.ToLower().Contains("exit"))
+        {
+            exit = true;
+        }
+        else
+        {
+            upperBound = int.Parse(userResponse);
+        }
+    }
+} while (exit == false);
+
+static decimal AverageOfEvenNumbers(int lowerBound, int upperBound)
+{
+    if (lowerBound >= upperBound)
+    {
+        throw new ArgumentOutOfRangeException("upperBound",
+            "ArgumentOutOfRangeException: ขอบเขตบนต้องมากกว่าขอบเขตล่าง");
+    }
+
+    int sum = 0;
+    int count = 0;
+
+    for (int i = lowerBound; i <= upperBound; i++)
+    {
+        if (i % 2 == 0)
+        {
+            sum += i;
+            count++;
+        }
+    }
+
+    return (decimal)sum / count;
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+กรอกขอบเขตล่าง: 3
+กรอกขอบเขตบน: 3
+เกิดข้อผิดพลาด
+ArgumentOutOfRangeException: ขอบเขตบนต้องมากกว่าขอบเขตล่าง (Parameter 'upperBound')
+กรอกขอบเขตบนใหม่ (หรือพิมพ์ exit เพื่อออก): 11
+ค่าเฉลี่ยเลขคู่ระหว่าง 3 ถึง 11 คือ 7</pre></div>
+
+    <p>สังเกตว่าใช้ <code>do-while</code> (ทบทวนจาก<a href="ch18.html">บทที่ 18</a>) เพราะ
+       ต้องการเรียก <code>AverageOfEvenNumbers</code> อย่างน้อยหนึ่งครั้งก่อนตรวจเงื่อนไข
+       <code>exit</code> — ตัวแปร <code>exit</code> เป็นตัวควบคุมว่าจะวนต่อหรือไม่ ตั้งเป็น
+       <code>true</code> ทั้งตอนสำเร็จและตอนผู้ใช้เลือกพิมพ์ "exit"</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch36-a"><span>throw ArgumentOutOfRangeException พร้อมข้อความเองได้</span></label></li>
+      <li><label><input type="checkbox" id="ch36-b"><span>ดักและรับมือ exception ด้วย do-while loop ให้ผู้ใช้ลองใหม่ได้</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">36.4 Re-throw Exception</h2>
+
+    <p>นอกจาก throw exception ใหม่ คุณยัง <code>throw</code> ซ้ำ (re-throw) exception เดิม
+       จากใน <code>catch</code> block ได้ — กรณีนี้ <code>throw</code> ไม่มี operand ตามหลัง:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง re-throw</span></div>
+      <pre><code class="lang-cs">catch (Exception ex)
+{
+    // จัดการหรือจัดการบางส่วน
+    // ...
+
+    throw; // โยน exception object เดิมต่อให้ระดับที่ลึกกว่าจัดการต่อ
+}</code></pre>
+    </div>
+
+    <p>การ re-throw แบบนี้ใช้ exception object <b>ตัวเดิม</b> จึงไม่เสียข้อมูลอะไรไป ถ้าอยาก
+       สร้าง exception ใหม่ที่ "ห่อ" exception เดิมไว้ข้างใน ส่งตัวเดิมเป็น argument ให้
+       constructor ของตัวใหม่ได้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง wrap exception</span></div>
+      <pre><code class="lang-cs">catch (Exception ex)
+{
+    // จัดการหรือจัดการบางส่วน
+    // ...
+
+    throw new ApplicationException("เกิดข้อผิดพลาด", ex); // ex กลายเป็น InnerException
+}</code></pre>
+    </div>
+
+    <p>ลองดูตัวอย่างที่ผสมทั้งสองแบบ: <code>BusinessProcess1</code> ก่อ exception ได้สองชนิด
+       (format ผิดหรือหารด้วยศูนย์) ส่วน <code>OperatingProcedure1</code> ที่เรียกมันจัดการ
+       <code>FormatException</code> ได้เต็มที่ แต่จัดการ <code>DivideByZeroException</code>
+       ได้แค่บางส่วน แล้วต้อง re-throw ต่อให้ top-level statements จัดการต่อ:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">try
+{
+    OperatingProcedure1();
+}
+catch (Exception ex)
+{
+    Console.WriteLine(ex.Message);
+    Console.WriteLine("ปิดโปรแกรม");
+}
+
+static void OperatingProcedure1()
+{
+    string[][] userEnteredValues = new string[][]
+    {
+        new string[] { "1", "two", "3" },
+        new string[] { "0", "1", "2" }
+    };
+
+    foreach (string[] userEntries in userEnteredValues)
+    {
+        try
+        {
+            BusinessProcess1(userEntries);
+        }
+        catch (FormatException ex)
+        {
+            Console.WriteLine(ex.Message);
+            Console.WriteLine("แก้ไขเรียบร้อยใน OperatingProcedure1");
+        }
+        catch (DivideByZeroException ex)
+        {
+            Console.WriteLine(ex.Message);
+            Console.WriteLine("แก้ไขได้บางส่วนใน OperatingProcedure1 - ต้องจัดการต่อ");
+            throw; // re-throw ตัวเดิมต่อให้ top-level statements
+        }
+    }
+}
+
+static void BusinessProcess1(string[] userEntries)
+{
+    foreach (string userValue in userEntries)
+    {
+        int valueEntered = int.Parse(userValue);
+
+        checked
+        {
+            int calculatedValue = 4 / valueEntered;
+        }
+    }
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+System.FormatException: The input string 'two' was not in a correct format.
+แก้ไขเรียบร้อยใน OperatingProcedure1
+System.DivideByZeroException: Attempted to divide by zero.
+แก้ไขได้บางส่วนใน OperatingProcedure1 - ต้องจัดการต่อ
+System.DivideByZeroException: Attempted to divide by zero.
+ปิดโปรแกรม</pre></div>
+
+    <p>สังเกตว่า exception ตัวเดียวกัน (<code>DivideByZeroException</code>) ถูกพิมพ์ข้อความ
+       ออกมาสองครั้ง — ครั้งแรกใน <code>OperatingProcedure1</code> (จัดการบางส่วน) ครั้งที่สอง
+       ใน top-level statements (จัดการต่อจนจบ) เพราะ <code>throw;</code> ส่งต่อ exception
+       object ตัวเดิมขึ้นไปให้ระดับที่สูงกว่าอีกที</p>
+
+    <!-- ============================================ -->
+    <h2 id="s05">36.5 ⚠️ สิ่งที่ควรเลี่ยงตอน throw Exception</h2>
+
+    <ul>
+      <li>อย่าใช้ exception เปลี่ยนทิศทางการทำงานของโปรแกรมแบบปกติ — ใช้ exception รายงานและ
+          จัดการเงื่อนไข "ผิดปกติ" เท่านั้น</li>
+      <li>อย่าคืน exception เป็นค่า return หรือ parameter แทนการ throw จริง</li>
+      <li>อย่า throw <code>System.Exception</code>, <code>System.SystemException</code>,
+          <code>System.NullReferenceException</code> หรือ <code>System.IndexOutOfRangeException</code>
+          โดยตั้งใจจากโค้ดของคุณเอง — พวกนี้ควรเป็น exception ที่ runtime สร้างเอง ไม่ใช่ที่
+          คุณสร้างเอง</li>
+      <li>อย่าสร้างเงื่อนไขที่ throw exception ได้เฉพาะตอน debug mode แต่ release mode ไม่ throw
+          — ถ้าต้องการเช็คเงื่อนไขที่ "ไม่ควรเกิดขึ้นเลย" ระหว่างพัฒนา ให้ใช้
+          <code>Debug.Assert()</code> แทน (ใช้เฉพาะตอน debug build เท่านั้น ไม่ใช่แทนที่
+          exception handling ของ flow ปกติ)</li>
+    </ul>
+
+    <div class="quiz" data-q="36-2">
+      <p class="q"><span class="num">Check ★</span> ข้อใดคือแนวทางที่<b>ควรเลี่ยง</b>ตอน throw exception?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>throw exception ชนิดที่เจาะจงกับปัญหาที่เกิดขึ้นจริง</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>throw System.Exception ตรงๆ จากโค้ดของตัวเอง</span></li>
+        <li class="opt"><span class="k">C</span><span>ใส่ข้อความอธิบายสาเหตุลงใน Message ก่อน throw</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ควรเลือก exception type ที่เจาะจงกับปัญหาเสมอ
+        ไม่ throw คลาสฐานกว้างๆ อย่าง System.Exception ตรงๆ จากโค้ดตัวเอง</div>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">36.6 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>แก้ <code>ex.Message</code> แล้ว error ว่า property เป็น read-only</td>
+          <td>Message กำหนดได้แค่ตอนสร้าง object ผ่าน constructor เท่านั้น สร้าง exception
+              object ใหม่ที่มีข้อความถูกต้องแทนการแก้ไขตัวเดิม</td>
+        </tr>
+        <tr>
+          <td>ใช้ <code>throw ex;</code> แทน <code>throw;</code> ตอน re-throw</td>
+          <td>ทั้งสองแบบ compile ผ่าน แต่ <code>throw ex;</code> จะรีเซ็ต StackTrace ให้เริ่มนับ
+              จากบรรทัดนั้นใหม่ ทำให้เสียร่องรอยต้นตอจริงของปัญหา — ใช้ <code>throw;</code>
+              เปล่าๆ เพื่อรักษา StackTrace เดิมไว้เสมอ</td>
+        </tr>
+        <tr>
+          <td>throw ArgumentException ทั่วไปในทุกกรณี ไม่เจาะจง</td>
+          <td>เลือกชนิดที่ตรงกับปัญหาที่สุด (ArgumentOutOfRangeException,
+              ArgumentNullException ฯลฯ) จะช่วยให้ฝั่ง catch แยกแยะและรับมือได้แม่นยำกว่า</td>
+        </tr>
+        <tr>
+          <td>เขียนเงื่อนไข throw exception เพื่อควบคุม flow ปกติของโปรแกรม (เช่น throw
+              แทนการ break ออกจาก loop)</td>
+          <td>exception มีต้นทุนด้าน performance และทำให้โค้ดอ่านยาก — สงวนไว้สำหรับ
+              เงื่อนไขผิดปกติจริงๆ เท่านั้น ใช้ if/else หรือ break/continue สำหรับ flow ปกติ</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">36.7 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Microsoft Learn (Check your knowledge)</p>
+
+    <div class="quiz" data-q="36-3">
+      <p class="q"><span class="num">1.</span> property <code>StackTrace</code> ของ exception object มีไว้ทำอะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>ตามหาต้นตอที่แท้จริงของ exception</span></li>
+        <li class="opt"><span class="k">B</span><span>ปรับแต่งค่า property ของ exception</span></li>
+        <li class="opt"><span class="k">C</span><span>throw exception object นั้นออกไป</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> StackTrace เก็บชื่อ method + บรรทัดที่เกี่ยวข้องกับ
+        การเกิด exception ไว้ทั้งสาย ใช้ตามรอยหาต้นตอปัญหาได้</div>
+    </div>
+
+    <div class="quiz" data-q="36-4">
+      <p class="q"><span class="num">2.</span> โค้ดข้อใดเป็นตัวอย่างการปรับแต่ง exception ด้วยข้อมูลบริบท?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>throw new FormatException();</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>throw new ArgumentException("ข้อมูลนอกช่วงที่กำหนด");</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>ArgumentNullException e = new ArgumentNullException();</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> การใส่ข้อความอธิบายเข้าไปใน constructor คือการปรับแต่ง
+        exception ด้วยข้อมูลบริบท — ข้อ A และ C ใช้ constructor เปล่าไม่มีข้อความเพิ่มเติม</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">36.8 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียนเมธอด <code>void CheckAge(int age)</code> ที่ throw
+           <code>ArgumentOutOfRangeException</code> พร้อมข้อความ <code>"อายุต้องอยู่ระหว่าง
+           0-120 ปี"</code> ถ้า <code>age</code> น้อยกว่า 0 หรือมากกว่า 120</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">static void CheckAge(int age)
+{
+    if (age < 0 || age > 120)
+    {
+        throw new ArgumentOutOfRangeException("age", "อายุต้องอยู่ระหว่าง 0-120 ปี");
+    }
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p><b>Create and Throw Exceptions Challenge</b> (ดัดแปลงจาก Microsoft Learn) — จากโค้ด
+           ต่อไปนี้ ที่ <code>Process1</code> คืนค่าเป็น string บอกสถานะแทนการ throw จริง ให้
+           แปลงทั้งสามเมธอดเป็น <code>void</code> แล้วทำตามเงื่อนไข: <code>Process1</code> ต้อง
+           throw exception ตามชนิดปัญหาที่เจอ, <code>Workflow1</code> ต้อง catch
+           <code>FormatException</code>, top-level statements ต้อง catch
+           <code>DivideByZeroException</code></p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ตั้งต้น)</span></div>
+        <pre><code class="lang-cs">static string Process1(string[] userEntries)
+{
+    string returnMessage = "";
+    foreach (string userValue in userEntries)
+    {
+        bool ok = int.TryParse(userValue, out int valueEntered);
+        if (!ok)
+        {
+            returnMessage = "ข้อมูลไม่ถูกต้อง ต้องเป็นจำนวนเต็ม";
+        }
+        else if (valueEntered == 0)
+        {
+            returnMessage = "ข้อมูลไม่ถูกต้อง ห้ามเป็นศูนย์";
+        }
+    }
+    return returnMessage == "" ? "process complete" : returnMessage;
+}</code></pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>แทนที่บรรทัด <code>returnMessage = "...";</code> ทั้งสองจุด
+           ด้วย <code>throw new FormatException("...");</code> และ
+           <code>throw new DivideByZeroException("...");</code> ตามลำดับ</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (เฉลย)</span></div>
+          <pre><code class="lang-cs">try
+{
+    Workflow1();
+    Console.WriteLine("Workflow1 สำเร็จ");
+}
+catch (DivideByZeroException ex)
+{
+    Console.WriteLine("เกิดข้อผิดพลาดระหว่าง Workflow1");
+    Console.WriteLine(ex.Message);
+}
+
+static void Workflow1()
+{
+    string[] userEntries = { "1", "0", "2" };
+    try
+    {
+        Process1(userEntries);
+        Console.WriteLine("Process1 สำเร็จ");
+    }
+    catch (FormatException ex)
+    {
+        Console.WriteLine("Process1 พบปัญหา ยกเลิกการทำงาน");
+        Console.WriteLine(ex.Message);
+    }
+}
+
+static void Process1(string[] userEntries)
+{
+    foreach (string userValue in userEntries)
+    {
+        bool ok = int.TryParse(userValue, out int valueEntered);
+        if (!ok)
+        {
+            throw new FormatException("ข้อมูลไม่ถูกต้อง ต้องเป็นจำนวนเต็ม");
+        }
+        if (valueEntered == 0)
+        {
+            throw new DivideByZeroException("ข้อมูลไม่ถูกต้อง ห้ามเป็นศูนย์");
+        }
+    }
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>อธิบายด้วยคำพูดตัวเอง (2-3 ประโยค) ว่าทำไม <code>throw;</code> ถึงดีกว่า
+           <code>throw ex;</code> ตอน re-throw exception ในสถานการณ์ที่ต้องการรักษา
+           StackTrace เดิมไว้</p>
+      </div>
+      <details class="fold"><summary>ดูแนวคำตอบ</summary>
+        <div class="fold-body">
+          <p>แนวคำตอบตัวอย่าง: <code>throw;</code> ส่งต่อ exception object ตัวเดิมไปทั้งชุด
+             รวมถึง StackTrace ที่ CLR สร้างไว้ตั้งแต่จุดเกิด exception จริง ทำให้ยังตามรอย
+             ต้นตอปัญหาได้ครบ ส่วน <code>throw ex;</code> แม้จะโยน exception ชนิดเดียวกันออกไป
+             แต่ C# จะรีเซ็ต StackTrace ให้เริ่มนับจากบรรทัด <code>throw ex;</code> นั้นแทน
+             ทำให้ข้อมูลตำแหน่งจริงที่ทำให้เกิดปัญหาหายไป ยากต่อการ debug ทีหลัง</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">📌 สรุปบทที่ 36</h2>
+
+    <p>บทนี้สอนให้คุณเป็นฝ่าย "โยน" exception เอง — สร้าง exception object ด้วย <code>new</code>
+       ปรับแต่ง <code>Message</code> ตอนสร้าง แล้ว throw ด้วย <code>throw</code> คุณเรียนรู้
+       วิธีเลือกชนิด exception ที่เจาะจงที่สุดสำหรับปัญหาแต่ละแบบ วิธี re-throw exception เดิม
+       ด้วย <code>throw;</code> เพื่อรักษา StackTrace ไว้ครบ และข้อควรเลี่ยงสำคัญๆ เช่น
+       ห้ามใช้ exception แทนตรรกะควบคุม flow ปกติ</p>
+
+    <p>ตอนนี้คุณจับ (catch) และโยน (throw) exception เองได้ครบวงจรแล้ว บทถัดไปจะรวมทักษะทั้งหมด
+       ของ Part 6 เข้าด้วยกันในโปรเจกต์แบบมีไกด์: ทั้ง debug ด้วย VS Code และเขียน exception
+       handling ในแอปเดียวกัน</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 36</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:32%">รายการ</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>new ArgumentException("msg")</code></td><td>สร้าง exception object พร้อมข้อความ custom</td></tr>
+          <tr><td><code>throw exObject;</code></td><td>โยน exception object ที่สร้างไว้ออกไป</td></tr>
+          <tr><td><code>throw;</code></td><td>re-throw exception เดิมใน catch โดยรักษา StackTrace ไว้</td></tr>
+          <tr><td><code>throw new T("msg", ex);</code></td><td>สร้าง exception ใหม่ที่ห่อ exception เดิมไว้เป็น InnerException</td></tr>
+          <tr><td>เลือก exception เจาะจงที่สุด</td><td>ArgumentOutOfRangeException แคบกว่า InvalidOperationException สำหรับปัญหาเรื่อง argument</td></tr>
+          <tr><td>ห้าม throw System.Exception ตรงๆ</td><td>เลือกชนิดที่เจาะจงกับปัญหาเสมอ</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s10">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>throw</td><td>โยน (exception)</td><td>คำสั่งสร้าง/ส่ง exception object ออกไปให้ระดับที่สูงกว่าจัดการ</td></tr>
+        <tr><td>re-throw</td><td>โยนซ้ำ</td><td>ส่งต่อ exception object เดิมจากใน catch ด้วย throw เปล่าๆ</td></tr>
+        <tr><td>inner exception</td><td>ข้อยกเว้นภายใน</td><td>exception เดิมที่ถูกห่อไว้ในตัวใหม่ผ่าน constructor</td></tr>
+        <tr><td>narrowly scoped</td><td>ขอบเขตแคบ</td><td>exception type ที่เจาะจงกับสถานการณ์มากกว่า</td></tr>
+        <tr><td>Debug.Assert</td><td>ดีบัก แอสเสิร์ท</td><td>เครื่องมือเช็คเงื่อนไขที่ไม่ควรเกิดขึ้นระหว่างพัฒนา ทำงานเฉพาะ debug build</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch35.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 35 · จัดการ Exception ด้วย try-catch-finally</span></a>
+      <a class="next" href="ch37.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 37 · Guided Project — Debug และ Handle Exceptions</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

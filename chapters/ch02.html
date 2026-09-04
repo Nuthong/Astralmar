@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 2 · Store and Retrieve Data — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="2">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 1 · Write Your First Code / บทที่ 2</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 1 · โมดูล 2/7</span>
+      <h1>เก็บและเรียกคืนข้อมูลด้วย Literal และ Variable</h1>
+      <div class="en">Store and Retrieve Data Using Literal and Variable Values in C#</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>50–70 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>สร้างและใช้งานตัวแปรได้ 5 ชนิดข้อมูลพื้นฐาน</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>สร้างค่า literal ของข้อมูล 5 ชนิดพื้นฐานได้</li>
+        <li>ประกาศ (declare) และกำหนดค่าเริ่มต้น (initialize) ตัวแปรได้</li>
+        <li>เก็บค่า (set) และเรียกคืนค่า (get) จากตัวแปรได้</li>
+        <li>ปล่อยให้คอมไพเลอร์อนุมานชนิดข้อมูลของตัวแปรให้อัตโนมัติด้วย <code>var</code></li>
+      </ul>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ความรู้ที่ต้องมีมาก่อน</span>
+      เข้าใจไวยากรณ์พื้นฐานของ C# และใช้ <code>Console.WriteLine()</code> เป็น — ถ้ายังไม่มั่นใจ
+      กลับไปทบทวน <a href="ch01.html">บทที่ 1</a> ก่อนได้
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">2.1 ทำไมต้องมี Literal และ Variable</h2>
+
+    <p>แอปพลิเคชันส่วนใหญ่ที่คุณจะสร้างด้วย C# ต้องทำงานกับข้อมูล บางครั้งข้อมูลนั้นถูก
+       "ฝังตายตัว" ไว้ในแอป ค่าที่ฝังตายตัวแบบนี้เรียกว่า <b>hard-coded value</b> คือค่าคงที่
+       ที่ไม่เปลี่ยนแปลงตลอดการทำงานของโปรแกรม เช่น ข้อความ "สำเร็จ" ที่แสดงเมื่อผู้ใช้ทำ
+       การบางอย่างสำเร็จ — ข้อความนี้มักจะเหมือนเดิมทุกครั้งที่โปรแกรมทำงาน ค่าแบบนี้เรียกอีกอย่างว่า
+       <b>constant</b> หรือ <b>literal value</b></p>
+
+    <p>สมมติคุณอยากแสดงข้อความที่จัดรูปแบบแล้วให้ผู้ใช้เห็น โดยมีทั้งข้อมูลชนิดต่างๆ ปนกัน
+       ข้อความนั้นจะประกอบด้วยสตริงที่ฝังตายตัว รวมกับข้อมูลที่แอปเก็บมาจากผู้ใช้ การจะแสดงข้อความ
+       แบบนี้ได้ คุณต้องสร้างทั้งค่าที่ฝังตายตัว และตัวแปรที่เก็บข้อมูลชนิดใดชนิดหนึ่งได้</p>
+
+    <p>ในบทนี้ คุณจะสร้างค่า literal ของข้อมูลหลายชนิด สร้างตัวแปรที่เก็บข้อมูลชนิดต่างๆ กำหนดค่า
+       ให้ตัวแปรเหล่านั้น แล้วเรียกคืนค่าทีหลังในโค้ด และสุดท้ายจะได้เรียนวิธีลดงานให้คอมไพเลอร์
+       ช่วยแบ่งเบา</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">2.2 ลงมือ: พิมพ์ค่า Literal 5 ชนิด</h2>
+
+    <p>C# มีชนิดข้อมูล (data type) เยอะมาก แต่ตอนเริ่มต้น คุณต้องรู้จักแค่ 5 ชนิดหลักก็ครอบคลุม
+       สถานการณ์ส่วนใหญ่แล้ว</p>
+
+    <svg viewBox="0 0 720 150" role="img" aria-label="5 ชนิดข้อมูลพื้นฐานของ C#" style="margin:18px 0">
+      <g font-family="var(--font-th)">
+        <!-- string -->
+        <rect x="4"   y="10" width="136" height="128" rx="11" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text x="72" y="34" text-anchor="middle" font-family="var(--font-code)" font-size="15" font-weight="700" fill="var(--ok)">string</text>
+        <text x="72" y="58" text-anchor="middle" font-family="var(--font-code)" font-size="12.5" fill="var(--text)">"Hello"</text>
+        <text x="72" y="80" text-anchor="middle" font-size="11.5" fill="var(--text-soft)">ข้อความ / คำ</text>
+        <text x="72" y="96" text-anchor="middle" font-size="11.5" fill="var(--text-soft)">หลายตัวอักษร</text>
+
+        <!-- char -->
+        <rect x="148" y="10" width="136" height="128" rx="11" fill="var(--info-soft)" stroke="var(--info)"/>
+        <text x="216" y="34" text-anchor="middle" font-family="var(--font-code)" font-size="15" font-weight="700" fill="var(--info)">char</text>
+        <text x="216" y="58" text-anchor="middle" font-family="var(--font-code)" font-size="12.5" fill="var(--text)">'b'</text>
+        <text x="216" y="80" text-anchor="middle" font-size="11.5" fill="var(--text-soft)">อักขระเดียว</text>
+        <text x="216" y="96" text-anchor="middle" font-size="11.5" fill="var(--text-soft)">single-quote</text>
+
+        <!-- int -->
+        <rect x="292" y="10" width="136" height="128" rx="11" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="360" y="34" text-anchor="middle" font-family="var(--font-code)" font-size="15" font-weight="700" fill="var(--brand-text)">int</text>
+        <text x="360" y="58" text-anchor="middle" font-family="var(--font-code)" font-size="12.5" fill="var(--text)">123</text>
+        <text x="360" y="80" text-anchor="middle" font-size="11.5" fill="var(--text-soft)">เลขจำนวนเต็ม</text>
+        <text x="360" y="96" text-anchor="middle" font-size="11.5" fill="var(--text-soft)">ไม่มีทศนิยม</text>
+
+        <!-- floating point -->
+        <rect x="436" y="10" width="140" height="128" rx="11" fill="var(--warn-soft)" stroke="var(--warn)"/>
+        <text x="506" y="34" text-anchor="middle" font-family="var(--font-code)" font-size="13" font-weight="700" fill="var(--warn)">float/double/decimal</text>
+        <text x="506" y="58" text-anchor="middle" font-family="var(--font-code)" font-size="12.5" fill="var(--text)">12.39816m</text>
+        <text x="506" y="80" text-anchor="middle" font-size="11.5" fill="var(--text-soft)">เลขมีทศนิยม</text>
+        <text x="506" y="96" text-anchor="middle" font-size="11.5" fill="var(--text-soft)">ต่างกันที่ความละเอียด</text>
+
+        <!-- bool -->
+        <rect x="584" y="10" width="132" height="128" rx="11" fill="var(--tip-soft)" stroke="var(--tip)"/>
+        <text x="650" y="34" text-anchor="middle" font-family="var(--font-code)" font-size="15" font-weight="700" fill="var(--tip)">bool</text>
+        <text x="650" y="58" text-anchor="middle" font-family="var(--font-code)" font-size="12.5" fill="var(--text)">true / false</text>
+        <text x="650" y="80" text-anchor="middle" font-size="11.5" fill="var(--text-soft)">จริง/เท็จ</text>
+        <text x="650" y="96" text-anchor="middle" font-size="11.5" fill="var(--text-soft)">ใช้ตัดสินใจ</text>
+      </g>
+    </svg>
+
+    <h3 id="s02a">ค่า literal แบบ char</h3>
+    <p>ถ้าอยากพิมพ์ตัวอักษรเดียวออกจอ ให้สร้าง <b>char literal</b> โดยล้อมตัวอักษรนั้นด้วยเครื่องหมาย
+       คำพูดเดี่ยว <code>'…'</code> คำว่า <code>char</code> ย่อมาจาก <i>character</i>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine('b');</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+b</pre></div>
+
+    <p>สังเกตว่าตัว <code>b</code> ถูกล้อมด้วยเครื่องหมายคำพูด<b>เดี่ยว</b> ต่างจาก string ที่ใช้คำพูด<b>คู่</b>
+       ถ้าใส่มากกว่า 1 ตัวอักษรในเครื่องหมายคำพูดเดี่ยว จะได้ error ทันที:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">Console.WriteLine('Hello World!');</code></pre>
+    </div>
+    <div class="out err auto"><div class="out-bar">Output</div><pre>
+CS1012: Too many characters in character literal</pre></div>
+
+    <h3 id="s02b">ค่า literal แบบ int</h3>
+    <p>ถ้าอยากแสดงเลขจำนวนเต็ม (ไม่มีเศษทศนิยม) ให้ใช้ <b>int literal</b> คำว่า <code>int</code>
+       ย่อมาจาก integer — ไม่ต้องใช้เครื่องหมายวรรคตอนอะไรเพิ่มเลย:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine(123);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+123</pre></div>
+
+    <h3 id="s02c">ค่า literal แบบทศนิยม (floating-point)</h3>
+    <p>เลขทศนิยม เช่น 3.14159 C# มี 3 ชนิดข้อมูลรองรับ ได้แก่ <code>float</code>, <code>double</code>,
+       และ <code>decimal</code> — แต่ละชนิดรองรับความละเอียด (precision) ต่างกัน:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>ชนิด</th><th>ความละเอียด (จำนวนหลักที่แม่นยำ)</th></tr></thead>
+      <tbody>
+        <tr><td><code>float</code></td><td>~6–9 หลัก</td></tr>
+        <tr><td><code>double</code></td><td>~15–17 หลัก</td></tr>
+        <tr><td><code>decimal</code></td><td>28–29 หลัก</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>สร้าง <code>float</code> literal ด้วยการเติมตัวอักษร <code>F</code> ต่อท้ายตัวเลข
+       (เรียกว่า <i>literal suffix</i> ใช้ <code>f</code> หรือ <code>F</code> ก็ได้):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine(0.25F);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+0.25</pre></div>
+
+    <p><code>float</code> เป็นชนิดที่ละเอียดน้อยที่สุด จึงเหมาะกับค่าทศนิยมคงที่ที่ไม่ต้องการความแม่นยำสูง
+       ถัดมา สร้าง <code>double</code> literal แค่พิมพ์เลขทศนิยมเฉยๆ ไม่ต้องมี suffix
+       (คอมไพเลอร์จะถือเป็น <code>double</code> โดยอัตโนมัติ):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine(2.625);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+2.625</pre></div>
+
+    <p>สร้าง <code>decimal</code> literal ด้วยการเติมตัวอักษร <code>m</code> ต่อท้าย
+       (<code>m</code> หรือ <code>M</code> ก็ได้):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine(12.39816m);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+12.39816</pre></div>
+
+    <h3 id="s02d">ค่า literal แบบ bool</h3>
+    <p>ถ้าอยากแสดงค่า <code>true</code> หรือ <code>false</code> ให้ใช้ <b>bool literal</b>
+       (ย่อมาจาก Boolean):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine(true);
+Console.WriteLine(false);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+True
+False</pre></div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ สังเกตตัวพิมพ์ใหญ่</span>
+      ในโค้ดคุณพิมพ์ <code>true</code>/<code>false</code> ตัวเล็ก แต่ผลลัพธ์ที่พิมพ์ออกจอ
+      เป็น <code>True</code>/<code>False</code> ขึ้นต้นด้วยตัวใหญ่ — เป็นพฤติกรรมปกติของ
+      เมธอด WriteLine ตอนแสดงค่า bool
+    </div>
+
+    <h3 id="s02e">ทำไมต้องเน้นเรื่องชนิดข้อมูล</h3>
+    <p>ชนิดข้อมูล (data type) มีบทบาทสำคัญมากใน C# จริงๆ แล้วการเน้นเรื่องชนิดข้อมูลนี่แหละ
+       คือหนึ่งในจุดเด่นที่ทำให้ C# ต่างจากภาษาอื่นอย่าง JavaScript ผู้ออกแบบ C# เชื่อว่าการ
+       "บังคับ" ให้ใช้ชนิดข้อมูลถูกต้อง จะช่วยนักพัฒนาเลี่ยงบั๊กที่พบบ่อยได้</p>
+
+    <p><code>string</code> กับ <code>char</code> ใช้สำหรับ "การแสดงผล ไม่ใช่การคำนวณ" ถ้าต้องคำนวณ
+       ทางคณิตศาสตร์กับตัวเลข ควรใช้ <code>int</code> หรือ <code>decimal</code> เช่น เบอร์โทรศัพท์
+       หรือรหัสไปรษณีย์ แม้จะเป็นตัวเลข แต่ไม่ค่อยถูกนำไปคำนวณ จึงควรเก็บเป็น <code>string</code>
+       แทน เช่นเดียวกับ <code>bool</code> — ถ้าทำงานกับคำว่า "true"/"false" ในฐานะข้อความ ให้ใช้
+       <code>string</code> แต่ถ้าทำงานกับแนวคิดจริง/เท็จเพื่อประเมินเงื่อนไข ให้ใช้ <code>bool</code></p>
+
+    <p>ค่าที่แสดงผลอาจดูเหมือนกัน แต่ชนิดข้อมูลข้างในต่างกันโดยสิ้นเชิง:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// Output: 123
+Console.WriteLine("123");
+// Output: 123
+Console.WriteLine(123);
+
+// Output: true
+Console.WriteLine("true");
+// Output: True
+Console.WriteLine(true);</code></pre>
+    </div>
+
+    <div class="note ok">
+      <span class="lbl">✅ สรุปสั้นๆ</span>
+      <code>string</code> คำ/วลี · <code>char</code> อักขระเดียว · <code>int</code> เลขเต็ม ·
+      <code>decimal</code> เลขทศนิยม (แนะนำให้ใช้ตัวนี้เป็นหลัก) · <code>bool</code> จริง/เท็จ
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s03">2.3 ประกาศตัวแปร (Declare Variables)</h2>
+
+    <p>literal คือค่าที่ฝังตายตัว แต่แอปส่วนใหญ่ต้องทำงานกับข้อมูลที่คุณไม่รู้ล่วงหน้า เช่น ข้อมูล
+       จากผู้ใช้ จากไฟล์ หรือจากเครือข่าย เมื่อไรที่ต้องทำงานกับข้อมูลที่ไม่ตายตัว คุณจะ<b>ประกาศตัวแปร</b></p>
+
+    <h3 id="s03a">ตัวแปรคืออะไร</h3>
+    <p><b>ตัวแปร (variable)</b> คือ "ภาชนะ" สำหรับเก็บค่าชนิดหนึ่ง ที่สำคัญคือค่าของมัน
+       <i>เปลี่ยนแปลงได้</i> ตลอดการทำงานของโปรแกรม — กำหนดค่า อ่านค่า และเปลี่ยนค่าได้
+       ชื่อตัวแปรเป็นป้ายที่มนุษย์อ่านง่าย ซึ่งคอมไพเลอร์ผูกไว้กับตำแหน่งในหน่วยความจำ พอต้องการ
+       เก็บ/เปลี่ยน/เรียกคืนค่าที่ตำแหน่งนั้น ก็แค่ใช้ชื่อตัวแปรที่ตั้งไว้</p>
+
+    <svg viewBox="0 0 720 170" role="img" aria-label="ขั้นตอนประกาศ กำหนดค่า และเรียกคืนค่าตัวแปร" style="margin:18px 0">
+      <defs>
+        <marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="var(--text-faint)"/>
+        </marker>
+      </defs>
+      <g font-family="var(--font-th)" font-size="12.5">
+        <rect x="10"  y="30" width="212" height="100" rx="11" fill="var(--bg-soft)" stroke="var(--line)"/>
+        <text x="116" y="54" text-anchor="middle" font-weight="700" fill="var(--text)">1. ประกาศ (declare)</text>
+        <text x="116" y="78" text-anchor="middle" font-family="var(--font-code)" font-size="12" fill="var(--brand-text)">string firstName;</text>
+        <text x="116" y="102" text-anchor="middle" fill="var(--text-soft)">จองที่ในหน่วยความจำ</text>
+        <text x="116" y="118" text-anchor="middle" fill="var(--text-soft)">ยังไม่มีค่า</text>
+
+        <rect x="254" y="30" width="212" height="100" rx="11" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="360" y="54" text-anchor="middle" font-weight="700" fill="var(--brand-text)">2. กำหนดค่า (set)</text>
+        <text x="360" y="78" text-anchor="middle" font-family="var(--font-code)" font-size="12" fill="var(--brand-text)">firstName = "Bob";</text>
+        <text x="360" y="102" text-anchor="middle" fill="var(--text-soft)">ทำงานจากขวาไปซ้าย</text>
+        <text x="360" y="118" text-anchor="middle" fill="var(--text-soft)">= คือ assignment operator</text>
+
+        <rect x="498" y="30" width="212" height="100" rx="11" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text x="604" y="54" text-anchor="middle" font-weight="700" fill="var(--ok)">3. เรียกคืนค่า (get)</text>
+        <text x="604" y="78" text-anchor="middle" font-family="var(--font-code)" font-size="12" fill="var(--ok)">WriteLine(firstName);</text>
+        <text x="604" y="102" text-anchor="middle" fill="var(--text-soft)">ใช้ชื่อตัวแปรเรียกค่า</text>
+        <text x="604" y="118" text-anchor="middle" fill="var(--text-soft)">ได้ผลลัพธ์ "Bob"</text>
+
+        <line x1="222" y1="80" x2="250" y2="80" stroke="var(--text-faint)" stroke-width="1.6" marker-end="url(#ar2)"/>
+        <line x1="466" y1="80" x2="494" y2="80" stroke="var(--text-faint)" stroke-width="1.6" marker-end="url(#ar2)"/>
+      </g>
+    </svg>
+
+    <h3 id="s03b">ประกาศตัวแปร</h3>
+    <p>การสร้างตัวแปรใหม่ ต้องประกาศชนิดข้อมูลก่อน แล้วค่อยตั้งชื่อ:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string firstName;</code></pre>
+    </div>
+
+    <p>บรรทัดนี้สร้างตัวแปรชนิด <code>string</code> ชื่อ <code>firstName</code> จากนี้ไป ตัวแปรนี้
+       เก็บได้แต่ค่าชนิด string เท่านั้น</p>
+
+    <h3 id="s03c">กฎและธรรมเนียมการตั้งชื่อตัวแปร</h3>
+    <p>มีนักพัฒนาเคยพูดไว้ว่า "ส่วนที่ยากที่สุดของการพัฒนาซอฟต์แวร์คือการตั้งชื่อสิ่งต่างๆ"
+       ชื่อตัวแปรไม่ใช่แค่ต้องตรงกฎไวยากรณ์ แต่ยังต้องช่วยให้โค้ดอ่านเข้าใจง่ายด้วย</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:20%">หมวด</th><th>กฎ / ธรรมเนียม</th></tr></thead>
+      <tbody>
+        <tr><td><b>กฎบังคับ</b></td><td>ใช้ตัวอักษร ตัวเลข และ <code>_</code> ได้เท่านั้น ห้ามใช้ <code>#</code>, <code>$</code> ฯลฯ</td></tr>
+        <tr><td><b>กฎบังคับ</b></td><td>ต้องขึ้นต้นด้วยตัวอักษรหรือ <code>_</code> ห้ามขึ้นต้นด้วยตัวเลข</td></tr>
+        <tr><td><b>กฎบังคับ</b></td><td>คำนึงตัวพิมพ์เล็ก-ใหญ่ — <code>Value</code> กับ <code>value</code> คือคนละตัวแปร</td></tr>
+        <tr><td><b>กฎบังคับ</b></td><td>ห้ามตั้งชื่อซ้ำกับคำสงวนของ C# เช่น <code>decimal decimal;</code> ทำไม่ได้</td></tr>
+        <tr><td>ธรรมเนียม</td><td>ใช้ <b>camelCase</b> — ตัวแรกเล็ก คำถัดไปขึ้นต้นด้วยตัวใหญ่ เช่น <code>thisIsCamelCase</code></td></tr>
+        <tr><td>ธรรมเนียม</td><td>ตั้งชื่อให้สื่อความหมาย บอกได้ว่าเก็บข้อมูลอะไร</td></tr>
+        <tr><td>ธรรมเนียม</td><td>ใช้คำเต็ม ไม่ย่อ ไม่ใช้คำห้วน เพื่อให้คนอื่นอ่านเข้าใจ</td></tr>
+        <tr><td>ธรรมเนียม</td><td>อย่าเอาชนิดข้อมูลใส่ในชื่อ เช่น <code>strValue</code> — วิธีนี้ล้าสมัยแล้ว</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>ตัวอย่าง <code>string firstName;</code> ทำตามกฎและธรรมเนียมครบทุกข้อ (สมมติว่าตั้งใจเก็บชื่อจริงคน)
+       ตัวอย่างอื่นๆ:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">char userOption;
+
+int gameScore;
+
+decimal particlesPerMillion;
+
+bool processedCustomer;</code></pre>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s04">2.4 ลงมือ: Set และ Get ค่าจากตัวแปร</h2>
+
+    <p>ตัวแปรมีไว้ให้<i>เขียนค่าลงไป</i>และ<i>อ่านค่าออกมา</i> — มาลองทั้งสองอย่างกัน</p>
+
+    <h3 id="s04a">สร้างตัวแปรตัวแรก</h3>
+    <p>สร้างโปรเจกต์ใหม่สำหรับบทนี้ แล้วพิมพ์โค้ด:</p>
+
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">PowerShell</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch02-variables
+cd ch02-variables</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string firstName;
+firstName = "Bob";</code></pre>
+    </div>
+    <div class="out auto"><div class="out-bar">ยังไม่มีผลลัพธ์ — โค้ดนี้แค่เก็บค่า ยังไม่ได้สั่งพิมพ์</div><pre> </pre></div>
+
+    <p>การจะกำหนดค่าให้ตัวแปร คุณใช้ <b>assignment operator</b> คือเครื่องหมายเท่ากับตัวเดียว
+       <code>=</code></p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ศัพท์</span>
+      การกำหนดค่าเรียกอีกอย่างว่า "set the variable" หรือสั้นๆ ว่า "set"
+    </div>
+
+    <h3 id="s04b">กำหนดค่าผิดลำดับ</h3>
+    <p>สำคัญมาก: การกำหนดค่าทำงาน<b>จากขวาไปซ้าย</b> คอมไพเลอร์ต้องเข้าใจค่าฝั่งขวาของ
+       <code>=</code> ก่อน แล้วค่อยเอาไปกำหนดให้ตัวแปรฝั่งซ้าย ถ้าสลับด้าน คอมไพเลอร์จะงง:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">string firstName;
+"Bob" = firstName;</code></pre>
+    </div>
+    <div class="out err auto"><div class="out-bar">Output</div><pre>
+CS0131: The left-hand side of an assignment must be a variable, property or indexer</pre></div>
+
+    <h3 id="s04c">กำหนดค่าผิดชนิดข้อมูล</h3>
+    <p>C# ถูกออกแบบให้บังคับชนิดข้อมูล หมายความว่าคุณกำหนดค่าชนิดหนึ่งให้ตัวแปรที่ประกาศไว้
+       เป็นอีกชนิดหนึ่งไม่ได้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">int firstName;
+firstName = "Bob";</code></pre>
+    </div>
+    <div class="out err auto"><div class="out-bar">Output</div><pre>
+CS0029: Cannot implicitly convert type 'string' to 'int'</pre></div>
+
+    <p>ข้อความ error นี้บอกใบ้ว่าคอมไพเลอร์พยายาม "แปลงโดยปริยาย (implicitly convert)"
+       สตริง "Bob" ให้เป็น int แต่ทำไม่ได้ เพราะคำว่า "Bob" ไม่มีค่าตัวเลขเทียบเท่า
+       (เรื่องการแปลงชนิดข้อมูลแบบ implicit/explicit จะเรียนละเอียดในบทหลังๆ)</p>
+
+    <h3 id="s04d">เรียกคืนค่าจากตัวแปร</h3>
+    <p>การเรียกคืนค่า แค่ใช้ชื่อตัวแปรนั้นเอง:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string firstName;
+firstName = "Bob";
+Console.WriteLine(firstName);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Bob</pre></div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ศัพท์</span>
+      การเรียกคืนค่าเรียกอีกอย่างว่า "get the variable" หรือสั้นๆ ว่า "get"
+    </div>
+
+    <h3 id="s04e">กำหนดค่าใหม่ซ้ำได้</h3>
+    <p>ใช้ซ้ำและกำหนดค่าใหม่ให้ตัวแปรได้เรื่อยๆ ตามต้องการ:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string firstName;
+firstName = "Bob";
+Console.WriteLine(firstName);
+firstName = "Liem";
+Console.WriteLine(firstName);
+firstName = "Isabella";
+Console.WriteLine(firstName);
+firstName = "Yasmin";
+Console.WriteLine(firstName);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Bob
+Liem
+Isabella
+Yasmin</pre></div>
+
+    <h3 id="s04f">กำหนดค่าเริ่มต้น (initialize)</h3>
+    <p>คุณต้อง <i>set</i> ค่าให้ตัวแปรก่อน ถึงจะ <i>get</i> ค่านั้นได้ ไม่งั้นจะเจอ error:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">string firstName;
+Console.WriteLine(firstName);</code></pre>
+    </div>
+    <div class="out err auto"><div class="out-bar">Output</div><pre>
+CS0165: Use of unassigned local variable 'firstName'</pre></div>
+
+    <p>เพื่อเลี่ยงปัญหานี้ แนะนำให้กำหนดค่าทันทีหลังประกาศตัวแปร จริงๆ แล้วสามารถประกาศและ
+       กำหนดค่าในบรรทัดเดียวได้เลย เทคนิคนี้เรียกว่า <b>initializing</b> ตัวแปร:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string firstName = "Bob";
+Console.WriteLine(firstName);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Bob</pre></div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch2-a"><span>ประกาศและกำหนดค่าตัวแปร string ได้สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch2-b"><span>ลองสลับด้าน = จนเจอ CS0131 ด้วยตัวเอง</span></label></li>
+      <li><label><input type="checkbox" id="ch2-c"><span>ลองกำหนดค่าผิดชนิดจนเจอ CS0029 ด้วยตัวเอง</span></label></li>
+      <li><label><input type="checkbox" id="ch2-d"><span>เขียนโค้ดแบบ initialize ในบรรทัดเดียวได้</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">2.5 ตัวแปรแบบอนุมานชนิดอัตโนมัติด้วย <code>var</code></h2>
+
+    <p>คอมไพเลอร์ C# ช่วยงานคุณได้อีกอย่าง — มันอนุมานชนิดข้อมูลของตัวแปรจากค่าที่กำหนดให้ได้เอง</p>
+
+    <h3 id="s05a"><code>var</code> คืออะไร</h3>
+    <p>ตัวแปรแบบอนุมานชนิดอัตโนมัติ (implicitly typed local variable) สร้างด้วยคีย์เวิร์ด
+       <code>var</code> ตามด้วยการกำหนดค่าเริ่มต้น:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">var message = "Hello world!";</code></pre>
+    </div>
+
+    <p>ตัวอย่างนี้สร้างตัวแปร string โดยใช้คีย์เวิร์ด <code>var</code> แทนคีย์เวิร์ด
+       <code>string</code> — <code>var</code> บอกคอมไพเลอร์ว่าชนิดข้อมูลถูก<i>อนุมาน</i>จากค่าที่กำหนดให้
+       พอชนิดถูกอนุมานแล้ว ตัวแปรนั้นจะทำงานเหมือนประกาศด้วยชนิดข้อมูลจริงทุกประการ
+       <code>var</code> ช่วยลดการพิมพ์เมื่อชื่อชนิดข้อมูลยาวหรือชัดเจนอยู่แล้วจากบริบท</p>
+
+    <p>เพราะตัวแปร <code>message</code> ถูกกำหนดค่าเป็น string ทันที คอมไพเลอร์จึงเข้าใจเจตนา
+       และปฏิบัติกับ <code>message</code> เป็น string ตลอดไป — ชนิดข้อมูลถูก "ล็อก" ไว้ตั้งแต่
+       ตอนประกาศ และจะไม่มีวันเปลี่ยนเป็นชนิดอื่นได้อีก:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">var message = "Hello World!";
+message = 10.703m;</code></pre>
+    </div>
+    <div class="out err auto"><div class="out-bar">Output</div><pre>
+CS0029: Cannot implicitly convert type 'decimal' to 'string'</pre></div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ เทียบกับภาษาอื่น</span>
+      ภาษาอื่นอาจใช้ <code>var</code> ต่างออกไป แต่ใน C# ตัวแปรถูกกำหนดชนิดโดยคอมไพเลอร์เสมอ
+      ไม่ว่าจะใช้ชื่อชนิดข้อมูลจริงหรือให้คอมไพเลอร์อนุมานก็ตาม ชนิดจะถูกล็อกตั้งแต่ตอนประกาศ
+      และจะเก็บค่าชนิดอื่นไม่ได้อีกเลย
+    </div>
+
+    <h3 id="s05b">ตัวแปรที่ใช้ <code>var</code> ต้องกำหนดค่าเริ่มต้นเสมอ</h3>
+    <p><code>var</code> ต้องพึ่งค่าที่ใช้กำหนดตอนเริ่มต้นเสมอ ถ้าใช้ <code>var</code>
+       โดยไม่กำหนดค่าเริ่มต้น จะคอมไพล์ไม่ผ่าน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">var message;</code></pre>
+    </div>
+    <div class="out err auto"><div class="out-bar">Output</div><pre>
+CS0818: Implicitly-typed variables must be initialized</pre></div>
+
+    <h3 id="s05c">ทำไมต้องใช้ <code>var</code></h3>
+    <p><code>var</code> ถูกใช้กันแพร่หลายมากในวงการ C# คุณจะเห็นมันบ่อยในตัวอย่างโค้ดจากหนังสือ
+       หรือออนไลน์ หลายครั้งชนิดของตัวแปรก็ชัดเจนอยู่แล้วจากค่าที่กำหนดให้ตอนประกาศ ทำให้ใช้
+       <code>var</code> ได้เรียบง่ายกว่า และยังมีประโยชน์ตอนวางแผนโค้ด — ตอนเริ่มพัฒนา
+       คุณอาจยังไม่รู้ทันทีว่าควรใช้ชนิดข้อมูลไหน การใช้ <code>var</code> ช่วยให้พัฒนาโซลูชันได้
+       ยืดหยุ่นกว่า</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 คำแนะนำสำหรับมือใหม่</span>
+      ตอนเริ่มต้น แนะนำให้ใช้ชื่อชนิดข้อมูลจริง (เช่น <code>string</code>, <code>int</code>)
+      แทน <code>var</code> ไปก่อน จนกว่าจะคุ้นเคยกับการเขียนโค้ดมากขึ้น การระบุชนิดข้อมูลชัดเจน
+      จะช่วยให้คุณตั้งใจ (purposeful) มากขึ้นตอนเขียนโค้ด
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">2.6 ท้าทาย: รวม Literal และ Variable เป็นข้อความเดียว</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl m">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>เก็บค่าต่อไปนี้ไว้ในตัวแปร (ตั้งชื่อให้สื่อความหมาย และเลือกชนิดข้อมูลให้ตรงกับข้อมูล):</p>
+        <ul>
+          <li><code>Bob</code></li>
+          <li><code>3</code></li>
+          <li><code>34.4</code></li>
+        </ul>
+        <p>แล้วผสมตัวแปรเหล่านี้เข้ากับสตริง literal ผ่านชุดคำสั่ง <code>Console.Write()</code>
+           หลายครั้ง เพื่อประกอบเป็นข้อความสมบูรณ์ตามนี้:</p>
+        <div class="out auto"><div class="out-bar">ผลลัพธ์ที่ต้องได้</div><pre>
+Hello, Bob! You have 3 messages in your inbox. The temperature is 34.4 celsius.</pre></div>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p><b>คำใบ้ 1:</b> คุณต้องมีตัวแปร 3 ตัว ชนิด <code>string</code>, <code>int</code>,
+             และ <code>decimal</code>/<code>float</code>/<code>double</code> ตามลำดับ</p>
+          <p><b>คำใบ้ 2:</b> <code>Console.Write()</code> รับตัวแปรเป็นพารามิเตอร์ได้โดยตรง
+             ไม่ต้องแปลงเป็น string เอง เช่น <code>Console.Write(ตัวแปร);</code></p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">2.7 เฉลยและวิเคราะห์</h2>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เฉลยตัวอย่าง</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string name = "Bob";
+int messages = 3;
+decimal temperature = 34.4m;
+
+Console.Write("Hello, ");
+Console.Write(name);
+Console.Write("! You have ");
+Console.Write(messages);
+Console.Write(" messages in your inbox. The temperature is ");
+Console.Write(temperature);
+Console.Write(" celsius.");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Hello, Bob! You have 3 messages in your inbox. The temperature is 34.4 celsius.</pre></div>
+
+    <p>นี่เป็น<i>เพียงหนึ่ง</i>ในหลายวิธีที่แก้โจทย์นี้ได้ อาจใช้จำนวนครั้งของ
+       <code>Console.Write()</code> ต่างไปก็ได้ แต่ตามโจทย์ คุณต้องกำหนดค่าเริ่มต้นให้ตัวแปร
+       ครบ 3 ตัว โดยใช้:</p>
+    <ul>
+      <li>ตัวแปรชนิด <code>string</code> เก็บชื่อ <code>"Bob"</code></li>
+      <li>ตัวแปรชนิด <code>int</code> เก็บจำนวนข้อความ</li>
+      <li>ตัวแปรชนิด <code>decimal</code>, <code>float</code>, หรือ <code>double</code> เก็บอุณหภูมิ</li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s08">2.8 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">พิมพ์ผิดแบบนี้</th><th style="width:18%">error</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>'Hello World!'</code></td>
+          <td><code>CS1012</code></td>
+          <td>เครื่องหมายคำพูดเดี่ยวใช้ได้กับ <code>char</code> 1 ตัวอักษรเท่านั้น สตริงต้องใช้ <code>"…"</code></td>
+        </tr>
+        <tr>
+          <td><code>"Bob" = firstName;</code></td>
+          <td><code>CS0131</code></td>
+          <td>การกำหนดค่าทำงานขวา→ซ้ายเสมอ ฝั่งซ้ายของ <code>=</code> ต้องเป็นตัวแปรเท่านั้น</td>
+        </tr>
+        <tr>
+          <td><code>int x; x = "Bob";</code></td>
+          <td><code>CS0029</code></td>
+          <td>กำหนดค่าคนละชนิดข้อมูลให้ตัวแปรไม่ได้ — C# บังคับชนิดข้อมูลเคร่งครัด</td>
+        </tr>
+        <tr>
+          <td>อ่านค่าตัวแปรก่อนกำหนดค่า</td>
+          <td><code>CS0165</code></td>
+          <td>ต้อง set ค่าก่อนเสมอ ก่อนจะ get — แนะนำให้ initialize ทันทีที่ประกาศ</td>
+        </tr>
+        <tr>
+          <td><code>var message;</code> (ไม่มีค่าเริ่มต้น)</td>
+          <td><code>CS0818</code></td>
+          <td><code>var</code> ต้องมีค่าเริ่มต้นเสมอ เพราะคอมไพเลอร์ใช้ค่านั้นอนุมานชนิดข้อมูล</td>
+        </tr>
+        <tr>
+          <td><code>string $name;</code> หรือ <code>string 1name;</code></td>
+          <td>syntax error</td>
+          <td>ชื่อตัวแปรห้ามมีอักขระพิเศษ และห้ามขึ้นต้นด้วยตัวเลข</td>
+        </tr>
+        <tr>
+          <td><code>decimal decimal;</code></td>
+          <td>syntax error</td>
+          <td>ห้ามตั้งชื่อตัวแปรซ้ำกับคำสงวน (keyword) ของ C#</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">2.9 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment จริงของบทนี้ใน Microsoft Learn</p>
+
+    <div class="quiz" data-q="2-1">
+      <p class="q"><span class="num">1.</span> ชื่อตัวแปรข้อใดต้องหลีกเลี่ยง (ผิดกฎ)?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>$DATA</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>registrationComplete</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>flag</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ชื่อตัวแปรห้ามมีอักขระพิเศษอย่าง <code>$</code> —
+        ผิดกฎ C# ทันที ข้อ B และ C เป็นชื่อที่ถูกต้องตามกฎและธรรมเนียม camelCase</div>
+    </div>
+
+    <div class="quiz" data-q="2-2">
+      <p class="q"><span class="num">2.</span> โค้ดบรรทัดนี้ผิดตรงไหน? <code>var message;</code></p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>var</code> ไม่ใช่ชนิดข้อมูล</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>ใช้คีย์เวิร์ด var โดยไม่กำหนดค่าเริ่มต้นให้ตัวแปร</span></li>
+        <li class="opt"><span class="k">C</span><span>ตัวแปรชื่อ message ต้องเป็น string เสมอ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ตัวแปรที่ประกาศด้วย <code>var</code> ต้องมีค่าเริ่มต้นเสมอ
+        เพราะคอมไพเลอร์ต้องใช้ค่านั้นอนุมานชนิดข้อมูล ไม่มีค่าก็อนุมานไม่ได้ → CS0818</div>
+    </div>
+
+    <div class="quiz" data-q="2-3">
+      <p class="q"><span class="num">3.</span> <code>Console.WriteLine(34.40M);</code> ให้ผลลัพธ์อะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>34.40M</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>34.4</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>34.40</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ชนิด <code>decimal</code> เก็บ "ความละเอียด (scale)"
+        ของเลขไว้ด้วย เลขศูนย์ท้ายที่คุณพิมพ์ไว้ตอนสร้าง literal จึงยังคงอยู่ตอนแสดงผล
+        (ต่างจาก float/double ที่มักตัดศูนย์ท้ายทิ้ง) — ส่วนตัวอักษร suffix <code>M</code>
+        ไม่ถูกพิมพ์ออกมาด้วย เพราะมันบอกชนิดข้อมูลให้คอมไพเลอร์เท่านั้น</div>
+    </div>
+
+    <div class="quiz" data-q="2-4">
+      <p class="q"><span class="num">4.</span> โค้ดข้อใดสร้างตัวแปร<b>ถูกต้อง</b>?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>int x = 12.3m;</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>decimal x = 12.3m;</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>bool x = 'False';</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ชนิดตัวแปรตรงกับ suffix ของ literal พอดี
+        ข้อ A ผิดเพราะกำหนดค่า decimal ให้ตัวแปร int ไม่ได้ ข้อ C ผิดสองต่อ — เครื่องหมายคำพูดเดี่ยว
+        สร้างได้แค่ char ตัวเดียว (แถม 'False' มี 5 ตัวอักษรจะ error CS1012 ด้วยซ้ำ)
+        และต่อให้เป็น char ก็กำหนดให้ตัวแปร bool ไม่ได้อยู่ดี</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">2.10 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ประกาศตัวแปรชนิด <code>int</code> ชื่อ <code>age</code> กำหนดค่าเป็นอายุของคุณ
+           แล้วพิมพ์ค่าออกด้วย <code>Console.WriteLine()</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int age = 25;
+Console.WriteLine(age);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ประกาศตัวแปร 3 ตัว: <code>string</code> ชื่อหนังสือ, <code>int</code> จำนวนหน้า,
+           <code>bool</code> ว่าอ่านจบหรือยัง แล้วพิมพ์ทั้ง 3 ค่าคนละบรรทัดด้วย WriteLine</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string bookTitle = "หนึ่งร้อยปีแห่งความโดดเดี่ยว";
+int pageCount = 448;
+bool isFinished = false;
+
+Console.WriteLine(bookTitle);
+Console.WriteLine(pageCount);
+Console.WriteLine(isFinished);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้คอมไพล์ไม่ผ่าน หาจุดผิดและแก้ให้ถูก:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">int score
+score = 100
+Console.WriteLine(score)</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ขาดเซมิโคลอนท้ายทั้ง 3 บรรทัด</p>
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ถูก)</span></div>
+          <pre><code class="lang-cs">int score;
+score = 100;
+Console.WriteLine(score);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้มี error 1 จุด (เกี่ยวกับชนิดข้อมูล) หาให้เจอและแก้ไข:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">decimal price;
+price = 129;
+bool onSale;
+onSale = "yes";
+Console.WriteLine(price);</code></pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>บรรทัด <code>price = 129;</code> ไม่ error เพราะ int แปลงเป็น decimal
+           โดยปริยายได้ (ไม่เสียข้อมูล) แต่อีกบรรทัดหนึ่งกำหนดค่าผิดชนิดตรงๆ</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p><code>onSale = "yes";</code> ผิด เพราะ <code>onSale</code> เป็น <code>bool</code>
+             แต่กำหนดค่าเป็น string — ต้องใช้ <code>true</code>/<code>false</code> แทน</p>
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ถูก)</span></div>
+          <pre><code class="lang-cs">decimal price;
+price = 129;
+bool onSale;
+onSale = true;
+Console.WriteLine(price);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดใหม่จากข้อ 2 แต่เปลี่ยนมาใช้ <code>var</code> แทนชื่อชนิดข้อมูลทั้ง 3 ตัวแปร
+           โดยผลลัพธ์เมื่อรันต้องเหมือนเดิมทุกประการ</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">var bookTitle = "หนึ่งร้อยปีแห่งความโดดเดี่ยว";
+var pageCount = 448;
+var isFinished = false;
+
+Console.WriteLine(bookTitle);
+Console.WriteLine(pageCount);
+Console.WriteLine(isFinished);</code></pre></div>
+          <p>คอมไพเลอร์อนุมานชนิดข้อมูลจากค่าที่กำหนดให้ตอนประกาศ ได้ชนิดเดียวกับที่พิมพ์เอง
+             ทุกประการ (string, int, bool ตามลำดับ)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>เขียนโปรแกรมเก็บข้อมูลใบเสร็จง่ายๆ ด้วยตัวแปร 4 ตัว (ชื่อสินค้า/ราคา/จำนวนชิ้น/มีส่วนลดไหม)
+           แล้วพิมพ์ข้อความสรุปให้ตรงเป๊ะบรรทัดนี้ โดยห้ามพิมพ์ค่าตัวเลข/ข้อความจริงลงในคำสั่ง Write
+           โดยตรง — ต้องดึงจากตัวแปรทั้งหมด:</p>
+        <div class="out auto"><pre>
+สินค้า: หูฟังไร้สาย จำนวน: 2 ชิ้น ราคารวม: 1590 บาท มีส่วนลด: True</pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ต้องมีตัวแปรอย่างน้อย: <code>string</code> ชื่อสินค้า,
+           <code>int</code> จำนวนชิ้น, <code>decimal</code> ราคารวม, <code>bool</code> มีส่วนลด
+           แล้วผสมกับสตริง literal ผ่าน <code>Console.Write()</code> หลายครั้งเหมือนหัวข้อ 2.7</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string productName = "หูฟังไร้สาย";
+int quantity = 2;
+decimal totalPrice = 1590;
+bool hasDiscount = true;
+
+Console.Write("สินค้า: ");
+Console.Write(productName);
+Console.Write(" จำนวน: ");
+Console.Write(quantity);
+Console.Write(" ชิ้น ราคารวม: ");
+Console.Write(totalPrice);
+Console.Write(" บาท มีส่วนลด: ");
+Console.Write(hasDiscount);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s11">📌 สรุปบทที่ 2</h2>
+
+    <p>เป้าหมายของบทนี้คือให้คุณแสดงข้อความที่จัดรูปแบบแล้ว โดยผสมค่า literal และค่าจากตัวแปร
+       เข้าด้วยกัน ด้วยไวยากรณ์ C# พื้นฐาน คุณได้สร้างค่า literal ของหลายชนิดข้อมูล ประกาศตัวแปร
+       กำหนดและเรียกคืนค่าจากตัวแปรเหล่านั้น รวมถึงเรียนรู้การใช้คีย์เวิร์ด <code>var</code>
+       เพื่อให้คอมไพเลอร์อนุมานชนิดข้อมูลแทนคุณ</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 2</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:30%">ไวยากรณ์</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>'x'</code></td><td>char literal — ตัวอักษรเดียวเท่านั้น</td></tr>
+          <tr><td><code>"..."</code></td><td>string literal</td></tr>
+          <tr><td><code>123</code></td><td>int literal</td></tr>
+          <tr><td><code>0.25F</code></td><td>float literal (suffix F/f)</td></tr>
+          <tr><td><code>2.625</code></td><td>double literal (ค่าเริ่มต้นของทศนิยม)</td></tr>
+          <tr><td><code>12.398m</code></td><td>decimal literal (suffix M/m)</td></tr>
+          <tr><td><code>true</code> / <code>false</code></td><td>bool literal (แสดงผลเป็น True/False)</td></tr>
+          <tr><td><code>ชนิด ชื่อ;</code></td><td>ประกาศตัวแปร (declare)</td></tr>
+          <tr><td><code>ชื่อ = ค่า;</code></td><td>กำหนดค่า (set) — ทำงานขวา→ซ้าย</td></tr>
+          <tr><td><code>ชนิด ชื่อ = ค่า;</code></td><td>ประกาศ + กำหนดค่าในบรรทัดเดียว (initialize)</td></tr>
+          <tr><td><code>var ชื่อ = ค่า;</code></td><td>ให้คอมไพเลอร์อนุมานชนิดข้อมูลเอง (ต้องมีค่าเริ่มต้นเสมอ)</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s12">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:22%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>literal value</td><td>ค่าคงที่ / ค่าฝังตายตัว</td><td>ค่าที่ไม่เปลี่ยนแปลง เขียนตรงๆ ในโค้ด</td></tr>
+        <tr><td>hard-coded</td><td>ฝังตายตัว</td><td>ค่าคงที่ที่พิมพ์ไว้ในโค้ดโดยตรง</td></tr>
+        <tr><td>variable</td><td>ตัวแปร</td><td>ภาชนะเก็บค่าที่เปลี่ยนแปลงได้</td></tr>
+        <tr><td>data type</td><td>ชนิดข้อมูล</td><td>ประเภทของค่าที่ตัวแปรเก็บได้ เช่น string, int</td></tr>
+        <tr><td>declare</td><td>ประกาศ</td><td>สร้างตัวแปรใหม่ ระบุชนิดข้อมูลและชื่อ</td></tr>
+        <tr><td>assign / set</td><td>กำหนดค่า</td><td>เขียนค่าลงในตัวแปร</td></tr>
+        <tr><td>retrieve / get</td><td>เรียกคืนค่า</td><td>อ่านค่าที่เก็บอยู่ในตัวแปร</td></tr>
+        <tr><td>initialize</td><td>กำหนดค่าเริ่มต้น</td><td>ประกาศและกำหนดค่าในบรรทัดเดียว</td></tr>
+        <tr><td>assignment operator</td><td>ตัวดำเนินการกำหนดค่า</td><td>เครื่องหมาย <code>=</code></td></tr>
+        <tr><td>implicitly typed</td><td>อนุมานชนิดโดยปริยาย</td><td>ให้คอมไพเลอร์เดาชนิดข้อมูลจากค่าเริ่มต้น (var)</td></tr>
+        <tr><td>literal suffix</td><td>ส่วนต่อท้ายค่าคงที่</td><td>ตัวอักษรต่อท้ายตัวเลข เช่น F, M เพื่อระบุชนิด</td></tr>
+        <tr><td>camelCase</td><td>คาเมลเคส</td><td>รูปแบบตั้งชื่อ: ตัวแรกเล็ก คำถัดไปขึ้นต้นตัวใหญ่</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch01.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 1 · Write Your First C# Code</span></a>
+      <a class="next" href="ch03.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 3 · Perform Basic String Formatting in C#</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

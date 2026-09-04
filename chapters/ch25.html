@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 25 · แก้ไขเนื้อหา String — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="25">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 4 · Work with Variable Data / บทที่ 25</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 4 · โมดูล 5/7</span>
+      <h1>แก้ไขเนื้อหาของ String ด้วย Built-in Method</h1>
+      <div class="en">Modify the Content of Strings Using Built-in String Data Type Methods</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>55–70 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>ดึง ลบ และแทนที่ข้อมูลใน string ได้อย่างแม่นยำ</b></span>
+        <span>🎯 ความยาก <b>กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ระบุตำแหน่งของตัวอักษรหรือ string หนึ่งภายใน string อีกอันได้</li>
+        <li>ดึง (extract) บางส่วนของ string ออกมาได้</li>
+        <li>ลบ (remove) บางส่วนของ string ได้</li>
+        <li>แทนที่ (replace) ค่าใน string ด้วยค่าอื่นได้</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">25.1 สถานการณ์: ระบบอัตโนมัติอัปเดตเว็บ "โปรโมชั่นโค้งสุดท้าย"</h2>
+
+    <p>สมมติคุณเป็นนักพัฒนาของแอปที่ให้ธุรกิจอัปเดตเว็บไซต์ "ดีลโค้งสุดท้าย" (last chance deals) ได้
+       โดยส่งอีเมล อีเมลอัปเดตใช้ข้อความ<i>พิเศษ</i>ที่กำหนดไว้ในหัวเรื่องและเนื้อหาอีเมล เพื่อสั่ง
+       ระบบอัตโนมัติว่าจะอัปเดตเว็บไซต์ยังไง อีเมลรวมชื่อดีลถัดไป เปอร์เซ็นต์ส่วนลด วันหมดอายุ และ
+       เวลาที่จะเผยแพร่ข้อเสนอนั้น</p>
+
+    <p>บ่อยครั้งที่ข้อมูลแอปของคุณต้องทำงานด้วยมาจากระบบซอฟต์แวร์<i>อื่น</i> และมีข้อมูลที่คุณไม่
+       ต้องการหรือไม่จำเป็น บางครั้งข้อมูลอยู่ในรูปแบบที่ใช้งานไม่ได้ มีข้อมูล<i>เกิน</i>ที่ทำให้ดึง
+       ข้อมูลสำคัญออกมาได้ยาก เพื่อปรับข้อมูลให้เหมาะกับแอปของคุณ คุณต้องมีเครื่องมือและเทคนิคแยก
+       วิเคราะห์ข้อมูล string, แยกข้อมูลที่ต้องการออกมา, และลบข้อมูลที่ไม่ต้องการทิ้ง</p>
+
+    <p>ในบทนี้ คุณใช้ string helper method ระบุและแยกข้อมูลที่คุณสนใจออกมา คุณเรียนวิธีก็อปปี้ส่วน
+       ย่อยของ string ที่ใหญ่กว่า คุณแทนที่ตัวอักษร หรือลบตัวอักษรออกจาก string ได้</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">25.2 IndexOf() และ Substring()</h2>
+
+    <h3 id="s02a">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch25-stringmod</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <h3 id="s02b">หาตำแหน่งวงเล็บที่ฝังอยู่ใน String</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string message = "Find what is (inside the parentheses)";
+
+int openingPosition = message.IndexOf('(');
+int closingPosition = message.IndexOf(')');
+
+Console.WriteLine(openingPosition);
+Console.WriteLine(closingPosition);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+13
+36</pre></div>
+
+    <p>ในกรณีนี้ index ของอักขระ <code>(</code> คือ 13 — จำไว้ว่าค่าพวกนี้เป็น zero-based เสมอ
+       (ทบทวนจาก <a href="ch10.html">บทที่ 10</a>) ดังนั้นมันคือตัวอักษรที่ 14 ของ string จริงๆ
+       index ของอักขระ <code>)</code> คือ 36 — ตอนนี้คุณมี index ทั้งสองตัวแล้ว ใช้เป็นขอบเขตดึงค่า
+       ที่อยู่ระหว่างกลางได้</p>
+
+    <h3 id="s02c">ดึงค่าระหว่างวงเล็บด้วย Substring()</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string message = "Find what is (inside the parentheses)";
+
+int openingPosition = message.IndexOf('(');
+int closingPosition = message.IndexOf(')');
+
+int length = closingPosition - openingPosition;
+Console.WriteLine(message.Substring(openingPosition, length));</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+(inside the parentheses</pre></div>
+
+    <p><code>Substring()</code> ต้องการตำแหน่งเริ่มต้นและจำนวนตัวอักษร (length) ที่จะดึง — คุณจึง
+       คำนวณ length เก็บไว้ในตัวแปรชั่วคราวชื่อ <code>length</code> แล้วส่งพร้อมกับค่า
+       <code>openingPosition</code> เพื่อดึง string ข้างในวงเล็บออกมา</p>
+
+    <p>ผลลัพธ์ใกล้เคียงแล้ว แต่ยังมีวงเล็บเปิดติดมาด้วย ในแบบฝึกหัดนี้ ไม่ต้องการวงเล็บติดมา ต้อง
+       อัปเดตโค้ดให้ข้าม index ของวงเล็บเปิดไปเอง</p>
+
+    <h3 id="s02d">ปรับตำแหน่งเริ่มต้นให้ข้ามวงเล็บ</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string message = "Find what is (inside the parentheses)";
+
+int openingPosition = message.IndexOf('(');
+int closingPosition = message.IndexOf(')');
+
+openingPosition += 1;
+
+int length = closingPosition - openingPosition;
+Console.WriteLine(message.Substring(openingPosition, length));</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+inside the parentheses</pre></div>
+
+    <p>ด้วยการเพิ่ม <code>openingPosition</code> ทีละ 1 คุณข้ามอักขระวงเล็บเปิดไป — เหตุผลที่ใช้ค่า
+       <code>1</code> เพราะนั่นคือความยาวของอักขระตัวนั้น ถ้าคุณพยายามหาค่าที่เริ่มหลัง string ที่
+       ยาวกว่า เช่น <code>&lt;div&gt;</code> หรือ <code>---</code> คุณต้องใช้ความยาวของ string นั้น
+       แทน</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string message = "What is the value <span>between the tags</span>?";
+
+int openingPosition = message.IndexOf("<span>");
+int closingPosition = message.IndexOf("</span>");
+
+openingPosition += 6;
+int length = closingPosition - openingPosition;
+Console.WriteLine(message.Substring(openingPosition, length));</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+between the tags</pre></div>
+
+    <p>ตัวอย่างนี้แสดงวิธีหาค่าข้างในแท็กเปิดและปิด <code>&lt;span&gt;</code> — คุณบวก
+       <code>6</code> เข้ากับ <code>openingPosition</code> เป็นค่า offset ในการคำนวณความยาวของ
+       substring (<code>"&lt;span&gt;"</code> มี 6 ตัวอักษรพอดี)</p>
+
+    <h3 id="s02e">หลีกเลี่ยง Magic Value ด้วย const</h3>
+    <p>string ที่ hardcode ไว้อย่าง <code>"&lt;span&gt;"</code> ในโค้ดก่อนหน้าเรียกว่า "magic
+       string" และค่าตัวเลขที่ hardcode ไว้อย่าง <code>6</code> เรียกว่า "magic number" — ค่า
+       "magic" แบบนี้ไม่ดีด้วยหลายเหตุผล และควรหลีกเลี่ยงถ้าทำได้</p>
+
+    <p>ลองพิจารณาว่าโค้ดก่อนหน้าอาจพังยังไง ถ้าคุณ hardcode string <code>"&lt;span&gt;"</code> ซ้ำ
+       หลายจุดในโค้ด แต่พิมพ์ผิดไปหนึ่งจุดเป็น <code>"&lt;sapn&gt;"</code> — compiler จับ
+       <code>"&lt;sapn&gt;"</code> ตอน compile time ไม่ได้เลย เพราะค่านั้นอยู่ในรูป string การพิมพ์
+       ผิดแบบนี้นำไปสู่ปัญหาตอนรันจริง และขึ้นอยู่กับความซับซ้อนของโค้ด อาจตามหาสาเหตุได้ยากมาก
+       ยิ่งไปกว่านั้น ถ้าคุณเปลี่ยน string <code>"&lt;span&gt;"</code> เป็น
+       <code>"&lt;div&gt;"</code> ที่สั้นกว่า แต่ลืมเปลี่ยนเลข <code>6</code> เป็น <code>5</code>
+       โค้ดของคุณจะให้ผลลัพธ์ที่ไม่ต้องการ</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string message = "What is the value <span>between the tags</span>?";
+
+const string openSpan = "<span>";
+const string closeSpan = "</span>";
+
+int openingPosition = message.IndexOf(openSpan);
+int closingPosition = message.IndexOf(closeSpan);
+
+openingPosition += openSpan.Length;
+int length = closingPosition - openingPosition;
+Console.WriteLine(message.Substring(openingPosition, length));</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+between the tags</pre></div>
+
+    <p>โค้ดนี้ใช้ constant ด้วยคีย์เวิร์ด <code>const</code> ใน <code>const string openSpan = "<span>";</code>
+       — <b>constant</b> ให้คุณประกาศและกำหนดค่าเริ่มต้นให้ตัวแปรที่ค่าของมัน<b>ไม่มีวันเปลี่ยนได้
+       เลย</b> คุณใช้ constant นั้นในโค้ดที่เหลือทุกครั้งที่ต้องการค่านั้น ทำให้แน่ใจว่าค่าถูก
+       กำหนดไว้แค่ที่เดียว และการพิมพ์ผิดชื่อ constant จะถูก compiler จับได้ทันที</p>
+
+    <p>โค้ดข้างบนเป็นวิธีที่ปลอดภัยกว่าในการเขียนโค้ดแบบเดียวกับที่เห็นในหัวข้อก่อนหน้า ตอนนี้ ถ้าค่า
+       ของ <code>openSpan</code> เปลี่ยนเป็น <code>&lt;div&gt;</code> บรรทัดที่ใช้ property
+       <code>Length</code> ก็ยังใช้งานได้ถูกต้องเสมอ ไม่ต้องแก้เลขด้วยมือเลย</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ IndexOf() คืน -1 ถ้าหาไม่เจอ</span>
+      ถ้า <code>IndexOf()</code> หาอักขระหรือ string ที่ต้องการไม่เจอเลย มันจะคืนค่า <code>-1</code>
+      กลับมา (ไม่ throw exception) — คุณจะได้เห็นวิธีใช้ประโยชน์จากพฤติกรรมนี้ในหัวข้อ 25.3
+    </div>
+
+    <div class="quiz" data-q="25-1">
+      <p class="q"><span class="num">Check ★</span> <code>myString.IndexOf('C');</code> คืนค่าอะไร
+        เมื่อ <code>string myString = "C# Time";</code>?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>0</span></li>
+        <li class="opt"><span class="k">B</span><span>1</span></li>
+        <li class="opt"><span class="k">C</span><span>-1</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> 'C' อยู่ที่ตำแหน่งแรกสุดของ string (zero-based index
+        0) — ไม่ใช่ -1 เพราะเจอตัวอักษรนั้นจริง</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch25-a"><span>ใช้ IndexOf() หาตำแหน่งอักขระ/string สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch25-b"><span>ใช้ Substring() ดึงค่าระหว่างสองตำแหน่งสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch25-c"><span>ใช้ const แทน magic string/number สำเร็จ เข้าใจข้อดีของมัน</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">25.3 LastIndexOf() และ IndexOfAny()</h2>
+
+    <p><code>.IndexOf()</code> คืน index ของการปรากฏ<b>ครั้งแรก</b>ของอักขระหรือ substring ที่ระบุ
+       ภายใน string เมธอด <code>.LastIndexOf()</code> คืน index ของการปรากฏ<b>ครั้งสุดท้าย</b>ของ
+       อักขระหรือ string นั้น ทั้ง <code>IndexOf()</code> และ <code>LastIndexOf()</code> คืนค่า
+       <code>-1</code> ถ้า<b>หาไม่เจอ</b></p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string message = "hello there!";
+
+int first_h = message.IndexOf('h');
+int last_h = message.LastIndexOf('h');
+
+Console.WriteLine($"For the message: '{message}', the first 'h' is at position {first_h} and the last 'h' is at position {last_h}.");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+For the message: 'hello there!', the first 'h' is at position 0 and the last 'h' is at position 7.</pre></div>
+
+    <h3 id="s03a">ดึงค่าจากวงเล็บคู่สุดท้าย</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string message = "(What if) I am (only interested) in the last (set of parentheses)?";
+int openingPosition = message.LastIndexOf('(');
+
+openingPosition += 1;
+int closingPosition = message.LastIndexOf(')');
+int length = closingPosition - openingPosition;
+Console.WriteLine(message.Substring(openingPosition, length));</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+set of parentheses</pre></div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ โค้ดนี้เปราะบาง</span>
+      โค้ดตัวอย่างข้างบนรันได้ไม่มี error เพราะ string <code>message</code> มีคู่วงเล็บที่จัดรูปแบบ
+      ถูกต้อง แต่โค้ดนี้ <b>เปราะบาง</b> (fragile) — จะเกิด error ถ้าไม่มีคู่วงเล็บอยู่เลย หรือถ้า
+      วงเล็บคู่สุดท้ายไม่ได้เปิด-ปิดเป็นคู่กันจริงๆ
+    </div>
+
+    <h3 id="s03b">ดึงค่าจากทุกคู่วงเล็บด้วย while</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string message = "(What if) there are (more than) one (set of parentheses)?";
+while (true)
+{
+    int openingPosition = message.IndexOf('(');
+    if (openingPosition == -1) break;
+
+    openingPosition += 1;
+    int closingPosition = message.IndexOf(')');
+    int length = closingPosition - openingPosition;
+    Console.WriteLine(message.Substring(openingPosition, length));
+
+    // ใช้ overload ของ Substring ที่คืนค่าเฉพาะส่วนที่ยังไม่ได้ประมวลผล
+    message = message.Substring(closingPosition + 1);
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+What if
+more than
+set of parentheses</pre></div>
+
+    <p>สังเกตบรรทัดสุดท้ายข้างใน loop: <code>message = message.Substring(closingPosition + 1);</code>
+       — เมื่อคุณใช้ <code>Substring()</code> โดยไม่ระบุ length เลย มันจะคืนทุกตัวอักษรหลังตำแหน่ง
+       เริ่มต้นที่คุณระบุ การตัดคู่วงเล็บแรก <code>(What if)</code> ออกจากค่า <code>message</code>
+       ช่วยให้ส่วนที่เหลือถูกประมวลผลต่อใน iteration ถัดไปของ <code>while</code> loop</p>
+
+    <p>พิจารณาว่าเกิดอะไรขึ้นตอน iteration สุดท้าย เมื่อเหลือแค่ตัวอักษร <code>?</code> ตัวเดียว —
+       โค้ดที่จัดการจุดสิ้นสุดของ string คือ:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">โค้ดจัดการเงื่อนไขจบ</span></div>
+      <pre><code class="lang-cs">int openingPosition = message.IndexOf('(');
+if (openingPosition == -1) break;</code></pre>
+    </div>
+
+    <p><code>IndexOf()</code> คืน <code>-1</code> ถ้าหา input parameter ใน string ไม่เจอ คุณแค่เช็ค
+       ค่า <code>-1</code> แล้ว <code>break</code> ออกจาก loop</p>
+
+    <h3 id="s03c">ค้นหาหลายชนิดสัญลักษณ์ด้วย IndexOfAny()</h3>
+    <p>คราวนี้ค้นหาตัวอักษรหลายแบบพร้อมกัน ไม่ใช่แค่วงเล็บ ด้วย <code>.IndexOfAny()</code> — เมธอดนี้
+       รายงาน index ของการปรากฏครั้งแรกของอักขระตัวใดตัวหนึ่งใน array ของอักขระที่คุณส่งเข้าไป
+       เมธอดคืน <code>-1</code> ถ้าหาอักขระทุกตัวใน array ไม่เจอเลย</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string message = "Hello, world!";
+char[] charsToFind = { 'a', 'e', 'i' };
+
+int index = message.IndexOfAny(charsToFind);
+
+Console.WriteLine($"Found '{message[index]}' in '{message}' at index: {index}.");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Found 'e' in 'Hello, world!' at index: 1.</pre></div>
+
+    <p>ตอนนี้ลองค้นหาสัญลักษณ์เปิดหลายแบบพร้อมกัน (<code>[</code>, <code>{</code>, <code>(</code>)
+       และใช้ overload ของ <code>IndexOfAny()</code> ที่กำหนดตำแหน่งเริ่มค้นหาได้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string message = "Help (find) the {opening symbols}";
+Console.WriteLine($"Searching THIS Message: {message}");
+char[] openSymbols = { '[', '{', '(' };
+int startPosition = 5;
+int openingPosition = message.IndexOfAny(openSymbols);
+Console.WriteLine($"Found WITHOUT using startPosition: {message.Substring(openingPosition)}");
+
+openingPosition = message.IndexOfAny(openSymbols, startPosition);
+Console.WriteLine($"Found WITH using startPosition {startPosition}:  {message.Substring(openingPosition)}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Searching THIS Message: Help (find) the {opening symbols}
+Found WITHOUT using startPosition: (find) the {opening symbols}
+Found WITH using startPosition 5:  (find) the {opening symbols}</pre></div>
+
+    <h3 id="s03d">จับคู่สัญลักษณ์เปิด-ปิดหลายแบบพร้อมกัน</h3>
+    <p>ตอนนี้คุณเจอสัญลักษณ์เปิดแล้ว ต้องหาสัญลักษณ์ปิดที่ตรงกันของมันด้วย</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string message = "(What if) I have [different symbols] but every {open symbol} needs a [matching closing symbol]?";
+
+char[] openSymbols = { '[', '{', '(' };
+
+int closingPosition = 0;
+
+while (true)
+{
+    int openingPosition = message.IndexOfAny(openSymbols, closingPosition);
+
+    if (openingPosition == -1) break;
+
+    string currentSymbol = message.Substring(openingPosition, 1);
+
+    char matchingSymbol = ' ';
+
+    switch (currentSymbol)
+    {
+        case "[":
+            matchingSymbol = ']';
+            break;
+        case "{":
+            matchingSymbol = '}';
+            break;
+        case "(":
+            matchingSymbol = ')';
+            break;
+    }
+
+    openingPosition += 1;
+    closingPosition = message.IndexOf(matchingSymbol, openingPosition);
+
+    int length = closingPosition - openingPosition;
+    Console.WriteLine(message.Substring(openingPosition, length));
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+What if
+different symbols
+open symbol
+matching closing symbol</pre></div>
+
+    <p>จุดสำคัญของโค้ดนี้คือบรรทัด <code>closingPosition = message.IndexOf(matchingSymbol, openingPosition);</code>
+       — ใช้ overload ของ <code>IndexOf()</code> ที่ระบุว่าการค้นหา <code>matchingSymbol</code>
+       ควรเริ่มที่ตำแหน่ง <code>openingPosition</code> ใน string</p>
+
+    <p>ตัวแปร <code>closingPosition</code> ถูกใช้ทั้งหาความยาวที่ส่งให้ <code>Substring()</code>
+       และหาค่า <code>openingPosition</code> ถัดไป (<code>message.IndexOfAny(openSymbols, closingPosition)</code>)
+       ด้วยเหตุนี้ ตัวแปร <code>closingPosition</code> จึงถูกประกาศไว้<b>นอก</b> scope ของ
+       <code>while</code> loop และตั้งค่าเริ่มต้นเป็น <code>0</code> สำหรับ iteration แรก</p>
+
+    <div class="quiz" data-q="25-2">
+      <p class="q"><span class="num">Check ★</span> ควรใช้เมธอดไหนค้นหาการปรากฏครั้งแรกของคำค้นหา
+        ใน string ยาวๆ?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>IndexOfAny()</span></li>
+        <li class="opt"><span class="k">B</span><span>LastIndexOf()</span></li>
+        <li class="opt"><span class="k">C</span><span>Substring()</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ตามนิยามของ <code>IndexOfAny()</code> เอง — "รายงาน
+        index ของการปรากฏ<b>ครั้งแรก</b>" ตรงกับสิ่งที่คำถามต้องการ ส่วน LastIndexOf() หา
+        <b>ครั้งสุดท้าย</b> (ตรงข้าม) และ Substring() ใช้ดึงค่า ไม่ใช่ค้นหาตำแหน่ง</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch25-d"><span>ใช้ LastIndexOf() หาตำแหน่งครั้งสุดท้ายสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch25-e"><span>ใช้ while + IndexOf() วนดึงค่าจากทุกคู่วงเล็บสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch25-f"><span>ใช้ IndexOfAny() ค้นหาหลายสัญลักษณ์พร้อมกัน และจับคู่เปิด-ปิดสำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">25.4 Remove() และ Replace()</h2>
+
+    <p>บางครั้งคุณต้องแก้ไขเนื้อหาของ string ด้วยการลบหรือแทนที่ตัวอักษร แม้จะใช้เครื่องมือที่รู้จัก
+       แล้วแทนที่ตัวอักษรได้ แต่ก็ต้องเก็บและประกอบ string กลับด้วยตัวเองพอสมควร โชคดีที่
+       <code>string</code> data type มี built-in method อื่นอีกสองตัว คือ <code>Remove()</code> และ
+       <code>Replace()</code> สำหรับสถานการณ์เฉพาะแบบนี้</p>
+
+    <h3 id="s04a">ใช้ Remove() ลบตำแหน่งที่แน่นอน</h3>
+    <p>คุณมักใช้ <code>Remove()</code> เมื่อตำแหน่งของตัวอักษรที่ต้องการลบออกจาก string นั้นคงที่
+       และแน่นอนเสมอ</p>
+
+    <p>แบบฝึกหัดนี้มีข้อมูลที่เก็บในไฟล์รุ่นเก่าที่มีความยาวคงที่ โดยกำหนดตำแหน่งตัวอักษรไว้สำหรับ
+       แต่ละฟิลด์ข้อมูล: 5 ตัวแรกแทนหมายเลขประจำตัวลูกค้า 20 ตัวถัดไปเก็บชื่อลูกค้า 6 ตำแหน่งถัดมา
+       แทนยอดใบแจ้งหนี้ล่าสุดของลูกค้า และ 3 ตำแหน่งสุดท้ายแทนจำนวนสินค้าที่สั่งในใบแจ้งหนี้นั้น</p>
+
+    <p>คุณต้องลบชื่อลูกค้าออก เพื่อจัดรูปแบบข้อมูลให้ส่งไปยัง process แยกต่างหากได้ เพราะคุณรู้ตำแหน่ง
+       และความยาวที่แน่นอนของชื่อผู้ใช้ คุณลบมันออกได้ง่ายๆ ด้วยเมธอด <code>Remove()</code></p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string data = "12345John Smith          5000  3  ";
+string updatedData = data.Remove(5, 20);
+Console.WriteLine(updatedData);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+123455000  3  </pre></div>
+
+    <p><code>Remove()</code> ทำงานคล้าย <code>Substring()</code> — คุณส่งตำแหน่งเริ่มต้นและความยาว
+       เพื่อลบตัวอักษรช่วงนั้นออกจาก string</p>
+
+    <h3 id="s04b">ใช้ Replace() แทนที่ทุกที่ที่เจอ</h3>
+    <p>ใช้ <code>Replace()</code> เมื่อต้องการแทนที่ตัวอักษรหนึ่งตัวหรือมากกว่าด้วยตัวอักษรอื่น
+       (หรือไม่มีตัวอักษรเลย) <code>Replace()</code> ต่างจากเมธออื่นๆ ที่ใช้มาก่อนหน้านี้ตรงที่มัน
+       <b>แทนที่ทุกครั้ง</b>ที่เจอตัวอักษรที่กำหนด ไม่ใช่แค่ครั้งแรกหรือครั้งสุดท้ายเท่านั้น</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string message = "This--is--ex-amp-le--da-ta";
+message = message.Replace("--", " ");
+message = message.Replace("-", "");
+Console.WriteLine(message);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+This is example data</pre></div>
+
+    <p>ที่นี่คุณใช้ <code>Replace()</code> สองครั้ง ครั้งแรกแทนที่ string <code>--</code> ด้วยช่องว่าง
+       ครั้งที่สองแทนที่ string <code>-</code> ด้วย empty string ซึ่งเท่ากับลบตัวอักษรนั้นออกจาก
+       string ไปเลย</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 ลำดับการเรียก Replace() สำคัญ</span>
+      สังเกตว่าโค้ดข้างบนเรียก <code>Replace("--", " ")</code> <b>ก่อน</b> <code>Replace("-", "")</code>
+      เสมอ — ถ้าสลับลำดับ (ลบ <code>-</code> เดี่ยวก่อน) เครื่องหมาย <code>--</code> คู่จะถูกลบไป
+      ด้วย ทำให้คำต่างๆ ติดกันหมด ไม่มีช่องว่างคั่นเลย ลำดับการเรียกเมธอดที่ทำงานทับซ้อนกันแบบนี้
+      ส่งผลต่อผลลัพธ์เสมอ ต้องคิดให้รอบคอบ
+    </div>
+
+    <div class="quiz" data-q="25-3">
+      <p class="q"><span class="num">Check ★</span> โค้ด <code>message = message.Replace("B", "D");</code>
+        เมื่อ <code>string message = "Big Dog";</code> ค่าใหม่ของ <code>message</code> คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>"Big Dog"</span></li>
+        <li class="opt"><span class="k">B</span><span>"Big Bog"</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>"Dig Dog"</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> "Big Dog" มีตัวอักษร "B" ตัวพิมพ์ใหญ่แค่ตัวเดียว (ใน
+        "Big") — Replace() แทนที่ทุกครั้งที่เจอ "B" (ตัวพิมพ์ใหญ่ ตรงตัว case-sensitive) ด้วย "D"
+        ได้ "Dig Dog" — ตัว "D" ใน "Dog" ไม่ถูกแตะเลย เพราะค้นหา "B" ไม่ใช่ "D"</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch25-g"><span>ใช้ Remove() ลบตัวอักษรตามตำแหน่งที่แน่นอนสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch25-h"><span>ใช้ Replace() แทนที่ทุกการปรากฏสำเร็จ เข้าใจว่าลำดับการเรียกมีผล</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">25.5 ท้าทาย: แยกวิเคราะห์ HTML Fragment</h2>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ความรู้พื้นฐาน HTML ที่ต้องใช้</span>
+      HTML คือภาษามาร์กอัปที่ใช้สร้างหน้าเว็บทั้งหมด ใน HTML คุณกำหนดโครงสร้างของเอกสารด้วย
+      <b>tag</b> — tag ประกอบด้วยวงเล็บเหลี่ยมเปิด <code>&lt;</code> คำที่บอกประเภทของ tag แล้วปิด
+      ด้วยวงเล็บเหลี่ยม <code>&gt;</code> เช่น <code>&lt;div&gt;</code>, <code>&lt;span&gt;</code>,
+      <code>&lt;h2&gt;</code> แต่ละ tag มี tag ปิดคู่กันเสมอ ซึ่งมีเครื่องหมาย <code>/</code> นำหน้า
+      เช่น <code>&lt;div&gt;</code> ต้องมี <code>&lt;/div&gt;</code> คู่กัน เนื้อหาระหว่าง tag
+      เปิดกับปิดคือเนื้อหาของ tag นั้น ซึ่งอาจมี text และ tag อื่นซ้อนอยู่ข้างในได้ ทำให้เอกสาร HTML
+      มีโครงสร้างแบบลำดับชั้น
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl h">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>ใช้ข้อมูลตั้งต้นนี้:</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">ข้อมูลตั้งต้น (ห้ามลบ)</span></div>
+          <pre><code class="lang-cs">const string input = "<div><h2>Widgets &trade;</h2><span>5000</span></div>";
+
+string quantity = "";
+string output = "";
+
+// Your work here
+
+Console.WriteLine(quantity);
+Console.WriteLine(output);</code></pre>
+        </div>
+        <p>ทำตามขั้นตอนนี้:</p>
+        <ol>
+          <li>กำหนดตัวแปร <code>quantity</code> ด้วยค่าที่ดึงจากข้อความระหว่างแท็ก
+              <code>&lt;span&gt;</code> และ <code>&lt;/span&gt;</code></li>
+          <li>กำหนดตัวแปร <code>output</code> ด้วยค่าของ <code>input</code> แล้วลบแท็ก
+              <code>&lt;div&gt;</code> และ <code>&lt;/div&gt;</code> ออก</li>
+          <li>แทนที่ HTML character <code>™</code> (<code>&amp;trade;</code>) ด้วย <code>®</code>
+              (<code>&amp;reg;</code>) ในตัวแปร <code>output</code></li>
+        </ol>
+        <p>ผลลัพธ์ที่ต้องได้:</p>
+        <div class="out auto"><pre>
+Quantity: 5000
+Output: <h2>Widgets &reg;</h2><span>5000</span></pre></div>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>ใช้ <code>const</code> ประกาศ tag ที่ต้องใช้ซ้ำ (เช่น <code>openSpan</code>,
+             <code>closeSpan</code>, <code>openDiv</code>, <code>closeDiv</code>) ตามหลักการ
+             หลีกเลี่ยง magic value จากหัวข้อ 25.2e — ทำทีละขั้นตอนตามลำดับที่โจทย์ระบุ (quantity
+             ก่อน แล้วค่อย output)</p>
+        </div>
+      </details>
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย (เฉลยทางการจาก Microsoft Learn)</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">const string input = "<div><h2>Widgets &trade;</h2><span>5000</span></div>";
+
+string quantity = "";
+string output = "";
+
+// Extract the "quantity"
+const string openSpan = "<span>";
+const string closeSpan = "</span>";
+
+int quantityStart = input.IndexOf(openSpan) + openSpan.Length;
+int quantityEnd = input.IndexOf(closeSpan);
+int quantityLength = quantityEnd - quantityStart;
+quantity = input.Substring(quantityStart, quantityLength);
+quantity = $"Quantity: {quantity}";
+
+// Set output to input, replacing the trademark symbol with the registered trademark symbol
+const string tradeSymbol = "&trade;";
+const string regSymbol = "&reg;";
+output = input.Replace(tradeSymbol, regSymbol);
+
+// Remove the opening <div> tag
+const string openDiv = "<div>";
+int divStart = output.IndexOf(openDiv);
+output = output.Remove(divStart, openDiv.Length);
+
+// Remove the closing </div> tag and add "Output:" to the beginning
+const string closeDiv = "</div>";
+int divCloseStart = output.IndexOf(closeDiv);
+output = "Output: " + output.Remove(divCloseStart, closeDiv.Length);
+
+Console.WriteLine(quantity);
+Console.WriteLine(output);</code></pre>
+        </div>
+        <div class="out"><div class="out-bar">Output</div><pre>
+Quantity: 5000
+Output: <h2>Widgets &reg;</h2><span>5000</span></pre></div>
+        <p>นี่เป็น<i>เพียงหนึ่งในหลายวิธี</i>ที่แก้โจทย์นี้ได้ สังเกตลำดับการทำงานของเฉลย:</p>
+        <ul>
+          <li><b>ดึง quantity ก่อน</b> — ใช้ <code>input.IndexOf(openSpan) + openSpan.Length</code>
+              คำนวณตำแหน่งเริ่มต้นในขั้นตอนเดียว (รวมการข้าม tag เปิดไว้ในสูตรเดียวเลย แทนที่จะ
+              แยกเป็น 2 บรรทัดแบบหัวข้อ 25.2d)</li>
+          <li><b>Replace ก่อน Remove เสมอ</b> — สังเกตว่าเฉลยเรียก
+              <code>input.Replace(tradeSymbol, regSymbol)</code> <b>ก่อน</b>จะลบ tag
+              <code>&lt;div&gt;</code>/<code>&lt;/div&gt;</code> ออก เพราะ <code>output</code>
+              ต้องมีค่าเริ่มต้นจาก <code>input</code> ก่อนถึงจะเอาไปแก้ไขต่อได้</li>
+          <li><b>ลบ div เปิดก่อน div ปิด</b> — เพราะการลบ <code>&lt;div&gt;</code> เปิดออกทำให้
+              ตำแหน่งของ <code>&lt;/div&gt;</code> ปิดเปลี่ยนไป (สั้นลง) โค้ดจึงต้องหาตำแหน่ง
+              <code>closeDiv</code> ใหม่<b>หลัง</b>ลบ <code>openDiv</code> ไปแล้ว ไม่ใช่คำนวณ
+              ตำแหน่งทั้งสองไว้ล่วงหน้าพร้อมกัน</li>
+        </ul>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch25-i"><span>แก้โจทย์ท้าทายสำเร็จ ได้ผลลัพธ์ตรงตามที่กำหนดทุกตัวอักษร</span></label></li>
+      <li><label><input type="checkbox" id="ch25-j"><span>เข้าใจว่าทำไมต้องลบ div เปิดก่อน แล้วค่อยหาตำแหน่ง div ปิดใหม่</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">25.6 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>ArgumentOutOfRangeException ตอนเรียก Substring()/Remove()</td>
+          <td>เกิดเมื่อ IndexOf() คืน -1 (หาไม่เจอ) แล้วโค้ดเอาค่า -1 นั้นไปใช้เป็น startIndex ตรงๆ
+              โดยไม่เช็คก่อน — ต้องเช็ค <code>if (index == -1)</code> ก่อนใช้ค่าที่ได้จาก IndexOf()
+              เสมอ (ทบทวนแพทเทิร์นจากหัวข้อ 25.3b)</td>
+        </tr>
+        <tr>
+          <td>ลืมบวก .Length ของ tag เปิด ทำให้ผลลัพธ์ที่ดึงมามี tag ติดมาด้วย</td>
+          <td>Substring() เริ่มดึงจากตำแหน่งที่ IndexOf() คืนมาตรงๆ ซึ่งเป็นตำแหน่ง<b>เริ่มต้น</b>
+              ของ tag เปิด ไม่ใช่ตำแหน่งหลังจบ tag เปิด — ต้องบวกความยาวของ tag เปิดเองเสมอ</td>
+        </tr>
+        <tr>
+          <td>ลบ tag เปิดแล้ว ตำแหน่งของ tag ปิดที่คำนวณไว้ก่อนหน้าใช้ไม่ได้อีกต่อไป</td>
+          <td>ไม่ใช่บั๊ก — string เป็น immutable (เปลี่ยนแปลงไม่ได้) ทุกเมธอดอย่าง Remove()/Replace()
+              คืน string <b>ใหม่</b>เสมอ ความยาวเปลี่ยนไปตำแหน่งก็เลื่อนตาม ต้องหาตำแหน่งใหม่หลัง
+              แก้ไข string แล้วเสมอ ไม่ใช่คำนวณตำแหน่งทั้งหมดไว้ล่วงหน้าครั้งเดียว</td>
+        </tr>
+        <tr>
+          <td>Replace() ลบเครื่องหมายคู่ (--) หายไปหมด ทั้งที่ต้องการแค่ลบเครื่องหมายเดี่ยว (-)</td>
+          <td>เรียก Replace("-", "") ก่อน Replace("--", " ") สลับลำดับผิด — ต้องจัดการ pattern ที่
+              ยาวกว่า/เจาะจงกว่าก่อนเสมอ แล้วค่อยจัดการ pattern ที่สั้นกว่า/ทั่วไปกว่าทีหลัง</td>
+        </tr>
+        <tr>
+          <td>ใช้ magic string/number ซ้ำหลายจุด แล้วพิมพ์ผิดจุดเดียวทำให้โค้ดพังแบบหาสาเหตุยาก</td>
+          <td>เปลี่ยนไปใช้ <code>const</code> ประกาศค่าไว้ที่เดียว แล้วอ้างอิงชื่อ constant แทนพิมพ์
+              ค่าซ้ำ (ทบทวนหัวข้อ 25.2e)</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">25.7 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment ของ Microsoft Learn</p>
+
+    <div class="quiz" data-q="25-4">
+      <p class="q"><span class="num">1.</span> เมธอดไหนใช้หา index ถัดไปของอักขระ <code>-</code>
+        หรือ <code>=</code> หรือ <code>_</code> (ตัวใดตัวหนึ่ง)?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>IndexOfAny()</span></li>
+        <li class="opt"><span class="k">B</span><span>Remove()</span></li>
+        <li class="opt"><span class="k">C</span><span>IndexOf()</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> IndexOfAny() รับ char array ของหลายตัวอักษร แล้วหา
+        ตำแหน่งของตัวแรกที่เจอในนั้น — ตรงกับ "อักขระตัวใดตัวหนึ่งในสามตัว" เป๊ะ ส่วน IndexOf()
+        เดี่ยวๆ หาได้แค่ตัวอักษรเดียวต่อครั้ง (ต้องเรียก 3 ครั้งแยกกันถ้าใช้ IndexOf())</div>
+    </div>
+
+    <div class="quiz" data-q="25-5">
+      <p class="q"><span class="num">2.</span> constant variable คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>magic string หรือ magic number</span></li>
+        <li class="opt"><span class="k">B</span><span>ตัวแปรที่ชื่อต้องตรงกับค่าของมัน</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>ค่าที่เมื่อกำหนดค่าเริ่มต้นแล้ว จะไม่มีวันเปลี่ยนแปลงได้อีก</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ตรงข้ามกับ magic value เลย — const คือวิธี<b>แก้</b>ปัญหา
+        magic value ไม่ใช่ตัวอย่างของมัน (ข้อ A ผิด) และไม่มีกฎว่าชื่อตัวแปรต้องตรงกับค่า (ข้อ B
+        ไม่สมเหตุสมผล)</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">25.8 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>หาตำแหน่งของ <code>@</code> ใน <code>"user@example.com"</code> แล้วใช้ Substring() ดึง
+           เฉพาะส่วน username (ก่อน @) กับ domain (หลัง @) ออกมาแยกกัน</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string email = "user@example.com";
+int atPosition = email.IndexOf('@');
+
+string username = email.Substring(0, atPosition);
+string domain = email.Substring(atPosition + 1);
+
+Console.WriteLine($"Username: {username}");
+Console.WriteLine($"Domain: {domain}");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ใช้ <code>Replace()</code> แทนที่ทุกคำว่า "cat" ด้วย "dog" ใน
+           <code>"The cat sat with the cat"</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string text = "The cat sat with the cat";
+text = text.Replace("cat", "dog");
+Console.WriteLine(text);</code></pre></div>
+          <p>ผลลัพธ์: "The dog sat with the dog"</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้ throw ArgumentOutOfRangeException ตอนหาคำว่า "xyz" ที่ไม่มีอยู่จริง หาสาเหตุและแก้:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">string text = "Hello world";
+int pos = text.IndexOf("xyz");
+Console.WriteLine(text.Substring(pos));</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p><code>IndexOf("xyz")</code> คืน <code>-1</code> เพราะหาไม่เจอ แล้วโค้ดเอา
+             <code>-1</code> ไปใช้เป็น startIndex ของ <code>Substring()</code> ตรงๆ ซึ่งเป็นค่าที่
+             ไม่ถูกต้อง (index ติดลบไม่มีในความเป็นจริง) ทำให้เกิด exception ต้องเช็คก่อนเสมอ:</p>
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (แก้แล้ว)</span></div>
+          <pre><code class="lang-cs">string text = "Hello world";
+int pos = text.IndexOf("xyz");
+if (pos != -1)
+{
+    Console.WriteLine(text.Substring(pos));
+}
+else
+{
+    Console.WriteLine("ไม่พบคำที่ค้นหา");
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดวนดึงข้อความในทุกคู่ <code>[...]</code> (วงเล็บเหลี่ยม) จาก string
+           <code>"Buy [milk], [bread], and [eggs] today"</code> ใช้แพทเทิร์น while + IndexOf จาก
+           หัวข้อ 25.3b (เปลี่ยนจาก () เป็น [])</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string message = "Buy [milk], [bread], and [eggs] today";
+while (true)
+{
+    int openingPosition = message.IndexOf('[');
+    if (openingPosition == -1) break;
+
+    openingPosition += 1;
+    int closingPosition = message.IndexOf(']');
+    int length = closingPosition - openingPosition;
+    Console.WriteLine(message.Substring(openingPosition, length));
+
+    message = message.Substring(closingPosition + 1);
+}</code></pre></div>
+          <p>ผลลัพธ์: milk, bread, eggs (แต่ละคำคนละบรรทัด)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดแปลง fixed-width string <code>"A001Widget           12000"</code> (4 ตัวแรก =
+           ID, 20 ตัวถัดไป = ชื่อสินค้า, ที่เหลือ = ราคาเป็นสตางค์) ให้เป็นข้อความอ่านง่ายรูปแบบ
+           <code>"A001: Widget = $120.00"</code> ใช้ Substring() ดึงแต่ละฟิลด์ แล้วใช้
+           <code>Trim()</code> (ทบทวนจาก <a href="ch18.html">บทที่ 18</a>) ตัดช่องว่างส่วนเกินออก</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string data = "A001Widget           12000";
+
+string id = data.Substring(0, 4);
+string name = data.Substring(4, 20).Trim();
+string priceCents = data.Substring(24);
+
+decimal price = decimal.Parse(priceCents) / 100;
+
+Console.WriteLine($"{id}: {name} = {price:C}");</code></pre></div>
+          <p>ใช้ <code>int.Parse</code>/<code>decimal.Parse</code> (ทบทวนจาก <a href="ch22.html">
+             บทที่ 22</a>) แปลง string ราคาเป็นตัวเลข หารด้วย 100 แปลงจากสตางค์เป็นบาท แล้วจัด
+             รูปแบบด้วย <code>:C</code> (ทบทวนจาก <a href="ch24.html">บทที่ 24</a>)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงเฉลยของท้าทาย HTML (หัวข้อ 25.5) ให้รองรับ input ที่ซ้อน <code>&lt;div&gt;</code>
+           2 ชั้น เช่น <code>"&lt;div&gt;&lt;div&gt;&lt;span&gt;42&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;"</code>
+           — ต้องดึง quantity (<code>42</code>) ออกมาได้ถูกต้องเหมือนเดิม โดยไม่ต้องแก้โค้ดส่วนดึง
+           quantity เลย (คำใบ้: โค้ดเดิมยังทำงานถูกไหม ลองรันดูก่อนแก้อะไร)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>โค้ดส่วนดึง <code>quantity</code> จากเฉลยเดิม<b>ทำงานถูกต้องอยู่แล้วโดยไม่ต้องแก้เลย</b>
+             เพราะมันใช้ <code>IndexOf(openSpan)</code> หาตำแหน่งของ <code>&lt;span&gt;</code>
+             โดยตรง ไม่สนใจว่า <code>&lt;div&gt;</code> จะซ้อนกี่ชั้นก่อนหน้า — นี่คือข้อดีของการ
+             ค้นหาด้วย <code>IndexOf()</code> แทนการนับตำแหน่งคงที่ (fixed position) เหมือนที่ใช้
+             ใน <code>Remove()</code> ตอนหัวข้อ 25.4a ที่ต้องรู้ตำแหน่งตายตัวล่วงหน้า วิธีค้นหา
+             ด้วย tag name จึงยืดหยุ่นกว่ามากเมื่อโครงสร้างข้อมูลเปลี่ยนไป</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">📌 สรุปบทที่ 25</h2>
+
+    <p>เป้าหมายของคุณคือดึง ลบ และแทนที่ค่าใน string บ่อยครั้งที่ข้อมูลซึ่งคุณได้รับมามีข้อมูลหรือ
+       ตัวอักษรเกินความจำเป็นที่ต้องหลีกเลี่ยงหรือกำจัดออกก่อนถึงจะใช้ข้อมูลเป้าหมายได้</p>
+
+    <p>การใช้เมธอด <code>IndexOf()</code> ทำให้คุณระบุตำแหน่งของตัวอักษรหรือ string ภายใน string
+       อีกอันได้ ตำแหน่งที่คืนกลับมาจาก <code>IndexOf()</code> เป็นส่วนประกอบแรกที่ใช้กับเมธอด
+       <code>Substring()</code> เพื่อดึงส่วนของ string ออกมา โดยกำหนดตำแหน่งเริ่มต้นและจำนวน
+       ตัวอักษรที่จะดึง (ความยาว) มันยังทำให้คุณใช้เมธอด <code>Remove()</code> ลบตัวอักษรออกจาก
+       string โดยกำหนดตำแหน่งเริ่มต้นและความยาวได้ด้วย คุณเรียนรู้ตัวแปรอย่าง
+       <code>LastIndexOf()</code> ที่หาตำแหน่งสุดท้ายของตัวอักษรหรือ string ภายใน string อื่น และ
+       <code>IndexOfAny()</code> ที่หาตำแหน่งของค่าใดๆ ใน <code>char</code> array ที่กำหนด คุณใช้
+       <code>while</code> statement วนผ่าน string ที่ยาวขึ้น เพื่อหาและดึงทุกการปรากฏของตัวอักษรหรือ
+       string ภายใน source string ที่ใหญ่กว่า สุดท้าย คุณใช้เมธอด <code>Replace()</code> สลับทุก
+       การปรากฏของตัวอักษรหรือ string ภายใน string ที่ใหญ่กว่า</p>
+
+    <p>แม้จะเป็นไปได้ที่จะทำการดำเนินการแบบนี้ด้วย <code>char</code> array วนผ่านแต่ละ
+       <code>char</code> เพื่อหาที่ตรงกัน คอยติดตามจุดเริ่มต้นและจุดสิ้นสุดที่ต้องการหา ฯลฯ แต่จะ
+       ต้องใช้ขั้นตอนมากกว่ามากในการทำสิ่งที่ string helper method เหล่านี้ทำได้ในการเรียกครั้งเดียว</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 25</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">เมธอด</th><th>ใช้ทำอะไร</th></tr></thead>
+        <tbody>
+          <tr><td><code>str.IndexOf(x)</code></td><td>ตำแหน่งการปรากฏ<b>ครั้งแรก</b>ของ x (คืน -1 ถ้าไม่เจอ)</td></tr>
+          <tr><td><code>str.LastIndexOf(x)</code></td><td>ตำแหน่งการปรากฏ<b>ครั้งสุดท้าย</b>ของ x</td></tr>
+          <tr><td><code>str.IndexOfAny(charArr)</code></td><td>ตำแหน่งแรกของตัวอักษรใดๆ ใน charArr</td></tr>
+          <tr><td><code>str.Substring(start, len)</code></td><td>ดึงส่วนของ string (len ไม่ระบุ = ดึงถึงท้าย)</td></tr>
+          <tr><td><code>str.Remove(start, len)</code></td><td>ลบส่วนของ string ทิ้ง</td></tr>
+          <tr><td><code>str.Replace(old, new)</code></td><td>แทนที่<b>ทุกครั้ง</b>ที่พบ old ด้วย new</td></tr>
+          <tr><td><code>const string x = "...";</code></td><td>ป้องกัน magic value — ค่าเปลี่ยนไม่ได้หลังกำหนด</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s10">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>magic value</td><td>ค่าลึกลับ</td><td>string/number ที่ hardcode ซ้ำหลายจุด เสี่ยงพิมพ์ผิด</td></tr>
+        <tr><td>constant</td><td>ค่าคงที่</td><td>ตัวแปรที่ค่าเปลี่ยนไม่ได้หลังกำหนดค่าเริ่มต้น (const)</td></tr>
+        <tr><td>fragile code</td><td>โค้ดเปราะบาง</td><td>โค้ดที่ทำงานได้เฉพาะกรณีข้อมูลสมบูรณ์แบบ พังง่ายถ้าข้อมูลผิดปกติ</td></tr>
+        <tr><td>immutable</td><td>เปลี่ยนแปลงไม่ได้</td><td>คุณสมบัติของ string — ทุกเมธอดคืน string ใหม่เสมอ ไม่แก้ของเดิม</td></tr>
+        <tr><td>markup language</td><td>ภาษามาร์กอัป</td><td>ภาษาที่ใช้ tag กำหนดโครงสร้างเอกสาร เช่น HTML</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch24.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 24 · Format Strings สำหรับการแสดงผล</span></a>
+      <a class="next" href="ch26.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 26 · Guided Project — Work with Variable Data</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

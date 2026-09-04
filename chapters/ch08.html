@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 8 · Call Methods From the .NET Class Library — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="8">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 2 · Create and Run Simple Console Apps / บทที่ 8</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 2 · โมดูล 2/8</span>
+      <h1>เรียกใช้เมธอดจาก .NET Class Library</h1>
+      <div class="en">Call Methods From the .NET Class Library Using C#</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>50–70 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เรียกใช้เมธอดสำเร็จรูปของ .NET ได้ และหาข้อมูลเมธอดเองเป็น</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น–กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>เขียนโค้ดเรียกใช้เมธอดแบบ stateless (ไม่มีสถานะ) ใน .NET Class Library ได้</li>
+        <li>สร้าง instance ของคลาสใน .NET Class Library เพื่อเรียกเมธอดแบบมีสถานะได้</li>
+        <li>ใช้ IntelliSense หาข้อมูลเมธอด รวมถึง overload ต่างๆ ชนิดค่าที่คืน และชนิดพารามิเตอร์</li>
+        <li>ใช้เอกสาร Microsoft Learn ค้นคว้าว่าเมธอดหนึ่งๆ ทำอะไร รับพารามิเตอร์อะไรบ้าง</li>
+      </ul>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ บทนี้ต้องใช้ VS Code</span>
+      บทนี้มีกิจกรรมที่ต้องใช้ IntelliSense ของ Visual Studio Code โดยเฉพาะ — ถ้ายังไม่ได้ติดตั้ง
+      ให้กลับไปทำ <a href="ch07.html">บทที่ 7</a> ก่อน
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">8.1 ทำไมต้องรู้จัก .NET Class Library</h2>
+
+    <p>ภาษา C# มาพร้อมกับคลังฟังก์ชันสำเร็จรูปขนาดใหญ่ ที่ช่วยให้คุณสร้างแอป เข้าถึงข้อมูลจากไฟล์
+       หรืออินเทอร์เน็ต ทำการคำนวณทางคณิตศาสตร์ขั้นสูง และอีกมากมาย การรู้จักนำทางคลังฟังก์ชันนี้
+       เป็นทักษะสำคัญที่ช่วยให้คุณสร้างแอปที่มีฟีเจอร์เยอะได้เร็วขึ้นมาก</p>
+
+    <p>สมมติคุณต้องสร้างรายงานประจำวันจากไฟล์ข้อมูลนับพันไฟล์ เพื่อประหยัดเวลา โค้ดของคุณสุ่ม
+       เลือกไฟล์บางส่วนมาคำนวณผลประมาณแทนที่จะวิเคราะห์ทุกไฟล์ จะสุ่มตัวเลขได้ยังไง? C#
+       รองรับไหม? ถ้ารองรับ จะกำหนดช่วงค่า สุ่ม แล้วดึงผลลัพธ์ออกมาได้ยังไง?</p>
+
+    <p>ในบทนี้คุณจะเรียนเรื่องคลาสไลบรารี เขียนโค้ดเรียกเมธอดใน .NET Class Library เรียนรู้ว่า
+       เมธอดมีคุณสมบัติยังไง และทำไมเมธอดใน .NET Class Library ถึงถูกออกแบบต่างกันไปในแต่ละส่วน
+       ที่สำคัญที่สุด คุณจะเขียนโค้ดใช้เมธอดของไลบรารีเพื่อทำงานเฉพาะให้สำเร็จ และใช้เครื่องมือ
+       ในตัวกับเอกสารออนไลน์ช่วยหาข้อมูลเมธอดที่ต้องการ</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">8.2 รู้จัก .NET Class Library</h2>
+
+    <p>การสร้างแอป C# ไม่ใช่แค่เรียงบรรทัดโค้ดต่อกัน คุณต้องพึ่ง <b>.NET Runtime</b> ที่โฮสต์และ
+       จัดการโค้ดของคุณตอนรันบนเครื่องผู้ใช้ และพึ่ง <b>.NET Class Library</b> คลังทรัพยากรโค้ด
+       สำเร็จรูปที่ใช้ในแอปของคุณได้เลย</p>
+
+    <h3 id="s02a">.NET Class Library คืออะไร</h3>
+    <p>เวลาต้องการหาหนังสือ ห้องสมุดสาธารณะคือที่ที่ดีในการมองหา เพราะมีหนังสือเป็นพันเป็นหมื่น
+       เล่ม จัดหมวดหมู่ไว้ช่วยให้หาเจอง่าย เวลาต้องทำงานเขียนโปรแกรมบางอย่าง .NET Class Library
+       ก็เป็นที่ที่ดีในการมองหาเช่นกัน เพราะเป็นคลังทรัพยากรโปรแกรมมิ่งที่จัดระเบียบไว้อย่างดี</p>
+
+    <p>.NET Class Library คือกลุ่มคลาสนับพันคลาส ที่รวมเมธอดนับหมื่นเมธอดไว้ข้างใน เช่น
+       คลาส <code>Console</code> สำหรับนักพัฒนาที่ทำแอป console มีเมธอดสำหรับรับ-ส่งข้อมูลอย่าง
+       <code>Write()</code>, <code>WriteLine()</code>, <code>Read()</code>, <code>ReadLine()</code>
+       และอื่นๆ — คุณคุ้นเคยกับโค้ดแบบนี้อยู่แล้ว: <code>Console.WriteLine("Hello, World!")</code></p>
+
+    <p>คิดว่าคลาสคือ "ภาชนะ" เก็บเมธอด เหมือนหมวดหมู่ในห้องสมุด นักพัฒนามักเก็บเมธอดที่เกี่ยวข้อง
+       กันไว้ในคลาสเดียวกัน อย่างที่เห็น เมธอดที่รับ-ส่งข้อมูลกับหน้าต่างคอนโซล ถูกรวมอยู่ในคลาส
+       <code>System.Console</code></p>
+
+    <p>บางคลาสช่วยให้สร้างแอปเฉพาะแบบได้ เช่น เว็บแอปแบบไดนามิก แอปเดสก์ท็อป หรือเชื่อมต่อฐานข้อมูล
+       บางคลาสก็เป็นเครื่องมือทั่วไปที่ใช้ได้กับทุกแพลตฟอร์ม เช่น อ่าน/เขียนไฟล์ หรือคำนวณตรีโกณมิติ/
+       แคลคูลัส — ไม่ว่าจะสร้างแอปสำหรับเว็บ เดสก์ท็อป มือถือ หรือคลาวด์ ก็มีคลาสรองรับ</p>
+
+    <h3 id="s02b">แม้แต่ชนิดข้อมูลก็เป็นส่วนหนึ่งของ .NET Class Library</h3>
+    <p>ชนิดข้อมูล C# อย่าง <code>string</code> และ <code>int</code> จริงๆ แล้วก็มาจากคลาสใน
+       .NET Class Library เช่นกัน — ภาษา C# แค่ซ่อนความเชื่อมโยงนี้ไว้เพื่อให้ใช้งานง่ายขึ้น
+       เบื้องหลังชนิดข้อมูลถูกสร้างเหมือนคลาสอื่นๆ ทุกประการ ทำให้ตัวแปรธรรมดาของคุณมีเมธอด
+       สำเร็จรูปในตัวด้วย เช่น คลาส <code>string</code> มีเมธอดแปลงเป็นตัวพิมพ์ใหญ่/เล็ก
+       (<code>ToUpper</code>, <code>ToLower</code>)</p>
+
+    <h3 id="s02c">หาสิ่งที่ต้องการใน .NET Class Library ยังไง</h3>
+    <p>คลาสและเมธอดมีเยอะมาก จะหาสิ่งที่ต้องการเจอได้ยังไง?</p>
+    <ol>
+      <li><b>ไม่จำเป็นต้องรู้ทุกอย่าง</b> — เหมือนไม่มีใครอ่านหนังสือครบทุกเล่มในห้องสมุด
+          คุณจะคุ้นเคยกับบางส่วนมากกว่าส่วนอื่นตามประเภทโปรเจกต์ที่ทำ แม้แต่คนที่ทำงานที่
+          Microsoft ก็ไม่มีใครรู้ทุกอย่างใน .NET Class Library</li>
+      <li><b>ความจำเป็นจะพาไปเจอเอง</b> — คนไปห้องสมุดตอนต้องการหาหนังสือ ไม่ใช่ไปดูว่าหาเจอกี่เล่ม
+          ใช้เสิร์ชเอนจินหาบทความ บล็อก หรือฟอรัมที่นักพัฒนาคนอื่นเคยเจอปัญหาคล้ายกันได้</li>
+      <li><b>เอกสารอ้างอิงของ Microsoft</b> — มีคู่มืออ้างอิงภาษาและการเขียนโปรแกรม C# ให้ค้นหาได้
+          ทีมเอกสารทำงานใกล้ชิดกับทีมพัฒนา .NET Class Library เพื่อความแม่นยำ นี่คือ
+          "แหล่งความจริง (source of truth)"</li>
+      <li><b>ทดลองทำโปรเจกต์เล็กๆ</b> — ยิ่งลองมาก ยิ่งเข้าใจลึกว่าคลาส/เมธอดทำงานยังไง</li>
+    </ol>
+
+    <p>นักพัฒนาทุกคนใช้กระบวนการคล้ายกันนี้เวลาเข้าสู่พื้นที่ที่ไม่คุ้นเคย — เป็นกระบวนการค้นพบ
+       ที่สนุก แม้จะท้าทายก็ตาม</p>
+
+    <div class="quiz" data-q="8-1">
+      <p class="q"><span class="num">Check ★</span> หาข้อมูลเกี่ยวกับคลาส/เมธอด .NET ที่กำลังใช้ได้จากที่ไหน?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>.NET Class Library เอกสารอย่างเดียว</span></li>
+        <li class="opt"><span class="k">B</span><span>เว็บไซต์ของนักพัฒนาอย่างเดียว</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>เอกสาร .NET Class Library, การค้นหาผ่าน Google, และเว็บไซต์นักพัฒนา</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ควรใช้ทั้ง 3 แหล่งประกอบกัน — เอกสารทางการเป็น
+        source of truth ส่วนบล็อก/ฟอรัมช่วยให้เห็นตัวอย่างการใช้งานจริงจากปัญหาที่คนอื่นเคยเจอ</div>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s03">8.3 ลงมือ: เรียกใช้เมธอดของคลาสใน .NET</h2>
+
+    <p>ตั้งแต่แอป "Hello, World!" แอปแรก คุณก็เรียกเมธอด C# มาตลอดโดยไม่รู้ตัว — แอปนั้นใช้
+       เมธอด <code>WriteLine()</code> ของคลาส <code>Console</code> แต่ไม่ใช่ทุกคลาส/เมธอดจะถูก
+       implement แบบเดียวกัน หัวข้อนี้จะพาดูรูปแบบที่พบบ่อยที่สุด</p>
+
+    <h3 id="s03a">วิธีเรียกเมธอดใน .NET Class Library</h3>
+    <p>จากประสบการณ์กับ <code>Console.WriteLine()</code> คุณรู้พื้นฐานอยู่แล้ว:</p>
+    <ul>
+      <li>พิมพ์ชื่อคลาส — ในที่นี้คือ <code>Console</code></li>
+      <li>ใส่ตัวเชื่อมเข้าถึงสมาชิก — เครื่องหมาย <code>.</code></li>
+      <li>ใส่ชื่อเมธอด — ในที่นี้คือ <code>WriteLine</code></li>
+      <li>ใส่ตัวเรียกใช้เมธอด — วงเล็บ <code>()</code></li>
+      <li>ระบุอาร์กิวเมนต์ (ถ้ามี) ในวงเล็บ</li>
+    </ul>
+
+    <h3 id="s03b">เตรียมโปรเจกต์</h3>
+    <p>เปิด VS Code → <b>File → Open Folder</b> → เลือกโฟลเดอร์ <code>CsharpProjects</code>
+       (ที่สร้างไว้ตั้งแต่บทที่ 7) → เปิด Terminal → สร้างโปรเจกต์ใหม่สำหรับบทนี้:</p>
+
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch08-methods</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <p>เปิดโฟลเดอร์ <code>ch08-methods</code> เลือก <code>Program.cs</code> แล้วลบโค้ดเดิมทั้งหมด
+       ทำแบบนี้ทุกครั้งที่บทนี้บอกให้ "ลบโค้ดเดิม แล้วพิมพ์ใหม่" ตลอดทั้งบท</p>
+
+    <h3 id="s03c">เรียกใช้เมธอดหลายแบบ</h3>
+    <p>พิมพ์โค้ดจำลองการทอยลูกเต๋า:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Random dice = new Random();
+int roll = dice.Next(1, 7);
+Console.WriteLine(roll);</code></pre>
+    </div>
+    <div class="out auto"><div class="out-bar">Output (ค่าสุ่มระหว่าง 1-6 ทุกครั้งที่รัน)</div><pre>
+4</pre></div>
+
+    <p>Save แล้วคลิกขวาโฟลเดอร์ <code>ch08-methods</code> เลือก <b>Open in Integrated Terminal</b>
+       รัน <code>dotnet run</code> — จะเห็นเลข 1 ถึง 6 (แต้มลูกเต๋า) แบบสุ่มทุกครั้งที่รัน</p>
+
+    <p>สังเกตว่าโค้ดใช้เทคนิคเข้าถึงเมธอด <b>ต่างกัน</b> ระหว่าง <code>dice.Next(1, 7)</code>
+       กับ <code>Console.WriteLine(roll)</code> — เพราะเมธอดบางตัว "มีสถานะ (stateful)"
+       บางตัว "ไม่มีสถานะ (stateless)"</p>
+
+    <h3 id="s03d">Stateful กับ Stateless เมธอด</h3>
+    <p>ในงานพัฒนาซอฟต์แวร์ คำว่า <b>state (สถานะ)</b> หมายถึงสภาพของสภาพแวดล้อมการทำงาน ณ ขณะใด
+       ขณะหนึ่ง ขณะโค้ดรันไปทีละบรรทัด ค่าต่างๆ ถูกเก็บในตัวแปร สถานะปัจจุบันของแอปคือ
+       ค่าทั้งหมดที่ถูกเก็บไว้ในหน่วยความจำ ณ ตอนนั้น</p>
+
+    <svg viewBox="0 0 720 200" role="img" aria-label="เปรียบเทียบเมธอดแบบ stateless กับ stateful" style="margin:18px 0">
+      <g font-family="var(--font-th)" font-size="12.5">
+        <rect x="16"  y="14" width="330" height="168" rx="11" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="181" y="38" text-anchor="middle" font-weight="700" fill="var(--brand-text)">Stateless (Static)</text>
+        <text x="181" y="60" text-anchor="middle" font-family="var(--font-code)" font-size="12" fill="var(--text)">Console.WriteLine(roll);</text>
+        <text x="181" y="86" text-anchor="middle" fill="var(--text-soft)">เรียกจากชื่อคลาสตรงๆ ได้เลย</text>
+        <text x="181" y="106" text-anchor="middle" fill="var(--text-soft)">ไม่ต้องสร้าง instance ก่อน</text>
+        <text x="181" y="126" text-anchor="middle" fill="var(--text-soft)">ไม่พึ่งพา/ไม่แก้ไขสถานะ</text>
+        <text x="181" y="146" text-anchor="middle" fill="var(--text-soft)">ของแอปเลย</text>
+        <text x="181" y="168" text-anchor="middle" font-family="var(--font-code)" font-size="11" fill="var(--brand-text)">ClassName.Method()</text>
+
+        <rect x="374" y="14" width="330" height="168" rx="11" fill="var(--tip-soft)" stroke="var(--tip)"/>
+        <text x="539" y="38" text-anchor="middle" font-weight="700" fill="var(--tip)">Stateful (Instance)</text>
+        <text x="539" y="60" text-anchor="middle" font-family="var(--font-code)" font-size="12" fill="var(--text)">dice.Next(1, 7);</text>
+        <text x="539" y="86" text-anchor="middle" fill="var(--text-soft)">ต้องสร้าง instance (object)</text>
+        <text x="539" y="106" text-anchor="middle" fill="var(--text-soft)">ด้วย new ก่อนเสมอ</text>
+        <text x="539" y="126" text-anchor="middle" fill="var(--text-soft)">พึ่งพา/เก็บสถานะไว้ใน object</text>
+        <text x="539" y="146" text-anchor="middle" fill="var(--text-soft)">(seed ของตัวสุ่ม)</text>
+        <text x="539" y="168" text-anchor="middle" font-family="var(--font-code)" font-size="11" fill="var(--tip)">objectName.Method()</text>
+      </g>
+    </svg>
+
+    <p>เมธอดบางตัวไม่พึ่งสถานะของแอปเลยก็ทำงานได้ เรียกว่า <b>stateless method</b> (หรือ
+       <b>static method</b>) เช่น <code>Console.WriteLine()</code> ไม่พึ่งค่าใดๆ ในหน่วยความจำ
+       ทำงานเสร็จโดยไม่กระทบสถานะแอปเลย</p>
+
+    <p>เมธอดอื่นๆ ต้องเข้าถึงสถานะของแอปถึงจะทำงานถูกต้อง เรียกว่า <b>stateful method</b> (หรือ
+       <b>instance method</b>) — สร้างขึ้นให้พึ่งค่าที่บรรทัดก่อนหน้าเก็บไว้ในหน่วยความจำ หรือ
+       แก้ไขสถานะโดยอัปเดต/เก็บค่าใหม่ เมธอดแบบ stateful เก็บสถานะไว้ใน <i>field</i>
+       ซึ่งเป็นตัวแปรที่นิยามไว้บนคลาส แต่ละ instance ใหม่ของคลาสจะได้สำเนา field ของตัวเอง
+       ไว้เก็บสถานะ</p>
+
+    <p>คลาสเดียวรองรับได้ทั้งเมธอดแบบ stateful และ stateless แต่เวลาเรียกเมธอด stateful
+       ต้องสร้าง <i>instance</i> ของคลาสก่อนเสมอ ถึงจะให้เมธอดเข้าถึงสถานะได้</p>
+
+    <h3 id="s03e">สร้าง Instance ของคลาส</h3>
+    <p>instance ของคลาสเรียกว่า <b>object</b> การสร้าง instance ใหม่ ใช้ตัวดำเนินการ <code>new</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">Random dice = new Random();</code></pre>
+    </div>
+
+    <svg viewBox="0 0 720 150" role="img" aria-label="3 ขั้นตอนที่ new operator ทำ" style="margin:18px 0">
+      <defs>
+        <marker id="ar8" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="var(--text-faint)"/>
+        </marker>
+      </defs>
+      <g font-family="var(--font-th)" font-size="12">
+        <rect x="10"  y="30" width="212" height="90" rx="10" fill="var(--bg-soft)" stroke="var(--line)"/>
+        <text x="116" y="54" text-anchor="middle" font-weight="700" fill="var(--text)">1. จองที่</text>
+        <text x="116" y="76" text-anchor="middle" fill="var(--text-soft)">ขอที่อยู่ในหน่วยความจำ</text>
+        <text x="116" y="94" text-anchor="middle" fill="var(--text-soft)">ให้พอเก็บ object ใหม่</text>
+
+        <rect x="254" y="30" width="212" height="90" rx="10" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="360" y="54" text-anchor="middle" font-weight="700" fill="var(--brand-text)">2. สร้าง object</text>
+        <text x="360" y="76" text-anchor="middle" fill="var(--text-soft)">สร้าง object ใหม่</text>
+        <text x="360" y="94" text-anchor="middle" fill="var(--text-soft)">เก็บไว้ที่ตำแหน่งนั้น</text>
+
+        <rect x="498" y="30" width="212" height="90" rx="10" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text x="604" y="54" text-anchor="middle" font-weight="700" fill="var(--ok)">3. คืนที่อยู่</text>
+        <text x="604" y="76" text-anchor="middle" fill="var(--text-soft)">ส่งที่อยู่กลับมาเก็บไว้</text>
+        <text x="604" y="94" text-anchor="middle" fill="var(--text-soft)">ในตัวแปร dice</text>
+
+        <line x1="222" y1="75" x2="250" y2="75" stroke="var(--text-faint)" marker-end="url(#ar8)"/>
+        <line x1="466" y1="75" x2="494" y2="75" stroke="var(--text-faint)" marker-end="url(#ar8)"/>
+      </g>
+    </svg>
+
+    <p>จากนั้นทุกครั้งที่โค้ดอ้างอิงถึง object <code>dice</code> .NET Runtime จะค้นหาเบื้องหลังให้
+       เสมือนคุณทำงานกับ object นั้นตรงๆ โค้ดของคุณใช้ <code>dice</code> เหมือนตัวแปรที่เก็บสถานะ
+       ของคลาส <code>Random</code> พอเรียก <code>Next()</code> บน <code>dice</code> เมธอดจะใช้
+       สถานะที่เก็บไว้ในนั้นสร้างเลขสุ่ม</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ทางลัดสร้าง instance (.NET รุ่นใหม่)</span>
+      .NET รุ่นล่าสุดให้สร้าง instance โดยไม่ต้องพิมพ์ชื่อชนิดซ้ำได้ (target-typed constructor
+      invocation) เช่น <code>Random dice = new();</code> ก็สร้าง instance ของ <code>Random</code>
+      ได้เหมือนกัน — เพื่อให้อ่านง่ายขึ้น ต้องมีวงเล็บเสมอเวลาเขียนแบบนี้
+    </div>
+
+    <h3 id="s03f">ทำไม Next() ต้องมีสถานะ</h3>
+    <p>คอมพิวเตอร์เก่งเรื่องทำตามคำสั่งเป๊ะๆ เพื่อให้ได้ผลลัพธ์ที่คาดเดาได้และทำซ้ำได้เหมือนเดิม
+       เพื่อสร้างภาพลวงตาของความสุ่ม ผู้พัฒนาเมธอด <code>Next()</code> เลือกจับเวลาวันที่/เวลา
+       ละเอียดถึงเสี้ยวมิลลิวินาที มาใช้เป็น seed ป้อนอัลกอริทึมที่สร้างเลขต่างกันทุกครั้ง แม้จะ
+       ไม่สุ่มแท้ๆ 100% แต่ก็เพียงพอสำหรับแอปส่วนใหญ่ สถานะที่ถูกเก็บและคงอยู่ตลอดอายุของ object
+       <code>dice</code> คือค่า seed นี้เอง</p>
+
+    <p>ไม่จำเป็นต้องเข้าใจกลไกเบื้องหลังก็ใช้ <code>Random.Next()</code> ได้ สิ่งสำคัญคือรู้ว่า
+       เมธอดบางตัวต้องสร้าง instance ก่อนเรียก บางตัวไม่ต้อง</p>
+
+    <h3 id="s03g">รู้ได้ยังไงว่าเมธอดไหนต้องสร้าง instance ก่อน</h3>
+    <p>วิธีหนึ่งคือดูเอกสาร ซึ่งจะมีตัวอย่างโค้ดบอกว่าต้องเรียกจาก instance หรือเรียกจากคลาสตรงๆ
+       อีกวิธีคือลองเข้าถึงเมธอดจากชื่อคลาสตรงๆ ดูเลย — ถ้าใช้ได้ แปลว่า stateless ถ้าใช้ไม่ได้
+       แย่สุดก็แค่เจอ compile error</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — ลองผิดดูก่อน</span></div>
+      <pre><code class="lang-cs">int result = Random.Next();</code></pre>
+    </div>
+    <div class="out err auto"><div class="out-bar">Output</div><pre>
+(1,14): error CS0120: An object reference is required for the non-static field, method, or property 'Random.Next()'</pre></div>
+
+    <p>error นี้ยืนยันว่า <code>Next()</code> เป็น stateful ต้องสร้าง instance ก่อนถึงจะเรียกได้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — แก้ถูกต้อง</span>
+        <button data-act="copy" type="button">Copy</button>
+        </div>
+      <pre><code class="lang-cs">Random dice = new Random();
+int roll = dice.Next();</code></pre>
+    </div>
+
+    <div class="quiz" data-q="8-2">
+      <p class="q"><span class="num">Check ★</span> ข้อใดสร้าง instance ของคลาสได้ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>Random dice = new Random.Next();</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>Random dice = new Random();</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>String dice = new Random();</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ข้อ A ผิดเพราะเอา <code>new</code> ไปวางหน้าการเรียกเมธอด
+        แทนที่จะเรียก constructor ของคลาส ข้อ C ผิดเพราะกำหนดชนิดตัวแปรกับ instance ที่สร้าง
+        คนละชนิดกัน (String ≠ Random)</div>
+    </div>
+
+    <div class="quiz" data-q="8-3">
+      <p class="q"><span class="num">Check ★</span> สมมติสร้าง instance ของ Random ชื่อ <code>coins</code>
+        แล้ว จะเรียก <code>Next()</code> ยังไง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>int money = new coins.Next();</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>int money = Random.Next();</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>int money = coins.Next();</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> เรียกผ่านชื่อ instance ตรงๆ ไม่ต้องมี <code>new</code>
+        ซ้ำอีก (instance สร้างไปแล้วครั้งเดียวตอนประกาศ) ข้อ B ผิดเพราะ Next() เป็น stateful
+        เรียกจากชื่อคลาสตรงๆ ไม่ได้</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch8-a"><span>ทอยลูกเต๋าจำลองด้วย Random.Next() สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch8-b"><span>เจอ error CS0120 ด้วยตัวเองตอนเรียก Random.Next() ตรงๆ</span></label></li>
+      <li><label><input type="checkbox" id="ch8-c"><span>เข้าใจความต่างระหว่าง stateless กับ stateful method</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">8.4 ลงมือ: Return Value และ Parameter ของเมธอด</h2>
+
+    <p>สถานการณ์ทอยลูกเต๋ายังสอนแนวคิดสำคัญอื่นๆ ได้อีก: การจัดการค่าที่เมธอดคืนกลับมา
+       พารามิเตอร์ของเมธอดและการส่งอาร์กิวเมนต์ และการเลือกเมธอด overload</p>
+
+    <h3 id="s04a">Return Value (ค่าที่คืนกลับ)</h3>
+    <p>บางเมธอดทำงานเสร็จแล้ว "เงียบๆ" ไม่คืนค่าอะไรกลับมา เรียกว่า <b>void method</b> บางเมธอด
+       ถูกออกแบบให้คืนค่าเมื่อทำงานเสร็จ — ค่าที่คืนมักเป็นผลลัพธ์ของการดำเนินการ เป็นวิธีหลัก
+       ที่เมธอดใช้สื่อสารกลับมายังโค้ดที่เรียกมัน</p>
+
+    <p><code>Random.Next()</code> คืนค่าชนิด <code>int</code> ที่เป็นเลขสุ่ม แต่เมธอดออกแบบให้
+       คืนค่าชนิดไหนก็ได้ แม้แต่คลาสอื่นก็คืนได้ เช่น คลาส <code>String</code> มีทั้งเมธอดที่คืน
+       string, int, และ bool</p>
+
+    <p>เวลาเรียกเมธอดที่คืนค่า มักจะเก็บค่าไว้ในตัวแปรเพื่อใช้ทีหลัง:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">int roll = dice.Next(1, 7);</code></pre>
+    </div>
+
+    <p>หรือใช้ค่าที่คืนโดยตรง ไม่ต้องเก็บลงตัวแปร:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">Console.WriteLine(dice.Next(1, 7));</code></pre>
+    </div>
+
+    <p>แม้เมธอดจะคืนค่า ก็เรียกโดยไม่สนใจค่าที่คืนได้เช่นกัน (แต่ในกรณีนี้ก็ไม่มีประโยชน์อะไร
+       เพราะจุดประสงค์การเรียก <code>Next()</code> ก็เพื่อเอาค่าที่สุ่มได้มาใช้):</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">dice.Next(1, 7);</code></pre>
+    </div>
+
+    <h3 id="s04b">Parameter กับ Argument</h3>
+    <p>เวลาเรียกเมธอด คุณส่งค่าเข้าไปให้เมธอดใช้ทำงานได้ ค่าที่ส่งเข้าไปเรียกว่า <b>argument
+       (อาร์กิวเมนต์)</b> เมธอดใช้อาร์กิวเมนต์กำหนดค่าให้ <b>parameter (พารามิเตอร์)</b> ที่นิยาม
+       ไว้ใน method signature ของมัน เมธอดหนึ่งอาจต้องการพารามิเตอร์หนึ่งหรือหลายตัว หรือไม่ต้องการ
+       เลยก็ได้</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ สองคำนี้มักใช้แทนกัน แต่จริงๆ ต่างกัน</span>
+      <b>parameter</b> คือตัวแปรที่ถูกใช้<i>ข้างใน</i>เมธอด (นิยามใน signature) —
+      <b>argument</b> คือค่าที่ถูกส่งเข้าไป<i>ตอนเรียก</i>เมธอด
+    </div>
+
+    <p>เมธอดส่วนใหญ่ถูกออกแบบให้รับพารามิเตอร์หนึ่งหรือหลายตัว บางตัวใช้พารามิเตอร์กำหนดวิธีทำงาน
+       บางตัวก็นำพารามิเตอร์ไปใช้ตรงๆ เช่น <code>Random.Next()</code> ใช้พารามิเตอร์กำหนดขอบเขต
+       บนล่างของค่าที่คืน ส่วน <code>Console.WriteLine()</code> ใช้พารามิเตอร์ตรงๆ โดยพิมพ์ค่า
+       นั้นออกคอนโซล</p>
+
+    <p>เมธอดใช้ <b>method signature</b> กำหนดจำนวนและชนิดข้อมูลของพารามิเตอร์ที่รับ คำสั่งที่เรียก
+       เมธอดต้องตรงตามข้อกำหนดของ signature นั้น ผู้เรียกต้องส่งอาร์กิวเมนต์ที่เข้ากันได้กับชนิด
+       พารามิเตอร์ (ชื่อของอาร์กิวเมนต์ไม่จำเป็นต้องตรงกับชื่อพารามิเตอร์)</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">Random dice = new Random();
+int roll = dice.Next(1, 7);
+Console.WriteLine(roll);</code></pre>
+    </div>
+
+    <p>บรรทัดแรกสร้าง instance ชื่อ <code>dice</code> บรรทัดที่สองใช้ <code>dice.Next(1, 7)</code>
+       กำหนดค่าสุ่มให้ <code>roll</code> — สังเกตว่าส่งอาร์กิวเมนต์ 2 ตัวคั่นด้วย <code>,</code>
+       method signature ของ <code>Next()</code> เวอร์ชันนี้รับพารามิเตอร์ 2 ตัวชนิด int ใช้กำหนด
+       ขอบเขตล่าง-บนของเลขสุ่ม บรรทัดสุดท้ายพิมพ์ค่า <code>roll</code> ออกคอนโซล</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ชนิดข้อมูลต้องตรง</span>
+      อาร์กิวเมนต์ที่ส่งเข้าไปต้องเป็นชนิดข้อมูลเดียวกับพารามิเตอร์ที่เมธอดกำหนดไว้ ถ้าส่งผิดชนิด
+      คอมไพเลอร์ C# จะจับได้และบังคับให้แก้ก่อนถึงจะคอมไพล์ผ่าน — เป็นวิธีที่ C# และ .NET ป้องกัน
+      ไม่ให้ผู้ใช้เจอ error ตอน runtime · เมธอดบางตัวก็ไม่ต้องการพารามิเตอร์เลย เช่น
+      <code>Console.Clear()</code> ที่ล้างข้อความบนคอนโซล ไม่ต้องมีพารามิเตอร์ก็ทำงานได้
+    </div>
+
+    <div class="quiz" data-q="8-4">
+      <p class="q"><span class="num">Check ★</span> return value คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>ค่าที่เมธอดคืนกลับมาให้เมื่อทำงานเสร็จ</span></li>
+        <li class="opt"><span class="k">B</span><span>อาร์กิวเมนต์ในการเรียกเมธอด ถูกเรียกว่า return value ข้างในเมธอด</span></li>
+        <li class="opt"><span class="k">C</span><span>ค่าที่เป็น string เท่านั้น</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> return value คือผลลัพธ์ที่เมธอดส่งกลับมาเมื่อทำงานเสร็จ
+        เป็นชนิดข้อมูลอะไรก็ได้ ไม่ใช่แค่ string (ข้อ C ผิด) และไม่ใช่สิ่งเดียวกับอาร์กิวเมนต์
+        (ข้อ B สลับความหมายกัน)</div>
+    </div>
+
+    <div class="quiz" data-q="8-5">
+      <p class="q"><span class="num">Check ★</span> method parameter คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ตัวแปรที่ถูกใช้ข้างในเมธอด</span></li>
+        <li class="opt"><span class="k">B</span><span>ค่าที่เมธอดคืนกลับมา</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>ตัวแปรที่ถูกส่งเข้าไปในเมธอดโดยคำสั่งที่เรียก</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> พารามิเตอร์คือตัวแปรใน method signature ที่รับค่าจาก
+        อาร์กิวเมนต์ตอนถูกเรียก ข้อ A กว้างเกินไป (ตัวแปรท้องถิ่นธรรมดาก็ "ถูกใช้ข้างในเมธอด"
+        เหมือนกันแต่ไม่ใช่พารามิเตอร์) ข้อ B คือคำนิยามของ return value ไม่ใช่พารามิเตอร์</div>
+    </div>
+
+    <h3 id="s04c">Overloaded Method (เมธอดแบบโอเวอร์โหลด)</h3>
+    <p>เมธอดหลายตัวใน .NET Class Library มี method signature แบบโอเวอร์โหลด ทำให้เรียกเมธอดนั้น
+       ได้หลายแบบ ทั้งแบบมี/ไม่มีอาร์กิวเมนต์ หรือส่งข้อมูลคนละชนิดก็ได้</p>
+
+    <p><b>overloaded method</b> คือเมธอดที่นิยามด้วย method signature หลายแบบ ให้เรียกเมธอดได้
+       หลายวิธี หรือส่งข้อมูลคนละชนิดก็ได้ บางกรณี overload ต่างกันที่ชนิดข้อมูลของพารามิเตอร์
+       เช่น <code>Console.WriteLine()</code> มี overload ถึง 19 แบบ:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int number = 7;
+string text = "seven";
+
+Console.WriteLine(number);
+Console.WriteLine();
+Console.WriteLine(text);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+7
+
+seven</pre></div>
+
+    <p>ตัวอย่างนี้เรียก <code>WriteLine()</code> ที่ overload ต่างกันถึง 3 แบบ: แบบรับพารามิเตอร์
+       <code>int</code>, แบบไม่รับพารามิเตอร์เลย, และแบบรับพารามิเตอร์ <code>string</code></p>
+
+    <p>บางกรณี overload ต่างกันที่<b>จำนวน</b>พารามิเตอร์ พารามิเตอร์เสริมช่วยควบคุมผลลัพธ์ได้
+       ละเอียดขึ้น เช่น <code>Random.Next()</code> มี overload หลายแบบ:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Random dice = new Random();
+int roll1 = dice.Next();
+int roll2 = dice.Next(101);
+int roll3 = dice.Next(50, 101);
+
+Console.WriteLine($"First roll: {roll1}");
+Console.WriteLine($"Second roll: {roll2}");
+Console.WriteLine($"Third roll: {roll3}");</code></pre>
+    </div>
+    <div class="out auto"><div class="out-bar">Output (ตัวเลขสุ่มทุกครั้ง)</div><pre>
+First roll: 342585470
+Second roll: 43
+Third roll: 89</pre></div>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:24%">overload</th><th style="width:34%">พารามิเตอร์</th><th>ช่วงค่าที่คืน</th></tr></thead>
+      <tbody>
+        <tr><td><code>Next()</code></td><td>ไม่มี</td><td>0 ถึง 2,147,483,647 (ค่าสูงสุดของ int)</td></tr>
+        <tr><td><code>Next(maxValue)</code></td><td><code>int maxValue</code></td><td>0 ถึง <i>ต่ำกว่า</i> maxValue (exclusive)</td></tr>
+        <tr><td><code>Next(minValue, maxValue)</code></td><td><code>int minValue, int maxValue</code></td><td>minValue (inclusive) ถึงต่ำกว่า maxValue</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="quiz" data-q="8-6">
+      <p class="q"><span class="num">Check ★</span> overloaded method คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เมธอดที่คืนค่าเป็น value type</span></li>
+        <li class="opt"><span class="k">B</span><span>เมธอดที่มีพารามิเตอร์มากกว่า 5 ตัว</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>เมธอดที่รองรับการเรียกได้หลายแบบ แต่ละแบบมี method signature ของตัวเอง</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> คำนิยามตรงตัว — ไม่เกี่ยวกับชนิดค่าที่คืน (ข้อ A)
+        และไม่มีเกณฑ์จำนวนพารามิเตอร์ตายตัว (ข้อ B)</div>
+    </div>
+
+    <h3 id="s04d">ใช้ IntelliSense</h3>
+    <p>VS Code มีฟีเจอร์ <b>IntelliSense</b> ขับเคลื่อนด้วย language service — ให้คำแนะนำโค้ด
+       อัตโนมัติตามความหมายของภาษาและการวิเคราะห์ซอร์สโค้ดของคุณ เพราะ IntelliSense อยู่ในตัว
+       editor เอง คุณเรียนรู้เกี่ยวกับเมธอดได้เยอะโดยไม่ต้องออกจากหน้าต่างเขียนโค้ดเลย</p>
+
+    <p>ลองพิมพ์ทีละตัวอักษรช้าๆ ใน VS Code:</p>
+    <ol>
+      <li>พิมพ์ <code>d</code>, <code>i</code>, <code>c</code> ทีละตัวช้าๆ — จะเห็น popup
+          IntelliSense โผล่มา พอพิมพ์ครบ <code>dic</code> ตัวแปร <code>dice</code> ควรขึ้นอันดับ
+          บนสุด กด <b>Tab</b> เพื่อเติมคำให้เต็ม</li>
+      <li>พิมพ์ <code>.</code> — popup จะโผล่แสดงรายการเมธอด/สมาชิกทั้งหมดของคลาส</li>
+      <li>พิมพ์ <code>N</code> — รายการกรองเหลือ <code>Next</code> เป็นตัวเลือกอันดับแรก
+          กด Tab เติมคำ</li>
+      <li>พิมพ์ <code>(</code> — วงเล็บปิดถูกเติมให้อัตโนมัติ IntelliSense จะแสดงข้อมูลละเอียด
+          ของ <code>Random.Next()</code></li>
+    </ol>
+
+    <p>Popup จะแสดง <code>int Random.Next()</code> ด้านบน และ "Returns a non-negative random
+       integer." ด้านล่าง — <code>int</code> คือชนิดข้อมูลที่คืนกลับ ด้านซ้ายจะขึ้น <code>1/3</code>
+       แปลว่ากำลังดู method signature อันที่ 1 จาก 3 แบบ กดลูกศรขึ้น-ลงเพื่อดู overload อื่นได้:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:10%">#</th><th>สิ่งที่ IntelliSense แสดง</th></tr></thead>
+      <tbody>
+        <tr><td>1/3</td><td>ไม่มีพารามิเตอร์ — "Returns a non-negative random integer."</td></tr>
+        <tr><td>2/3</td><td><code>int maxValue</code> — ขอบเขตบนแบบ exclusive (ค่าที่คืนน้อยกว่า maxValue เสมอ)</td></tr>
+        <tr><td>3/3</td><td><code>int minValue, int maxValue</code> — minValue เป็นขอบเขตล่างแบบ inclusive</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 ทำไม dice.Next(1, 7) แต้มสูงสุดถึงเป็น 6</span>
+      เพราะ <code>maxValue</code> เป็นขอบเขตแบบ <b>exclusive</b> (ไม่รวมค่านั้น) ค่าที่คืนจะ
+      "น้อยกว่า" 7 เสมอ สูงสุดคือ 6 พอดี — เหมาะกับลูกเต๋า 6 หน้า
+    </div>
+
+    <h3 id="s04e">ใช้ learn.microsoft.com ค้นข้อมูล Overload</h3>
+    <p>อีกวิธีคือค้นหาผ่านเสิร์ชเอนจิน พิมพ์ "C# Random.Next()" แล้วเลือกผลลัพธ์ที่ URL ขึ้นต้นด้วย
+       <code>https://learn.microsoft.com</code> เอกสารจะมีหัวข้อ <b>Overloads</b> แสดงทั้ง 3
+       เวอร์ชัน แต่ละเวอร์ชันมีลิงก์ไปยังส่วนอธิบายละเอียด: คำอธิบายสั้นๆ, method definition,
+       พารามิเตอร์ที่รับ, ค่าที่คืน, exception ที่อาจเกิดขึ้น, ตัวอย่างการใช้งาน</p>
+
+    <p>ในส่วน Parameters จะบอกว่า <code>maxValue</code> คือ "exclusive upper bound" และ
+       "maxValue must be greater than or equal to 0" ถ้าฝ่าฝืน จะได้ <code>ArgumentOutOfRangeException</code>
+       ตามที่ระบุในส่วน Exceptions</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ learn.microsoft.com คือแหล่งความจริง</span>
+      เนื้อหาที่ learn.microsoft.com คือ "source of truth" ของ .NET Class Library ควรใช้เวลา
+      อ่านเอกสารให้เข้าใจว่าเมธอดที่ต้องการใช้ทำงานยังไงจริงๆ
+    </div>
+
+    <div class="quiz" data-q="8-7">
+      <p class="q"><span class="num">Check ★</span> IntelliSense ช่วยนักพัฒนายังไง?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>ช่วยให้เขียนโค้ดได้เร็วขึ้น</span></li>
+        <li class="opt"><span class="k">B</span><span>ช่วย refactor โค้ดให้อัตโนมัติ</span></li>
+        <li class="opt"><span class="k">C</span><span>เปลี่ยนธีมสีของ IDE ได้</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> IntelliSense เน้นช่วยแนะนำโค้ด/ข้อมูลเมธอดระหว่างพิมพ์
+        ทำให้เขียนโค้ดเร็วและแม่นยำขึ้น ไม่ใช่เครื่องมือ refactor หรือปรับธีม (นั่นเป็นฟีเจอร์อื่น
+        ของ VS Code)</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch8-d"><span>ลองพิมพ์ dice.Next( ช้าๆ แล้วสังเกต IntelliSense popup</span></label></li>
+      <li><label><input type="checkbox" id="ch8-e"><span>ไล่ดู overload ทั้ง 3 แบบด้วยลูกศรขึ้น-ลง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">8.5 ท้าทาย: หาเมธอดที่คืนค่ามากกว่าระหว่างตัวเลขสองตัว</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl m">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>เริ่มจากโค้ดนี้ (ห้ามแก้ 4 บรรทัดนี้ แต่เพิ่มโค้ดตรงกลางได้):</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs — บังคับใช้</span></div>
+        <pre><code class="lang-cs">int firstValue = 500;
+int secondValue = 600;
+int largerValue;
+
+Console.WriteLine(largerValue);</code></pre></div>
+        <p>ใช้ IntelliSense หรือ learn.microsoft.com หาเมธอดของคลาส <code>System.Math</code>
+           ที่คืนค่ามากกว่าระหว่างตัวเลขสองตัว แล้วใช้เมธอดนั้นกำหนดค่าให้ตัวแปร
+           <code>largerValue</code> — ต้องส่งค่า <code>firstValue</code> และ <code>secondValue</code>
+           เป็นอาร์กิวเมนต์ให้เมธอดนั้นได้ และเมธอดต้องคืนค่าชนิด <code>int</code></p>
+        <div class="out auto"><div class="out-bar">ผลลัพธ์ที่ต้องได้</div><pre>
+600</pre></div>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>ลองพิมพ์ <code>Math.</code> ใน VS Code แล้วดู IntelliSense แนะนำเมธอดที่ขึ้นต้นด้วย
+             คำว่า "Max" — ชื่อเมธอดสื่อความหมายตรงตัวอยู่แล้ว</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">8.6 เฉลยและวิเคราะห์</h2>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เฉลยตัวอย่าง</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int firstValue = 500;
+int secondValue = 600;
+int largerValue;
+largerValue = Math.Max(firstValue, secondValue);
+Console.WriteLine(largerValue);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+600</pre></div>
+
+    <p>เมธอด <code>Math.Max()</code> มี overload ถึง 13 แบบ รองรับชนิดข้อมูลต่างกัน เวอร์ชันที่
+       เรียกในโค้ดนี้รับพารามิเตอร์ทั้งสองเป็น <code>int</code> และคืนค่ามากกว่าเป็น
+       <code>int</code> กลับมา</p>
+
+    <p>สังเกตว่า <code>Math.Max()</code> เป็น<b>เมธอด stateless</b> — เรียกจากชื่อคลาส
+       <code>Math</code> ตรงๆ ได้เลย ไม่ต้องสร้าง <code>new Math()</code> ก่อน ต่างจาก
+       <code>Random.Next()</code> ที่ต้องสร้าง instance ก่อนเสมอ นี่คือตัวอย่างจริงที่ตอกย้ำ
+       บทเรียนเรื่อง stateless/stateful จากหัวข้อ 8.3</p>
+
+    <!-- ============================================ -->
+    <h2 id="s07">8.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:32%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>Random.Next()</code> โดยไม่สร้าง instance</td>
+          <td><code>CS0120</code> — เมธอดนี้เป็น stateful ต้อง <code>new Random()</code> ก่อนเสมอ</td>
+        </tr>
+        <tr>
+          <td>สร้าง <code>new Math()</code> ก่อนเรียก Max()</td>
+          <td>ไม่จำเป็น — Math.Max() เป็น stateless เรียกจากชื่อคลาสตรงๆ ได้เลย</td>
+        </tr>
+        <tr>
+          <td>สับสนคำว่า parameter กับ argument</td>
+          <td>parameter = ตัวแปรในนิยามเมธอด · argument = ค่าจริงที่ส่งตอนเรียก</td>
+        </tr>
+        <tr>
+          <td>คิดว่า dice.Next(1, 7) จะได้แต้มสูงสุด 7</td>
+          <td>maxValue เป็นขอบเขตแบบ exclusive ค่าที่คืนน้อยกว่า 7 เสมอ (สูงสุดคือ 6)</td>
+        </tr>
+        <tr>
+          <td>ไม่รู้ว่ามี overload ให้ใช้แบบสั้นกว่า</td>
+          <td>เปิด IntelliSense ดู (พิมพ์ "(" แล้วดูเลขมุมซ้าย เช่น 1/3, 2/3) หรือเช็ค
+              learn.microsoft.com หัวข้อ Overloads เสมอก่อนเขียนโค้ดยาวเกินจำเป็น</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">8.8 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment จริงของบทนี้ใน Microsoft Learn (บทนี้มี 3 ข้อ)</p>
+
+    <div class="quiz" data-q="8-8">
+      <p class="q"><span class="num">1.</span> object คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ที่อยู่หน่วยความจำ</span></li>
+        <li class="opt"><span class="k">B</span><span>คลาสที่ไม่มีสถานะ</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>instance ของคลาส</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> object คือ instance ของคลาสหนึ่งๆ ที่ถูกสร้างด้วย
+        <code>new</code> — ที่อยู่หน่วยความจำ (ข้อ A) เป็นแค่<i>ส่วนหนึ่ง</i>ของกลไกเบื้องหลัง
+        การอ้างอิง object เท่านั้น ไม่ใช่คำนิยามของ object เอง</div>
+    </div>
+
+    <div class="quiz" data-q="8-9">
+      <p class="q"><span class="num">2.</span> ข้อความใด<b>ถูกต้อง</b>?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>.NET Class Library นิยาม overload ให้ทุกเมธอดเสมอ</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>.NET Class Library มีนิยามของชนิดข้อมูลที่ใช้ใน C# ด้วย</span></li>
+        <li class="opt"><span class="k">C</span><span>.NET Class Library มีคลาสเยอะจนทำให้พัฒนาช้าลง</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ชนิดข้อมูลอย่าง string/int จริงๆ มาจากคลาสใน
+        .NET Class Library (หัวข้อ 8.2) ข้อ A ผิดเพราะไม่ใช่ทุกเมธอดจะมี overload ข้อ C ผิดเพราะ
+        คลังฟังก์ชันขนาดใหญ่ช่วย<b>ประหยัด</b>เวลาพัฒนา ไม่ใช่ทำให้ช้าลง</div>
+    </div>
+
+    <div class="quiz" data-q="8-10">
+      <p class="q"><span class="num">3.</span> สัญลักษณ์ใดคือตัวเรียกใช้เมธอด (method invocation operator)?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>.</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>{}</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>()</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> วงเล็บ <code>()</code> คือตัวเรียกใช้เมธอด ต้องมีเสมอ
+        เวลาจะเรียกเมธอด — <code>.</code> คือตัวเชื่อมเข้าถึงสมาชิก (ทบทวนบทที่ 1) และ
+        <code>{}</code> ใช้กับ interpolation หรือ code block (ทบทวนบทที่ 3)</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">8.9 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดสุ่มเลข 1-100 (ใช้ overload ที่รับพารามิเตอร์ตัวเดียว) แล้วพิมพ์ค่าที่ได้</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Random rng = new Random();
+int number = rng.Next(101);
+Console.WriteLine(number);</code></pre></div>
+          <p>ใช้ <code>101</code> เพราะขอบเขตบนเป็นแบบ exclusive ต้องการค่าสูงสุด 100
+             จึงต้องส่ง 101</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ใช้ <code>Math.Min()</code> หาค่าน้อยกว่าระหว่าง 45 กับ 12 แล้วพิมพ์ผล
+           (ค้นดูจาก IntelliSense หรือคาดเดาจากชื่อเมธอดที่คล้าย Math.Max())</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int smaller = Math.Min(45, 12);
+Console.WriteLine(smaller);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้ error หาสาเหตุและแก้ไข:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">int result = Random.Next(1, 10);
+Console.WriteLine(result);</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>error CS0120 — <code>Next()</code> เป็น stateful เรียกจากชื่อคลาส <code>Random</code>
+             ตรงๆ ไม่ได้ ต้องสร้าง instance ก่อน:</p>
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ถูก)</span></div>
+          <pre><code class="lang-cs">Random rng = new Random();
+int result = rng.Next(1, 10);
+Console.WriteLine(result);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ใช้ IntelliSense หรือ learn.microsoft.com ค้นหาเมธอดของคลาส <code>string</code>
+           ที่แปลงข้อความเป็นตัวพิมพ์ใหญ่ทั้งหมด แล้วใช้กับตัวแปร <code>string name = "somchai";</code>
+           ให้ได้ผลลัพธ์ <code>SOMCHAI</code></p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>บทที่ 8.2 พูดถึงเมธอดนี้ไว้แล้วเป็นตัวอย่าง ชื่อเมธอดขึ้นต้นด้วย "To"</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string name = "somchai";
+Console.WriteLine(name.ToUpper());</code></pre></div>
+          <p>สังเกตว่า <code>ToUpper()</code> เป็น stateful — เรียกผ่านตัวแปร <code>name</code>
+             ตรงๆ ได้เลย เพราะ <code>string</code> ก็เป็น instance ของคลาสอยู่แล้วตั้งแต่ตอน
+             สร้างค่า literal (ทบทวนหัวข้อ 8.2 เรื่อง "แม้แต่ชนิดข้อมูลก็เป็นส่วนหนึ่งของ
+             .NET Class Library")</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>อธิบายว่าทำไม <code>Console.WriteLine()</code> ถึงเป็น stateless ทั้งที่มันต้อง "รู้"
+           ว่าต้องพิมพ์ไปที่หน้าต่างคอนโซลไหนของโปรแกรม (ไม่ต้องเขียนโค้ด ตอบเป็นข้อความ)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ความเป็น stateless หมายถึงเมธอดไม่พึ่งพา/แก้ไข<b>ค่าที่โปรแกรมของคุณเก็บไว้ในตัวแปร</b>
+             ระหว่างการทำงาน ไม่ได้แปลว่าเมธอดทำงานแบบไม่มีบริบทเลย — คอนโซลที่จะพิมพ์ไปนั้นถูก
+             จัดการโดยระบบปฏิบัติการ/runtime อยู่เบื้องหลัง ไม่ใช่ state ที่โค้ดของคุณต้องสร้าง
+             หรือดูแลเอง</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>เขียนโปรแกรมจำลอง "ทอยลูกเต๋า 2 ลูก" (ค่า 1-6 แต่ละลูก) แล้วใช้ <code>Math.Max()</code>
+           หาว่าลูกไหนแต้มสูงกว่า พิมพ์ผลทั้งสองแต้มและแต้มที่สูงกว่า ให้ได้ผลลัพธ์ทำนองนี้
+           (ตัวเลขจะสุ่มต่างกันทุกครั้ง):</p>
+        <div class="out auto"><pre>
+ลูกเต๋าลูกที่ 1: 4
+ลูกเต๋าลูกที่ 2: 6
+แต้มสูงสุด: 6</pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>สร้าง <code>Random</code> instance ตัวเดียว แล้วเรียก
+           <code>Next(1, 7)</code> สองครั้งเก็บใส่ตัวแปรคนละตัว จากนั้นส่งทั้งสองตัวแปรให้
+           <code>Math.Max()</code></p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Random dice = new Random();
+int die1 = dice.Next(1, 7);
+int die2 = dice.Next(1, 7);
+int higher = Math.Max(die1, die2);
+
+Console.WriteLine($"ลูกเต๋าลูกที่ 1: {die1}");
+Console.WriteLine($"ลูกเต๋าลูกที่ 2: {die2}");
+Console.WriteLine($"แต้มสูงสุด: {higher}");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 8</h2>
+
+    <p>เป้าหมายของบทนี้คือเรียกใช้เมธอดที่นิยามไว้ใน .NET Class Library เพื่อทำงานอย่างสุ่มตัวเลข
+       หรือคำนวณทางคณิตศาสตร์ คุณเรียกเมธอดหลายแบบด้วยไวยากรณ์ C#: เมธอดที่คืนค่า เมธอดที่รับ
+       พารามิเตอร์หลายตัว และเมธอดที่เก็บสถานะ คุณใช้ IntelliSense ของ VS Code และ
+       learn.microsoft.com ค้นคว้าข้อมูลเมธอด และเข้าใจลึกซึ้งขึ้นว่าแต่ละเมธอดทำงานยังไง —
+       นี่คือก้าวสำคัญที่ทำให้คุณเข้าใจว่านักพัฒนาซอฟต์แวร์สร้างแอปจริงกันยังไง</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 8</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:36%">ไวยากรณ์/แนวคิด</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td>stateless / static method</td><td>เรียกจากชื่อคลาสตรงๆ ได้ ไม่ต้อง new</td></tr>
+          <tr><td>stateful / instance method</td><td>ต้อง <code>new</code> สร้าง instance ก่อนเสมอ</td></tr>
+          <tr><td><code>ClassName obj = new ClassName();</code></td><td>สร้าง instance (object)</td></tr>
+          <tr><td>parameter</td><td>ตัวแปรในนิยามเมธอด</td></tr>
+          <tr><td>argument</td><td>ค่าจริงที่ส่งเข้าไปตอนเรียก</td></tr>
+          <tr><td>overloaded method</td><td>เมธอดเดียวกัน มีหลาย signature ให้เลือกใช้</td></tr>
+          <tr><td>void method</td><td>เมธอดที่ไม่คืนค่าอะไรกลับมา</td></tr>
+          <tr><td>IntelliSense</td><td>popup แนะนำโค้ด/ข้อมูลเมธอดขณะพิมพ์ใน VS Code</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>class library</td><td>คลังคลาส</td><td>คลังคลาส/เมธอดสำเร็จรูปให้เรียกใช้</td></tr>
+        <tr><td>state</td><td>สถานะ</td><td>ค่าทั้งหมดที่เก็บในหน่วยความจำ ณ ขณะหนึ่ง</td></tr>
+        <tr><td>stateless / static method</td><td>เมธอดไร้สถานะ</td><td>ไม่พึ่ง/แก้สถานะแอป เรียกจากชื่อคลาสตรงๆ ได้</td></tr>
+        <tr><td>stateful / instance method</td><td>เมธอดมีสถานะ</td><td>พึ่ง/แก้สถานะ ต้องสร้าง instance ก่อนเรียก</td></tr>
+        <tr><td>object / instance</td><td>ออบเจกต์ / อินสแตนซ์</td><td>สำเนาที่สร้างจากคลาส ด้วย new</td></tr>
+        <tr><td>new operator</td><td>ตัวดำเนินการ new</td><td>สร้าง instance ใหม่ของคลาส</td></tr>
+        <tr><td>return value</td><td>ค่าที่คืนกลับ</td><td>ผลลัพธ์ที่เมธอดส่งกลับเมื่อทำงานเสร็จ</td></tr>
+        <tr><td>void</td><td>ไม่มีค่าที่คืน</td><td>เมธอดที่ไม่คืนค่าอะไรเลย</td></tr>
+        <tr><td>parameter</td><td>พารามิเตอร์</td><td>ตัวแปรที่นิยามไว้ใน method signature</td></tr>
+        <tr><td>argument</td><td>อาร์กิวเมนต์</td><td>ค่าจริงที่ส่งเข้าไปตอนเรียกเมธอด</td></tr>
+        <tr><td>method signature</td><td>ลายเซ็นเมธอด</td><td>จำนวนและชนิดของพารามิเตอร์ที่เมธอดรับ</td></tr>
+        <tr><td>overloaded method</td><td>เมธอดโอเวอร์โหลด</td><td>เมธอดที่มีหลาย signature</td></tr>
+        <tr><td>IntelliSense</td><td>อินเทลลิเซนส์</td><td>ระบบแนะนำโค้ดอัตโนมัติของ editor</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch07.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 7 · Install and Configure Visual Studio Code</span></a>
+      <a class="next" href="ch09.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 9 · Add Decision Logic Using if, else, else if</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 7 · Install and Configure VS Code — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="7">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 2 · Create and Run Simple Console Apps / บทที่ 7</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 2 · โมดูล 1/8</span>
+      <h1>ติดตั้งและตั้งค่า Visual Studio Code</h1>
+      <div class="en">Install and Configure Visual Studio Code</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>35–50 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>มี IDE มืออาชีพพร้อมใช้ เขียน/รัน/แก้โค้ดในที่เดียว</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น (เน้นติดตั้ง+สำรวจ ไม่เขียนโค้ดใหม่)</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ดาวน์โหลดและติดตั้ง Visual Studio Code ได้</li>
+        <li>สำรวจหน้าตา (UI) ของ Visual Studio Code ได้</li>
+        <li>ตั้งค่า Visual Studio Code ให้ใช้ C# extension ได้</li>
+        <li>ติดตั้ง .NET runtime library ได้</li>
+        <li>สร้าง build และรันแอป console ด้วย Visual Studio Code ได้</li>
+      </ul>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 ทำไมเพิ่งมาสอน VS Code ตอนนี้</span>
+      บทที่ 0–6 คุณใช้แค่ Notepad + PowerShell เขียนและรันโค้ดมาตลอด — ตั้งใจให้เห็นว่า C#
+      ไม่ได้ผูกติดกับโปรแกรมไหนโปรแกรมหนึ่ง จริงๆ แล้วนี่คือลำดับเดียวกับหลักสูตรต้นฉบับด้วย
+      (Course 2 ถึงจะแนะนำ VS Code) จากบทนี้ไป เราจะใช้ VS Code เป็นหลัก เพราะมันช่วยประหยัดเวลา
+      และมีเครื่องมือดีบั๊กที่ Notepad ไม่มี
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">7.1 ทำไมต้องใช้ IDE</h2>
+
+    <p>การพัฒนาซอฟต์แวร์ไม่ใช่แค่การเขียนโค้ด แต่เป็น<b>กระบวนการ</b> โปรเจกต์ใหญ่ๆ อาจใช้เวลา
+       เป็นเดือนหรือเป็นปีและซับซ้อนมาก กระบวนการเขียน ดีบั๊ก ทดสอบ อัปเดต/versioning และปล่อย
+       โค้ด เป็นงานใหญ่มาก เพื่อช่วยกระบวนการนี้ นักพัฒนาใช้เครื่องมือเฉพาะทางที่เรียกว่า
+       <b>Integrated Development Environment (IDE)</b></p>
+
+    <p>IDE มักมีชุดเครื่องมือที่รองรับกระบวนการพัฒนาซอฟต์แวร์ตั้งแต่ต้นจนจบ (เรียกว่า
+       development lifecycle) ช่วยให้นักพัฒนาคนเดียวหรือทีมทำงานได้มีประสิทธิภาพขึ้นมาก
+       IDE ที่ดีคือเพื่อนคู่ใจของโปรแกรมเมอร์</p>
+
+    <p>สมมติคุณสนใจเริ่มพัฒนาแอป C# จริงจัง ขั้นแรกคือเลือกสภาพแวดล้อมการเขียนโปรแกรม
+       หลังค้นข้อมูลออนไลน์ คุณพบว่า <b>Visual Studio Code</b> เป็นหนึ่งใน code editor ที่นิยม
+       ที่สุดในหมู่นักพัฒนา C# ติดตั้งง่ายรวดเร็ว และรองรับ extension มากมายที่ช่วยเพิ่ม
+       ประสิทธิภาพการทำงาน (ยังมี Visual Studio ตัวเต็มที่มีฟีเจอร์เยอะกว่าสำหรับมืออาชีพด้วย
+       ทั้งสองตัวมีเวอร์ชันฟรีให้ใช้) ในบทนี้คุณจะติดตั้งและตั้งค่า VS Code ให้พร้อมใช้งานจริง</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">7.2 ลงมือ: ดาวน์โหลดและติดตั้ง VS Code</h2>
+
+    <p>Visual Studio Code เป็น source code editor ที่เบาแต่ทรงพลัง ใช้ได้ทั้ง Windows, macOS,
+       และ Linux รองรับ JavaScript/TypeScript/Node.js ในตัว และมี extension มากมายสำหรับภาษาอื่นๆ
+       (C++, C#, Java, Python, PHP, Go, .NET)</p>
+
+    <h3 id="s02a">ดาวน์โหลด</h3>
+    <ol>
+      <li>เปิดเบราว์เซอร์ ไปที่ <b>code.visualstudio.com</b></li>
+      <li>กดปุ่ม <b>Download for Windows</b> (เว็บจะตรวจจับระบบปฏิบัติการให้อัตโนมัติ)</li>
+      <li>รอไฟล์ติดตั้งดาวน์โหลดเสร็จ — ชื่อไฟล์จะคล้าย <code>VSCodeUserSetup-x64-1.9x.x.exe</code></li>
+    </ol>
+
+    <h3 id="s02b">ติดตั้ง</h3>
+    <ol>
+      <li>เปิด File Explorer ไปที่โฟลเดอร์ Downloads</li>
+      <li>ดับเบิลคลิกไฟล์ติดตั้งที่ดาวน์โหลดมา</li>
+      <li>ติ๊ก <b>I accept the license agreement</b> แล้วกด Next ไปเรื่อยๆ ใช้ค่าเริ่มต้นทั้งหมด</li>
+      <li>ถ้าเปิด VS Code ขึ้นมาตอนจบการติดตั้ง ให้ปิดไปก่อน (จะมาสำรวจกันในหัวข้อถัดไป)</li>
+    </ol>
+
+    <div class="note">
+      <span class="lbl">ℹ️ User Installer กับ System Installer</span>
+      ตอนติดตั้งอาจมีให้เลือก 2 แบบ — <b>User Installer</b> ติดตั้งให้แค่ผู้ใช้ปัจจุบัน (แนะนำ
+      สำหรับคนส่วนใหญ่) ส่วน <b>System Installer</b> ติดตั้งให้ทุกบัญชีผู้ใช้ในเครื่อง
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch7-a"><span>ดาวน์โหลดและติดตั้ง VS Code สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">7.3 รู้จักหน้าตา VS Code</h2>
+
+    <p>โดยพื้นฐาน VS Code คือ code editor ที่มี UI คล้ายกับ editor อื่นๆ ทั่วไป ฝั่งซ้ายเป็น
+       side bar สำหรับเข้าถึงไฟล์/โฟลเดอร์ในโปรเจกต์ ฝั่งขวาเป็นพื้นที่ editor แสดงเนื้อหาไฟล์</p>
+
+    <svg viewBox="0 0 720 380" role="img" aria-label="6 ส่วนหลักของหน้าตา Visual Studio Code" style="margin:18px 0">
+      <g font-family="var(--font-th)" font-size="12">
+        <rect x="4" y="4" width="712" height="372" rx="8" fill="var(--bg-page)" stroke="var(--line)" stroke-width="2"/>
+
+        <!-- F: Main Menu -->
+        <rect x="4" y="4" width="712" height="30" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="20" y="24" fill="var(--brand-text)" font-weight="700">F · Main Menu — File Edit Selection View Run Terminal ...</text>
+
+        <!-- A: Activity Bar -->
+        <rect x="4" y="34" width="42" height="304" fill="var(--tip-soft)" stroke="var(--tip)"/>
+        <text x="25" y="130" text-anchor="middle" fill="var(--tip)" font-weight="700" transform="rotate(-90 25 130)">A · Activity Bar</text>
+
+        <!-- B: Side Bar -->
+        <rect x="46" y="34" width="150" height="304" fill="var(--info-soft)" stroke="var(--info)"/>
+        <text x="121" y="60" text-anchor="middle" fill="var(--info)" font-weight="700">B · Side Bar</text>
+        <text x="121" y="80" text-anchor="middle" fill="var(--text-soft)" font-size="11">EXPLORER /</text>
+        <text x="121" y="96" text-anchor="middle" fill="var(--text-soft)" font-size="11">EXTENSIONS ฯลฯ</text>
+
+        <!-- C: Editor -->
+        <rect x="196" y="34" width="520" height="220" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text x="456" y="60" text-anchor="middle" fill="var(--ok)" font-weight="700">C · Editor</text>
+        <text x="456" y="80" text-anchor="middle" fill="var(--text-soft)" font-size="11">พื้นที่แก้ไขไฟล์โค้ด (Program.cs)</text>
+
+        <!-- D: Panel -->
+        <rect x="196" y="254" width="520" height="84" fill="var(--warn-soft)" stroke="var(--warn)"/>
+        <text x="456" y="276" text-anchor="middle" fill="var(--warn)" font-weight="700">D · Panel</text>
+        <text x="456" y="296" text-anchor="middle" fill="var(--text-soft)" font-size="11">TERMINAL / OUTPUT / DEBUG CONSOLE / PROBLEMS</text>
+
+        <!-- E: Status Bar -->
+        <rect x="4" y="338" width="712" height="30" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="20" y="358" fill="var(--brand-text)" font-weight="700">E · Status Bar — ข้อมูลโปรเจกต์/ไฟล์ที่เปิดอยู่</text>
+      </g>
+    </svg>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:10%">ส่วน</th><th style="width:24%">ชื่อ</th><th>หน้าที่</th></tr></thead>
+      <tbody>
+        <tr><td><b>A</b></td><td>Activity Bar</td><td>แถบแนวตั้งซ้ายสุด สลับมุมมอง (Explorer, Extensions ฯลฯ) และตัวชี้บริบทอื่นๆ</td></tr>
+        <tr><td><b>B</b></td><td>Side Bar</td><td>แสดงเครื่องมือ/ทรัพยากรตามมุมมองที่เลือกจาก Activity Bar</td></tr>
+        <tr><td><b>C</b></td><td>Editor</td><td>พื้นที่แก้ไขไฟล์ เปิดได้หลายไฟล์พร้อมกัน ทั้งแนวตั้งและแนวนอน</td></tr>
+        <tr><td><b>D</b></td><td>Panel</td><td>แสดงผลลัพธ์/ดีบั๊ก/error/warning หรือ terminal ที่ฝังในตัว</td></tr>
+        <tr><td><b>E</b></td><td>Status Bar</td><td>แถบแนวนอนล่างสุด แสดงข้อมูลโปรเจกต์และไฟล์ที่กำลังแก้</td></tr>
+        <tr><td><b>F</b></td><td>Main Menu</td><td>เมนูบนสุด ใช้บันทึก แก้ไข รันโค้ด และอื่นๆ</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>ตอนเริ่มต้น ส่วนที่สำคัญที่สุดที่ต้องจำคือ <b>Activity Bar</b> (เลือกกิจกรรม),
+       <b>Side Bar</b> (เครื่องมือ/ตัวเลือก) และ <b>Editor</b> (แก้ไขโค้ด) — ส่วนอื่นๆ จะคุ้นเคยขึ้นเอง
+       เมื่อใช้งานบ่อยขึ้น</p>
+
+    <!-- ============================================ -->
+    <h2 id="s04">7.4 ลงมือ: สำรวจหน้าตา VS Code</h2>
+
+    <h3 id="s04a">เปิด VS Code และหน้า Welcome</h3>
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch7-b"><span>เปิด VS Code จากเมนู Start (หรือค้นหา "Visual Studio Code")</span></label></li>
+      <li><label><input type="checkbox" id="ch7-c"><span>สังเกตหน้า "Welcome" ที่มีลิงก์และข้อมูลช่วยเหลือ</span></label></li>
+      <li><label><input type="checkbox" id="ch7-d"><span>ปิดหน้า Welcome ด้วยปุ่ม X ที่แท็บ</span></label></li>
+    </ul>
+
+    <h3 id="s04b">สำรวจ Activity Bar และ Side Bar</h3>
+    <p>เอาเมาส์ไปวางบนไอคอนแต่ละอันใน Activity Bar จะเห็น label โผล่ขึ้นมา ไล่จากบนลงล่าง
+       ไอคอนคือ: <b>Explorer</b>, <b>Search</b>, <b>Source Control</b>, <b>Run and Debug</b>,
+       <b>Extensions</b>, <b>Accounts</b>, และ <b>Manage</b></p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch7-e"><span>กด Explorer → Side Bar เปลี่ยนเป็น EXPLORER ใช้เข้าถึงไฟล์/โฟลเดอร์โปรเจกต์</span></label></li>
+      <li><label><input type="checkbox" id="ch7-f"><span>กด Extensions → Side Bar เปลี่ยนเป็น EXTENSIONS (จะติดตั้ง C# extension ในหัวข้อถัดไป)</span></label></li>
+    </ul>
+
+    <h3 id="s04c">สำรวจเมนูบนสุด</h3>
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch7-g"><span>เปิดเมนู File → ดู New, Open, Save, Close</span></label></li>
+      <li><label><input type="checkbox" id="ch7-h"><span>เปิดเมนู Terminal → New Terminal → สังเกตแท็บ PROBLEMS, OUTPUT, DEBUG CONSOLE, TERMINAL</span></label></li>
+      <li><label><input type="checkbox" id="ch7-i"><span>ปิด Panel ด้วยปุ่ม X มุมขวาบนของ Panel</span></label></li>
+    </ul>
+
+    <div class="note">
+      <span class="lbl">ℹ️ Command Palette — เครื่องมือที่คุ้มค่าจำที่สุด</span>
+      เปิดเมนู <b>View → Command Palette</b> (หรือกด <code>Ctrl+Shift+P</code>) แล้วพิมพ์ชื่อคำสั่งที่
+      ต้องการ เช่น พิมพ์ <code>help</code> แล้วเลือก <b>Help: Interactive Editor Playground</b>
+      จะเปิดหน้าฝึกใช้ฟีเจอร์ต่างๆ แบบอินเทอร์แอกทีฟ Command Palette คือทางลัดสู่แทบทุกคำสั่งของ
+      VS Code ยิ่งใช้บ่อย ยิ่งเร็ว
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch7-j"><span>เปิด Command Palette ด้วย Ctrl+Shift+P และลองพิมพ์ค้นหาคำสั่งดู</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">7.5 ลงมือ: ติดตั้ง Extension สำหรับ C#</h2>
+
+    <p>Extension คือส่วนเสริมที่เพิ่มความสามารถให้ VS Code มีทั้ง extension ภาษา, ธีม, และฟีเจอร์
+       ใหม่ๆ VS Code รองรับการพัฒนา C# ผ่าน C# language extension ร่วมกับ .NET SDK</p>
+
+    <h3 id="s05a">.NET SDK กับ .NET Runtime ต่างกันยังไง</h3>
+    <p>.NET เป็นแพลตฟอร์มพัฒนาข้ามระบบปฏิบัติการ (cross-platform) แบบโอเพนซอร์ส ใช้พัฒนาแอปได้
+       หลายแบบ เขียนได้ทั้ง C#, F#, Visual Basic รันได้ทั้ง Windows, macOS, Linux</p>
+
+    <p><b>.NET runtime</b> คือไลบรารีที่จำเป็นสำหรับ<i>รัน</i>แอป C# (บางทีเรียก Common Language
+       Runtime หรือ CLR) — ไม่จำเป็นสำหรับ<i>เขียน</i>โค้ด แต่จำเป็นสำหรับ<i>รัน</i>แอปจริง
+       ส่วน <b>.NET SDK</b> (ที่คุณติดตั้งไปแล้วในบทที่ 0) มี runtime รวมอยู่ในตัว บวกกับเครื่องมือ
+       สำหรับ<i>สร้าง</i>แอปด้วย</p>
+
+    <h3 id="s05b">ติดตั้ง C# Dev Kit</h3>
+    <ol>
+      <li>เปิด VS Code → คลิก <b>Extensions</b> บน Activity Bar</li>
+      <li>ช่องค้นหา พิมพ์ <code>C#</code></li>
+      <li>เลือก extension ชื่อ <b>"C# Dev Kit — Official C# extension from Microsoft"</b> (ผู้พัฒนา Microsoft)</li>
+      <li>กด <b>Install</b> รอประมาณ 30–40 วินาที ปุ่มจะเปลี่ยนเป็น Installed</li>
+    </ol>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ระหว่างติดตั้งอาจเจอ notification 2 อัน</span>
+      อันที่ให้ "log in" — ข้ามไปได้เลย · อันที่บอกว่า "The .NET SDK cannot be located" — ปิดไปได้
+      เพราะคุณติดตั้ง .NET SDK ไว้แล้วตั้งแต่บทที่ 0 (VS Code แค่ยังไม่เจอ จะเจอเองหลังรีสตาร์ต
+      terminal หรือเปิดโปรเจกต์ใหม่)
+    </div>
+
+    <p>การติดตั้ง C# Dev Kit จะติดตั้ง extension ย่อยมาด้วย 3 ตัว:</p>
+    <ul>
+      <li><b>.NET Install Tool</b> — ติดตั้งและจัดการเวอร์ชันต่างๆ ของ .NET SDK/Runtime</li>
+      <li><b>C#</b> — รองรับไวยากรณ์พื้นฐานของภาษา C#</li>
+      <li><b>C# Dev Kit</b> — extension หลักจาก Microsoft</li>
+    </ul>
+
+    <div class="note tip">
+      <span class="lbl">💡 อย่าลงเยอะเกินจำเป็น</span>
+      ไม่มีรางวัลให้คนลง extension เยอะที่สุด มี extension ดีๆ เยอะมาก แต่รอจนกว่าจะ<b>ต้องใช้จริง</b>
+      ค่อยลงก็ได้
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch7-k"><span>ติดตั้ง C# Dev Kit สำเร็จ (ปุ่มขึ้น Installed)</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">7.6 ลงมือ: เช็คและติดตั้ง .NET SDK ผ่าน VS Code</h2>
+
+    <p>C# Dev Kit ช่วยติดตั้ง .NET SDK ให้ได้เช่นกัน — ในบทนี้เราจะเช็คว่าสิ่งที่คุณติดตั้งไว้
+       ในบทที่ 0 ยังใช้ได้ดี และรู้จักอีกวิธีติดตั้ง/จัดการเวอร์ชัน .NET ผ่านตัว VS Code เอง</p>
+
+    <h3 id="s06a">เช็คว่ามี .NET ติดตั้งอยู่หรือยัง</h3>
+    <ol>
+      <li>เมนู <b>Terminal → New Terminal</b></li>
+      <li>พิมพ์ <code>dotnet --version</code> กด Enter</li>
+      <li>ถ้าเจอเลขเวอร์ชัน (เช่น <code>10.0.100</code>) แปลว่าติดตั้งอยู่แล้ว — ถ้าจากบทที่ 0
+         ควรเจอตรงนี้แน่นอน</li>
+    </ol>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ณ วันที่เขียนบทนี้</span>
+      .NET 10 คือรุ่น LTS (Long-Term Support) ล่าสุด แนะนำให้ใช้รุ่นนี้หรือใหม่กว่า .NET 8/9
+      ก็ยังใช้งานร่วมกับหลักสูตรนี้ได้เช่นกัน
+    </div>
+
+    <h3 id="s06b">ติดตั้ง/อัปเดตผ่าน Command Palette (ถ้าต้องการ)</h3>
+    <p>ถ้าอยากติดตั้งเวอร์ชันใหม่ หรือยังไม่มีเลย ทำได้ผ่าน VS Code โดยตรง:</p>
+    <ol>
+      <li><b>View → Command Palette</b> (หรือ <code>Ctrl+Shift+P</code>)</li>
+      <li>พิมพ์ <code>.NET: Install</code> แล้วเลือก <b>.NET: Install New .NET SDK</b></li>
+      <li>เลือก <b>Latest</b> (.NET 10) → กด <b>Install</b></li>
+      <li>รอจนติดตั้งเสร็จ (อาจใช้เวลาหลายนาที) แล้วปิด VS Code</li>
+    </ol>
+
+    <p>เปิด VS Code ใหม่ เปิด Terminal ใหม่ พิมพ์ <code>dotnet --version</code> อีกครั้งเพื่อยืนยัน
+       (ต้องเปิด terminal <b>ใหม่</b> หลังติดตั้ง ไม่งั้นจะยังตรวจไม่เจอ)</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch7-l"><span>รัน dotnet --version ใน Terminal ของ VS Code สำเร็จ เห็นเลขเวอร์ชัน</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s07">7.7 ลงมือ: สร้าง Build และ Run แอปด้วย VS Code</h2>
+
+    <p>.NET SDK มี command-line interface (CLI) ที่เรียกผ่าน Terminal ในตัว VS Code ได้เลย
+       ตลอดหลักสูตรนี้คุณจะใช้คำสั่ง .NET CLI สร้างแอปใหม่ build โค้ด และรันแอป</p>
+
+    <p>ตัวอย่างคำสั่งสร้างแอป console ใหม่ในโฟลเดอร์ที่กำหนด:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">PowerShell / Terminal</span></div>
+      <pre><code>dotnet new console -o ./CsharpProjects/TestProject</code></pre>
+    </div>
+
+    <p>โครงสร้างคำสั่ง CLI มี 3 ส่วน:</p>
+    <ul>
+      <li><b>driver</b> — <code>dotnet</code></li>
+      <li><b>command</b> — <code>new console</code></li>
+      <li><b>command arguments</b> — <code>-o ./CsharpProjects/TestProject</code> (ตัวเลือกเสริม)</li>
+    </ul>
+
+    <div class="note">
+      <span class="lbl">ℹ️ argument เป็นตัวเลือก</span>
+      ไม่ใส่ <code>-o ...</code> ก็รันได้ แค่ <code>dotnet new console</code> เฉยๆ — จะสร้างแอปที่
+      ตำแหน่งโฟลเดอร์ปัจจุบันแทน
+    </div>
+
+    <h3 id="s07a">สร้างแอปในโฟลเดอร์ที่กำหนด</h3>
+    <ol>
+      <li>เปิด VS Code → เมนู <b>File → Open Folder</b></li>
+      <li>เลือกโฟลเดอร์ Desktop (หรือที่เก็บโปรเจกต์ของคุณ) → <b>Select Folder</b></li>
+      <li>ถ้ามี dialog ถามว่าเชื่อถือผู้เขียนไหม (Trust) เลือก <b>Yes</b></li>
+      <li>เมนู <b>Terminal → New Terminal</b></li>
+      <li>พิมพ์คำสั่ง:</li>
+    </ol>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ./CsharpProjects/TestProject</code></pre>
+    </div>
+
+    <p>คำสั่งนี้สร้างโฟลเดอร์ <code>CsharpProjects</code> และ <code>TestProject</code> ให้อัตโนมัติ
+       และตั้งชื่อไฟล์โปรเจกต์ <code>TestProject.csproj</code> ตามชื่อโฟลเดอร์</p>
+
+    <p>ในมุมมอง EXPLORER ขยายโฟลเดอร์ <code>CsharpProjects</code> → จะเห็นโฟลเดอร์ <code>TestProject</code>
+       มีไฟล์ 2 อัน: <code>Program.cs</code> (โค้ด C#) และ <code>TestProject.csproj</code>
+       (ไฟล์โปรเจกต์) คลิก <code>Program.cs</code> ดู — เป็นแอป "Hello World!" แบบเดิม:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">TestProject/Program.cs</span></div>
+      <pre><code class="lang-cs">// See https://aka.ms/new-console-template for more information
+Console.WriteLine("Hello, World!");</code></pre>
+    </div>
+
+    <h3 id="s07b">แก้ไข Build และ Run</h3>
+    <ol>
+      <li>ใน EXPLORER คลิกขวาที่โฟลเดอร์ <b>TestProject</b> → เลือก <b>Open in Integrated Terminal</b>
+          (เพื่อให้ Terminal อยู่ในโฟลเดอร์โปรเจกต์พอดี — สำคัญมาก ก่อนสั่ง build/run ต้องเช็คว่า
+          Terminal อยู่ถูกโฟลเดอร์เสมอ)</li>
+      <li>แก้บรรทัดโค้ดเป็น:</li>
+    </ol>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Hello C#!");</code></pre>
+    </div>
+
+    <p>ครั้งแรกที่แก้ไฟล์ .cs อาจมี prompt ถาม "add missing assets to build and debug" — เลือก
+       <b>Yes</b> ได้เลย</p>
+
+    <div class="note bad">
+      <span class="lbl">🛑 อย่าลืม Save</span>
+      กด <b>Ctrl+S</b> (หรือ File → Save) เสมอหลังแก้โค้ด — คอมไพเลอร์เห็นแค่สิ่งที่<b>บันทึกแล้ว</b>
+      เท่านั้น ถ้าลืม save แล้วรัน จะได้ผลลัพธ์เป็นโค้ด<b>เก่า</b>ที่ยังไม่ได้แก้
+    </div>
+
+    <p>Build โปรเจกต์:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet build</code></pre>
+    </div>
+
+    <p><code>dotnet build</code> คอมไพล์โปรเจกต์และ dependency ทั้งหมดเป็นชุดไบนารี รวมถึงไฟล์
+       Intermediate Language (IL) นามสกุล <code>.dll</code> ถ้าอยากรู้ ไฟล์ <code>TestProject.dll</code>
+       จะอยู่ที่ประมาณ <code>TestProject\bin\Debug\net10.0\</code></p>
+
+    <p>รันแอป:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code>dotnet run</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Hello C#!</pre></div>
+
+    <p><code>dotnet run</code> รันซอร์สโค้ดโดยไม่ต้องสั่ง compile/launch แยก — สะดวกมากสำหรับ
+       การพัฒนาแบบวนซ้ำเร็วๆ จากบรรทัดคำสั่ง (แต่เบื้องหลังยังพึ่ง <code>dotnet build</code> ทำงานอยู่ดี)</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ เห็น "Hello, World!" แทน "Hello C#!" ไหม?</span>
+      แปลว่าคุณลืม save ไฟล์ก่อนสั่ง build/run — กลับไป save แล้วรันใหม่
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch7-m"><span>สร้างโปรเจกต์ TestProject ผ่าน VS Code สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch7-n"><span>แก้ข้อความ Save แล้ว build+run เห็นผลลัพธ์ใหม่ถูกต้อง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s08">7.8 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:32%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>รัน <code>dotnet build</code>/<code>dotnet run</code> แล้ว error "ไม่พบไฟล์โปรเจกต์"</td>
+          <td>Terminal ไม่ได้อยู่ในโฟลเดอร์โปรเจกต์ — ใช้ "Open in Integrated Terminal" จากเมนูคลิกขวา
+              บนโฟลเดอร์โปรเจกต์เสมอ</td>
+        </tr>
+        <tr>
+          <td>แก้โค้ดแล้วรันยังได้ผลลัพธ์เดิม</td>
+          <td>ลืม Ctrl+S บันทึกไฟล์ก่อนสั่ง build/run</td>
+        </tr>
+        <tr>
+          <td>ขึ้น notification "The .NET SDK cannot be located" หลังลง C# Dev Kit</td>
+          <td>ปกติ ปิดได้เลย ถ้าเคยติดตั้ง .NET SDK ไว้แล้ว (เช่นบทที่ 0) VS Code จะเจอเองหลัง
+              เปิด terminal ใหม่</td>
+        </tr>
+        <tr>
+          <td><code>dotnet --version</code> ใน terminal ของ VS Code ไม่เจอคำสั่ง</td>
+          <td>ต้องเปิด terminal <b>ใหม่</b>หลังติดตั้ง .NET SDK เสมอ (terminal เก่ายังจำ path เดิมอยู่)</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">7.9 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment จริงของบทนี้ใน Microsoft Learn (บทนี้มี 2 ข้อ)</p>
+
+    <div class="quiz" data-q="7-1">
+      <p class="q"><span class="num">1.</span> ส่วนไหนของหน้าตา VS Code ที่ใช้เขียนโค้ด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>Explorer</span></li>
+        <li class="opt"><span class="k">B</span><span>Extensions</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>Editor</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> Editor คือพื้นที่แก้ไขไฟล์โดยตรง ส่วน Explorer ใช้
+        เรียกดูไฟล์/โฟลเดอร์ และ Extensions ใช้จัดการส่วนเสริม ไม่ใช่ที่เขียนโค้ด</div>
+    </div>
+
+    <div class="quiz" data-q="7-2">
+      <p class="q"><span class="num">2.</span> เครื่องมือใดจำเป็นสำหรับรันคำสั่ง CLI อย่าง <code>dotnet run</code>?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>Visual Studio Code</span></li>
+        <li class="opt"><span class="k">B</span><span>C# Dev Kit</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>.NET SDK</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> คำสั่ง <code>dotnet</code> มาจาก .NET SDK โดยตรง —
+        VS Code เป็นแค่ editor ที่มี terminal ฝังอยู่ (รันได้แม้ไม่มี VS Code ผ่าน PowerShell ตรงๆ
+        แบบที่ทำมาตั้งแต่บทที่ 0) ส่วน C# Dev Kit เป็นแค่ extension ที่ช่วยอำนวยความสะดวก
+        ไม่ใช่สิ่งที่ CLI ต้องพึ่งพา</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">7.10 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ใน VS Code สร้างโปรเจกต์ใหม่ชื่อ <code>ch07-practice</code> ด้วยคำสั่ง
+           <code>dotnet new console -o ch07-practice</code> ผ่าน Terminal ที่ฝังอยู่ในตัว
+           (ไม่ใช่ PowerShell แยก) แล้ว build+run ให้เห็น Hello, World!</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ไม่มีโค้ดให้เฉลย เป็นแบบฝึกหัดลงมือทำจริง — เช็คจากผลลัพธ์ที่เห็นในเทอร์มินัลว่าตรงกับ
+             "Hello, World!" หรือไม่</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เปิด Command Palette (Ctrl+Shift+P) แล้วหาคำสั่งที่ใช้เปลี่ยนธีมสี (พิมพ์ "theme")
+           ลองเปลี่ยนดูว่ามีธีมอะไรให้เลือกบ้าง</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body"><p>คำสั่งที่ต้องการคือ <b>Preferences: Color Theme</b></p></div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>แยกส่วนประกอบคำสั่งนี้ตามโครงสร้าง driver/command/argument:
+           <code>dotnet new console -o MyApp</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>driver = <code>dotnet</code> · command = <code>new console</code> ·
+             argument = <code>-o MyApp</code></p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>รัน <code>dotnet build</code> ในโปรเจกต์ที่สร้างในข้อ 1 แล้วหาไฟล์ <code>.dll</code>
+           ที่ถูกสร้างขึ้นใน EXPLORER — อยู่ที่โฟลเดอร์ย่อยอะไร?</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>อยู่ที่ <code>ch07-practice\bin\Debug\net10.0\ch07-practice.dll</code>
+             (เลขเวอร์ชัน net10.0 อาจต่างกันไปตามที่คุณติดตั้ง)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>อธิบายว่าทำไมการคลิกขวาแล้วเลือก "Open in Integrated Terminal" ที่โฟลเดอร์โปรเจกต์
+           ปลอดภัยกว่าการเปิด Terminal เปล่าๆ แล้วพิมพ์ <code>cd</code> เอง</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ลดโอกาสพิมพ์ path ผิดหรือสะกดชื่อโฟลเดอร์ผิด — VS Code เติม path ที่ถูกต้องให้อัตโนมัติ
+             ตรงจากตำแหน่งโฟลเดอร์ที่คลิก ลดข้อผิดพลาดจากมนุษย์</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>สร้างโปรเจกต์ใหม่ แก้โค้ดให้พิมพ์ข้อความอะไรก็ได้ที่มีชื่อคุณอยู่ด้วย
+           <b>โดยตั้งใจไม่ save ไฟล์ก่อนสั่ง</b> <code>dotnet run</code> — สังเกตผลลัพธ์ที่ได้
+           ว่าตรงกับสิ่งที่คุณเพิ่งแก้ไปหรือไม่ แล้วอธิบายว่าทำไม</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ผลลัพธ์จะเป็นโค้ด<b>ก่อนแก้ไข</b> (เช่น "Hello, World!" เดิม) เพราะคอมไพเลอร์อ่านจาก
+             ไฟล์บนดิสก์เท่านั้น ไม่ใช่จากสิ่งที่ยังค้างอยู่ใน editor ที่ยังไม่ได้บันทึก —
+             นี่คือกับดักที่พบบ่อยมากตอนเพิ่งเริ่มใช้ IDE</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s11">📌 สรุปบทที่ 7</h2>
+
+    <p>เป้าหมายของบทนี้คือติดตั้งและตั้งค่าสภาพแวดล้อมการพัฒนาที่ตอบโจทย์การเขียน C# คุณติดตั้ง
+       Visual Studio Code และสำรวจ UI ที่มีโครงสร้างเป็นมาตรฐานอุตสาหกรรม ตั้งค่า extension
+       ที่ทำให้ VS Code เป็นเครื่องมือพัฒนา C# ที่ทรงพลังขึ้น ติดตั้ง .NET SDK เพื่อรองรับการ
+       คอมไพล์และรัน รวมถึงคำสั่ง .NET CLI ตอนนี้คุณพร้อมสร้างแอป C# ในสภาพแวดล้อมแบบที่
+       นักพัฒนามืออาชีพทั่วโลกใช้กันแล้ว</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 7</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:36%">คำสั่ง/ปุ่มลัด</th><th>ทำอะไร</th></tr></thead>
+        <tbody>
+          <tr><td><code>Ctrl+Shift+P</code></td><td>เปิด Command Palette</td></tr>
+          <tr><td><code>Ctrl+S</code></td><td>บันทึกไฟล์ (ทำก่อน build/run เสมอ)</td></tr>
+          <tr><td><code>Ctrl+`</code> (backtick)</td><td>เปิด/ปิด Terminal panel</td></tr>
+          <tr><td>คลิกขวาโฟลเดอร์ → Open in Integrated Terminal</td><td>เปิด Terminal ตรงตำแหน่งโปรเจกต์</td></tr>
+          <tr><td><code>dotnet new console -o ชื่อ</code></td><td>สร้างโปรเจกต์ console ใหม่</td></tr>
+          <tr><td><code>dotnet build</code></td><td>คอมไพล์อย่างเดียว</td></tr>
+          <tr><td><code>dotnet run</code></td><td>คอมไพล์ + รันในคำสั่งเดียว</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s12">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>IDE</td><td>สภาพแวดล้อมพัฒนาแบบครบวงจร</td><td>เครื่องมือรวมที่ช่วยเขียน/ดีบั๊ก/ทดสอบ/รันโค้ด</td></tr>
+        <tr><td>extension</td><td>ส่วนเสริม</td><td>ปลั๊กอินเพิ่มความสามารถให้ VS Code</td></tr>
+        <tr><td>Activity Bar</td><td>แถบกิจกรรม</td><td>แถบไอคอนแนวตั้งซ้ายสุด สลับมุมมอง</td></tr>
+        <tr><td>Side Bar</td><td>แถบข้าง</td><td>แสดงเครื่องมือตามมุมมองที่เลือก</td></tr>
+        <tr><td>Editor</td><td>ตัวแก้ไข</td><td>พื้นที่หลักสำหรับเขียน/แก้โค้ด</td></tr>
+        <tr><td>Panel</td><td>แผงข้อมูล</td><td>พื้นที่ใต้ editor แสดง terminal/output/debug</td></tr>
+        <tr><td>Command Palette</td><td>จานคำสั่ง</td><td>ช่องค้นหาและรันคำสั่งทุกอย่างของ VS Code</td></tr>
+        <tr><td>CLI (command-line interface)</td><td>อินเทอร์เฟซบรรทัดคำสั่ง</td><td>วิธีสั่งงานด้วยการพิมพ์คำสั่งข้อความ</td></tr>
+        <tr><td>build</td><td>สร้าง/คอมไพล์</td><td>แปลงโค้ดต้นฉบับเป็นไบนารีที่รันได้</td></tr>
+        <tr><td>IL (Intermediate Language)</td><td>ภาษากลาง</td><td>รูปแบบที่โค้ด C# ถูกคอมไพล์ไปเป็นก่อนรันจริง (.dll)</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch06.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 6 · Guided Project — Calculate Final GPA</span></a>
+      <a class="next" href="ch08.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 8 · Call Methods From the .NET Class Library</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

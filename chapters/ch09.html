@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 9 · Add Decision Logic — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="9">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 2 · Create and Run Simple Console Apps / บทที่ 9</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 2 · โมดูล 3/8</span>
+      <h1>เพิ่มตรรกะการตัดสินใจด้วย if, else, else if</h1>
+      <div class="en">Add Decision Logic Using if, else, and else if Statements</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>60–80 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เขียนโค้ดแตกเส้นทางการทำงานตามเงื่อนไขได้</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น–กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>เขียนโค้ดประเมินเงื่อนไขด้วย <code>if</code>, <code>else</code>, <code>else if</code> ได้</li>
+        <li>สร้าง Boolean expression เพื่อประเมินเงื่อนไขได้</li>
+        <li>รวม Boolean expression หลายตัวด้วย logical operator (<code>&&</code>, <code>||</code>) ได้</li>
+        <li>ซ้อน code block ไว้ในกันและกันได้ (nesting)</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">9.1 ทำไมต้องมีตรรกะการตัดสินใจ</h2>
+
+    <p>C# ให้คุณสร้างแอปที่มีตรรกะการตัดสินใจได้ สมมติอยากแสดงข้อมูลต่างกันให้ผู้ใช้ตามกฎธุรกิจ
+       บางอย่าง เช่น แสดงข้อความพิเศษบนบิลลูกค้าตามภูมิภาค ให้ส่วนลดตามขนาดคำสั่งซื้อ หรือแสดง
+       ตำแหน่งพนักงานตามระดับในบริษัท — ทุกกรณีต้องใช้ตรรกะการตัดสินใจ</p>
+
+    <p>จบบทนี้ คุณจะเขียนโค้ดที่เปลี่ยนเส้นทางการทำงานตามเงื่อนไขที่กำหนดได้</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">9.2 ลงมือ: สร้างตรรกะตัดสินใจด้วย if</h2>
+
+    <p>แอปส่วนใหญ่มีเส้นทางการทำงานหลายแบบ — นักพัฒนาเรียกโค้ดที่สร้างเส้นทางต่างๆ ว่า
+       <b>code branch</b> (สาขาของโค้ด) คำสั่งแตกสาขาที่ใช้บ่อยที่สุดคือ <code>if</code>
+       ซึ่งอาศัย Boolean expression ในวงเล็บ ถ้า expression เป็น true โค้ดหลัง <code>if</code>
+       จะทำงาน ถ้าไม่ .NET runtime จะข้ามไปเฉยๆ</p>
+
+    <p>ในหัวข้อนี้คุณจะสร้างเกมทอยลูกเต๋า 3 ลูก:</p>
+    <ul>
+      <li>ถ้าลูกเต๋า 2 ลูกออกเลขเดียวกัน ได้โบนัส 2 แต้ม (double)</li>
+      <li>ถ้าลูกเต๋าทั้ง 3 ลูกออกเลขเดียวกัน ได้โบนัส 6 แต้ม (triple)</li>
+      <li>ถ้าผลรวม (รวมโบนัส) ≥ 15 ชนะ ไม่งั้นแพ้</li>
+    </ul>
+
+    <h3 id="s02a">เตรียมโปรเจกต์</h3>
+    <p>เปิด VS Code → โฟลเดอร์ <code>CsharpProjects</code> → Terminal → สร้างโปรเจกต์ใหม่:</p>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch09-decisions</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <h3 id="s02b">สร้างข้อมูลตั้งต้น</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Random dice = new Random();
+
+int roll1 = dice.Next(1, 7);
+int roll2 = dice.Next(1, 7);
+int roll3 = dice.Next(1, 7);
+
+int total = roll1 + roll2 + roll3;
+
+Console.WriteLine($"Dice roll: {roll1} + {roll2} + {roll3} = {total}");</code></pre>
+    </div>
+    <div class="out auto"><div class="out-bar">Output (ตัวเลขสุ่มทุกครั้ง)</div><pre>
+Dice roll: 4 + 5 + 2 = 11</pre></div>
+
+    <h3 id="s02c">เพิ่ม if แสดงข้อความตามค่า total</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — ต่อท้าย</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">if (total > 14)
+{
+    Console.WriteLine("You win!");
+}
+
+if (total < 15)
+{
+    Console.WriteLine("Sorry, you lose.");
+}</code></pre>
+    </div>
+
+    <p><code>if</code> statement ประกอบด้วย 3 ส่วน:</p>
+    <ul>
+      <li>คีย์เวิร์ด <code>if</code></li>
+      <li><b>Boolean expression</b> ในวงเล็บ <code>()</code></li>
+      <li><b>code block</b> ในปีกกา <code>{ }</code></li>
+    </ul>
+
+    <p>ตอนรัน expression <code>total &gt; 14</code> ถูกประเมิน ถ้าเป็น true โค้ดใน code block จะ
+       ทำงาน ถ้า false จะถูกข้ามไป</p>
+
+    <h3 id="s02d">Boolean Expression คืออะไร</h3>
+    <p>Boolean expression คือโค้ดใดๆ ที่คืนค่า <code>true</code> หรือ <code>false</code> ง่ายที่สุด
+       ก็คือค่า <code>true</code>/<code>false</code> ตรงๆ หรือจะเป็นผลจากเมธอดที่คืน bool ก็ได้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง</span></div>
+      <pre><code class="lang-cs">string message = "The quick brown fox jumps over the lazy dog.";
+bool result = message.Contains("dog");
+Console.WriteLine(result);
+
+if (message.Contains("fox"))
+{
+    Console.WriteLine("What does the fox say?");
+}</code></pre>
+    </div>
+
+    <p>สร้าง Boolean expression ได้ด้วยตัวดำเนินการเปรียบเทียบ:</p>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:16%">ตัวดำเนินการ</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td><code>==</code></td><td>เท่ากับ</td></tr>
+        <tr><td><code>&gt;</code></td><td>มากกว่า</td></tr>
+        <tr><td><code>&lt;</code></td><td>น้อยกว่า</td></tr>
+        <tr><td><code>&gt;=</code></td><td>มากกว่าหรือเท่ากับ</td></tr>
+        <tr><td><code>&lt;=</code></td><td>น้อยกว่าหรือเท่ากับ</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ เจาะลึกเพิ่มเติม</span>
+      หลักสูตรนี้มีโมดูลเต็มๆ ว่าด้วยเรื่อง Boolean expression โดยเฉพาะ (Part 3 ของเล่มนี้)
+      บทนี้แค่ปูพื้นฐานเท่าที่จำเป็นก่อน
+    </div>
+
+    <p>เปลี่ยน <code>total > 14</code> เป็น <code>total >= 15</code> จะได้ผลเหมือนกันทุกประการ
+       (เพราะทำงานกับเลข int) แต่สื่อความหมายตรงกับกฎเกมที่เขียนไว้ว่า "≥ 15" มากกว่า</p>
+
+    <h3 id="s02e">Code Block คืออะไร</h3>
+    <p><b>code block</b> คือกลุ่มโค้ดหนึ่งบรรทัดขึ้นไป ที่ถูกล้อมด้วยปีกกาเปิด-ปิด
+       <code>{ }</code> เป็นหน่วยโค้ดสมบูรณ์ที่มีจุดประสงค์เดียว ตอนรัน ถ้า Boolean expression
+       เป็น true โค้ดทุกบรรทัดใน block จะทำงาน ถ้า false ทุกบรรทัดจะถูกข้าม — code block ซ้อนกัน
+       ได้ด้วย (nested) ซึ่งพบบ่อยมากในแอปจริง จะได้ลองทำในหัวข้อถัดไป</p>
+
+    <h3 id="s02f">เพิ่มโบนัส Doubles</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เพิ่มก่อน if แรก</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">if ((roll1 == roll2) || (roll2 == roll3) || (roll1 == roll3))
+{
+    Console.WriteLine("You rolled doubles! +2 bonus to total!");
+    total += 2;
+}</code></pre>
+    </div>
+
+    <p>นี่คือการรวม Boolean expression 3 ตัวเป็น <b>compound condition</b> เดียว เครื่องหมาย
+       pipe คู่ <code>||</code> คือ <b>logical OR</b> — แปลว่า "ฝั่งซ้าย<i>หรือ</i>ฝั่งขวาต้องเป็น
+       true อย่างน้อยหนึ่งฝั่ง ทั้ง expression ถึงจะ true" ถ้าทั้งสองฝั่ง false ทั้ง expression
+       ก็ false ตามลำดับ C# ประเมินจากซ้ายไปขวา: เช็ค <code>roll1==roll2</code> ก่อน ถ้า false
+       ค่อยเช็ค <code>roll2==roll3</code> ถ้ายัง false ค่อยเช็ค <code>roll1==roll3</code></p>
+
+    <h3 id="s02g">เพิ่มโบนัส Triples</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เพิ่มต่อจาก if doubles</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">if ((roll1 == roll2) && (roll2 == roll3))
+{
+    Console.WriteLine("You rolled triples! +6 bonus to total!");
+    total += 6;
+}</code></pre>
+    </div>
+
+    <p>เครื่องหมาย ampersand คู่ <code>&&</code> คือ <b>logical AND</b> — "ต้องเป็น true
+       <i>ทั้งสองฝั่ง</i> expression ถึงจะ true" ในที่นี้ ถ้า <code>roll1==roll2</code> และ
+       <code>roll2==roll3</code> ก็สรุปได้ว่า <code>roll1==roll3</code> ด้วย แปลว่าออกเลข
+       เดียวกันทั้ง 3 ลูก</p>
+
+    <div class="out auto"><div class="out-bar">ตัวอย่างผลลัพธ์ที่เป็นไปได้</div><pre>
+Dice roll: 6 + 6 + 6 = 18
+You rolled doubles! +2 bonus to total!
+You rolled triples! +6 bonus to total!
+You win!</pre></div>
+
+    <div class="note bad">
+      <span class="lbl">🛑 พบบั๊ก!</span>
+      ทอยได้ triple แต่กลับได้โบนัสทั้ง double (+2) และ triple (+6) พร้อมกัน — ทั้งที่ triple
+      ก็ถือเป็น double อยู่แล้วในตัว โบนัสไม่ควร "ซ้อน" กันแบบนี้ ต้องมีเงื่อนไขแยกกันจริงๆ
+      สองแบบ — จะแก้ในหัวข้อถัดไป
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch9-a"><span>เขียน if แสดง win/lose ตาม total ได้</span></label></li>
+      <li><label><input type="checkbox" id="ch9-b"><span>เข้าใจว่า || คือ OR และ && คือ AND</span></label></li>
+      <li><label><input type="checkbox" id="ch9-c"><span>สังเกตเห็นบั๊กโบนัสซ้อนกันด้วยตาตัวเอง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">9.3 ลงมือ: if, else if, else แบบซ้อน</h2>
+
+    <p>หัวข้อนี้จะใช้ <code>else</code> และ <code>else if</code> ปรับปรุงการแตกสาขาโค้ด และ
+       แก้บั๊กโบนัสซ้อนกันด้วยการซ้อน (nesting) <code>if</code></p>
+
+    <h3 id="s03a">ใช้ else แทน if 2 อัน</h3>
+    <p>แทนที่จะเช็ค 2 รอบแยกกัน ใช้ <code>else</code> รวมเป็นชุดเดียว:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">if (total >= 15)
+{
+    Console.WriteLine("You win!");
+}
+else 
+{
+    Console.WriteLine("Sorry, you lose.");
+}</code></pre>
+    </div>
+
+    <p>ถ้า <code>total >= 15</code> เป็น false โค้ดใน code block หลัง <code>else</code> จะ
+       ทำงานแทน — เพราะทั้งสองผลลัพธ์เป็นด้านตรงข้ามกันพอดี นี่คือสถานการณ์ที่เหมาะกับ
+       <code>else</code> ที่สุด</p>
+
+    <h3 id="s03b">ซ้อน if แก้บั๊กโบนัสซ้อนกัน</h3>
+    <p><b>Nesting</b> คือการวาง code block ไว้ในกันและกัน ในที่นี้จะซ้อนชุด <code>if-else</code>
+       (เช็ค doubles) ไว้ข้างใน <code>if</code> อีกชั้น (เช็ค doubles ก่อน) เพื่อป้องกันไม่ให้
+       ได้โบนัสทั้งสองแบบพร้อมกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        </div>
+      <pre><code class="lang-cs">if ((roll1 == roll2) || (roll2 == roll3) || (roll1 == roll3))
+{
+    if ((roll1 == roll2) && (roll2 == roll3))
+    {
+        Console.WriteLine("You rolled triples! +6 bonus to total!");
+        total += 6;
+    }
+    else
+    {
+        Console.WriteLine("You rolled doubles! +2 bonus to total!");
+        total += 2;
+    }
+}
+
+if (total >= 15)
+{
+    Console.WriteLine("You win!");
+}
+else 
+{
+    Console.WriteLine("Sorry, you lose.");
+}</code></pre>
+    </div>
+
+    <svg viewBox="0 0 720 210" role="img" aria-label="แผนผังตรรกะการซ้อน if แก้บั๊กโบนัสซ้อนกัน" style="margin:18px 0">
+      <defs>
+        <marker id="ar9" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="var(--text-faint)"/>
+        </marker>
+      </defs>
+      <g font-family="var(--font-th)" font-size="12">
+        <rect x="270" y="10" width="180" height="46" rx="9" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="360" y="38" text-anchor="middle" fill="var(--brand-text)" font-weight="700">มีคู่ไหนเลขตรงกันไหม?</text>
+
+        <line x1="360" y1="56" x2="360" y2="80" stroke="var(--text-faint)" marker-end="url(#ar9)"/>
+        <text x="380" y="72" fill="var(--text-soft)">true</text>
+
+        <rect x="240" y="80" width="240" height="46" rx="9" fill="var(--tip-soft)" stroke="var(--tip)"/>
+        <text x="360" y="108" text-anchor="middle" fill="var(--tip)" font-weight="700">ครบทั้ง 3 ลูกเลยไหม? (triple)</text>
+
+        <line x1="330" y1="126" x2="180" y2="160" stroke="var(--text-faint)" marker-end="url(#ar9)"/>
+        <text x="220" y="148" fill="var(--text-soft)">true</text>
+        <rect x="20" y="160" width="220" height="42" rx="9" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text x="130" y="186" text-anchor="middle" fill="var(--ok)" font-weight="700">+6 triple เท่านั้น</text>
+
+        <line x1="390" y1="126" x2="540" y2="160" stroke="var(--text-faint)" marker-end="url(#ar9)"/>
+        <text x="500" y="148" fill="var(--text-soft)">false (else)</text>
+        <rect x="460" y="160" width="240" height="42" rx="9" fill="var(--warn-soft)" stroke="var(--warn)"/>
+        <text x="580" y="186" text-anchor="middle" fill="var(--warn)" font-weight="700">+2 double เท่านั้น</text>
+      </g>
+    </svg>
+
+    <p>โครงสร้างนี้สร้าง <code>if-else</code> ชั้นในที่ผลลัพธ์ตรงข้ามกันพอดี แล้วใช้ทั้งสองด้าน
+       (if/true และ else/false) มอบแต้มโบนัสให้ triples กับ doubles — เช็ค doubles ที่ชั้นนอกก่อน
+       แล้วเช็ค triples ที่ชั้นในทีหลัง แบบนี้พอชั้นในตรวจ triples แล้วได้ <code>false</code>
+       ชั้น else ก็มอบแต้มให้ doubles ได้อย่างแน่ใจว่าไม่ใช่ triples</p>
+
+    <p>ลอง hard-code ค่าทอยชั่วคราวเพื่อทดสอบโดยไม่ต้องรันซ้ำหลายสิบครั้ง — เพิ่มบรรทัดนี้เหนือ
+       บรรทัดประกาศ <code>total</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — ทดสอบ doubles</span></div>
+      <pre><code class="lang-cs">roll1 = 6;
+roll2 = 6;
+roll3 = 5;</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Dice roll: 6 + 6 + 5 = 17
+You rolled doubles! +2 bonus to total!
+You win!</pre></div>
+
+    <p>เปลี่ยนเป็น <code>roll3 = 6;</code> ทดสอบ triples:</p>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Dice roll: 6 + 6 + 6 = 18
+You rolled triples! +6 bonus to total!
+You win!</pre></div>
+
+    <p>คราวนี้ได้แค่โบนัสเดียวแล้ว — บั๊กแก้เรียบร้อย!</p>
+
+    <h3 id="s03c">ใช้ if, else if, else มอบรางวัลหลายระดับ</h3>
+    <p>เปลี่ยนจากข้อความ win/lose เป็นมอบรางวัลสมมติ 4 แบบ (ได้รางวัลเดียวเท่านั้น):</p>
+    <ul>
+      <li>คะแนน ≥ 16 → ได้รถใหม่</li>
+      <li>คะแนน ≥ 10 → ได้แล็ปท็อปใหม่</li>
+      <li>คะแนน = 7 พอดี → ได้ทริปเที่ยว</li>
+      <li>นอกนั้น → ได้ลูกแมว</li>
+    </ul>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        </div>
+      <pre><code class="lang-cs">if (total >= 16)
+{
+    Console.WriteLine("You win a new car!");
+}
+else if (total >= 10)
+{
+    Console.WriteLine("You win a new laptop!");
+}
+else if (total == 7)
+{
+    Console.WriteLine("You win a trip for two!");
+}
+else
+{
+    Console.WriteLine("You win a kitten!");
+}</code></pre>
+    </div>
+
+    <p><code>if</code>, <code>else if</code>, <code>else</code> ให้คุณสร้างเงื่อนไขที่แยกจากกัน
+       (mutually exclusive) ได้หลายชุด — ใช้เมื่อต้องการให้เกิดผลลัพธ์เดียวเท่านั้น จากหลาย
+       เงื่อนไขที่เป็นไปได้ ใช้ <code>else if</code> ได้กี่ตัวก็ได้ ถ้าไม่มีเงื่อนไขไหนตรงเลย
+       code block ของ <code>else</code> ตัวสุดท้ายจะทำงาน — <code>else</code> เป็นตัวเลือกเสริม
+       แต่ถ้าจะใส่ ต้องอยู่ท้ายสุดเสมอ</p>
+
+    <div class="note ok">
+      <span class="lbl">✅ สรุปหลักการ</span>
+      คู่ <code>if</code>/<code>else</code> ใช้ทดสอบเงื่อนไขเดียว แล้วเลือกทำ 1 ใน 2 ทาง —
+      ซ้อน <code>if</code> เพื่อจำกัดเงื่อนไขให้แคบลงได้ แต่ควรพิจารณาใช้
+      <code>if, else if, else</code> แทนถ้าเงื่อนไขมีหลายทางเลือก
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch9-d"><span>แก้บั๊กโบนัสซ้อนด้วยการซ้อน if สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch9-e"><span>ทดสอบด้วยการ hard-code ค่าทอยทั้ง double และ triple</span></label></li>
+      <li><label><input type="checkbox" id="ch9-f"><span>สร้างรางวัล 4 ระดับด้วย if/else if/else สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">9.4 ท้าทาย: กฎธุรกิจการต่ออายุสมาชิก</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl h">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>เริ่มจากโค้ดนี้ (ลบได้แค่บรรทัดคอมเมนต์ ห้ามลบบรรทัดอื่น และต้องใช้ตัวแปรทั้ง 3 ตัว
+           ในคำตอบ):</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs — บังคับใช้</span></div>
+        <pre><code class="lang-cs">Random random = new Random();
+int daysUntilExpiration = random.Next(12);
+int discountPercentage = 0;
+
+// เขียนโค้ดของคุณต่อจากตรงนี้</code></pre></div>
+        <p><code>daysUntilExpiration</code> เป็นค่าสุ่ม 0–11 (จำนวนวันก่อนหมดอายุ)
+           <code>discountPercentage</code> เริ่มที่ 0</p>
+        <p><b>กฎ 1:</b> แสดงข้อความได้แค่ข้อความเดียวเท่านั้น กฎที่เลขสูงกว่ามีความสำคัญเหนือกว่า</p>
+        <p><b>กฎ 2:</b> เหลือ ≤10 วัน → <code>Your subscription will expire soon. Renew now!</code></p>
+        <p><b>กฎ 3:</b> เหลือ ≤5 วัน → <code>Your subscription expires in _ days.</code> (แทน _
+           ด้วยค่า daysUntilExpiration) บวกบรรทัด <code>Renew now and save 10%!</code></p>
+        <p><b>กฎ 4:</b> เหลือ 1 วัน → <code>Your subscription expires within a day!</code> บวก
+           <code>Renew now and save 20%!</code></p>
+        <p><b>กฎ 5:</b> หมดอายุแล้ว (0 วัน) → <code>Your subscription has expired.</code></p>
+        <p><b>กฎ 6:</b> เหลือมากกว่า 10 วัน → ไม่ต้องแสดงอะไรเลย</p>
+        <p>ต้องใช้ <code>if-else</code> แยกอย่างน้อย 2 ชุด: ชุดหนึ่งแสดงข้อความวันหมดอายุ
+           อีกชุดแสดงข้อเสนอส่วนลด</p>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p><b>คำใบ้:</b> ใช้ <code>if, else if, else if, else if</code> เรียงจากกฎที่เจาะจง
+             ที่สุด (0 วัน) ไปหากฎที่กว้างที่สุด (≤10 วัน) — เพราะ C# ประเมินจากบนลงล่าง
+             แล้วหยุดที่เงื่อนไขแรกที่ตรง</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s05">9.5 เฉลยและวิเคราะห์</h2>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เฉลยตัวอย่าง</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Random random = new Random();
+int daysUntilExpiration = random.Next(12);
+int discountPercentage = 0;
+
+if (daysUntilExpiration == 0)
+{
+    Console.WriteLine("Your subscription has expired.");
+}
+else if (daysUntilExpiration == 1)
+{
+    Console.WriteLine("Your subscription expires within a day!");
+    discountPercentage = 20;
+}
+else if (daysUntilExpiration <= 5)
+{
+    Console.WriteLine($"Your subscription expires in {daysUntilExpiration} days.");
+    discountPercentage = 10;
+}
+else if (daysUntilExpiration <= 10)
+{
+    Console.WriteLine("Your subscription will expire soon. Renew now!");
+}
+
+if (discountPercentage > 0)
+{
+    Console.WriteLine($"Renew now and save {discountPercentage}%.");
+}</code></pre>
+    </div>
+    <div class="out auto"><div class="out-bar">ตัวอย่าง Output (สุ่มค่า daysUntilExpiration)</div><pre>
+Your subscription expires in 3 days.
+Renew now and save 10%.</pre></div>
+
+    <p>เฉลยนี้ใช้ <code>if-else if</code> ชุดเดียวจัดการทั้ง 4 กฎเรื่องข้อความหมดอายุ (กฎ 2–5)
+       เรียงจากเจาะจงสุด (0 วัน, 1 วัน) ไปกว้างสุด (≤10 วัน) แล้วใช้ <code>if</code> แยกต่างหาก
+       อีกชุดตรวจว่ามีส่วนลดให้แสดงหรือไม่ — ตอบโจทย์ "กฎ 1: แสดงข้อความได้แค่ข้อความเดียว"
+       เพราะแต่ละ <code>else if</code> loyalอยู่ในเชนเดียวกัน มีแค่เงื่อนไขเดียวที่จะทำงาน</p>
+
+    <!-- ============================================ -->
+    <h2 id="s06">9.6 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>ได้โบนัสซ้อนกันทั้งที่ไม่ควร</td>
+          <td>ใช้ <code>if</code> แยกกันหลายชุดแทนที่จะซ้อน (nest) — ทำให้เงื่อนไขที่ควรแยกกัน
+              กลับทำงานพร้อมกันได้ทั้งคู่</td>
+        </tr>
+        <tr>
+          <td>ลืมใส่ <code>{ }</code> เพราะคิดว่ามีโค้ดบรรทัดเดียว</td>
+          <td>C# อนุญาตให้ไม่ใส่ปีกกาได้ถ้ามีแค่ 1 บรรทัด แต่<b>ไม่แนะนำ</b> — เพิ่มบรรทัดทีหลัง
+              โดยไม่รู้ตัวว่ามันไม่อยู่ใน if แล้วจะกลายเป็นบั๊กเงียบ ควรใส่ปีกกาเสมอ</td>
+        </tr>
+        <tr>
+          <td>ใช้ <code>=</code> แทน <code>==</code> ใน Boolean expression</td>
+          <td><code>=</code> คือกำหนดค่า ไม่ใช่เปรียบเทียบ — C# จะ error ทันทีถ้าใช้ผิดแบบนี้
+              ในเงื่อนไขที่ต้องการ bool (ต่างจากบางภาษาที่ปล่อยผ่านแล้วเกิดบั๊กเงียบ)</td>
+        </tr>
+        <tr>
+          <td>วาง <code>else</code> ไว้กลางเชค else if แล้ว error</td>
+          <td><code>else</code> ต้องอยู่ท้ายสุดของเชนเสมอ ถ้ามี</td>
+        </tr>
+        <tr>
+          <td>ลำดับ else if ผิด ทำให้เงื่อนไขที่ตั้งใจไม่เคยถูกเช็คถึง</td>
+          <td>C# ประเมินจากบนลงล่าง หยุดที่ตัวแรกที่ตรง — เรียงจากเงื่อนไขแคบ/เจาะจงไปกว้าง
+              เสมอ (เหมือนโจทย์ 9.4 ที่เรียง 0 วัน → 1 วัน → ≤5 วัน → ≤10 วัน)</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">9.7 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Microsoft Learn (2 ข้อฝังในเนื้อหา + 3 ข้อ Module Assessment)</p>
+
+    <div class="quiz" data-q="9-1">
+      <p class="q"><span class="num">1.</span> code block คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>.NET Class Library</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>บรรทัดโค้ดที่ควรถูกปฏิบัติเป็นหน่วยเดียวกัน</span></li>
+        <li class="opt"><span class="k">C</span><span>บล็อกโค้ดที่ถูกบล็อกไม่ให้เข้าถึงได้</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> code block คือกลุ่มโค้ดที่ล้อมด้วย <code>{ }</code>
+        ถือเป็นหน่วยเดียวกัน — ไม่เกี่ยวกับการบล็อกการเข้าถึง (ข้อ C เข้าใจผิดจากชื่อ)</div>
+    </div>
+
+    <div class="quiz" data-q="9-2">
+      <p class="q"><span class="num">2.</span> Boolean statement/expression คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>นิพจน์ modulus</span></li>
+        <li class="opt"><span class="k">B</span><span>คำศัพท์เชิงลำดับ</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>โค้ดที่คืนค่า true หรือ false</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> นิยามตรงตัว</div>
+    </div>
+
+    <div class="quiz" data-q="9-3">
+      <p class="q"><span class="num">3.</span> กำหนด <code>int x = 5</code> Boolean expression ข้อใดถูกต้องและได้ผลเป็น true?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>x &lt; 5</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>x &gt; 5</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>x == 5</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> 5==5 เป็น true ส่วนข้อ A และ B เป็น false ทั้งคู่
+        (5 ไม่น้อยกว่า 5 และไม่มากกว่า 5)</div>
+    </div>
+
+    <div class="quiz" data-q="9-4">
+      <p class="q"><span class="num">4.</span> ตัวเลือกใด<b>ไม่ใช่</b>ตัวดำเนินการที่ถูกต้องใน C#?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>%%</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>&amp;&amp;</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>||</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> <code>%%</code> ไม่มีอยู่จริงใน C# (มีแค่ <code>%</code>
+        ตัวเดียวสำหรับ modulus) ส่วน <code>&&</code> และ <code>||</code> เป็นตัวดำเนินการ
+        logical AND/OR ที่ถูกต้อง</div>
+    </div>
+
+    <div class="quiz" data-q="9-5">
+      <p class="q"><span class="num">5.</span> ข้อความใดอธิบายไวยากรณ์ <code>if</code> statement ได้ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>Boolean expression ที่ if ประเมินเป็นตัวเลือกเสริม ใส่หรือไม่ใส่ก็ได้</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>else statement วางไว้ก่อน else if ไม่ได้</span></li>
+        <li class="opt"><span class="k">C</span><span>ถ้ามี else if ต้องมี else เสมอ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> <code>else</code> ต้องอยู่ท้ายสุดของเชนเสมอ (ถ้ามี)
+        ข้อ A ผิดเพราะ Boolean expression เป็นส่วนบังคับของ if ข้อ C ผิดเพราะ else เป็นตัวเลือก
+        เสริม ไม่บังคับต้องมี</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">9.8 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดตรวจว่าตัวแปร <code>int age = 20;</code> เป็นผู้ใหญ่ (≥18) หรือไม่
+           พิมพ์ข้อความ "เป็นผู้ใหญ่" หรือ "ยังไม่บรรลุนิติภาวะ" ตามผล</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int age = 20;
+if (age >= 18)
+{
+    Console.WriteLine("เป็นผู้ใหญ่");
+}
+else
+{
+    Console.WriteLine("ยังไม่บรรลุนิติภาวะ");
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดตัดเกรดจากคะแนน <code>int score = 78;</code>: ≥90=A, ≥80=B, ≥70=C, ต่ำกว่านั้น=F
+           ใช้ if/else if/else</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int score = 78;
+if (score >= 90)
+{
+    Console.WriteLine("A");
+}
+else if (score >= 80)
+{
+    Console.WriteLine("B");
+}
+else if (score >= 70)
+{
+    Console.WriteLine("C");
+}
+else
+{
+    Console.WriteLine("F");
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้ error หาสาเหตุและแก้ไข:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">int x = 10;
+if (x = 10)
+{
+    Console.WriteLine("เท่ากับ 10");
+}</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ใช้ <code>=</code> (กำหนดค่า) แทน <code>==</code> (เปรียบเทียบ) ต้องแก้เป็น
+             <code>if (x == 10)</code></p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดตรวจว่าปี <code>int year = 2028;</code> เป็นปีอธิกสุรทิน (leap year) หรือไม่
+           ด้วยกฎ: หารด้วย 4 ลงตัว<b>และ</b>(หารด้วย 100 ไม่ลงตัว<b>หรือ</b>หารด้วย 400 ลงตัว)</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ใช้ <code>%</code> เช็คหารลงตัว (เศษ=0) รวมกับ <code>&&</code>
+           และ <code>||</code> ตามกฎ ใส่วงเล็บให้ชัดเจนแบบเดียวกับหัวข้อ 9.2</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int year = 2028;
+if ((year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0)))
+{
+    Console.WriteLine($"{year} เป็นปีอธิกสุรทิน");
+}
+else
+{
+    Console.WriteLine($"{year} ไม่ใช่ปีอธิกสุรทิน");
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดกำหนดค่าตั๋วหนัง: อายุ &lt;12 = "เด็ก 100 บาท", อายุ 12–59 = "ผู้ใหญ่ 200 บาท",
+           อายุ ≥60 = "ผู้สูงอายุ 120 บาท" จากตัวแปร <code>int age = 65;</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int age = 65;
+if (age < 12)
+{
+    Console.WriteLine("เด็ก 100 บาท");
+}
+else if (age < 60)
+{
+    Console.WriteLine("ผู้ใหญ่ 200 บาท");
+}
+else
+{
+    Console.WriteLine("ผู้สูงอายุ 120 บาท");
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงเกมทอยลูกเต๋าจากหัวข้อ 9.3 ให้เพิ่มกฎใหม่: <b>ถ้าทอยได้ triple แล้วยังผลรวม
+           (ก่อนบวกโบนัส) เป็น 18 พอดี</b> (คือทอยได้ 6-6-6) ให้แสดงข้อความพิเศษ
+           "JACKPOT! Perfect roll!" เพิ่มขึ้นมาอีกบรรทัด ก่อนข้อความ win/lose ปกติ
+           (ต้องซ้อน if เพิ่มอีกชั้นจากโค้ดเดิม)</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>เพิ่ม if ตรวจ <code>total == 18</code> (ก่อนบวกโบนัส) ไว้ข้างใน
+           code block ของ triple ก่อนบรรทัด <code>total += 6;</code></p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่แก้)</span></div>
+          <pre><code class="lang-cs">if ((roll1 == roll2) || (roll2 == roll3) || (roll1 == roll3))
+{
+    if ((roll1 == roll2) && (roll2 == roll3))
+    {
+        if (total == 18)
+        {
+            Console.WriteLine("JACKPOT! Perfect roll!");
+        }
+        Console.WriteLine("You rolled triples! +6 bonus to total!");
+        total += 6;
+    }
+    else
+    {
+        Console.WriteLine("You rolled doubles! +2 bonus to total!");
+        total += 2;
+    }
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">📌 สรุปบทที่ 9</h2>
+
+    <p>เป้าหมายของบทนี้คือเพิ่มตรรกะแตกสาขาให้โค้ด ด้วย <code>if</code>, <code>else if</code>,
+       และ <code>else</code> คุณประเมิน Boolean expression เพื่อสร้างเส้นทางการทำงานทางเลือก
+       ในแอป ทำให้บางโค้ดทำงานและบางโค้ดถูกข้าม ขึ้นกับเงื่อนไข ถ้าไม่มีคำสั่งตัดสินใจ แอปของคุณ
+       จะไม่สามารถทำงานอัตโนมัติตามธุรกิจ เกม หรือวิทยาศาสตร์ที่ซับซ้อนได้เลย — เทคนิคจากบทนี้
+       จะถูกใช้ในแทบทุกแอปที่คุณสร้างต่อจากนี้</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 9</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:32%">ไวยากรณ์</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>if (เงื่อนไข) { }</code></td><td>ทำถ้าเงื่อนไขเป็น true</td></tr>
+          <tr><td><code>if () {} else {}</code></td><td>เลือก 1 ใน 2 ทาง</td></tr>
+          <tr><td><code>if () {} else if () {} else {}</code></td><td>เลือก 1 จากหลายทาง (else if ได้หลายตัว, else เสริม)</td></tr>
+          <tr><td><code>== &gt; &lt; &gt;= &lt;=</code></td><td>ตัวดำเนินการเปรียบเทียบ</td></tr>
+          <tr><td><code>&amp;&amp;</code></td><td>logical AND — true ทั้งคู่ถึงจะ true</td></tr>
+          <tr><td><code>||</code></td><td>logical OR — true ฝั่งใดฝั่งหนึ่งก็ true</td></tr>
+          <tr><td>if ซ้อนใน if</td><td>nesting — จำกัดเงื่อนไขให้แคบลง</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s10">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>code branch</td><td>สาขาโค้ด</td><td>เส้นทางการทำงานที่ต่างกันในแอป</td></tr>
+        <tr><td>Boolean expression</td><td>นิพจน์บูลีน</td><td>โค้ดที่คืนค่า true/false</td></tr>
+        <tr><td>code block</td><td>บล็อกโค้ด</td><td>กลุ่มโค้ดในปีกกา ถือเป็นหน่วยเดียวกัน</td></tr>
+        <tr><td>compound condition</td><td>เงื่อนไขผสม</td><td>รวม Boolean expression หลายตัวเข้าด้วยกัน</td></tr>
+        <tr><td>logical AND / OR</td><td>ตรรกะและ / หรือ</td><td>&& รวมด้วยเงื่อนไข "และ" · || รวมด้วยเงื่อนไข "หรือ"</td></tr>
+        <tr><td>nesting</td><td>การซ้อน</td><td>วาง code block ไว้ในกันและกัน</td></tr>
+        <tr><td>mutually exclusive</td><td>แยกจากกัน</td><td>เกิดได้แค่ผลลัพธ์เดียวจากหลายทางเลือก</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch08.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 8 · Call Methods From the .NET Class Library</span></a>
+      <a class="next" href="ch10.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 10 · Arrays and the foreach Statement</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

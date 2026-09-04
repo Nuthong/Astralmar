@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ตาราง Error Code CSxxxx รวม — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="appendix-errors">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ ภาคผนวก / Error Code (CSxxxx)</span>
+  <span class="spacer"></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">ภาคผนวก</span>
+      <h1>ตาราง Error Code (CSxxxx) รวม</h1>
+      <div class="en">Common C# Compiler Error &amp; Warning Codes</div>
+    </div>
+
+    <p>เวลาเขียนโค้ดแล้ว VS Code ขึ้นเส้นหยักสีแดงพร้อมรหัสแบบ <code>CS0103</code> นั่นคือรหัส
+       ข้อผิดพลาดของ<b>คอมไพเลอร์ C#</b> เอง (ต่างจาก exception ที่เกิดตอน runtime อย่าง
+       <code>DivideByZeroException</code> ซึ่งไม่มีรหัส CSxxxx) — รหัสพวกนี้คงที่และค้นหาได้เสมอ
+       ลอง copy รหัสไปค้นใน Google หรือพิมพ์ในช่อง "Filter by title" ของเอกสาร Microsoft Learn
+       ได้โดยตรง</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 วิธีอ่านตารางนี้</span>
+      ตารางเรียงตามลำดับที่เจอบ่อยตามช่วงที่เรียนในหนังสือเล่มนี้ — ถ้าเจอ error ไม่รู้จัก ลอง
+      Ctrl+F หารหัสในหน้านี้ก่อน ถ้าไม่เจอให้ลองอ่านข้อความ error เต็มๆ จาก VS Code เอง เพราะ
+      คอมไพเลอร์บอกตำแหน่งบรรทัดที่ผิดไว้เสมอ
+    </div>
+
+    <h2 id="s01">ข้อผิดพลาดตอน Build (ก่อนโค้ดจะได้รันด้วยซ้ำ)</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:10%">รหัส</th><th style="width:8%">ระดับ</th><th style="width:34%">ข้อความจากคอมไพเลอร์</th><th>สาเหตุที่พบบ่อย</th></tr></thead>
+      <tbody>
+        <tr><td><code>CS1002</code></td><td>Error</td><td><code>; expected</code></td>
+            <td>ลืมพิมพ์เซมิโคลอนปิดท้ายคำสั่ง — ทบทวน<a href="ch01.html">บทที่ 1</a></td></tr>
+        <tr><td><code>CS1513</code></td><td>Error</td><td><code>} expected</code></td>
+            <td>ปีกกาเปิด-ปิดไม่ครบคู่ มักเกิดตอนซ้อน if/for/method หลายชั้น — ทบทวน
+                <a href="ch11.html">บทที่ 11</a></td></tr>
+        <tr><td><code>CS0103</code></td><td>Error</td><td><code>The name 'X' does not exist in the current context</code></td>
+            <td>พิมพ์ชื่อตัวแปร/เมธอดผิด หรือเรียกใช้ตัวแปรนอก scope ของมัน — ทบทวน
+                <a href="ch15.html">บทที่ 15</a></td></tr>
+        <tr><td><code>CS0246</code></td><td>Error</td><td><code>The type or namespace name 'X' could not be found</code></td>
+            <td>พิมพ์ชื่อชนิดข้อมูล/คลาสผิด หรือลืม <code>using</code> namespace ที่ต้องใช้</td></tr>
+        <tr><td><code>CS0201</code></td><td>Error</td><td><code>Only assignment, call, increment, decrement, await, and new object expressions can be used as a statement</code></td>
+            <td>เขียน <code>==</code> (เปรียบเทียบ) ทั้งที่ตั้งใจเขียน <code>=</code> (กำหนดค่า)
+                เป็นบรรทัดคำสั่งเดี่ยวๆ — ทบทวน<a href="ch02.html">บทที่ 2</a></td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h2 id="s02">เรื่อง Scope และตัวแปร (Part 3)</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:10%">รหัส</th><th style="width:8%">ระดับ</th><th style="width:34%">ข้อความจากคอมไพเลอร์</th><th>สาเหตุที่พบบ่อย</th></tr></thead>
+      <tbody>
+        <tr><td><code>CS0165</code></td><td>Error</td><td><code>Use of unassigned local variable 'X'</code></td>
+            <td>ประกาศตัวแปรไว้แต่ยังไม่กำหนดค่า (ไม่มี definite assignment) แล้วนำไปใช้ก่อน —
+                ทบทวน<a href="ch15.html">บทที่ 15</a></td></tr>
+        <tr><td><code>CS0128</code></td><td>Error</td><td><code>A local variable named 'X' is already defined in this scope</code></td>
+            <td>ประกาศตัวแปรชื่อซ้ำกันใน scope เดียวกัน</td></tr>
+        <tr><td><code>CS0136</code></td><td>Error</td><td><code>A local or parameter named 'X' cannot be declared in this scope because it is used in an enclosing local scope</code></td>
+            <td>ตั้งชื่อตัวแปรใน block ซ้อนซ้ำกับชื่อที่ใช้ใน block ที่ล้อมรอบอยู่ —
+                ทบทวน<a href="ch15.html">บทที่ 15</a></td></tr>
+        <tr><td><code>CS0152</code></td><td>Error</td><td><code>The label 'X' already occurs in this switch statement</code></td>
+            <td>เขียน <code>case</code> ค่าเดียวกันซ้ำสองครั้งใน switch เดียว — ทบทวน
+                <a href="ch16.html">บทที่ 16</a></td></tr>
+        <tr><td><code>CS0163</code></td><td>Error</td><td><code>Control cannot fall through from one case label ('label') to another</code></td>
+            <td>ลืมปิด <code>case</code> ด้วย <code>break</code>/<code>return</code> (C# ไม่มี
+                fall-through แบบ C/Java) — ทบทวน<a href="ch16.html">บทที่ 16</a></td></tr>
+        <tr><td><code>CS0139</code></td><td>Error</td><td><code>No enclosing loop out of which to break or continue</code></td>
+            <td>เขียน <code>break</code> หรือ <code>continue</code> ไว้นอก loop/switch —
+                ทบทวน<a href="ch17.html">บทที่ 17</a></td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h2 id="s03">เรื่องชนิดข้อมูลและ Casting (Part 4)</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:10%">รหัส</th><th style="width:8%">ระดับ</th><th style="width:34%">ข้อความจากคอมไพเลอร์</th><th>สาเหตุที่พบบ่อย</th></tr></thead>
+      <tbody>
+        <tr><td><code>CS0029</code></td><td>Error</td><td><code>Cannot implicitly convert type 'X' to 'Y'</code></td>
+            <td>กำหนดค่าชนิดหนึ่งให้ตัวแปรอีกชนิดที่เข้ากันไม่ได้เลย (ไม่มีทาง cast ได้ด้วยซ้ำ)</td></tr>
+        <tr><td><code>CS0266</code></td><td>Error</td><td><code>Cannot implicitly convert type 'X' to 'Y'. An explicit conversion exists (are you missing a cast?)</code></td>
+            <td>ลืมใส่ <code>(ชนิด)</code> ข้างหน้าตอนแปลงชนิดข้อมูลแคบลง เช่น
+                <code>double</code> เป็น <code>int</code> — ทบทวน<a href="ch22.html">บทที่ 22</a></td></tr>
+        <tr><td><code>CS1503</code></td><td>Error</td><td><code>Argument N: cannot convert from 'X' to 'Y'</code></td>
+            <td>ส่ง argument ชนิดผิดให้เมธอด/constructor ตอนเรียกใช้ — ทบทวน
+                <a href="ch29.html">บทที่ 29</a></td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h2 id="s04">เรื่อง Method (Part 5)</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:10%">รหัส</th><th style="width:8%">ระดับ</th><th style="width:34%">ข้อความจากคอมไพเลอร์</th><th>สาเหตุที่พบบ่อย</th></tr></thead>
+      <tbody>
+        <tr><td><code>CS0161</code></td><td>Error</td><td><code>'method': not all code paths return a value</code></td>
+            <td>เมธอดมี return type ไม่ใช่ <code>void</code> แต่บางเส้นทาง (เช่น
+                if ไม่มี else) ไม่มี <code>return</code> — ทบทวน<a href="ch30.html">บทที่ 30</a></td></tr>
+        <tr><td><code>CS0127</code></td><td>Error</td><td><code>Since 'method' returns void, a return keyword must not be followed by an object expression</code></td>
+            <td>เขียน <code>return ค่า;</code> ในเมธอดที่ประกาศเป็น <code>void</code> —
+                ทบทวน<a href="ch30.html">บทที่ 30</a></td></tr>
+        <tr><td><code>CS1501</code></td><td>Error</td><td><code>No overload for method 'X' takes N arguments</code></td>
+            <td>เรียกเมธอดโดยใส่จำนวน argument ไม่ตรงกับ parameter ที่นิยามไว้ — ทบทวน
+                <a href="ch29.html">บทที่ 29</a></td></tr>
+        <tr><td><code>CS8321</code></td><td>Warning</td><td><code>The local function 'X' is declared but never used</code></td>
+            <td>ประกาศ local function ไว้ใน top-level statements แต่ไม่เคยเรียกใช้เลย</td></tr>
+        <tr><td><code>CS0219</code></td><td>Warning</td><td><code>The variable 'X' is assigned but its value is never used</code></td>
+            <td>ประกาศและกำหนดค่าตัวแปรไว้ แต่ไม่เคยอ่านค่ามันไปใช้ที่ไหนเลย — ไม่ทำให้โค้ดพัง
+                แต่มักบ่งบอกว่าลืมเขียนบางบรรทัด</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ Error vs Warning ต่างกันอย่างไร</span>
+      <b>Error</b> (สีแดง) ทำให้คอมไพล์ไม่ผ่านเลย ต้องแก้ก่อนถึงจะรันได้ ส่วน <b>Warning</b>
+      (สีเหลือง) ไม่ขวางการคอมไพล์ โค้ดยังรันได้ปกติ แต่เป็นสัญญาณเตือนว่าอาจมีบางอย่างไม่ตั้งใจ
+      เกิดขึ้น (เช่น ประกาศตัวแปรไว้เฉยๆ ไม่ได้ใช้) — มืออาชีพมักตั้งใจไล่แก้ warning ให้เกลี้ยง
+      ด้วยเหมือนกัน แม้จะไม่บังคับก็ตาม
+    </div>
+
+    <div class="pager">
+      <a href="../index.html"><span class="dir">← กลับสารบัญ</span><span class="ttl">Foundational C#</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

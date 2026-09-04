@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Foundational C# with Microsoft Certification — หนังสือเรียนภาษาไทย</title>
+<link rel="stylesheet" href="assets/book.css">
+</head>
+<body>
+
+<header class="topbar">
+  <span class="home">📘 <span>Foundational C#</span></span>
+  <span class="spacer"></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+</header>
+
+<section class="cover">
+  <span class="badge">Microsoft Learn × freeCodeCamp</span>
+  <h1>Foundational C#<br>with Microsoft Certification</h1>
+  <p class="sub">หนังสือเรียนภาษาไทยฉบับสมบูรณ์ — รันโค้ดได้จริง ไม่ต้องพึ่งอินเทอร์เน็ต</p>
+  <p class="sub2">แปล เรียบเรียง และเสริมแบบฝึกหัดจากเนื้อหาต้นฉบับ Microsoft Learn ครบทุกโมดูล</p>
+
+  <div class="cover-stats">
+    <div class="stat"><b>6</b><span>คอร์ส</span></div>
+    <div class="stat"><b>44</b><span>โมดูล</span></div>
+    <div class="stat"><b>39/39</b><span>บทพร้อมอ่าน</span></div>
+    <div class="stat"><b>7/7</b><span>Part เสร็จแล้ว</span></div>
+  </div>
+
+  <p style="margin-top:26px">
+    <a class="btn-play" href="chapters/playground.html" style="height:44px;padding:0 22px;font-size:.95rem">
+      🎮 <span>ลองเขียน C# เล่นได้เลย — รันจริงในเบราว์เซอร์</span>
+    </a>
+  </p>
+
+  <div class="note tip" style="max-width:640px;margin:22px auto 0;text-align:left">
+    <span class="lbl">💡 เปิดเล่มนี้ยังไง</span>
+    ถ้าแค่จะ<b>อ่าน</b>เนื้อหา ดับเบิลคลิก <code>index.html</code> ได้ตามปกติเลย — แต่ถ้าอยาก
+    ใช้ปุ่ม <b>▶ Run</b> หรือหน้า <b>🎮 เล่นโค้ด</b> (รันโค้ด C# จริง) ต้องเปิดผ่าน
+    <code>start-book.bat</code> แทน (ดับเบิลคลิกไฟล์นี้ในโฟลเดอร์เดียวกัน จะเปิดเบราว์เซอร์ให้
+    อัตโนมัติ) เพราะเบราว์เซอร์บล็อกไม่ให้หน้าที่เปิดแบบ file:// โหลดตัว C# runtime กันเอง
+  </div>
+</section>
+
+<div class="toc">
+
+  <div class="part">
+    <div class="part-head">
+      <div class="pn">0</div>
+      <h2>ปฐมบท<span class="pen">Before You Begin</span></h2>
+      <span class="cnt">1/1 บทพร้อมอ่าน</span>
+    </div>
+    <ol>
+      <li><a href="chapters/ch00.html">
+        <span class="num">00</span>
+        <span class="name">ก่อนเริ่มต้น<small>ติดตั้ง .NET SDK · ทำความรู้จักเส้นทางทั้งเล่ม</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="0"><i></i></span>
+      </a></li>
+    </ol>
+  </div>
+
+  <div class="part">
+    <div class="part-head">
+      <div class="pn">1</div>
+      <h2>Write Your First Code Using C#<span class="pen">Part 1 · 6 โมดูล + 🏆 Trophy</span></h2>
+      <span class="cnt">6/6 บทพร้อมอ่าน ✅</span>
+    </div>
+    <ol>
+      <li><a href="chapters/ch01.html">
+        <span class="num">01</span>
+        <span class="name">Write Your First C# Code<small>Console.WriteLine · Console.Write · ไวยากรณ์พื้นฐาน</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="1"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch02.html">
+        <span class="num">02</span>
+        <span class="name">Store and Retrieve Data<small>literal · variable · ชนิดข้อมูล 5 แบบ · var</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="2"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch03.html">
+        <span class="num">03</span>
+        <span class="name">Perform Basic String Formatting<small>escape sequence · verbatim · concatenation · interpolation</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="3"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch04.html">
+        <span class="num">04</span>
+        <span class="name">Perform Basic Operations on Numbers<small>+ - * / % · cast · increment/decrement</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="4"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch05.html">
+        <span class="num">05</span>
+        <span class="name">Guided Project — Student Grades<small>โปรเจกต์แรก: คำนวณเกรดนักเรียน</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="5"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch06.html">
+        <span class="num">06</span>
+        <span class="name">Guided Project — Final GPA<small>แกะทศนิยมทีละหลัก + 🏆 Trophy Part 1</small></span>
+        <span class="tag trophy">🏆 พร้อมอ่าน</span>
+        <span class="pbar" data-for="6"><i></i></span>
+      </a></li>
+    </ol>
+  </div>
+
+  <div class="part">
+    <div class="part-head">
+      <div class="pn">2</div>
+      <h2>Create and Run Simple C# Console Applications<span class="pen">Part 2 · 7 โมดูล + 🏆 Trophy</span></h2>
+      <span class="cnt">7/7 บทพร้อมอ่าน ✅</span>
+    </div>
+    <ol>
+      <li><a href="chapters/ch07.html">
+        <span class="num">07</span>
+        <span class="name">Install and Configure Visual Studio Code<small>ติดตั้ง IDE มืออาชีพ + สำรวจหน้าตา</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="7"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch08.html">
+        <span class="num">08</span>
+        <span class="name">Call Methods From the .NET Class Library<small>stateful/stateless · overload · IntelliSense</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="8"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch09.html">
+        <span class="num">09</span>
+        <span class="name">Add Decision Logic (if / else if / else)<small>Boolean expression · && · || · nesting</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="9"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch10.html">
+        <span class="num">10</span>
+        <span class="name">Arrays and the foreach Statement<small>zero-based index · Length · IndexOutOfRangeException</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="10"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch11.html">
+        <span class="num">11</span>
+        <span class="name">Create Readable Code<small>camelCase · comment · whitespace</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="11"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch12.html">
+        <span class="num">12</span>
+        <span class="name">Guided Project — Arrays, Iteration, Selection<small>รีแฟกเตอร์แอปตัดเกรดด้วย array+loop+if</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="12"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch13.html">
+        <span class="num">13</span>
+        <span class="name">Challenge Project — Arrays, Iteration, Selection<small>ท้าทายไม่มีเฉลยทางการ + 🏆 Trophy Part 2</small></span>
+        <span class="tag trophy">🏆 พร้อมอ่าน</span>
+        <span class="pbar" data-for="13"><i></i></span>
+      </a></li>
+    </ol>
+  </div>
+
+  <div class="part">
+    <div class="part-head">
+      <div class="pn">3</div>
+      <h2>Add Logic to C# Console Applications<span class="pen">Part 3 · 7 โมดูล + 🏆 Trophy</span></h2>
+      <span class="cnt">7/7 บทพร้อมอ่าน ✅</span>
+    </div>
+    <ol>
+      <li><a href="chapters/ch14.html">
+        <span class="num">14</span>
+        <span class="name">Evaluate Boolean Expressions to Make Decisions<small>กฎ De Morgan · && · || · ! · short-circuit evaluation</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="14"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch15.html">
+        <span class="num">15</span>
+        <span class="name">Control Variable Scope and Logic Using Code Blocks<small>local scope · definite assignment · nested block</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="15"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch16.html">
+        <span class="num">16</span>
+        <span class="name">Branch the Flow of Code Using switch-case<small>ไม่มี fall-through แบบ C/Java · string.Split()</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="16"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch17.html">
+        <span class="num">17</span>
+        <span class="name">Iterate Through a Code Block Using the for Statement<small>initializer · condition · iterator · FizzBuzz!</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="17"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch18.html">
+        <span class="num">18</span>
+        <span class="name">Add Looping Logic Using do-while and while<small>continue · จำลองศึก RPG · กับดักเซมิโคลอนเกิน</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="18"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch19.html">
+        <span class="num">19</span>
+        <span class="name">Guided Project — Conditional Branching and Looping<small>สร้างแอป Contoso Pets ตัวแรก (multidimensional array)</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="19"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch20.html">
+        <span class="num">20</span>
+        <span class="name">Challenge Project — Branching and Looping<small>เมนู 3-4 ของ Contoso Pets + 🏆 Trophy Part 3</small></span>
+        <span class="tag trophy">🏆 พร้อมอ่าน</span>
+        <span class="pbar" data-for="20"><i></i></span>
+      </a></li>
+    </ol>
+  </div>
+
+  <div class="part">
+    <div class="part-head">
+      <div class="pn">4</div>
+      <h2>Work with Variable Data in C# Console Applications<span class="pen">Part 4 · 7 โมดูล + 🏆 Trophy</span></h2>
+      <span class="cnt">7/7 บทพร้อมอ่าน ✅</span>
+    </div>
+    <ol>
+      <li><a href="chapters/ch21.html">
+        <span class="num">21</span>
+        <span class="name">Choose the Correct Data Type<small>value type vs reference type · stack กับ heap</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="21"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch22.html">
+        <span class="num">22</span>
+        <span class="name">Convert Data Types Using Casting and Conversion<small>implicit/explicit · Convert class · TryParse()</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="22"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch23.html">
+        <span class="num">23</span>
+        <span class="name">Perform Operations on Arrays Using Helper Methods<small>Sort · Reverse · Clear · Resize · Split · Join</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="23"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch24.html">
+        <span class="num">24</span>
+        <span class="name">Format Alphanumeric Data for Presentation<small>composite formatting · :C :N :P · padding/alignment</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="24"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch25.html">
+        <span class="num">25</span>
+        <span class="name">Modify the Content of Strings<small>IndexOf · Substring · Remove · Replace · const</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="25"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch26.html">
+        <span class="num">26</span>
+        <span class="name">Guided Project — Work with Variable Data<small>เพิ่มระบบค้นหาและเงินบริจาคให้ Contoso Pets</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="26"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch27.html">
+        <span class="num">27</span>
+        <span class="name">Challenge Project — Work with Variable Data<small>ค้นหาหลายคำ + แอนิเมชันหมุน + 🏆 Trophy Part 4</small></span>
+        <span class="tag trophy">🏆 พร้อมอ่าน</span>
+        <span class="pbar" data-for="27"><i></i></span>
+      </a></li>
+    </ol>
+  </div>
+
+  <div class="part">
+    <div class="part-head">
+      <div class="pn">5</div>
+      <h2>Create Methods in C# Console Applications<span class="pen">Part 5 · 5 โมดูล + 🏆 Trophy</span></h2>
+      <span class="cnt">5/5 บทพร้อมอ่าน ✅</span>
+    </div>
+    <ol>
+      <li><a href="chapters/ch28.html">
+        <span class="num">28</span>
+        <span class="name">Write Your First C# Method<small>method signature · pseudo-code · placeholder method</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="28"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch29.html">
+        <span class="num">29</span>
+        <span class="name">Create C# Methods with Parameters<small>pass-by-value/reference · named &amp; optional argument</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="29"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch30.html">
+        <span class="num">30</span>
+        <span class="name">Create C# Methods that Return Values<small>return type · โจทย์สัมภาษณ์คลาสสิก (palindrome, reverse)</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="30"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch31.html">
+        <span class="num">31</span>
+        <span class="name">Guided Project — Plan a Petting Zoo Visit<small>Fisher-Yates shuffle · optional parameter</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="31"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch32.html">
+        <span class="num">32</span>
+        <span class="name">Challenge Project — Create a Mini-Game<small>เกมคอนโซลเล่นได้จริง + 🏆 Trophy Part 5</small></span>
+        <span class="tag trophy">🏆 พร้อมอ่าน</span>
+        <span class="pbar" data-for="32"><i></i></span>
+      </a></li>
+    </ol>
+  </div>
+
+  <div class="part">
+    <div class="part-head">
+      <div class="pn">6</div>
+      <h2>Debug C# Console Applications<span class="pen">Part 6 · 6 โมดูล + 🏆 Trophy</span></h2>
+      <span class="cnt">6/6 บทพร้อมอ่าน ✅</span>
+    </div>
+    <ol>
+      <li><a href="chapters/ch33.html">
+        <span class="num">33</span>
+        <span class="name">ทบทวนหลักการ Debug และ Exception<small>testing vs debugging vs exception handling · debugger คืออะไร</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="33"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch34.html">
+        <span class="num">34</span>
+        <span class="name">ใช้เครื่องมือ Debug ของ Visual Studio Code<small>breakpoint · step over/into/out · launch.json</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="34"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch35.html">
+        <span class="num">35</span>
+        <span class="name">จัดการ Exception ด้วย try-catch-finally<small>call stack unwinding · exception ที่พบบ่อย</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="35"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch36.html">
+        <span class="num">36</span>
+        <span class="name">สร้างและโยน Exception ของคุณเอง<small>throw · re-throw · เลือกชนิด exception ให้เจาะจง</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="36"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch37.html">
+        <span class="num">37</span>
+        <span class="name">Guided Project — Debug และจัดการ Exception<small>แอปเครื่องคิดเงิน + หาบั๊ก logic เงียบ</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+        <span class="pbar" data-for="37"><i></i></span>
+      </a></li>
+      <li><a href="chapters/ch38.html">
+        <span class="num">38</span>
+        <span class="name">Challenge Project — Debug แอปให้สมบูรณ์<small>ตามล่าบั๊กเงียบด้วยตัวเอง + 🏆 Trophy Part 6</small></span>
+        <span class="tag trophy">🏆 พร้อมอ่าน</span>
+        <span class="pbar" data-for="38"><i></i></span>
+      </a></li>
+    </ol>
+  </div>
+
+  <div class="part">
+    <div class="part-head">
+      <div class="pn">7</div>
+      <h2>Foundational C# with Microsoft Certification Exam<span class="pen">Part 7 · ข้อสอบรับใบรับรอง</span></h2>
+      <span class="cnt">1/1 บทพร้อมอ่าน ✅</span>
+    </div>
+    <ol>
+      <li><a href="chapters/exam.html">
+        <span class="name">คู่มือสอบ + ข้อสอบจำลอง<small>รูปแบบข้อสอบจริง 80 ข้อ · ทบทวนภาพรวมทั้งเล่ม · ข้อสอบจำลอง 30 ข้อ</small></span>
+        <span class="tag trophy">🎓 พร้อมอ่าน</span>
+      </a></li>
+    </ol>
+  </div>
+
+  <div class="part">
+    <div class="part-head">
+      <div class="pn">A</div>
+      <h2>ภาคผนวก<span class="pen">Cheat Sheet รวม · ศัพท์ EN–TH · ดัชนี</span></h2>
+      <span class="cnt">4/4 พร้อมอ่าน ✅</span>
+    </div>
+    <ol>
+      <li><a href="chapters/appendix-cheatsheet.html">
+        <span class="name">Cheat Sheet รวมทั้งเล่ม<small>รวม 38 ตารางจากทุกบท เรียงตาม Part</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+      </a></li>
+      <li><a href="chapters/appendix-glossary.html">
+        <span class="name">ตารางศัพท์ EN–TH ทั้งเล่ม<small>243 คำศัพท์ เรียง A-Z พร้อมลิงก์กลับบทเรียน</small></span>
+        <span class="tag ready">พร้อมอ่าน</span>
+      </a></li>
+      <li><a href="chapters/appendix-errors.html">
+        <span class="name">ตาราง Error Code (CSxxxx) รวม</span>
+        <span class="tag ready">พร้อมอ่าน</span>
+      </a></li>
+      <li><a href="chapters/appendix-index.html">
+        <span class="name">ดัชนี</span>
+        <span class="tag ready">พร้อมอ่าน</span>
+      </a></li>
+    </ol>
+  </div>
+
+</div>
+
+<script src="assets/book.js"></script>
+</body>
+</html>

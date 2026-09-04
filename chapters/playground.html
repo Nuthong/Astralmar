@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>เล่นโค้ด C# — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="playground">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ เล่นโค้ด C#</span>
+  <span class="spacer"></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">🎮 Playground</span>
+      <h1>เล่นโค้ด C#</h1>
+      <div class="en">Write your own C# and run it for real</div>
+    </div>
+
+    <p>เขียนโค้ด C# อะไรก็ได้ในกล่องด้านล่าง แล้วกด <b>▶ Run</b> (หรือกด <code>Ctrl+Enter</code>)
+       เพื่อคอมไพล์และรันจริงทันที — เครื่องมือเดียวกับที่ใช้รันตัวอย่างโค้ดทั้งเล่ม ทำงาน
+       ในเครื่องคุณล้วนๆ ไม่มีการส่งโค้ดออกไปที่ไหนเลย</p>
+
+    <p>ยังไม่รู้จะเขียนอะไรดี? ลองกดตัวอย่างด้านล่างเพื่อโหลดโค้ดตัวอย่างเข้ากล่องได้เลย:</p>
+
+    <div class="pg-examples">
+      <button type="button" data-ex="hello">👋 Hello World</button>
+      <button type="button" data-ex="vars">🔤 ตัวแปร + คำนวณ</button>
+      <button type="button" data-ex="loop">🔁 ลูป (FizzBuzz)</button>
+      <button type="button" data-ex="method">🧩 เมธอด</button>
+      <button type="button" data-ex="exception">⚠️ try-catch</button>
+    </div>
+
+    <div class="code" id="pg-editor">
+      <div class="code-bar">
+        <span class="dot"></span><span class="name">Program.cs (แก้ไขได้)</span>
+        <button class="run" id="pg-run" type="button">▶ Run</button>
+      </div>
+      <textarea id="pg-code" spellcheck="false" autocapitalize="off" autocomplete="off"
+        rows="16"></textarea>
+    </div>
+
+    <div class="out" id="pg-out"><div class="out-bar">Output</div><pre></pre></div>
+
+    <p class="pg-hint">💡 กด <code>Tab</code> ในกล่องโค้ดเพื่อเยื้อง 4 ช่องว่าง (ไม่กระโดดออก
+       จากกล่อง) โค้ดที่พิมพ์ไว้จะถูกจำไว้ในเครื่องอัตโนมัติ ครั้งแรกที่กด Run ในเซสชันนี้อาจ
+       ใช้เวลาสักครู่เพื่อโหลด C# runtime — ครั้งถัดไปจะเร็วขึ้นมาก</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ถ้ากด Run แล้วค้างที่ "กำลังโหลด C# runtime…" ตลอด</span>
+      แปลว่าคุณเปิดหน้านี้ด้วยการดับเบิลคลิกไฟล์โดยตรง (file://) — เบราว์เซอร์บล็อกไม่ให้หน้า
+      แบบนี้โหลดไฟล์ประกอบกันเอง ต้องปิดแท็บนี้ แล้วไปดับเบิลคลิก <code>start-book.bat</code>
+      ในโฟลเดอร์เดียวกับ <code>index.html</code> แทน (เปิดครั้งเดียว จะพาเข้าเล่มให้อัตโนมัติ)
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ข้อจำกัดอื่นที่ควรรู้</span>
+      กล่องนี้ไม่มี <code>Console.ReadLine()</code>/<code>ReadKey()</code> ให้ใช้จริง (ไม่มี
+      stdin ในบราวเซอร์) และถ้าโค้ดมีลูปไม่สิ้นสุดจริงๆ แท็บนี้จะค้าง ต้องรีเฟรชหน้าใหม่ — เหมือน
+      ข้อจำกัดของทุกเครื่องมือรันโค้ดในบราวเซอร์ทั่วไป
+    </div>
+
+    <div class="pager">
+      <a href="../index.html"><span class="dir">← กลับสารบัญ</span><span class="ttl">Foundational C#</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

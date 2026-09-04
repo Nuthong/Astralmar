@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 15 · Code Blocks and Variable Scope — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="15">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 3 · Add Logic to Console Apps / บทที่ 15</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 3 · โมดูล 2/7</span>
+      <h1>ควบคุมขอบเขตตัวแปรและตรรกะด้วย Code Block</h1>
+      <div class="en">Control Variable Scope and Logic Using Code Blocks</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>45–65 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เข้าใจว่าตัวแปร "มองเห็น" กันได้แค่ไหน หมดปัญหา error งงๆ</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น–กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>เข้าใจผลกระทบของการประกาศ/กำหนดค่าตัวแปรทั้งข้างในและข้างนอก code block</li>
+        <li>ตัด code block ออกจาก if statement เพื่อเพิ่มความอ่านง่ายในกรณีที่เหมาะสมได้</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">15.1 ทำไมต้องเข้าใจ Scope ของตัวแปร</h2>
+
+    <p>คำสั่งแตกสาขาและคำสั่งวนซ้ำใช้ code block รวมกลุ่มบรรทัดโค้ดที่ควรถูกรัน ข้าม หรือวนซ้ำ
+       แต่นั่นไม่ใช่หน้าที่เดียวของ code block — code block ยังใช้ควบคุม/จำกัดการเข้าถึงตัวแปรได้
+       ด้วย <b>scope</b> ของตัวแปรหมายถึงส่วนของแอปที่ตัวแปรนั้นเข้าถึงได้ การเข้าใจว่า code block
+       มีผลต่อ scope ของตัวแปรยังไง เป็นเรื่องสำคัญมากในการเขียนโปรแกรม</p>
+
+    <p>สมมติคุณทำงานกับแอปขนาดใหญ่ที่ใช้ nested iteration และ selection statement ประมวลผลข้อมูล
+       ใน array แอปของคุณใช้ตัวแปรช่วยทำงานหลายอย่างทั่วทั้งแอป ตัวแปรบางตัวทำหน้าที่เดียวกันใน
+       หลายส่วนของแอป และคุณพยายามใช้ชื่อตัวแปรซ้ำ พอแอปโตขึ้น คุณเริ่มเจอผลลัพธ์การคำนวณที่ไม่คาด
+       คิด และ error ที่บอกว่าตัวแปรยังไม่ถูกกำหนดค่าหรือไม่มีอยู่จริง — คุณต้องปรับปรุงวิธีประกาศ
+       และเข้าถึงตัวแปร และต้องเข้าใจเรื่อง scope ให้ลึกซึ้งขึ้น</p>
+
+    <p>ในบทนี้ คุณจะประกาศตัวแปรเพื่อใช้ทั้งข้างในและข้างนอกขอบเขตของ code block คุณจะตัด
+       code block ออกในบางสถานการณ์เพื่อให้โค้ดอ่านง่ายขึ้น และเรียนว่า code block มีผลต่อการ
+       เข้าถึงและมองเห็นตัวแปรยังไง</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">15.2 ลงมือ: Code Block กับ Scope ของตัวแปร</h2>
+
+    <p><b>code block</b> คือคำสั่ง C# หนึ่งบรรทัดขึ้นไปที่นิยามเส้นทางการทำงาน คำสั่งที่อยู่
+       นอก code block มีผลต่อว่า code block นั้นจะถูกรันเมื่อไร รันไหม และรันบ่อยแค่ไหนตอนรันจริง
+       ขอบเขตของ code block มักถูกกำหนดด้วยปีกกา <code>{}</code></p>
+
+    <p>นอกจากมีผลต่อเส้นทางการทำงานแล้ว code block ยังมีผลต่อ scope ของตัวแปรด้วย —
+       <b>scope</b> ของตัวแปรหมายถึงการมองเห็นของตัวแปรนั้นต่อโค้ดส่วนอื่นในแอป ตัวแปรที่มี scope
+       แบบ local เข้าถึงได้แค่ข้างใน code block ที่มันถูกนิยามไว้เท่านั้น ถ้าพยายามเข้าถึงตัวแปร
+       นอก code block นั้น จะได้ compiler error</p>
+
+    <h3 id="s02a">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch15-scope</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <h3 id="s02b">สร้างตัวแปรข้างใน Code Block</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">bool flag = true;
+if (flag)
+{
+    int value = 10;
+    Console.WriteLine($"Inside the code block: {value}");
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Inside the code block: 10</pre></div>
+
+    <svg viewBox="0 0 720 170" role="img" aria-label="ขอบเขตการมองเห็นของตัวแปรที่ประกาศข้างในกับข้างนอก code block" style="margin:18px 0">
+      <g font-family="var(--font-th)" font-size="12.5">
+        <rect x="10" y="14" width="700" height="146" rx="12" fill="var(--bg-page)" stroke="var(--line)" stroke-width="2"/>
+        <text x="30" y="36" fill="var(--text-faint)" font-size="12">โปรแกรมทั้งไฟล์ — มองเห็นตัวแปรที่ประกาศตรงนี้ได้ทุกที่ด้านล่าง</text>
+
+        <rect x="30" y="46" width="660" height="98" rx="10" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="50" y="68" fill="var(--brand-text)" font-weight="700">if (flag) { ... } — code block</text>
+        <rect x="50" y="78" width="300" height="50" rx="8" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text x="200" y="108" text-anchor="middle" font-family="var(--font-code)" fill="var(--ok)" font-weight="700">int value = 10;</text>
+
+        <text x="380" y="108" fill="var(--text-soft)" font-size="12">↑ มองเห็นได้แค่ในกรอบเขียวนี้</text>
+        <text x="380" y="128" fill="var(--bad)" font-size="12">✗ เรียกใช้นอกกรอบนี้ = error</text>
+      </g>
+    </svg>
+
+    <h3 id="s02c">พยายามเข้าถึงตัวแปรนอก Code Block</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">bool flag = true;
+if (flag)
+{
+    int value = 10;
+    Console.WriteLine($"Inside the code block: {value}");
+}
+Console.WriteLine($"Outside the code block: {value}");</code></pre>
+    </div>
+    <div class="out err auto"><div class="out-bar">Output</div><pre>
+Program.cs(7,46): error CS0103: The name 'value' does not exist in the current context</pre></div>
+
+    <p>error นี้เกิดขึ้นเพราะตัวแปรที่ประกาศข้างใน code block เข้าถึงได้ (มองเห็นได้) แค่ข้างใน
+       code block นั้นเท่านั้น เพราะไม่สามารถเข้าถึง <code>value</code> นอก code block ที่มัน
+       ถูกประกาศได้ จึงเข้าถึงจากบรรทัดที่ 7 ไม่ได้</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ Local Variable</span>
+      ตัวแปรที่ประกาศไว้ใน code block ของเมธอด เรียกว่า <b>local variable</b> — คุณอาจเจอคำนี้
+      บ่อยเวลาอ่านบทความที่พูดถึงเรื่อง variable scope
+    </div>
+
+    <h3 id="s02d">ย้ายการประกาศตัวแปรขึ้นไปเหนือ Code Block</h3>
+    <p>ถ้าต้องการเข้าถึงตัวแปรทั้งข้างในและข้างนอก code block ต้องประกาศตัวแปรไว้<b>ก่อน</b> (เหนือ)
+       code block เพื่อให้โค้ดข้างนอก "มองเห็น" ตัวแปรได้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">bool flag = true;
+int value;
+
+if (flag)
+{
+    Console.WriteLine($"Inside the code block: {value}");
+}
+
+value = 10;
+Console.WriteLine($"Outside the code block: {value}");</code></pre>
+    </div>
+    <div class="out err auto"><div class="out-bar">Output</div><pre>
+Program.cs(6,49): error CS0165: Use of unassigned local variable 'value'</pre></div>
+
+    <p>ยัง error อยู่ดี! คราวนี้ error มาจากบรรทัดข้างใน code block เพราะ <code>value</code>
+       ยังไม่ถูกกำหนดค่า (ทบทวน error นี้ได้จาก <a href="ch02.html">บทที่ 2</a>) ถ้าบรรทัด
+       <code>value = 10;</code> อยู่<b>เหนือ</b> code block ของ <code>if</code> แอปจะคอมไพล์ผ่าน
+       ปกติ แต่เพราะ <code>value</code> ยังไม่ถูกกำหนดค่า จึงเข้าถึงข้างใน code block ไม่ได้</p>
+
+    <h3 id="s02e">กำหนดค่าเริ่มต้นตอนประกาศตัวแปร</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">bool flag = true;
+int value = 0;
+
+if (flag)
+{
+    Console.WriteLine($"Inside the code block: {value}");
+}
+
+value = 10;
+Console.WriteLine($"Outside the code block: {value}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Inside the code block: 0
+Outside the code block: 10</pre></div>
+
+    <p>โค้ดนี้แก้ error "unassigned local variable" ได้ด้วยการกำหนดค่า <code>value</code> ตอน
+       ประกาศ (initialize) เลย</p>
+
+    <h3 id="s02f">คอมไพเลอร์ตีความโค้ดยังไง — จุดที่ต้องระวัง</h3>
+    <p>เพื่อช่วยป้องกัน runtime error คอมไพเลอร์ C# วิเคราะห์โค้ดของคุณอย่างละเอียด แต่บางครั้ง
+       คอมไพเลอร์ก็ตีความโค้ดต่างจากที่คุณคิด ลองเทียบโค้ด 2 ชุดนี้ที่ดูเหมือนจะทำหน้าที่เดียวกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ชุดที่ 1</span></div>
+      <pre><code class="lang-cs">bool flag = true;
+int value;
+
+if (flag)
+{
+    value = 10;
+    Console.WriteLine($"Inside the code block: {value}");
+}
+
+Console.WriteLine($"Outside the code block: {value}");</code></pre>
+    </div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ชุดที่ 2</span></div>
+      <pre><code class="lang-cs">int value;
+
+if (true)
+{
+    value = 10;
+    Console.WriteLine($"Inside the code block: {value}");
+}
+
+Console.WriteLine($"Outside the code block: {value}");</code></pre>
+    </div>
+
+    <div class="note bad">
+      <span class="lbl">🛑 ชุดที่ 1 compile ไม่ผ่าน แต่ชุดที่ 2 ผ่าน! ทำไม?</span>
+      สำหรับ<b>ชุดที่ 1</b> คอมไพเลอร์ตีความว่า <code>flag</code> เป็นตัวแปร bool ที่<i>อาจ</i>
+      เป็น true หรือ false ก็ได้ คอมไพเลอร์จึงสรุปว่าถ้า <code>flag</code> เป็น false
+      <code>value</code> จะไม่ถูกกำหนดค่าเลยตอน <code>Console.WriteLine()</code> บรรทัดสุดท้าย
+      ทำงาน — คอมไพเลอร์มองเห็น 2 เส้นทางที่เป็นไปได้ (ถ้า flag=true กับถ้า flag=false)
+      และเส้นทางหลังทำให้เกิด error จึงฟ้อง error ทันที (พร้อมขีดเส้นหยักแดงใต้ <code>value</code>
+      ใน editor)<br><br>
+      สำหรับ<b>ชุดที่ 2</b> คอมไพเลอร์สรุปว่าเนื้อหาใน code block ของ <code>if (true)</code>
+      จะถูกรัน<b>เสมอ</b> (เพราะ <code>true</code> เป็น <code>true</code> ตายตัว ไม่มีทาง
+      เปลี่ยนแปลง) คอมไพเลอร์จึงมองว่ามีแค่เส้นทางเดียวที่เป็นไปได้ ไม่มี error
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 บทเรียนสำคัญ</span>
+      คอมไพเลอร์ C# วิเคราะห์ "เส้นทางการทำงานที่เป็นไปได้ทั้งหมด" (definite assignment analysis)
+      ไม่ใช่แค่เดาว่าคุณตั้งใจให้เกิดอะไรขึ้น — ถ้ามีเส้นทางไหนที่ตัวแปรอาจยังไม่ถูกกำหนดค่า
+      คอมไพเลอร์จะฟ้อง error ทันที แม้ในทางปฏิบัติเส้นทางนั้นจะไม่มีวันเกิดขึ้นจริงก็ตาม
+      (เช่นถ้าคุณรู้ว่า flag จะเป็น true เสมอ) — วิธีแก้ที่ปลอดภัยที่สุดคือ initialize ตัวแปรเสมอ
+      ตอนประกาศ (แบบหัวข้อ 15.2e)
+    </div>
+
+    <div class="quiz" data-q="15-1">
+      <p class="q"><span class="num">Check ★</span> นักพัฒนาเขียนโค้ดที่มี if code block โดย
+        initialize ตัวแปร int ตัวแรกเป็น 5 <b>เหนือ</b> code block เงื่อนไข if เป็น true ถ้าตัว
+        แรกมีค่ามากกว่า 0 บรรทัดแรกในบล็อก initialize ตัวแปร int ตัวที่สองเป็น 6 บรรทัดที่สอง
+        ในบล็อกกำหนดผลบวกของทั้งสองตัวให้ตัวแรก บรรทัดแรกหลังบล็อกแสดงค่าตัวแรก ผลลัพธ์คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>ไม่ error และแสดงค่า = ผลบวกของตัวแปรทั้งสอง</span></li>
+        <li class="opt"><span class="k">B</span><span>ไม่ error และแสดงค่าเริ่มต้นจากก่อนเข้าบล็อก</span></li>
+        <li class="opt"><span class="k">C</span><span>error เพราะตัวแปรตัวแรกไม่อยู่ใน scope หลังจบบล็อก</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ตัวแปรตัวแรกถูกประกาศ<b>เหนือ</b> code block จึงมี
+        scope ครอบคลุมทั้งข้างในและข้างนอก (ไม่ error แบบข้อ C) และค่าที่แสดงหลังบล็อกคือค่าล่าสุด
+        ที่ถูกกำหนด (คือผลบวก 5+6=11) ไม่ใช่ค่าเริ่มต้นก่อนเข้าบล็อก (ข้อ B ผิด)</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch15-a"><span>เจอ error CS0103 จากตัวแปรที่ scope อยู่แค่ในบล็อกด้วยตัวเอง</span></label></li>
+      <li><label><input type="checkbox" id="ch15-b"><span>เจอ error CS0165 จากตัวแปรที่ยังไม่ initialize ด้วยตัวเอง</span></label></li>
+      <li><label><input type="checkbox" id="ch15-c"><span>เข้าใจว่าทำไม if(flag) กับ if(true) ให้ผลคอมไพล์ต่างกัน</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">15.3 ลงมือ: ตัด Code Block ออกจาก if เพื่อความอ่านง่าย</h2>
+
+    <p>นักพัฒนาชอบเขียนโค้ดที่ประหยัดการพิมพ์และพื้นที่ โดยไม่เสียความอ่านง่าย — ใช้หลัก
+       "น้อยแต่มาก" เฉพาะตอนที่มันทำให้กระบวนการพัฒนาอ่านและเข้าใจง่ายขึ้นเท่านั้น</p>
+
+    <p>ถ้า code block มีแค่บรรทัดเดียว บางทีก็ไม่จำเป็นต้องนิยาม code block แบบเป็นทางการด้วยปีกกา
+       เลยก็ได้ แม้ในทางเทคนิคจะไม่ต้องแยกบรรทัดด้วยซ้ำ แต่การรวมหลายคำสั่งไว้บรรทัดเดียวมักทำให้
+       โค้ดอ่านยาก</p>
+
+    <h3 id="s03a">ตัวอย่าง if ที่มี Code Block</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">bool flag = true;
+if (flag)
+{
+    Console.WriteLine(flag);
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+True</pre></div>
+
+    <h3 id="s03b">ตัดปีกกาออก</h3>
+    <p>code block นี้มีแค่บรรทัดเดียว จึงมีตัวเลือกตัดปีกกาออกได้:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">bool flag = true;
+if (flag)
+    Console.WriteLine(flag);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+True</pre></div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ตัดปีกกาไม่ได้เปลี่ยนความหมาย</span>
+      แม้ตัดปีกกาออก <code>Console.WriteLine(flag);</code> ก็ยังเป็น code block ของ
+      <code>if</code> statement นั้นเหมือนเดิม — แค่ 2 บรรทัดสั้นลง และตราบใดที่บรรทัดข้างใต้
+      <code>if</code> ยังเยื้อง (indent) อยู่ โค้ดก็ยังอ่านง่ายเหมือนเดิม
+    </div>
+
+    <h3 id="s03c">ระวัง: รวมทุกอย่างไว้บรรทัดเดียวอาจทำให้อ่านยากขึ้น</h3>
+    <p>เพราะทั้ง <code>if</code> และ <code>Console.WriteLine()</code> สั้น อาจถูกล่อใจให้รวม
+       ไว้บรรทัดเดียว — ไวยากรณ์ C# อนุญาตให้ทำแบบนี้ได้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ไม่แนะนำ)</span></div>
+      <pre><code class="lang-cs">bool flag = true;
+if (flag) Console.WriteLine(flag);</code></pre>
+    </div>
+
+    <p>ผลลัพธ์เหมือนเดิม แต่ลองนึกภาพโค้ดแบบนี้อยู่ในไฟล์ใหญ่ๆ ที่มีโค้ดรอบข้างเยอะๆ การรวม
+       คำสั่งแบบนี้อาจทำให้อ่านยากขึ้นมาก Microsoft แนะนำแนวทางนี้เวลาทำ <code>if</code>
+       ที่มี code block บรรทัดเดียว:</p>
+
+    <ul>
+      <li><b>อย่าใช้รูปแบบบรรทัดเดียวเด็ดขาด</b> เช่น <code>if (flag) Console.WriteLine(flag);</code></li>
+      <li>ใช้ปีกกาได้เสมอ (ไม่ผิด) และ<b>บังคับ</b>ต้องใช้ถ้า code block ใดใน
+          <code>if/else if/.../else</code> ใช้ปีกกา หรือถ้าคำสั่งเดียวยาวคร่อมหลายบรรทัด</li>
+      <li>ละปีกกาได้ก็ต่อเมื่อทุก code block ใน <code>if/else if/.../else</code> เดียวกัน
+          อยู่ในบรรทัดเดียวทั้งหมด (ต้องสม่ำเสมอ)</li>
+    </ul>
+
+    <h3 id="s03d">ตัวอย่างกับเชน if-elseif-else</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — อ่านยาก</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string name = "steve";
+if (name == "bob") Console.WriteLine("Found Bob");
+else if (name == "steve") Console.WriteLine("Found Steve");
+else Console.WriteLine("Found Chuck");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Found Steve</pre></div>
+
+    <p>โค้ดรันได้ แต่แน่นและอ่านยาก ลองจัดใหม่ให้แต่ละคำสั่งขึ้นบรรทัดใหม่:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — อ่านง่ายขึ้นมาก</span>
+        <button data-act="copy" type="button">Copy</button>
+        </div>
+      <pre><code class="lang-cs">string name = "steve";
+
+if (name == "bob")
+    Console.WriteLine("Found Bob");
+else if (name == "steve") 
+    Console.WriteLine("Found Steve");
+else
+    Console.WriteLine("Found Chuck");</code></pre>
+    </div>
+
+    <p>สังเกตว่าอ่านง่ายขึ้นมากแค่ไหน — นี่คือตัวอย่างที่ดีของ "ละปีกกาแต่คงความอ่านง่ายไว้"
+       ตามที่แนวทางแนะนำ</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch15-d"><span>ตัดปีกกาจาก if บรรทัดเดียวสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch15-e"><span>เห็นความต่างระหว่างเชน if-elseif-else แบบรวมบรรทัดกับแยกบรรทัด</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">15.4 ท้าทาย: แก้โค้ดที่มีปัญหาเรื่อง Scope</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl h">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้เขียนได้ไม่ดี มีปัญหาซ่อนอยู่หลายจุด ให้คุณใช้ความรู้เรื่อง code block และ
+           variable scope แก้ไข:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs — โค้ดตั้งต้น (มีปัญหา)</span></div>
+        <pre><code class="lang-cs">int[] numbers = { 4, 8, 15, 16, 23, 42 };
+
+foreach (int number in numbers)
+{
+    int total;
+
+    total += number;
+
+    if (number == 42)
+    {
+       bool found = true;
+
+    }
+
+}
+
+if (found) 
+{
+    Console.WriteLine("Set contains 42");
+
+}
+
+Console.WriteLine($"Total: {total}");</code></pre></div>
+        <p>ผลลัพธ์ที่ต้องได้หลังแก้ไข:</p>
+        <div class="out auto"><div class="out-bar">ผลลัพธ์เป้าหมาย</div><pre>
+Set contains 42
+Total: 108</pre></div>
+        <p>อาจต้องปรับเรื่อง scope ของตัวแปร และปรับให้อ่านง่ายขึ้นด้วย (ควรได้ประมาณ 17 บรรทัด)</p>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>ลองไล่หาปัญหาทีละจุด: <code>total</code> ประกาศไว้ที่ไหน initialize หรือยัง?
+             <code>found</code> ประกาศไว้ที่ไหน เข้าถึงได้จากนอก <code>if (found)</code> ไหม?
+             ปีกกาที่มี code block บรรทัดเดียวจำเป็นต้องมีไหม?</p>
+        </div>
+      </details>
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เฉลย</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">int[] numbers = { 4, 8, 15, 16, 23, 42 };
+int total = 0;
+bool found = false;
+
+foreach (int number in numbers)
+{
+    total += number;
+    if (number == 42)
+        found = true;
+}
+
+if (found)
+    Console.WriteLine("Set contains 42");
+
+Console.WriteLine($"Total: {total}");</code></pre>
+        </div>
+        <div class="out"><div class="out-bar">Output</div><pre>
+Set contains 42
+Total: 108</pre></div>
+
+        <p>การเปลี่ยนแปลงหลักที่แก้ปัญหาโค้ดเดิม:</p>
+        <ul>
+          <li>ย้ายการประกาศตัวแปร <code>total</code> และ <code>found</code> ออกมาไว้
+              <b>นอก</b> foreach statement — เดิม <code>total</code> ถูกประกาศ<i>ข้างใน</i>
+              foreach ทำให้ถูกสร้างใหม่ (และ reset) ทุกรอบของลูป ส่วน <code>found</code> ถูก
+              ประกาศไว้ข้างใน <code>if (number == 42)</code> ซ้อนอยู่ 2 ชั้น เข้าถึงจากนอก
+              foreach ไม่ได้เลย (นี่คือสาเหตุที่โค้ดเดิม error CS0103 ตอนเช็ค
+              <code>if (found)</code>)</li>
+          <li>กำหนดค่าเริ่มต้นให้ทั้ง <code>total</code> และ <code>found</code> ด้วยค่าที่
+              สมเหตุสมผล (0 และ false) — แก้ error CS0165 จากตัวแปรที่ยังไม่ initialize</li>
+          <li>ตัด code block (ปีกกา) ออกจาก <code>if</code> ที่มีแค่บรรทัดเดียว เพื่อความ
+              อ่านง่าย</li>
+        </ul>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch15-f"><span>แก้โค้ดตั้งต้นได้ผลลัพธ์ตรงเป้าหมาย</span></label></li>
+      <li><label><input type="checkbox" id="ch15-g"><span>อธิบายได้ว่าทำไมต้องย้าย total/found ออกนอก foreach</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">15.5 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>CS0103: The name '...' does not exist in the current context</code></td>
+          <td>พยายามเข้าถึงตัวแปรที่ scope อยู่แค่ในอีก code block หนึ่ง — ย้ายการประกาศตัวแปร
+              ขึ้นไปเหนือ code block ที่ต้องการให้เข้าถึงได้ทั้งคู่</td>
+        </tr>
+        <tr>
+          <td><code>CS0165: Use of unassigned local variable</code></td>
+          <td>ประกาศตัวแปรไว้นอก block แล้ว แต่ยังไม่ initialize — กำหนดค่าเริ่มต้นให้เสมอตอน
+              ประกาศ (ทบทวนที่ <a href="ch02.html">บทที่ 2</a>)</td>
+        </tr>
+        <tr>
+          <td>ตัวแปรสะสม (เช่น sum) รีเซ็ตทุกรอบของ loop โดยไม่ตั้งใจ</td>
+          <td>ประกาศตัวแปรไว้<b>ข้างใน</b> code block ของ loop โดยไม่ตั้งใจ — ต้องประกาศไว้นอก
+              loop เสมอถ้าต้องการให้ค่าคงอยู่ข้ามรอบ (ทบทวนที่ <a href="ch10.html">บทที่ 10</a>
+              และ <a href="ch12.html">บทที่ 12</a>)</td>
+        </tr>
+        <tr>
+          <td>คอมไพล์ไม่ผ่านทั้งที่ "ดูแล้วน่าจะเข้าเงื่อนไขเสมอ"</td>
+          <td>คอมไพเลอร์วิเคราะห์ทุกเส้นทางที่<i>เป็นไปได้</i>ตามชนิดข้อมูล (เช่น bool อาจเป็น
+              true หรือ false) ไม่ได้เดาเจตนาของคุณ — initialize ตัวแปรเสมอเพื่อความปลอดภัย</td>
+        </tr>
+        <tr>
+          <td>เชน if-elseif-else อ่านยากเพราะยัดทุกอย่างไว้บรรทัดเดียว</td>
+          <td>ตัดปีกกาได้ แต่ต้อง<b>ขึ้นบรรทัดใหม่</b>เสมอสำหรับ code block — อย่ารวม if กับ
+              คำสั่งไว้บรรทัดเดียวกัน (Microsoft แนะนำห้ามใช้รูปแบบนี้เด็ดขาด)</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">15.6 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Microsoft Learn (1 ข้อฝังในเนื้อหา + 3 ข้อ Module Assessment — ข้อ 2
+       กับ 3 เป็นโจทย์หลอกที่ต้องไล่โค้ดในหัวอย่างละเอียด ลองคิดเองก่อนดูเฉลย)</p>
+
+    <div class="quiz" data-q="15-2">
+      <p class="q"><span class="num">1.</span> ข้อใดถูกต้องเกี่ยวกับการแสดง/ตัดปีกกาของ code block
+        ใน if statement?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ตัดปีกกาออกจาก else if และ else ไม่ได้</span></li>
+        <li class="opt"><span class="k">B</span><span>ถ้าตัดปีกกาออกจาก if-elseif-else ต้องตัด whitespace ออกด้วย</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>เลือกสไตล์ที่เพิ่มความอ่านง่ายเสมอ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> นี่คือหลักการภาพรวมที่คลุมทุกกรณี — ข้อ A ผิดเพราะ
+        ตัดปีกกาจาก else if/else ได้เหมือนกัน (ตราบใดที่ทุก block ในเชนเดียวกันอยู่บรรทัดเดียว)
+        ข้อ B ผิดเพราะการตัด whitespace เป็นคนละเรื่องกับการตัดปีกกา (ดูตัวอย่างหัวข้อ 15.3
+        ที่ตัดปีกกาแต่<b>เพิ่ม</b>การขึ้นบรรทัดใหม่กลับเข้าไป)</div>
+    </div>
+
+    <div class="quiz" data-q="15-3">
+      <p class="q"><span class="num">2.</span> ตัวแปรตัวแรก initialize เป็น 1 <b>เหนือ</b> if code block
+        เงื่อนไขเป็น true ถ้าตัวแรก &gt; 0 บรรทัดแรกในบล็อก initialize ตัวแปรตัวที่สองเป็น 8
+        บรรทัดที่สองในบล็อกกำหนดผลบวกทั้งสองให้ตัวแรก บรรทัดแรกหลังบล็อกแสดงค่าตัวแรก ผลลัพธ์คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>ไม่ error และแสดงค่า 9</span></li>
+        <li class="opt"><span class="k">B</span><span>ไม่ error และแสดงค่า 1</span></li>
+        <li class="opt"><span class="k">C</span><span>error เพราะตัวแรกไม่อยู่ใน scope หลังจบบล็อก</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A (แสดงค่า 9).</b> ตัวแรกประกาศเหนือบล็อก จึง scope ครอบคลุม
+        ทั้งสองฝั่ง (ไม่ error) และค่าที่แสดงคือค่าล่าสุดหลังบวกกัน (1+8=9) ไม่ใช่ค่าตั้งต้น (ข้อ B ผิด)</div>
+    </div>
+
+    <div class="quiz" data-q="15-4">
+      <p class="q"><span class="num">3.</span> ตัวแปรตัวแรก initialize เป็น 5 <b>เหนือ</b> if code block
+        เงื่อนไขเป็น true ถ้าตัวแรก &gt; 0 บรรทัดแรกใน<b>บล็อก</b> initialize ตัวแปรตัวที่สองเป็น
+        6 (ตัวที่สองประกาศ<b>ข้างใน</b>บล็อกเท่านั้น) บรรทัดแรก<b>หลังบล็อก</b>เอาตัวที่สองไปบวก
+        กับตัวแรก บรรทัดที่สองหลังบล็อกแสดงค่าตัวแรก ผลลัพธ์คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ไม่ error และแสดงค่า 11</span></li>
+        <li class="opt"><span class="k">B</span><span>error เกิดที่บรรทัดแสดงค่าตัวแรก</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>build error เกิดที่บรรทัดบวกตัวแปรทั้งสอง</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> จุดต่างจากข้อ 2 คือตัวที่สองถูกประกาศ<b>ข้างใน</b>
+        บล็อก scope ของมันจึงจำกัดอยู่แค่ในนั้น พอบรรทัด "บวกตัวแปรทั้งสอง" อยู่<b>นอก</b>บล็อก
+        แต่พยายามอ้างอิงตัวที่สอง จะได้ error CS0103 ทันทีตอน build — ไม่ใช่ error ที่บรรทัดแสดงผล
+        (ข้อ B ผิดตำแหน่ง) และไม่ใช่กรณีไม่ error (ข้อ A ผิด)</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">15.7 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้ error หาสาเหตุและแก้ไข:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">bool isReady = true;
+if (isReady)
+{
+    string message = "พร้อมแล้ว";
+}
+Console.WriteLine(message);</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p><code>message</code> scope อยู่แค่ในบล็อก if ต้องย้ายการประกาศออกมาไว้นอกบล็อก
+             (พร้อม initialize):</p>
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ถูก)</span></div>
+          <pre><code class="lang-cs">bool isReady = true;
+string message = "";
+if (isReady)
+{
+    message = "พร้อมแล้ว";
+}
+Console.WriteLine(message);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ตัดปีกกาออกจากโค้ดนี้ (มีแค่บรรทัดเดียวต่อ block) พร้อมคงการขึ้นบรรทัดใหม่ไว้:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ก่อนแก้)</span></div>
+        <pre><code class="lang-cs">int score = 85;
+if (score >= 80)
+{
+    Console.WriteLine("ผ่าน");
+}
+else
+{
+    Console.WriteLine("ไม่ผ่าน");
+}</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (หลังแก้)</span></div>
+          <pre><code class="lang-cs">int score = 85;
+if (score >= 80)
+    Console.WriteLine("ผ่าน");
+else
+    Console.WriteLine("ไม่ผ่าน");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้ compile ไม่ผ่าน หาสาเหตุ (ใบ้: ไม่ใช่ปัญหาเรื่อง scope แต่เป็นปัญหาเรื่อง
+           initialize):</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">bool ready = true;
+int count;
+
+if (ready)
+{
+    Console.WriteLine(count);
+}
+
+count = 5;</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>error CS0165 — <code>count</code> ถูกใช้ข้างใน code block <b>ก่อน</b>ที่จะถูก
+             กำหนดค่า (บรรทัด <code>count = 5;</code> อยู่หลัง code block) ต้องย้ายการกำหนดค่า
+             ขึ้นไปก่อน หรือ initialize ตอนประกาศเลย เช่น <code>int count = 0;</code></p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้ compile ผ่าน (ไม่ error) ทั้งที่ดูคล้ายข้อ 3 มาก อธิบายว่าทำไมถึงต่างกัน:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+        <pre><code class="lang-cs">int count;
+
+if (true)
+{
+    count = 5;
+    Console.WriteLine(count);
+}</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ตรงกับหลักการจากหัวข้อ 15.2f — เงื่อนไขเป็น <code>true</code> ตัวอักษรตรงๆ (ไม่ใช่
+             ตัวแปร bool) คอมไพเลอร์จึงรู้แน่นอนว่า code block นี้จะถูกรัน<b>เสมอ</b> มีเส้นทาง
+             การทำงานเดียวเท่านั้น (ไม่มีทางที่ <code>count</code> จะไม่ถูกกำหนดค่าตอนถึงบรรทัด
+             <code>Console.WriteLine(count)</code>) จึงไม่ error</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดวนหา array <code>int[] temps = { 28, 31, 35, 29, 33 };</code> นับว่ามีกี่วัน
+           ที่อุณหภูมิเกิน 30 องศา ใช้ตัวแปรนับที่ scope ถูกต้อง (ไม่รีเซ็ตทุกรอบ) และตัดปีกกา
+           ออกจาก if ที่มีบรรทัดเดียวด้วย</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int[] temps = { 28, 31, 35, 29, 33 };
+int hotDays = 0;
+
+foreach (int temp in temps)
+    if (temp > 30)
+        hotDays++;
+
+Console.WriteLine($"มี {hotDays} วันที่เกิน 30 องศา");</code></pre></div>
+          <p><small>สังเกตว่าตัดปีกกาได้ทั้งชั้น foreach และชั้น if ที่ซ้อนกัน เพราะแต่ละชั้น
+             มีแค่คำสั่งเดียวข้างใน</small></p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้มีบั๊กเรื่อง scope ซ่อนอยู่ 2 จุด (คล้ายโจทย์ท้าทายหัวข้อ 15.4 แต่เป็นสถานการณ์ใหม่)
+           หาให้เจอและแก้ไข ให้ได้ผลลัพธ์ <code>คะแนนรวม: 15, พบเลข 7: True</code></p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (มีบั๊ก)</span></div>
+        <pre><code class="lang-cs">int[] scores = { 3, 5, 7 };
+
+foreach (int score in scores)
+{
+    int sum;
+    sum += score;
+
+    if (score == 7)
+    {
+        bool foundSeven = true;
+    }
+}
+
+Console.WriteLine($"คะแนนรวม: {sum}, พบเลข 7: {foundSeven}");</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>บั๊กทั้งสองจุดเหมือนโจทย์หัวข้อ 15.4 เป๊ะ: <code>sum</code> ต้องย้ายออกมานอก
+             foreach พร้อม initialize เป็น 0 · <code>foundSeven</code> ต้องย้ายออกมานอกทั้ง
+             foreach และ if พร้อม initialize เป็น false:</p>
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ถูก)</span></div>
+          <pre><code class="lang-cs">int[] scores = { 3, 5, 7 };
+int sum = 0;
+bool foundSeven = false;
+
+foreach (int score in scores)
+{
+    sum += score;
+    if (score == 7)
+        foundSeven = true;
+}
+
+Console.WriteLine($"คะแนนรวม: {sum}, พบเลข 7: {foundSeven}");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">📌 สรุปบทที่ 15</h2>
+
+    <p>เป้าหมายของบทนี้คือเข้าใจว่า code block มีผลต่อการเข้าถึงตัวแปรยังไง และต้องทำอะไรบ้างเพื่อ
+       ให้แน่ใจว่าตัวแปรมี scope ที่เหมาะสม ถูก initialize และเข้าถึงได้เมื่อจำเป็นในแอป คุณสำรวจ
+       ผลของการประกาศตัวแปรทั้งข้างในและข้างนอกขอบเขตของ code block และผลของการ initialize
+       ตัวแปรที่มีต่อการเข้าถึง รวมถึงวิธีที่การตัด code block ที่ไม่จำเป็นออก มีผลต่อความอ่านง่าย
+       ของโค้ด</p>
+
+    <p>โค้ดที่ใช้ตัวแปร scope ผิดหรือยังไม่ initialize จะทำให้เกิด error ตอนคอมไพล์หรือรัน
+       ความสามารถในการกำหนด scope และ initialize ตัวแปรได้ถูกต้อง จะช่วยให้ผู้ใช้แอปของคุณได้
+       ประสบการณ์ที่ดีขึ้น</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 15</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">หลักการ</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td>ประกาศตัวแปรในบล็อก</td><td>เข้าถึงได้แค่ในบล็อกนั้น (local scope)</td></tr>
+          <tr><td>ประกาศตัวแปรเหนือบล็อก</td><td>เข้าถึงได้ทั้งข้างในและข้างนอกบล็อก</td></tr>
+          <tr><td>initialize ตอนประกาศเสมอ</td><td>ป้องกัน CS0165 (unassigned local variable)</td></tr>
+          <tr><td><code>if (ตัวแปร bool)</code></td><td>คอมไพเลอร์เห็น 2 เส้นทางที่เป็นไปได้ (true/false)</td></tr>
+          <tr><td><code>if (true)</code> ตรงๆ</td><td>คอมไพเลอร์เห็นเส้นทางเดียว (รันเสมอ)</td></tr>
+          <tr><td>ตัดปีกกาจาก if บรรทัดเดียว</td><td>ทำได้ ถ้าทุก block ในเชนเดียวกันเป็นบรรทัดเดียวหมด และยังขึ้นบรรทัดใหม่</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s09">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>scope</td><td>ขอบเขต</td><td>ส่วนของโค้ดที่ตัวแปรนั้นมองเห็น/เข้าถึงได้</td></tr>
+        <tr><td>local variable</td><td>ตัวแปรท้องถิ่น</td><td>ตัวแปรที่ประกาศไว้ใน code block</td></tr>
+        <tr><td>definite assignment</td><td>การกำหนดค่าแน่นอน</td><td>การวิเคราะห์ของคอมไพเลอร์ว่าตัวแปรถูกกำหนดค่าแน่ในทุกเส้นทางหรือไม่</td></tr>
+        <tr><td>execution path</td><td>เส้นทางการทำงาน</td><td>ลำดับที่โค้ดอาจถูกรันได้ ขึ้นกับเงื่อนไข</td></tr>
+        <tr><td>single-line form</td><td>รูปแบบบรรทัดเดียว</td><td>if กับคำสั่งอยู่บรรทัดเดียวกัน (Microsoft แนะนำห้ามใช้)</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch14.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 14 · Evaluate Boolean Expressions</span></a>
+      <a class="next" href="ch16.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 16 · Branch the Flow of Code Using switch-case</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

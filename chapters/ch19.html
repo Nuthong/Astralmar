@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 19 · Guided Project: Contoso Pets — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="19">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 3 · Add Logic to Console Apps / บทที่ 19</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 3 · โมดูล 6/7 · 🏗️ Guided Project</span>
+      <h1>Guided Project — สร้างแอป Contoso Pets</h1>
+      <div class="en">Guided Project - Develop Conditional Branching and Looping Structures in C#</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>90–120 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>Console app จริง 300+ บรรทัด ที่รวม for, foreach, if, switch, while, do-while เข้าด้วยกัน</b></span>
+        <span>🎯 ความยาก <b>สูง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ใช้ Visual Studio Code พัฒนา console application ที่ผสม selection และ iteration statement เข้าด้วยกัน</li>
+        <li>ประเมินเงื่อนไขในแอปของคุณ แล้วตัดสินใจเลือกระหว่าง selection statement ตัวเลือกต่างๆ ได้อย่างมีเหตุผล</li>
+        <li>ประเมินเงื่อนไขในแอปของคุณ แล้วตัดสินใจเลือกระหว่าง iteration statement ตัวเลือกต่างๆ ได้อย่างมีเหตุผล</li>
+        <li>กำหนด scope ของตัวแปรในระดับที่เหมาะสมภายในแอปพลิเคชัน</li>
+      </ul>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ นี่คือ Guided Project</span>
+      โมดูลนี้เป็น <b>Guided Project</b> — คุณจะสร้างแอปทั้งตัวไปทีละขั้นตอนตามคำแนะนำ ต่างจากบทก่อนๆ
+      ที่เน้นสอนแนวคิดทีละอัน บทนี้จะพาคุณประกอบทุกอย่างที่เรียนมาตั้งแต่บทที่ 9-18 (if-elseif-else,
+      switch-case, scope, for, foreach, do-while, while) เข้าเป็นแอปพลิเคชันจริงหนึ่งตัว
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">19.1 สถานการณ์: Contoso Pets</h2>
+
+    <p>นักพัฒนาส่วนใหญ่มักเริ่มโปรเจกต์ด้วยการพัฒนาฟีเจอร์ที่ import หรือสร้างข้อมูลของแอปก่อน
+       เมื่อแอปของคุณเข้าถึงข้อมูลที่มันต้องพึ่งพาได้แล้ว คุณถึงเริ่มพัฒนาฟีเจอร์ที่ประมวลผลข้อมูล
+       และสร้างรายงานต่อได้</p>
+
+    <p>สมมติคุณเป็นนักพัฒนาที่ชอบช่วยเหลือชุมชนท้องถิ่น คุณกับเพื่อนเริ่มธุรกิจที่ช่วยหาบ้านใหม่
+       ให้แมวและสุนัขจรจัดหรือถูกทอดทิ้ง ธุรกิจของคุณเริ่มต้นเล็กๆ มีสัตว์จรจัดแค่ไม่กี่ตัว แต่ตอนนี้
+       กำลังเติบโตขึ้นเรื่อยๆ คุณอยากสร้างแอปพลิเคชันที่ช่วยจับคู่สัตว์ที่คุณดูแลกับคนที่กำลังมองหา
+       สัตว์เลี้ยง คุณพบว่าการมีคำอธิบายลักษณะของสัตว์อย่างละเอียดเพื่อแชร์ให้เจ้าของในอนาคตเป็น
+       เรื่องสำคัญมาก และการอธิบายนิสัยของหมาหรือแมวก็ช่วยให้พวกมันน่าสนใจสำหรับเจ้าของในอนาคต
+       มากขึ้นด้วย คุณจึงตัดสินใจสร้างแอปที่ช่วยจัดการข้อมูลของหมาและแมวที่คุณกำลังดูแลอยู่</p>
+
+    <p>บทนี้จะพาคุณผ่านกระบวนการพัฒนาฟีเจอร์ที่เกี่ยวกับข้อมูลของแอป <b>Contoso Pets</b> คุณจะใช้
+       selection และ iteration statement สร้างข้อมูลตัวอย่าง แสดงรายชื่อสัตว์ที่คุณดูแล และเพิ่มสัตว์
+       ตัวใหม่เข้าธุรกิจของคุณ ตลอดทั้งแอป คุณจะใช้ตัวแปรและ expression ควบคุม code branch ต่างๆ
+       และดูแลให้ตัวแปรถูก scope อย่างเหมาะสม</p>
+
+    <p>แอปที่คุณจะพัฒนาจะ:</p>
+    <ul>
+      <li>เพิ่มข้อมูลตัวอย่างที่กำหนดไว้ล่วงหน้าลงใน array ของสัตว์เลี้ยง</li>
+      <li>วน code block "แสดงเมนูและรับตัวเลือกจากผู้ใช้" เพื่อสร้าง outer loop ของแอป</li>
+      <li>implement code branch ที่ตรงกับตัวเลือกเมนูที่ผู้ใช้เลือก</li>
+      <li>แสดงข้อมูลทั้งหมดที่เก็บอยู่ใน array ของสัตว์เลี้ยง (ตามตัวเลือกเมนูของผู้ใช้)</li>
+      <li>วน code block "เพิ่มข้อมูลสัตว์ตัวใหม่" ที่ให้ผู้ใช้เพิ่มสัตว์ตัวใหม่หนึ่งตัวหรือมากกว่าเข้า
+          array (ตามตัวเลือกเมนูของผู้ใช้)</li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s02">19.2 ข้อกำหนดของโปรเจกต์</h2>
+
+    <p>สเปกของแอป Contoso Pets มีดังนี้:</p>
+    <ul>
+      <li>สร้าง C# console application</li>
+      <li>เก็บข้อมูลแอปใน multidimensional string array ชื่อ <code>ourAnimals</code></li>
+      <li>array <code>ourAnimals</code> เก็บ "ลักษณะของสัตว์เลี้ยง" ต่อไปนี้สำหรับสัตว์แต่ละตัว:
+        <ul>
+          <li>หมายเลข Pet ID</li>
+          <li>สปีชีส์ (แมวหรือสุนัข)</li>
+          <li>อายุ (ปี)</li>
+          <li>คำอธิบายสภาพร่างกาย/ลักษณะทางกายภาพ</li>
+          <li>คำอธิบายนิสัย</li>
+          <li>ชื่อเล่นของสัตว์</li>
+        </ul>
+      </li>
+      <li>สร้างชุดข้อมูลตัวอย่างที่แทนหมาและแมวที่กำลังดูแลอยู่ในปัจจุบัน</li>
+      <li>แสดงตัวเลือกเมนูเพื่อเข้าถึงฟีเจอร์หลักของแอป — ฟีเจอร์หลักที่รองรับงานต่อไปนี้:
+        <ul>
+          <li>แสดงข้อมูลสัตว์ทั้งหมดใน array <code>ourAnimals</code></li>
+          <li>เพิ่มสัตว์ตัวใหม่เข้า array <code>ourAnimals</code> — ภายใต้เงื่อนไข: ต้องกรอกสปีชีส์
+              (หมาหรือแมว), ต้องสร้าง pet ID โดยอัตโนมัติ, ลักษณะทางกายภาพบางอย่างอาจยังไม่ทราบ
+              จนกว่าสัตวแพทย์จะตรวจ (เช่น อายุ พันธุ์ สถานะทำหมัน), ชื่อเล่นและนิสัยอาจยังไม่ทราบ
+              ตอนสัตว์เพิ่งมาถึง</li>
+          <li>ตรวจสอบให้อายุและคำอธิบายทางกายภาพของสัตว์สมบูรณ์ (หลังสัตวแพทย์ตรวจ)</li>
+          <li>ตรวจสอบให้ชื่อเล่นและคำอธิบายนิสัยของสัตว์สมบูรณ์ (หลังทีมงานรู้จักสัตว์ตัวนั้นมากขึ้น)</li>
+          <li>แก้ไขอายุของสัตว์ (ถ้ารู้วันเกิดและสัตว์มีวันเกิดระหว่างอยู่ในความดูแล)</li>
+          <li>แก้ไขคำอธิบายนิสัยของสัตว์ (สัตว์อาจมีพฤติกรรมต่างไปหลังอยู่ในความดูแลนานขึ้น)</li>
+          <li>แสดงแมวทั้งหมดที่มีลักษณะตามที่ผู้ใช้กำหนด</li>
+          <li>แสดงหมาทั้งหมดที่มีลักษณะตามที่ผู้ใช้กำหนด</li>
+        </ul>
+      </li>
+    </ul>
+
+    <div class="note tip">
+      <span class="lbl">💡 ขอบเขตของบทนี้</span>
+      โจทย์ต้นฉบับของ Microsoft Learn มีฟีเจอร์ทั้งหมด 8 เมนู แต่ Guided Project นี้พาคุณ implement
+      แค่ <b>เมนู 1 กับ 2</b> ให้สมบูรณ์ (แสดงข้อมูลทั้งหมด + เพิ่มสัตว์ตัวใหม่) ส่วนเมนู 3-8 คุณจะ
+      implement เองใน<a href="ch20.html">บทที่ 20 (Challenge Project)</a> — เมนูที่เหลือในบทนี้จะเป็น
+      แค่ placeholder ข้อความ "เร็วๆ นี้" เท่านั้น
+    </div>
+
+    <h3 id="s02a">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch19-contosopets</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <h3 id="s02b">โครงสร้างข้อมูลตั้งต้น</h3>
+    <p>เริ่มต้นด้วยการประกาศตัวแปรที่ใช้เก็บและประมวลผลข้อมูลสัตว์เลี้ยงและตัวเลือกเมนู:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// the ourAnimals array will store the following:
+string animalSpecies = "";
+string animalID = "";
+string animalAge = "";
+string animalPhysicalDescription = "";
+string animalPersonalityDescription = "";
+string animalNickname = "";
+
+// variables that support data entry
+int maxPets = 8;
+string? readResult;
+string menuSelection = "";
+
+// array used to store runtime data, there is no persisted data
+string[,] ourAnimals = new string[maxPets, 6];</code></pre>
+    </div>
+
+    <p>ตัวแปร <code>animalSpecies</code> ถึง <code>animalNickname</code> ใช้เก็บค่าของแต่ละลักษณะของ
+       สัตว์เลี้ยงชั่วคราว — ทีหลังคุณจะกำหนดค่าเหล่านี้ให้ multidimensional string array ชื่อ
+       <code>ourAnimals</code> แต่ละตัวเริ่มต้นด้วย string ความยาวศูนย์ <code>""</code></p>
+
+    <p>สังเกตบรรทัด <code>string? readResult;</code> — เครื่องหมาย <code>?</code> ทำให้เป็น
+       <b>nullable type</b> variable เวลาอ่านค่าที่ผู้ใช้กรอกด้วย <code>Console.ReadLine()</code>
+       ควรใช้ nullable type แบบนี้เสมอ (ทบทวนจาก <a href="ch18.html">บทที่ 18</a>)</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ Multidimensional Array คืออะไร</span>
+      <code>string[,] ourAnimals = new string[maxPets, 6];</code> คือ array 2 มิติแบบ
+      <b>rectangular</b> (สี่เหลี่ยมผืนผ้า — ทุกแถวมีจำนวนคอลัมน์เท่ากัน) สังเกตเครื่องหมายจุลภาค
+      <code>[,]</code> ในการประกาศชนิด — มิติแรก (<code>maxPets</code> = 8 แถว) แทนสัตว์แต่ละตัว
+      มิติที่สอง (6 คอลัมน์) แทนลักษณะ 6 อย่างของสัตว์แต่ละตัว เข้าถึง element ได้ด้วย
+      <code>ourAnimals[แถว, คอลัมน์]</code> เช่น <code>ourAnimals[0, 0]</code> คือ pet ID ของสัตว์
+      ตัวแรก — ต่างจาก array ที่คุณเคยใช้ในบทก่อนๆ ซึ่งเป็น array มิติเดียว
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch19-a"><span>เข้าใจสเปกของแอป Contoso Pets ทั้งหมด</span></label></li>
+      <li><label><input type="checkbox" id="ch19-b"><span>สร้างตัวแปรตั้งต้น + multidimensional array ourAnimals สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">19.3 สร้างข้อมูลตัวอย่าง + Menu Loop</h2>
+
+    <h3 id="s03a">สร้างข้อมูลตัวอย่างด้วย switch-case</h3>
+    <p>ใช้ <code>for</code> loop วนสร้างข้อมูลตัวอย่างให้สัตว์ 4 ตัวแรก (ที่เหลือเป็นค่าว่าง) —
+       ต้นฉบับ MS Learn ให้เริ่มจาก <code>if-elseif-else</code> แล้วแปลงเป็น <code>switch-case</code>
+       เพื่อความอ่านง่าย (ทบทวนหลักการเลือกจาก <a href="ch16.html">บทที่ 16</a>: ใช้
+       <code>switch</code> เมื่อมี <code>else if</code> มากกว่า 2-3 บล็อก) เราจะเขียนเป็น
+       <code>switch</code> ตั้งแต่แรกเลย:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">for (int i = 0; i < maxPets; i++)
+{
+    switch (i)
+    {
+        case 0:
+            animalSpecies = "dog";
+            animalID = "d1";
+            animalAge = "2";
+            animalPhysicalDescription = "medium sized cream colored female golden retriever weighing about 65 pounds. housebroken.";
+            animalPersonalityDescription = "loves to have her belly rubbed and likes to chase her tail. gives lots of kisses.";
+            animalNickname = "lola";
+            break;
+
+        case 1:
+            animalSpecies = "dog";
+            animalID = "d2";
+            animalAge = "9";
+            animalPhysicalDescription = "large reddish-brown male golden retriever weighing about 85 pounds. housebroken.";
+            animalPersonalityDescription = "loves to have his ears rubbed when he greets you at the door, or at any time! loves to lean-in and give doggy hugs.";
+            animalNickname = "loki";
+            break;
+
+        case 2:
+            animalSpecies = "cat";
+            animalID = "c3";
+            animalAge = "1";
+            animalPhysicalDescription = "small white female weighing about 8 pounds. litter box trained.";
+            animalPersonalityDescription = "friendly";
+            animalNickname = "Puss";
+            break;
+
+        case 3:
+            animalSpecies = "cat";
+            animalID = "c4";
+            animalAge = "?";
+            animalPhysicalDescription = "";
+            animalPersonalityDescription = "";
+            animalNickname = "";
+            break;
+
+        default:
+            animalSpecies = "";
+            animalID = "";
+            animalAge = "";
+            animalPhysicalDescription = "";
+            animalPersonalityDescription = "";
+            animalNickname = "";
+            break;
+    }
+
+    ourAnimals[i, 0] = "ID #: " + animalID;
+    ourAnimals[i, 1] = "Species: " + animalSpecies;
+    ourAnimals[i, 2] = "Age: " + animalAge;
+    ourAnimals[i, 3] = "Nickname: " + animalNickname;
+    ourAnimals[i, 4] = "Physical description: " + animalPhysicalDescription;
+    ourAnimals[i, 5] = "Personality: " + animalPersonalityDescription;
+}</code></pre>
+    </div>
+
+    <p>สังเกตว่าท้าย <code>for</code> loop แต่ละรอบ เราเอาค่าของตัวแปรชั่วคราวทั้ง 6 ตัวไปกำหนดให้
+       แถวที่ <code>i</code> ของ <code>ourAnimals</code> — โดยเติม prefix อย่าง <code>"ID #: "</code>
+       และ <code>"Species: "</code> นำหน้าค่าจริง เพื่อให้ตอนแสดงผลอ่านง่ายขึ้น (และใช้ prefix นี้
+       เป็นค่า default สำหรับเช็คว่าสัตว์ตัวนั้นมีข้อมูลหรือยังในหัวข้อถัดไปด้วย)</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ execution ไม่ fall-through</span>
+      ระลึกไว้ว่าการทำงานของแต่ละ switch section ห้าม "fall through" ไปยัง section ถัดไป
+      <code>break</code> statement ใช้รับประกันว่าจะไม่เกิด "fall through" (ทบทวนจาก
+      <a href="ch16.html">บทที่ 16</a>)
+    </div>
+
+    <h3 id="s03b">สร้าง Menu Loop ด้วย do-while</h3>
+    <p>ตอนนี้สร้าง <code>do</code> loop ที่ครอบตัวเลือกเมนูและโค้ดที่อ่าน input จากผู้ใช้ loop นี้
+       รับประกันว่าเมนูหลักจะ refresh ให้ผู้ใช้ทุกครั้งที่เลือกเมนู และวนซ้ำจนกว่าผู้ใช้จะเลือกออก
+       จากโปรแกรม</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">do
+{
+    // display the top-level menu options
+    Console.WriteLine("Welcome to the Contoso PetFriends app. Your main menu options are:");
+    Console.WriteLine("1. List all of our current pet information");
+    Console.WriteLine("2. Add a new animal friend to the ourAnimals array");
+    Console.WriteLine("3. Ensure animal ages and physical descriptions are complete");
+    Console.WriteLine("4. Ensure animal nicknames and personality descriptions are complete");
+    Console.WriteLine("5. Edit an animal's age");
+    Console.WriteLine("6. Edit an animal's personality description");
+    Console.WriteLine("7. Display all cats with a specified characteristic");
+    Console.WriteLine("8. Display all dogs with a specified characteristic");
+    Console.WriteLine();
+    Console.WriteLine("Enter your selection number (or type Exit to exit the program)");
+
+    readResult = Console.ReadLine();
+    if (readResult != null)
+    {
+        menuSelection = readResult.ToLower();
+    }
+
+    // switch statement goes here (หัวข้อถัดไป)
+
+} while (menuSelection != "exit");</code></pre>
+    </div>
+
+    <p>เพราะครอบตัวเลือกเมนูของโปรแกรมไว้ข้างใน <code>do</code> loop คุณมั่นใจได้ว่าผู้ใช้จะเห็น
+       ตัวเลือกเมนูอย่างน้อยหนึ่งครั้งเสมอ — เงื่อนไข <code>while (menuSelection != "exit")</code>
+       ทำให้ loop วนไปเรื่อยๆ จนกว่าผู้ใช้จะพิมพ์ "exit" (ใช้ <code>.ToLower()</code> ตอนอ่านค่า
+       ทำให้พิมพ์ "Exit" หรือ "exit" ก็ใช้ได้เหมือนกัน)</p>
+
+    <h3 id="s03c">สร้าง switch Statement สำหรับตัวเลือกเมนู</h3>
+    <p>ตอนนี้เขียน <code>switch</code> statement ที่แตก code execution ตามค่าที่กำหนดให้
+       <code>menuSelection</code> สร้าง <code>switch</code> label ที่ตรงกับหมายเลขเมนูแต่ละอัน
+       การแยก <code>switch</code> label แต่ละอันช่วยให้แต่ละตัวเลือกเมนูถูกจัดการแยกกันชัดเจน</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (โครงร่าง)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">switch (menuSelection)
+{
+    case "1":
+        // List all of our current pet information
+        break;
+
+    case "2":
+        // Add a new animal friend to the ourAnimals array
+        break;
+
+    case "3":
+        // Ensure animal ages and physical descriptions are complete
+        Console.WriteLine("Challenge Project - please check back soon to see progress.");
+        Console.WriteLine("Press the Enter key to continue.");
+        readResult = Console.ReadLine();
+        break;
+
+    case "4":
+        // Ensure animal nicknames and personality descriptions are complete
+        Console.WriteLine("Challenge Project - please check back soon to see progress.");
+        Console.WriteLine("Press the Enter key to continue.");
+        readResult = Console.ReadLine();
+        break;
+
+    case "5":
+        // Edit an animal's age
+        Console.WriteLine("UNDER CONSTRUCTION - please check back next month to see progress.");
+        Console.WriteLine("Press the Enter key to continue.");
+        readResult = Console.ReadLine();
+        break;
+
+    case "6":
+        // Edit an animal's personality description
+        Console.WriteLine("UNDER CONSTRUCTION - please check back next month to see progress.");
+        Console.WriteLine("Press the Enter key to continue.");
+        readResult = Console.ReadLine();
+        break;
+
+    case "7":
+        // Display all cats with a specified characteristic
+        Console.WriteLine("UNDER CONSTRUCTION - please check back next month to see progress.");
+        Console.WriteLine("Press the Enter key to continue.");
+        readResult = Console.ReadLine();
+        break;
+
+    case "8":
+        // Display all dogs with a specified characteristic
+        Console.WriteLine("UNDER CONSTRUCTION - please check back next month to see progress.");
+        Console.WriteLine("Press the Enter key to continue.");
+        readResult = Console.ReadLine();
+        break;
+
+    default:
+        break;
+}</code></pre>
+    </div>
+
+    <p>สังเกตว่า case pattern ตอนนี้เป็น <code>case "1":</code> ไม่ใช่ <code>case 1:</code> แบบตอน
+       สร้างข้อมูลตัวอย่าง — เพราะตอนนั้นเช็คค่า <code>int</code> (ตัวแปร <code>i</code>) แต่ตอนนี้
+       เช็คค่า <code>string</code> (<code>menuSelection</code>) ที่มาจาก <code>Console.ReadLine()</code>
+       เสมอ</p>
+
+    <p><code>case "1":</code> และ <code>case "2":</code> ยังว่างเปล่า (แค่มี comment + break) —
+       เพราะนั่นคือฟีเจอร์ที่คุณกำลังจะ implement เต็มรูปแบบในหัวข้อ 19.4-19.6 ถัดไป ส่วน
+       <code>case "3"</code> ถึง <code>case "8"</code> เป็น placeholder ที่ให้ feedback แก่ผู้ใช้
+       ก่อน (จะ implement จริงในบทที่ 20)</p>
+
+    <div class="out auto"><div class="out-bar">ทดสอบรัน (เลือกเมนู 1)</div><pre>
+Welcome to the Contoso PetFriends app. Your main menu options are:
+1. List all of our current pet information
+2. Add a new animal friend to the ourAnimals array
+3. Ensure animal ages and physical descriptions are complete
+4. Ensure animal nicknames and personality descriptions are complete
+5. Edit an animal's age
+6. Edit an animal's personality description
+7. Display all cats with a specified characteristic
+8. Display all dogs with a specified characteristic
+
+Enter your selection number (or type Exit to exit the program)
+1</pre></div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch19-c"><span>สร้างข้อมูลตัวอย่าง 4 ตัวด้วย for + switch สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch19-d"><span>สร้าง menu loop ด้วย do-while ที่ออกเมื่อพิมพ์ exit สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch19-e"><span>รันโปรแกรมแล้วเห็นเมนูและทดสอบทุกตัวเลือกได้</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">19.4 แสดงข้อมูลสัตว์ทั้งหมด (เมนู 1)</h2>
+
+    <h3 id="s04a">ทำไมต้องใช้ for ไม่ใช่ foreach กับ Multidimensional Array</h3>
+    <p>เป้าหมายคือวนผ่านสัตว์แต่ละตัวใน <code>ourAnimals</code> ทีละตัว แล้วทำไมไม่ใช้
+       <code>foreach</code> ล่ะ ในเมื่อรู้อยู่แล้วว่า <code>foreach</code> ถูกออกแบบมาสำหรับวน
+       ผ่านแต่ละ item ใน array?</p>
+
+    <p>เหตุผลที่ไม่ใช้ <code>foreach</code> ในสถานการณ์นี้ก็เพราะ <code>ourAnimals</code> เป็น
+       multidimensional array — เพราะ <code>ourAnimals</code> เป็น multidimensional string array
+       แต่ละ element ข้างในเป็น <code>string</code> แยกกัน ถ้าใช้ <code>foreach</code> วนผ่าน
+       <code>ourAnimals</code> มันจะมองแต่ละ string เป็น item แยกกันในลิสต์ที่มี 48 string items
+       (8 × 6 = 48) <code>foreach</code> จะไม่แยกประมวลผลสองมิติออกจากกัน พูดอีกแบบคือ
+       <code>foreach</code> loop จะไม่รู้จัก "8 แถว" ของ string element ที่แต่ละแถวมี "6 คอลัมน์"
+       เพราะเราต้องการทำงานกับสัตว์ทีละตัว และประมวลผลลักษณะทั้ง 6 อย่างในการวนซ้ำครั้งเดียวกัน
+       <code>foreach</code> จึงไม่ใช่ตัวเลือกที่ถูกต้อง</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 ถ้าเป็น jagged array ล่ะ</span>
+      ถ้า <code>ourAnimals</code> เป็น <b>jagged array</b> (array ของ array) แทน คุณจะใช้
+      <code>foreach</code> ได้ — สร้าง <code>foreach</code> ชั้นนอกวนผ่าน element ที่เป็น string
+      array แต่ละตัว (แถว) แล้ว <code>foreach</code> ชั้นในวนผ่าน string element ในนั้น (คอลัมน์):
+      <div class="code">
+        <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง jagged array</span></div>
+        <pre><code class="lang-cs">string[][] jaggedArray = new string[][]
+{
+    new string[] { "one1", "two1", "three1" },
+    new string[] { "one2", "two2", "three2" }
+};
+
+foreach (string[] array in jaggedArray)
+{
+    foreach (string value in array)
+    {
+        Console.WriteLine(value);
+    }
+    Console.WriteLine();
+}</code></pre>
+      </div>
+      สำหรับแอป Contoso Pets การใช้ rectangular multidimensional array กับ nested <code>for</code>
+      loop ทำได้ง่ายกว่าการใช้ jagged array กับ nested <code>foreach</code> — ตอนนี้คุณเห็นแล้วว่า
+      ทั้งสองแบบทำงานยังไง เลือกใช้ตามความเหมาะสมในโปรเจกต์ต่อๆ ไปได้เลย
+    </div>
+
+    <h3 id="s04b">สร้าง Outer Loop วนผ่านสัตว์แต่ละตัว</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">for (int i = 0; i < maxPets; i++)
+{
+}</code></pre>
+    </div>
+
+    <p>ทบทวนจาก <a href="ch17.html">บทที่ 17</a>: <code>for</code> statement มี 3 ส่วนควบคุม —
+       array ถูก index จาก 0 เสมอ หมายความว่า array ที่มี <code>n</code> element จะ index ตั้งแต่
+       <code>0</code> ถึง <code>n-1</code> คุณต้องการให้ initializer, condition, และ iterator
+       ตรงกับมิติของ array ในกรณีนี้คุณต้องการให้ <code>for</code> loop เริ่มที่ <code>0</code>
+       เพิ่มทีละ <code>1</code> และจบที่ <code>maxPets-1</code></p>
+
+    <p><code>ourAnimals</code> ถูกประกาศไว้ว่า <code>string[,] ourAnimals = new string[maxPets, 6];</code>
+       — คุณรู้ว่า <code>maxPets</code> มีค่าเป็น <code>8</code> ในที่นี้ <code>maxPets</code> ระบุ
+       "จำนวน" element ในมิติแรกของ array ไม่ใช่หมายเลข index แบบ zero-based ที่ใช้อ้างอิง element
+       ดังนั้นแม้ <code>maxPets = 8</code> หมายเลข index ของ array จะมีค่าตั้งแต่ <code>0</code>
+       ถึง <code>7</code></p>
+
+    <h3 id="s04c">เช็คว่าสัตว์ตัวนี้มีข้อมูลหรือยัง</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">for (int i = 0; i < maxPets; i++)
+{
+    if (ourAnimals[i, 0] != "ID #: ")
+    {
+        Console.WriteLine(ourAnimals[i, 0]);
+    }
+}</code></pre>
+    </div>
+
+    <p>ลองพิจารณาว่า <code>if</code> statement นี้ประเมินอะไร และทำไม:</p>
+    <ul>
+      <li><b>ฝั่งซ้ายของ expression</b> — <code>ourAnimals[i, 0]</code>: loop control variable
+          <code>i</code> ใช้ระบุว่ากำลังตรวจสัตว์ตัวไหนอยู่ มิติแรก (<code>i</code>) แทนหมายเลข
+          ของสัตว์ ส่วน <code>0</code> ใน <code>[i, 0]</code> ตรงกับลักษณะ <code>petID</code></li>
+      <li><b>ตัวดำเนินการเปรียบเทียบ</b> — ใช้ <code>!=</code> expression จะเป็น <code>true</code>
+          เมื่อค่าที่กำหนดให้ <code>petID</code> (<code>ourAnimals[i, 0]</code>) <b>ไม่เท่ากับ</b>
+          ค่าฝั่งขวา</li>
+      <li><b>ฝั่งขวาของ expression</b> — ค่า string คงที่ <code>"ID #: "</code> นี่คือค่า default
+          ที่กำหนดให้ <code>petID</code> ตอนสร้างข้อมูลตัวอย่าง เมื่อสัตว์ตัวนั้นถูกกำหนดลักษณะ
+          จริง ค่า <code>petID</code> จะถูกอัปเดต และจะ<b>ไม่เท่ากับ</b>ค่า default นี้อีกต่อไป</li>
+    </ul>
+
+    <p>บอกได้ว่า code block ของ <code>if</code> จะรันเมื่อสัตว์ตัวปัจจุบันมีการกำหนดลักษณะแล้ว
+       เท่านั้น</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 ตัวอย่างที่ดีของการใช้ !=</span>
+      นี่เป็นตัวอย่างที่ดีว่าเมื่อไรควรใช้ <code>!=</code> — คุณไม่สนใจว่าค่าที่กำหนดให้
+      <code>petID</code> เป็นอะไร ตราบใดที่มันไม่ใช่ค่า default
+    </div>
+
+    <div class="out auto"><div class="out-bar">ทดสอบรัน (เลือกเมนู 1)</div><pre>
+ID #: d1
+ID #: d2
+ID #: c3
+ID #: c4
+Press the Enter key to continue.</pre></div>
+
+    <h3 id="s04d">Inner Loop แสดงลักษณะทั้ง 6 อย่างของสัตว์แต่ละตัว</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">for (int i = 0; i < maxPets; i++)
+{
+    if (ourAnimals[i, 0] != "ID #: ")
+    {
+        Console.WriteLine();
+        for (int j = 0; j < 6; j++)
+        {
+            Console.WriteLine(ourAnimals[i, j]);
+        }
+    }
+}</code></pre>
+    </div>
+
+    <p>ตอนนี้คุณมี <code>for</code> loop ตัวที่สอง ที่ "ซ้อน" (nested) อยู่ข้างใน code block ของ
+       loop แรก loop ชั้นนอกวนผ่านสัตว์ใน <code>ourAnimals</code> loop ชั้นในวนผ่านลักษณะของสัตว์
+       แต่ละตัว เพราะข้อมูลสัตว์ถูกเก็บใน multidimensional array การเข้าถึงลักษณะของสัตว์จึงทำได้
+       ง่าย</p>
+
+    <p>สังเกตชื่อ loop control variable ชั้นในคือ <code>j</code> — เมื่อ nest <code>for</code>
+       loop กัน แนวทางที่นิยมคือใช้ <code>i</code> ในชั้นนอกและ <code>j</code> ในชั้นใน (ทบทวนจาก
+       <a href="ch17.html">บทที่ 17</a>) ทำตามธรรมเนียมแบบนี้ช่วยให้คนอื่นอ่านโค้ดคุณง่ายขึ้น
+       เพราะเก็บ 6 ลักษณะต่อสัตว์หนึ่งตัว initializer คือ <code>int j = 0;</code> และ condition
+       คือ <code>j < 6;</code> ตรงกับช่วง index ของ array ที่ต้องการ (<code>0</code>-<code>5</code>)</p>
+
+    <p>บรรทัด <code>Console.WriteLine()</code> เปล่าๆ ก่อนเข้า loop ชั้นในถูกใช้แทนที่ข้อความ
+       petID เดี่ยวๆ — เพื่อให้เห็นช่องว่างแบ่งระหว่างสัตว์แต่ละตัวชัดเจนขึ้นตอนแสดงผล</p>
+
+    <div class="out"><div class="out-bar">Output (menu option 1)</div><pre>
+ID #: d1
+Species: dog
+Age: 2
+Nickname: lola
+Physical description: medium sized cream colored female golden retriever weighing about 65 pounds. housebroken.
+Personality: loves to have her belly rubbed and likes to chase her tail. gives lots of kisses.
+
+ID #: d2
+Species: dog
+Age: 9
+Nickname: loki
+Physical description: large reddish-brown male golden retriever weighing about 85 pounds. housebroken.
+Personality: loves to have his ears rubbed when he greets you at the door, or at any time! loves to lean-in and give doggy hugs.
+
+ID #: c3
+Species: cat
+Age: 1
+Nickname: Puss
+Physical description: small white female weighing about 8 pounds. litter box trained.
+Personality: friendly
+
+ID #: c4
+Species: cat
+Age: ?
+Nickname:
+Physical description:
+Personality:
+Press the Enter key to continue.</pre></div>
+
+    <p>เอาโค้ดนี้ไปใส่ใน <code>case "1":</code> ของ <code>switch</code> statement (แทนที่ comment
+       ว่างเปล่า) แล้วอย่าลืมข้อความ <code>"Press the Enter key to continue."</code> +
+       <code>Console.ReadLine()</code> ต่อท้ายด้วย</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch19-f"><span>เข้าใจว่าทำไม foreach ใช้กับ multidimensional array ตรงๆ ไม่ได้</span></label></li>
+      <li><label><input type="checkbox" id="ch19-g"><span>สร้าง nested for + if แสดงข้อมูลสัตว์ทั้งหมดสำเร็จ ตรงตามผลลัพธ์เป้าหมาย</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">19.5 Loop สำหรับเพิ่มสัตว์ตัวใหม่ (เมนู 2 — ส่วนที่ 1)</h2>
+
+    <h3 id="s05a">นับจำนวนสัตว์ที่มีข้อมูลแล้ว</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ใน case "2":)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string anotherPet = "y";
+int petCount = 0;
+
+for (int i = 0; i < maxPets; i++)
+{
+    if (ourAnimals[i, 0] != "ID #: ")
+    {
+        petCount += 1;
+    }
+}</code></pre>
+    </div>
+
+    <p>ตัวแปร 2 ตัวนี้ควบคุมการวนซ้ำของ <code>while</code> loop ที่ใช้กรอกข้อมูลสัตว์ตัวใหม่:</p>
+    <ul>
+      <li><code>anotherPet</code> เริ่มต้นด้วยค่า <code>y</code> ก่อนเริ่ม <code>while</code> loop
+          — ทีหลังจะได้รับค่าจากผู้ใช้ (<code>y</code> หรือ <code>n</code>) ข้างใน loop</li>
+      <li><code>petCount</code> แทนจำนวนสัตว์ที่มีการกำหนดลักษณะแล้ว — จะถูกกำหนดค่าคำนวณไว้
+          <b>นอก</b> <code>while</code> loop และเพิ่มค่าทีละ <code>1</code> <b>ข้างใน</b>
+          <code>while</code> loop ทุกครั้งที่เพิ่มสัตว์ตัวใหม่เข้า <code>ourAnimals</code></li>
+    </ul>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ scope ตัวแปรให้แคบที่สุดเท่าที่จำเป็น</span>
+      scope ของตัวแปรควรแคบที่สุดเท่าที่จะทำได้เสมอ (ทบทวนจาก <a href="ch15.html">บทที่ 15</a>)
+      ในแอป Contoso Pets คุณอาจจะ scope <code>petCount</code> ไว้ระดับแอปทั้งตัวแทนที่จะ scope
+      ไว้แค่ใน <code>case "2":</code> ก็ได้ — scope ที่กว้างกว่านี้จะทำให้เข้าถึง
+      <code>petCount</code> จากที่ไหนก็ได้ในแอป คำถามคือ ควร scope ตัวแปรระดับไหน ตอนที่ยังไม่
+      แน่ใจว่าจะถูกใช้ในส่วนอื่นของแอปหรือไม่? มันน่าดึงดูดที่จะ scope <code>petCount</code> ไว้
+      ระดับแอปทั้งตัว "เผื่อไว้" แม้ตอนนี้จะยังไม่ได้ใช้ที่อื่นก็ตาม — แต่การ scope ตัวแปรกว้างเกิน
+      จำเป็นอาจนำไปสู่ปัญหาได้ scope ที่สูงเกินจำเป็นทำให้แอปต้องการทรัพยากรมากขึ้น และอาจเปิด
+      ช่องให้เกิดความเสี่ยงด้านความปลอดภัยที่ไม่จำเป็น เมื่อแอปของคุณใหญ่และซับซ้อนขึ้น มันต้องการ
+      ทรัพยากรมากขึ้น โทรศัพท์และคอมพิวเตอร์จัดสรรหน่วยความจำให้ทรัพยากรเหล่านี้ตราบเท่าที่มันยังอยู่
+      ใน scope แอปในโลกจริงมักเข้าถึงได้จาก cloud หรือแอปอื่น และมักถูกปล่อยให้รันค้างไว้แม้ไม่ได้
+      ใช้งาน จึงสำคัญที่จะควบคุมความต้องการทรัพยากรและพื้นที่เสี่ยงด้านความปลอดภัยให้เล็กที่สุด
+      เท่าที่ทำได้ — ถ้าภายหลังคุณตัดสินใจใช้ <code>petCount</code> กว้างขึ้นในแอป ค่อยอัปเดตโค้ด
+      scope ให้สูงขึ้นทีหลังได้เสมอ
+    </div>
+
+    <h3 id="s05b">แจ้งเตือนเมื่อยังมีที่ว่างรับสัตว์เพิ่ม</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ใน case "2":)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">if (petCount < maxPets)
+{
+    Console.WriteLine($"We currently have {petCount} pets that need homes. We can manage {(maxPets - petCount)} more.");
+}</code></pre>
+    </div>
+
+    <div class="out auto"><div class="out-bar">ทดสอบรัน (เลือกเมนู 2)</div><pre>
+We currently have 4 pets that need homes. We can manage 4 more.
+Press the Enter key to continue.</pre></div>
+
+    <h3 id="s05c">สร้าง while Loop รับข้อมูลสัตว์ตัวใหม่</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ใน case "2":)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">while (anotherPet == "y" && petCount < maxPets)
+{
+    // (ข้อมูลจะถูกกรอกและบันทึกตรงนี้ — หัวข้อ 19.6)
+
+    // increment petCount (the array is zero-based, so we increment the counter after adding to the array)
+    petCount = petCount + 1;
+
+    // check maxPet limit
+    if (petCount < maxPets)
+    {
+        // another pet?
+        Console.WriteLine("Do you want to enter info for another pet (y/n)");
+        do
+        {
+            readResult = Console.ReadLine();
+            if (readResult != null)
+            {
+                anotherPet = readResult.ToLower();
+            }
+
+        } while (anotherPet != "y" && anotherPet != "n");
+    }
+}
+
+if (petCount >= maxPets)
+{
+    Console.WriteLine("We have reached our limit on the number of pets that we can manage.");
+    Console.WriteLine("Press the Enter key to continue.");
+    readResult = Console.ReadLine();
+}</code></pre>
+    </div>
+
+    <p>ทำไมใช้ <code>while</code> เป็น loop ชั้นนอกตรงนี้ ไม่ใช่ <code>do-while</code>? เพราะเงื่อนไข
+       <code>anotherPet == "y" && petCount < maxPets</code> ถูกรู้อยู่แล้ว<b>ก่อน</b>เข้า loop
+       (จากการนับ <code>petCount</code> ในหัวข้อ 19.5a) — ถ้า Contoso Pets เต็มความจุอยู่แล้ว
+       (<code>petCount >= maxPets</code>) code block นี้ไม่ควรทำงานเลยแม้แต่ครั้งเดียว ตรงกับหลักการ
+       เลือก <code>while</code> vs <code>do-while</code> ที่เรียนใน
+       <a href="ch18.html#s04">บทที่ 18 หัวข้อ 18.4</a></p>
+
+    <p>ข้างในมี <code>do-while</code> loop ตัวเล็กซ้อนอยู่อีกชั้น (validate ว่าผู้ใช้ตอบ "y" หรือ
+       "n" เท่านั้น) — ใช้ <code>do-while</code> ตรงนี้เพราะต้องถามคำถามและรับคำตอบอย่างน้อยหนึ่ง
+       ครั้งเสมอ</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ลำดับสำคัญมาก: increment ก่อน แล้วค่อยถาม</span>
+      สังเกตว่า <code>petCount = petCount + 1;</code> ทำงาน<b>ก่อน</b>ถามว่า "ต้องการเพิ่มอีกไหม"
+      เสมอ — เพราะ array เป็น zero-based ตอนที่ <code>petCount</code> เท่ากับ <code>4</code> (มี
+      สัตว์ตัวอย่าง 4 ตัวอยู่แล้ว) นั่นหมายถึงคุณกำลังจะบันทึกข้อมูลให้สัตว์ตัวที่ 5 พอบันทึกเสร็จและ
+      increment แล้ว <code>petCount</code> จะเป็น <code>5</code> — ตอนแสดง prompt "Do you want to
+      enter info for another pet" ครั้งแรก <code>petCount</code> จึงเป็น <code>5</code> ไปแล้ว
+      ถ้าสลับลำดับ (ถามก่อน increment ทีหลัง) ตรรกะการตรวจ <code>maxPets</code> จะเพี้ยนทันที
+    </div>
+
+    <div class="out auto"><div class="out-bar">ทดสอบรัน — ตอบ y 3 ครั้งจนเต็มความจุ (petCount 4→5→6→7→8)</div><pre>
+We currently have 4 pets that need homes. We can manage 4 more.
+Do you want to enter info for another pet (y/n)
+y
+Do you want to enter info for another pet (y/n)
+y
+Do you want to enter info for another pet (y/n)
+y
+We have reached our limit on the number of pets that we can manage.
+Press the Enter key to continue.</pre></div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch19-h"><span>นับ petCount และแจ้งจำนวนที่ว่างสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch19-i"><span>สร้าง while loop รับสัตว์ตัวใหม่ พร้อมเงื่อนไขจบครบสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch19-j"><span>ทดสอบตอบ y ซ้ำๆ จนเต็มความจุ เห็นข้อความแจ้งเตือนถูกต้อง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">19.6 อ่าน ตรวจสอบ และบันทึกข้อมูลสัตว์ตัวใหม่ (เมนู 2 — ส่วนที่ 2)</h2>
+
+    <p>ตอนนี้เติมเนื้อในของ <code>while</code> loop จากหัวข้อก่อน — สำหรับสัตว์แต่ละตัว ต้องรับและ
+       ตรวจสอบข้อมูล 5 อย่าง: สปีชีส์, อายุ, ลักษณะทางกายภาพ, นิสัย, และชื่อเล่น แต่ละอย่างใช้
+       <code>do-while</code> loop วนจนกว่าจะได้ input ที่ยอมรับได้ — รูปแบบซ้ำเดิมทั้ง 5 จุด
+       ทำให้เห็นแพทเทิร์นการ validate input ที่ใช้ซ้ำได้บ่อยในโลกจริง</p>
+
+    <h3 id="s06a">รับและตรวจสอบสปีชีส์ (บังคับกรอก)</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ในต้น while loop)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">bool validEntry = false;
+
+// get species (cat or dog) - string animalSpecies is a required field
+do
+{
+    Console.WriteLine("\n\rEnter 'dog' or 'cat' to begin a new entry");
+    readResult = Console.ReadLine();
+    if (readResult != null)
+    {
+        animalSpecies = readResult.ToLower();
+        if (animalSpecies != "dog" && animalSpecies != "cat")
+        {
+            validEntry = false;
+        }
+        else
+        {
+            validEntry = true;
+        }
+    }
+} while (validEntry == false);
+
+// build the animal ID number - for example C1, C2, D3 (for Cat 1, Cat 2, Dog 3)
+animalID = animalSpecies.Substring(0, 1) + (petCount + 1).ToString();</code></pre>
+    </div>
+
+    <p><code>animalSpecies</code> เป็นฟิลด์ที่<b>บังคับกรอก</b> — <code>do-while</code> loop จะไม่
+       ยอมออกจน validEntry เป็น <code>true</code> (คือผู้ใช้พิมพ์ "dog" หรือ "cat" เท่านั้น)</p>
+
+    <p><code>animalID</code> ถูกสร้างขึ้นอัตโนมัติจากตัวอักษรแรกของสปีชีส์ต่อด้วยหมายเลขลำดับ —
+       ใช้ <code>Substring(0, 1)</code> (ทบทวนจาก <a href="ch10.html">บทที่ 10</a>) ตัดตัวอักษร
+       แรกของ <code>animalSpecies</code> ออกมา (<code>"d"</code> หรือ <code>"c"</code>) แล้วต่อด้วย
+       <code>(petCount + 1).ToString()</code> — บวก 1 เพราะ <code>petCount</code> เป็น zero-based
+       (สัตว์ตัวที่ 5 มี <code>petCount = 4</code> แต่ควรได้ ID ลงท้ายด้วย <code>5</code>)</p>
+
+    <h3 id="s06b">รับและตรวจสอบอายุ (ตอบ ? ได้ถ้ายังไม่รู้)</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// get the pet's age. can be ? at initial entry.
+validEntry = false;
+do
+{
+    int petAge;
+    Console.WriteLine("Enter the pet's age or enter ? if unknown");
+    readResult = Console.ReadLine();
+    if (readResult != null)
+    {
+        animalAge = readResult;
+        if (animalAge != "?")
+        {
+            validEntry = int.TryParse(animalAge, out petAge);
+        }
+        else
+        {
+            validEntry = true;
+        }
+    }
+} while (validEntry == false);</code></pre>
+    </div>
+
+    <p>ใช้ <code>int.TryParse()</code> (ทบทวนจาก <a href="ch18.html">บทที่ 18</a>) ตรวจว่าค่าที่
+       กรอกเป็นตัวเลขจำนวนเต็มที่ถูกต้องหรือไม่ — ค่าคืนกลับของ <code>TryParse()</code> เป็น
+       <code>bool</code> เอามากำหนดให้ <code>validEntry</code> ได้โดยตรงเลย ไม่ต้องเขียน
+       <code>if-else</code> เพิ่ม แต่ถ้าผู้ใช้พิมพ์ <code>?</code> (ยังไม่รู้อายุ) ก็ยอมรับได้
+       ทันทีโดยไม่ต้องผ่าน <code>TryParse()</code></p>
+
+    <h3 id="s06c">รับลักษณะทางกายภาพ นิสัย และชื่อเล่น (เว้นว่างได้)</h3>
+    <p>3 ฟิลด์นี้<b>ไม่บังคับ</b> — ถ้าผู้ใช้กด Enter เฉยๆ (ค่าว่าง) จะถูกแทนที่ด้วย
+       <code>"tbd"</code> (to be determined) โดยอัตโนมัติ แพทเทิร์นเหมือนกันทั้ง 3 ฟิลด์:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// get a description of the pet's physical appearance/condition - animalPhysicalDescription can be blank.
+animalPhysicalDescription = "";
+do
+{
+    Console.WriteLine("Enter a physical description of the pet (size, color, gender, weight, housebroken)");
+    readResult = Console.ReadLine();
+    if (readResult != null)
+    {
+        animalPhysicalDescription = readResult.ToLower();
+        if (animalPhysicalDescription == "")
+        {
+            animalPhysicalDescription = "tbd";
+        }
+    }
+} while (animalPhysicalDescription == "");
+
+// get a description of the pet's personality - animalPersonalityDescription can be blank.
+animalPersonalityDescription = "";
+do
+{
+    Console.WriteLine("Enter a description of the pet's personality (likes or dislikes, tricks, energy level)");
+    readResult = Console.ReadLine();
+    if (readResult != null)
+    {
+        animalPersonalityDescription = readResult.ToLower();
+        if (animalPersonalityDescription == "")
+        {
+            animalPersonalityDescription = "tbd";
+        }
+    }
+} while (animalPersonalityDescription == "");
+
+// get the pet's nickname. animalNickname can be blank.
+animalNickname = "";
+do
+{
+    Console.WriteLine("Enter a nickname for the pet");
+    readResult = Console.ReadLine();
+    if (readResult != null)
+    {
+        animalNickname = readResult.ToLower();
+        if (animalNickname == "")
+        {
+            animalNickname = "tbd";
+        }
+    }
+} while (animalNickname == "");</code></pre>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 สังเกตแพทเทิร์นที่ต่างกัน 2 แบบ</span>
+      สปีชีส์และอายุใช้ตัวแปร <code>validEntry</code> ควบคุมเงื่อนไขจบ เพราะต้อง "ตรวจสอบความถูกต้อง"
+      (validate) ไม่ใช่แค่เช็คว่าว่างหรือไม่ ส่วนลักษณะทางกายภาพ/นิสัย/ชื่อเล่น ใช้ค่าตัวแปรเอง
+      (<code>animalPhysicalDescription == ""</code>) เป็นเงื่อนไขจบโดยตรง เพราะกฎง่ายกว่า — แค่ "ห้าม
+      ว่างเปล่า" (แล้วถ้าว่างก็เติม "tbd" ให้อัตโนมัติ จึงไม่มีทางวนซ้ำเกินหนึ่งรอบจริงๆ อยู่แล้ว)
+      เลือกใช้ตัวแปรเงื่อนไขที่ตรงกับความซับซ้อนของกฎที่ต้อง validate
+    </div>
+
+    <h3 id="s06d">บันทึกข้อมูลสัตว์ตัวใหม่ลง Array</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// store the pet information in the ourAnimals array (zero based)
+ourAnimals[petCount, 0] = "ID #: " + animalID;
+ourAnimals[petCount, 1] = "Species: " + animalSpecies;
+ourAnimals[petCount, 2] = "Age: " + animalAge;
+ourAnimals[petCount, 3] = "Nickname: " + animalNickname;
+ourAnimals[petCount, 4] = "Physical description: " + animalPhysicalDescription;
+ourAnimals[petCount, 5] = "Personality: " + animalPersonalityDescription;</code></pre>
+    </div>
+
+    <p>โค้ดนี้วางต่อจากลูปรับชื่อเล่น (หัวข้อ 19.6c) และก่อนบรรทัด
+       <code>petCount = petCount + 1;</code> ที่คุณเขียนไว้แล้วในหัวข้อ 19.5c — สังเกตว่าใช้
+       <code>petCount</code> เป็น index ตรงๆ (ยังไม่ increment) เพราะ array เป็น zero-based:
+       สัตว์ตัวอย่าง 4 ตัวอยู่ที่ index 0-3 ดังนั้นสัตว์ตัวใหม่ตัวแรกที่เพิ่มเข้ามาต้องอยู่ที่
+       index <code>4</code> ซึ่งตรงกับค่า <code>petCount</code> ก่อน increment พอดี</p>
+
+    <div class="out auto"><div class="out-bar">ทดสอบรัน — เพิ่มหมา 1 ตัว (กด Enter เฉยๆ ให้ฟิลด์ที่ไม่บังคับ)</div><pre>
+Enter 'dog' or 'cat' to begin a new entry
+dog
+Enter the pet's age or enter ? if unknown
+?
+Enter a physical description of the pet (size, color, gender, weight, housebroken)
+
+Enter a description of the pet's personality (likes or dislikes, tricks, energy level)
+
+Enter a nickname for the pet
+
+Do you want to enter info for another pet (y/n)
+n</pre></div>
+
+    <p>แล้วเลือกเมนู 1 อีกครั้งเพื่อยืนยันว่าสัตว์ตัวใหม่ถูกบันทึกจริง:</p>
+
+    <div class="out"><div class="out-bar">Output (menu option 1 — หลังเพิ่มสัตว์)</div><pre>
+(... สัตว์ตัวอย่าง 4 ตัวเดิม ...)
+
+ID #: d5
+Species: dog
+Age: ?
+Nickname: tbd
+Physical description: tbd
+Personality: tbd
+Press the Enter key to continue</pre></div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch19-k"><span>เขียน validation loop ครบทั้ง 5 ฟิลด์ (species, age, physical, personality, nickname)</span></label></li>
+      <li><label><input type="checkbox" id="ch19-l"><span>บันทึกข้อมูลสัตว์ตัวใหม่ลง ourAnimals array สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch19-m"><span>ทดสอบเพิ่มสัตว์แล้วเช็คด้วยเมนู 1 เห็นสัตว์ตัวใหม่ถูกต้อง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s07">19.7 🔓 โค้ดฉบับเต็ม (Program.cs)</h2>
+
+    <p>นี่คือ Program.cs ที่ประกอบทุกชิ้นส่วนจากหัวข้อ 19.2-19.6 เข้าด้วยกันครบถ้วน — ใช้เป็น
+       reference เทียบกับโค้ดของคุณเองได้ ถ้าติดปัญหาระหว่างทาง (เหมือนที่ MS Learn แนะนำให้เทียบ
+       กับ Program.cs ในโฟลเดอร์ "Final" เมื่อทำ Guided Project ค้าง)</p>
+
+    <details class="fold">
+      <summary>🔓 ดู Program.cs ฉบับเต็ม (300+ บรรทัด)</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button></div>
+          <pre><code class="lang-cs">// the ourAnimals array will store the following:
+string animalSpecies = "";
+string animalID = "";
+string animalAge = "";
+string animalPhysicalDescription = "";
+string animalPersonalityDescription = "";
+string animalNickname = "";
+
+// variables that support data entry
+int maxPets = 8;
+string? readResult;
+string menuSelection = "";
+
+// array used to store runtime data, there is no persisted data
+string[,] ourAnimals = new string[maxPets, 6];
+
+// build sample data
+for (int i = 0; i < maxPets; i++)
+{
+    switch (i)
+    {
+        case 0:
+            animalSpecies = "dog";
+            animalID = "d1";
+            animalAge = "2";
+            animalPhysicalDescription = "medium sized cream colored female golden retriever weighing about 65 pounds. housebroken.";
+            animalPersonalityDescription = "loves to have her belly rubbed and likes to chase her tail. gives lots of kisses.";
+            animalNickname = "lola";
+            break;
+
+        case 1:
+            animalSpecies = "dog";
+            animalID = "d2";
+            animalAge = "9";
+            animalPhysicalDescription = "large reddish-brown male golden retriever weighing about 85 pounds. housebroken.";
+            animalPersonalityDescription = "loves to have his ears rubbed when he greets you at the door, or at any time! loves to lean-in and give doggy hugs.";
+            animalNickname = "loki";
+            break;
+
+        case 2:
+            animalSpecies = "cat";
+            animalID = "c3";
+            animalAge = "1";
+            animalPhysicalDescription = "small white female weighing about 8 pounds. litter box trained.";
+            animalPersonalityDescription = "friendly";
+            animalNickname = "Puss";
+            break;
+
+        case 3:
+            animalSpecies = "cat";
+            animalID = "c4";
+            animalAge = "?";
+            animalPhysicalDescription = "";
+            animalPersonalityDescription = "";
+            animalNickname = "";
+            break;
+
+        default:
+            animalSpecies = "";
+            animalID = "";
+            animalAge = "";
+            animalPhysicalDescription = "";
+            animalPersonalityDescription = "";
+            animalNickname = "";
+            break;
+    }
+
+    ourAnimals[i, 0] = "ID #: " + animalID;
+    ourAnimals[i, 1] = "Species: " + animalSpecies;
+    ourAnimals[i, 2] = "Age: " + animalAge;
+    ourAnimals[i, 3] = "Nickname: " + animalNickname;
+    ourAnimals[i, 4] = "Physical description: " + animalPhysicalDescription;
+    ourAnimals[i, 5] = "Personality: " + animalPersonalityDescription;
+}
+
+do
+{
+    // display the top-level menu options
+    Console.WriteLine("Welcome to the Contoso PetFriends app. Your main menu options are:");
+    Console.WriteLine("1. List all of our current pet information");
+    Console.WriteLine("2. Add a new animal friend to the ourAnimals array");
+    Console.WriteLine("3. Ensure animal ages and physical descriptions are complete");
+    Console.WriteLine("4. Ensure animal nicknames and personality descriptions are complete");
+    Console.WriteLine("5. Edit an animal's age");
+    Console.WriteLine("6. Edit an animal's personality description");
+    Console.WriteLine("7. Display all cats with a specified characteristic");
+    Console.WriteLine("8. Display all dogs with a specified characteristic");
+    Console.WriteLine();
+    Console.WriteLine("Enter your selection number (or type Exit to exit the program)");
+
+    readResult = Console.ReadLine();
+    if (readResult != null)
+    {
+        menuSelection = readResult.ToLower();
+    }
+
+    switch (menuSelection)
+    {
+        case "1":
+            // List all of our current pet information
+            for (int i = 0; i < maxPets; i++)
+            {
+                if (ourAnimals[i, 0] != "ID #: ")
+                {
+                    Console.WriteLine();
+                    for (int j = 0; j < 6; j++)
+                    {
+                        Console.WriteLine(ourAnimals[i, j]);
+                    }
+                }
+            }
+            Console.WriteLine("Press the Enter key to continue.");
+            readResult = Console.ReadLine();
+            break;
+
+        case "2":
+            // Add a new animal friend to the ourAnimals array
+            string anotherPet = "y";
+            int petCount = 0;
+
+            for (int i = 0; i < maxPets; i++)
+            {
+                if (ourAnimals[i, 0] != "ID #: ")
+                {
+                    petCount += 1;
+                }
+            }
+
+            if (petCount < maxPets)
+            {
+                Console.WriteLine($"We currently have {petCount} pets that need homes. We can manage {(maxPets - petCount)} more.");
+            }
+
+            while (anotherPet == "y" && petCount < maxPets)
+            {
+                bool validEntry = false;
+
+                // get species (cat or dog) - string animalSpecies is a required field
+                do
+                {
+                    Console.WriteLine("\n\rEnter 'dog' or 'cat' to begin a new entry");
+                    readResult = Console.ReadLine();
+                    if (readResult != null)
+                    {
+                        animalSpecies = readResult.ToLower();
+                        if (animalSpecies != "dog" && animalSpecies != "cat")
+                        {
+                            validEntry = false;
+                        }
+                        else
+                        {
+                            validEntry = true;
+                        }
+                    }
+                } while (validEntry == false);
+
+                // build the animal ID number - for example C1, C2, D3 (for Cat 1, Cat 2, Dog 3)
+                animalID = animalSpecies.Substring(0, 1) + (petCount + 1).ToString();
+
+                // get the pet's age. can be ? at initial entry.
+                validEntry = false;
+                do
+                {
+                    int petAge;
+                    Console.WriteLine("Enter the pet's age or enter ? if unknown");
+                    readResult = Console.ReadLine();
+                    if (readResult != null)
+                    {
+                        animalAge = readResult;
+                        if (animalAge != "?")
+                        {
+                            validEntry = int.TryParse(animalAge, out petAge);
+                        }
+                        else
+                        {
+                            validEntry = true;
+                        }
+                    }
+                } while (validEntry == false);
+
+                // get a description of the pet's physical appearance/condition - animalPhysicalDescription can be blank.
+                animalPhysicalDescription = "";
+                do
+                {
+                    Console.WriteLine("Enter a physical description of the pet (size, color, gender, weight, housebroken)");
+                    readResult = Console.ReadLine();
+                    if (readResult != null)
+                    {
+                        animalPhysicalDescription = readResult.ToLower();
+                        if (animalPhysicalDescription == "")
+                        {
+                            animalPhysicalDescription = "tbd";
+                        }
+                    }
+                } while (animalPhysicalDescription == "");
+
+                // get a description of the pet's personality - animalPersonalityDescription can be blank.
+                animalPersonalityDescription = "";
+                do
+                {
+                    Console.WriteLine("Enter a description of the pet's personality (likes or dislikes, tricks, energy level)");
+                    readResult = Console.ReadLine();
+                    if (readResult != null)
+                    {
+                        animalPersonalityDescription = readResult.ToLower();
+                        if (animalPersonalityDescription == "")
+                        {
+                            animalPersonalityDescription = "tbd";
+                        }
+                    }
+                } while (animalPersonalityDescription == "");
+
+                // get the pet's nickname. animalNickname can be blank.
+                animalNickname = "";
+                do
+                {
+                    Console.WriteLine("Enter a nickname for the pet");
+                    readResult = Console.ReadLine();
+                    if (readResult != null)
+                    {
+                        animalNickname = readResult.ToLower();
+                        if (animalNickname == "")
+                        {
+                            animalNickname = "tbd";
+                        }
+                    }
+                } while (animalNickname == "");
+
+                // store the pet information in the ourAnimals array (zero based)
+                ourAnimals[petCount, 0] = "ID #: " + animalID;
+                ourAnimals[petCount, 1] = "Species: " + animalSpecies;
+                ourAnimals[petCount, 2] = "Age: " + animalAge;
+                ourAnimals[petCount, 3] = "Nickname: " + animalNickname;
+                ourAnimals[petCount, 4] = "Physical description: " + animalPhysicalDescription;
+                ourAnimals[petCount, 5] = "Personality: " + animalPersonalityDescription;
+
+                // increment petCount (the array is zero-based, so we increment the counter after adding to the array)
+                petCount = petCount + 1;
+
+                // check maxPet limit
+                if (petCount < maxPets)
+                {
+                    // another pet?
+                    Console.WriteLine("Do you want to enter info for another pet (y/n)");
+                    do
+                    {
+                        readResult = Console.ReadLine();
+                        if (readResult != null)
+                        {
+                            anotherPet = readResult.ToLower();
+                        }
+
+                    } while (anotherPet != "y" && anotherPet != "n");
+                }
+            }
+
+            if (petCount >= maxPets)
+            {
+                Console.WriteLine("We have reached our limit on the number of pets that we can manage.");
+                Console.WriteLine("Press the Enter key to continue.");
+                readResult = Console.ReadLine();
+            }
+
+            break;
+
+        case "3":
+            // Ensure animal ages and physical descriptions are complete
+            Console.WriteLine("Challenge Project - please check back soon to see progress.");
+            Console.WriteLine("Press the Enter key to continue.");
+            readResult = Console.ReadLine();
+            break;
+
+        case "4":
+            // Ensure animal nicknames and personality descriptions are complete
+            Console.WriteLine("Challenge Project - please check back soon to see progress.");
+            Console.WriteLine("Press the Enter key to continue.");
+            readResult = Console.ReadLine();
+            break;
+
+        case "5":
+            // Edit an animal's age
+            Console.WriteLine("UNDER CONSTRUCTION - please check back next month to see progress.");
+            Console.WriteLine("Press the Enter key to continue.");
+            readResult = Console.ReadLine();
+            break;
+
+        case "6":
+            // Edit an animal's personality description
+            Console.WriteLine("UNDER CONSTRUCTION - please check back next month to see progress.");
+            Console.WriteLine("Press the Enter key to continue.");
+            readResult = Console.ReadLine();
+            break;
+
+        case "7":
+            // Display all cats with a specified characteristic
+            Console.WriteLine("UNDER CONSTRUCTION - please check back next month to see progress.");
+            Console.WriteLine("Press the Enter key to continue.");
+            readResult = Console.ReadLine();
+            break;
+
+        case "8":
+            // Display all dogs with a specified characteristic
+            Console.WriteLine("UNDER CONSTRUCTION - please check back next month to see progress.");
+            Console.WriteLine("Press the Enter key to continue.");
+            readResult = Console.ReadLine();
+            break;
+
+        default:
+            break;
+    }
+
+} while (menuSelection != "exit");</code></pre>
+        </div>
+        <p>🎉 ยินดีด้วย! คุณเพิ่งสร้างแอปพลิเคชันที่ผสม selection กับ iteration statement เข้าด้วยกัน
+           เพื่อบรรลุเป้าหมายการออกแบบแอปสำเร็จแล้ว โค้ดของคุณมีมากกว่า 300 บรรทัด และทำงานในแบบ
+           ที่คุณอาจพบในแอปพลิเคชันระดับมืออาชีพจริงๆ ถือเป็นความสำเร็จที่สำคัญมาก ทำได้ดีมาก!</p>
+      </div>
+    </details>
+
+    <!-- ============================================ -->
+    <h2 id="s08">19.8 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>IndexOutOfRangeException ตอนเข้าถึง ourAnimals[i, j]</td>
+          <td>สับสนระหว่าง <code>maxPets</code> (จำนวน element = 8) กับ index สูงสุดที่ใช้ได้จริง
+              (7) — condition ของ for ต้องเป็น <code>i &lt; maxPets</code> ไม่ใช่
+              <code>i &lt;= maxPets</code></td>
+        </tr>
+        <tr>
+          <td>สัตว์ตัวใหม่เขียนทับสัตว์ตัวเดิม (index ชนกัน)</td>
+          <td>บันทึกข้อมูลด้วย <code>petCount</code> <b>ก่อน</b> increment เสมอ ถ้า increment ก่อน
+              บันทึก จะได้ index ผิดตำแหน่งไปหนึ่งช่อง</td>
+        </tr>
+        <tr>
+          <td>while loop รับสัตว์ตัวใหม่ไม่ทำงานเลยทั้งที่ยังมีที่ว่าง</td>
+          <td>ตรวจสอบเงื่อนไข <code>anotherPet == "y" && petCount &lt; maxPets</code> — ถ้า
+              <code>anotherPet</code> เผลอตั้งค่าอื่นที่ไม่ใช่ <code>"y"</code> ตอนต้น loop จะไม่
+              เข้าเลย</td>
+        </tr>
+        <tr>
+          <td>ใช้ foreach วน ourAnimals แล้ว compile error หรือผลลัพธ์เพี้ยน</td>
+          <td>ourAnimals เป็น <b>2 มิติ</b> — foreach จะมองเห็นเป็น 48 string element เรียงกัน
+              ไม่ใช่ 8 แถว × 6 คอลัมน์ ต้องใช้ nested for แทนเสมอกับ rectangular array แบบนี้</td>
+        </tr>
+        <tr>
+          <td>เช็ค "มีข้อมูลหรือยัง" ผิดพลาด</td>
+          <td>ต้องเทียบกับค่า default ที่ตั้งไว้ตอนสร้างข้อมูลตัวอย่างเป๊ะๆ (<code>"ID #: "</code>
+              รวม prefix และช่องว่างท้ายด้วย) พิมพ์ผิดแม้แต่ตัวเดียวจะทำให้เงื่อนไขไม่ตรงกับที่ตั้งใจ</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">19.9 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment ของ Microsoft Learn</p>
+
+    <div class="quiz" data-q="19-1">
+      <p class="q"><span class="num">1.</span> เมื่อไรที่ควรใช้ switch-case แทน if-elseif-else?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>switch-case เหมาะเมื่อต้องใช้ else if มากกว่า 2-3 code block</span></li>
+        <li class="opt"><span class="k">B</span><span>switch-case เหมาะเมื่อจำนวน case pattern มีน้อย</span></li>
+        <li class="opt"><span class="k">C</span><span>switch-case เหมาะเมื่อ selection statement อยู่ข้างใน loop</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ตรงกับหลักการที่เรียนใน <a href="ch16.html">บทที่ 16</a>
+        และใช้จริงในบทนี้ตอนแปลง if-elseif-else 5 กิ่งเป็น switch-case เพื่อความอ่านง่าย</div>
+    </div>
+
+    <div class="quiz" data-q="19-2">
+      <p class="q"><span class="num">2.</span> ทำไมนักพัฒนาควรเลือก for แทน foreach เมื่อประมวลผล
+        เนื้อหาของ multidimensional array?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>for statement ตรวจสอบแต่ละ array item แยกกันได้ดีกว่า</span></li>
+        <li class="opt"><span class="k">B</span><span>foreach statement ตรวจสอบแต่ละ array item แยกกันได้ดีกว่า</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>for statement ทำให้นักพัฒนาแยกจัดการแต่ละมิติของ array ได้</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ตามที่อธิบายในหัวข้อ 19.4a — foreach มองเห็น multidimensional
+        array เป็นลิสต์แบนๆ (48 item) ไม่แยกแถว-คอลัมน์ ส่วน for ให้ตัวแปร i กับ j แยกควบคุมแต่ละมิติ
+        ได้อย่างชัดเจน</div>
+    </div>
+
+    <div class="quiz" data-q="19-3">
+      <p class="q"><span class="num">3.</span> ทำไมการ scope ตัวแปรไว้ในระดับต่ำสุดเท่าที่จำเป็นจึง
+        สำคัญ?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เพื่อให้ตัวแปรที่ประกาศนอก code block เข้าถึงได้ข้างใน code block ก่อนถูกกำหนดค่า</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>เพื่อรักษาให้ทรัพยากรของแอปและพื้นที่เสี่ยงด้านความปลอดภัยมีขนาดเล็ก</span></li>
+        <li class="opt"><span class="k">C</span><span>เพื่อให้ตัวแปรเข้าถึงได้จาก code branch ระดับต่ำสุดของแอป</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ตรงกับคำอธิบายในหัวข้อ 19.5a เรื่อง scope ของ
+        <code>petCount</code> — scope กว้างเกินจำเป็นเพิ่มการใช้ทรัพยากรและความเสี่ยงด้านความ
+        ปลอดภัยโดยไม่จำเป็น</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">19.10 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>สร้าง 2 มิติ string array ชื่อ <code>books</code> ขนาด 3 แถว 2 คอลัมน์ (ชื่อหนังสือ,
+           ผู้แต่ง) กำหนดค่าด้วยมือให้ครบทั้ง 3 แถว แล้วใช้ nested for แสดงผลออกมาทีละแถว</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string[,] books = new string[3, 2];
+books[0, 0] = "Dune"; books[0, 1] = "Frank Herbert";
+books[1, 0] = "1984"; books[1, 1] = "George Orwell";
+books[2, 0] = "Foundation"; books[2, 1] = "Isaac Asimov";
+
+for (int i = 0; i < 3; i++)
+{
+    for (int j = 0; j < 2; j++)
+    {
+        Console.WriteLine(books[i, j]);
+    }
+    Console.WriteLine();
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดนับจำนวนแถวใน <code>ourAnimals</code> ที่<b>ยังไม่มี</b>ข้อมูล (ตรงข้ามกับ
+           <code>petCount</code> ในหัวข้อ 19.5a) แล้วพิมพ์ผลลัพธ์</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int emptyCount = 0;
+for (int i = 0; i < maxPets; i++)
+{
+    if (ourAnimals[i, 0] == "ID #: ")
+    {
+        emptyCount += 1;
+    }
+}
+Console.WriteLine($"ที่ว่างเหลือ {emptyCount} ตำแหน่ง");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงเมนู 1 (หัวข้อ 19.4d) ให้แสดงเฉพาะ<b>สัตว์สปีชีส์แมว</b>เท่านั้น (ใช้
+           <code>ourAnimals[i, 1]</code> ซึ่งเก็บ <code>"Species: cat"</code> หรือ
+           <code>"Species: dog"</code> เช็คด้วย <code>Contains("cat")</code> ทบทวนจาก
+           <a href="ch14.html">บทที่ 14</a>)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">for (int i = 0; i < maxPets; i++)
+{
+    if (ourAnimals[i, 0] != "ID #: " && ourAnimals[i, 1].Contains("cat"))
+    {
+        Console.WriteLine();
+        for (int j = 0; j < 6; j++)
+        {
+            Console.WriteLine(ourAnimals[i, j]);
+        }
+    }
+}</code></pre></div>
+          <p>ใช้ <code>&&</code> รวม 2 เงื่อนไข: "มีข้อมูลแล้ว" และ "เป็นแมว" เข้าด้วยกัน — นี่คือ
+             พื้นฐานของเมนู 7 "Display all cats with a specified characteristic" ที่จะ implement
+             เต็มรูปแบบในบทที่ 20</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ในหัวข้อ 19.6a มีข้อจำกัดหนึ่งอย่าง: ถ้าผู้ใช้พิมพ์ชื่อสปีชีส์ที่มีตัวพิมพ์ใหญ่ปนกัน เช่น
+           "DOG" มันควรถูกยอมรับ อธิบายว่าบรรทัดไหนในโค้ดทำให้กรณีนี้ทำงานถูกต้อง แล้วลองเขียน
+           test case ที่พิสูจน์ว่าถ้าลบบรรทัดนั้นออก โค้ดจะปฏิเสธ "DOG" หรือไม่</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>บรรทัด <code>animalSpecies = readResult.ToLower();</code> แปลง input ให้เป็นตัวพิมพ์
+             เล็กทั้งหมดก่อนเทียบกับ <code>"dog"</code>/<code>"cat"</code> ถ้าลบ
+             <code>.ToLower()</code> ออก (เหลือแค่ <code>animalSpecies = readResult;</code>)
+             การพิมพ์ "DOG" จะไม่ตรงกับเงื่อนไข <code>animalSpecies != "dog" && animalSpecies != "cat"</code>
+             (เพราะ string comparison ใน C# แยกตัวพิมพ์เล็ก-ใหญ่โดย default) ทำให้ <code>validEntry</code>
+             เป็น <code>false</code> ตลอดไป กลายเป็น infinite loop ที่ผู้ใช้พิมพ์ "DOG" ยังไงก็ไม่ผ่าน</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>เขียนฟังก์ชันย่อย (แค่ code block ธรรมดา ยังไม่ต้องใช้ method) ที่นับจำนวนหมาและแมวแยกกัน
+           จาก <code>ourAnimals</code> แล้วพิมพ์ผลสรุปแบบ:
+           <code>"มีหมา 3 ตัว, แมว 2 ตัว"</code></p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int dogCount = 0;
+int catCount = 0;
+
+for (int i = 0; i < maxPets; i++)
+{
+    if (ourAnimals[i, 0] != "ID #: ")
+    {
+        if (ourAnimals[i, 1].Contains("dog"))
+        {
+            dogCount += 1;
+        }
+        else if (ourAnimals[i, 1].Contains("cat"))
+        {
+            catCount += 1;
+        }
+    }
+}
+
+Console.WriteLine($"มีหมา {dogCount} ตัว, แมว {catCount} ตัว");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>วิเคราะห์: ถ้า <code>maxPets</code> ถูกเปลี่ยนจาก <code>8</code> เป็น <code>4</code>
+           (พอดีกับจำนวนสัตว์ตัวอย่าง) จะเกิดอะไรขึ้นเมื่อผู้ใช้เลือกเมนู 2 ทันทีตอนเริ่มโปรแกรม
+           โดยไม่ต้องรันจริง ลองไล่ตรรกะทีละบรรทัดด้วยตัวเอง แล้วอธิบายว่า while loop รับสัตว์ตัวใหม่
+           จะเข้าทำงานหรือไม่ ทำไม</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>จะไม่เข้าทำงานเลย — เพราะ <code>petCount</code> ที่คำนวณได้จากข้อมูลตัวอย่าง 4 ตัวจะ
+             เท่ากับ <code>4</code> พอดี ซึ่งเท่ากับ <code>maxPets</code> ใหม่ (<code>4</code>)
+             เงื่อนไข <code>while (anotherPet == "y" && petCount < maxPets)</code> จะเป็น
+             <code>false</code> ตั้งแต่ก่อนเข้า loop ครั้งแรก (เพราะ <code>petCount &lt; maxPets</code>
+             คือ <code>4 &lt; 4</code> ซึ่งเป็นเท็จ) และโค้ดจะกระโดดไปที่
+             <code>if (petCount >= maxPets)</code> ทันที แสดงข้อความ "We have reached our limit"
+             เลยโดยไม่ถามข้อมูลสัตว์ตัวใหม่แม้แต่คำถามเดียว — นี่คือตัวอย่างที่ดีว่าทำไมต้องเลือก
+             <code>while</code> (เช็คก่อนเข้า) แทน <code>do-while</code> (เข้าก่อนเช็ค) ในจุดนี้</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s11">📌 สรุปบทที่ 19</h2>
+
+    <p>เป้าหมายของคุณคือสร้างแอปพลิเคชันที่ผสม selection และ iteration statement เข้าด้วยกัน เพื่อ
+       บรรลุเป้าหมายการออกแบบของแอป</p>
+
+    <p>ด้วยการสร้าง nested combination ของ iteration และ selection statement คุณสร้าง user
+       interface ที่ให้ผู้ใช้แสดงข้อมูลสัตว์เลี้ยงจาก array <code>ourAnimals</code> ได้ คุณยังพัฒนา
+       ฟีเจอร์รับและตรวจสอบลักษณะของสัตว์ตัวใหม่ แล้วเพิ่มเข้า array <code>ourAnimals</code> ผู้ใช้
+       แอปสามารถเลือกเมนูต่อไปเรื่อยๆ จนกว่าจะเลือกออกจากแอป</p>
+
+    <p>การมีความสามารถ implement iteration และ selection statement หลากหลายแบบ ช่วยให้คุณ optimize
+       โค้ดของคุณได้</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 19</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">แพทเทิร์น</th><th>ใช้เมื่อ</th></tr></thead>
+        <tbody>
+          <tr><td><code>string[,] arr = new string[r, c];</code></td><td>ประกาศ rectangular multidimensional array</td></tr>
+          <tr><td><code>arr[i, j]</code></td><td>เข้าถึง element แถว i คอลัมน์ j</td></tr>
+          <tr><td>nested for (ไม่ใช่ foreach)</td><td>วน multidimensional array — แยกมิติได้ชัดเจน</td></tr>
+          <tr><td>do { วนถามซ้ำ } while (validEntry == false);</td><td>validate input ที่มีกฎซับซ้อน (เช่น ต้องอยู่ในลิสต์ที่กำหนด)</td></tr>
+          <tr><td>do { วนถามซ้ำ } while (field == "");</td><td>validate input ที่แค่ "ห้ามว่าง"</td></tr>
+          <tr><td>while (cond1 && cond2) { }</td><td>outer loop ที่รู้เงื่อนไขจบล่วงหน้าก่อนเข้า loop</td></tr>
+          <tr><td>บันทึกก่อน increment counter เสมอ</td><td>ป้องกัน index เพี้ยนเวลาเขียนลง array แบบ zero-based</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s12">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>guided project</td><td>โปรเจกต์นำทาง</td><td>โมดูลที่พาสร้างแอปทั้งตัวไปทีละขั้นตอน</td></tr>
+        <tr><td>rectangular array</td><td>array สี่เหลี่ยมผืนผ้า</td><td>multidimensional array ที่ทุกแถวมีจำนวนคอลัมน์เท่ากัน (<code>[,]</code>)</td></tr>
+        <tr><td>jagged array</td><td>array หยัก</td><td>array ของ array ที่แต่ละแถวมีความยาวต่างกันได้ (<code>[][]</code>)</td></tr>
+        <tr><td>data entry validation</td><td>การตรวจสอบข้อมูลนำเข้า</td><td>วนถามซ้ำจนกว่าผู้ใช้จะกรอกค่าที่ถูกต้อง</td></tr>
+        <tr><td>required field</td><td>ฟิลด์บังคับกรอก</td><td>ข้อมูลที่ต้องมีค่า ห้ามว่างเปล่า</td></tr>
+        <tr><td>placeholder</td><td>ข้อความชั่วคราว</td><td>feedback ที่บอกผู้ใช้ว่าฟีเจอร์นี้ยังไม่เสร็จ</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch18.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 18 · do-while และ while Statement</span></a>
+      <a class="next" href="ch20.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 20 · Challenge Project — Contoso Pets ภาคต่อ</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

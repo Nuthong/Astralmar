@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ดัชนีค้นหาหัวข้อ — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="appendix-index">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ ภาคผนวก / ดัชนี</span>
+  <span class="spacer"></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">ภาคผนวก</span>
+      <h1>ดัชนีค้นหาหัวข้อ</h1>
+      <div class="en">Subject Index</div>
+    </div>
+
+    <p>ดัชนีนี้จัดกลุ่มตาม<b>หัวข้อ</b> (ต่างจาก<a href="appendix-glossary.html">ตารางศัพท์
+       EN–TH</a>ที่เรียงตามตัวอักษรทีละคำ) — ใช้หน้านี้เวลาจำได้ว่า "เรื่องประมาณนี้" แต่นึกไม่ออก
+       ว่าอยู่บทไหน</p>
+
+    <h2 id="s01">Console และ Input/Output</h2>
+    <ul class="idx">
+      <li><code>Console.WriteLine()</code> / <code>Console.Write()</code> — <a href="ch01.html">บทที่ 1</a></li>
+      <li><code>Console.ReadLine()</code> (รับ input ผู้ใช้) — <a href="ch18.html">บทที่ 18</a>, <a href="ch28.html">28</a></li>
+      <li><code>Console.ReadKey()</code> (รับปุ่มกดโดยไม่ echo) — <a href="ch32.html">บทที่ 32</a>, <a href="ch34.html">34</a></li>
+      <li><code>Console.SetCursorPosition()</code> (วาดตำแหน่งบนจอ) — <a href="ch32.html">บทที่ 32</a></li>
+      <li>DEBUG CONSOLE ไม่รองรับ input — ต้องแก้ <code>launch.json</code> — <a href="ch34.html">บทที่ 34</a></li>
+    </ul>
+
+    <h2 id="s02">ตัวแปรและชนิดข้อมูล</h2>
+    <ul class="idx">
+      <li>literal, variable, การประกาศ/กำหนดค่า — <a href="ch02.html">บทที่ 2</a></li>
+      <li><code>var</code> (type inference) — <a href="ch02.html">บทที่ 2</a></li>
+      <li>value type vs reference type — <a href="ch21.html">บทที่ 21</a></li>
+      <li>casting และ conversion, <code>TryParse()</code> — <a href="ch22.html">บทที่ 22</a></li>
+      <li>local scope, definite assignment, nested block — <a href="ch15.html">บทที่ 15</a></li>
+    </ul>
+
+    <h2 id="s03">String</h2>
+    <ul class="idx">
+      <li>escape sequence, verbatim string, concatenation, interpolation — <a href="ch03.html">บทที่ 3</a></li>
+      <li>composite formatting, <code>:C :N :P</code>, padding — <a href="ch24.html">บทที่ 24</a></li>
+      <li><code>IndexOf()</code>, <code>Substring()</code>, <code>Remove()</code>, <code>Replace()</code> — <a href="ch25.html">บทที่ 25</a></li>
+      <li>เทียบ string ด้วย <code>Trim().ToLower()</code> — <a href="ch14.html">บทที่ 14</a></li>
+    </ul>
+
+    <h2 id="s04">ตัวดำเนินการ (Operators)</h2>
+    <ul class="idx">
+      <li>ตัวดำเนินการเลข <code>+ - * / %</code>, cast, increment/decrement — <a href="ch04.html">บทที่ 4</a></li>
+      <li>ตัวดำเนินการเปรียบเทียบ/ตรรกะ <code>== != &gt; &lt; &amp;&amp; ||</code> — <a href="ch09.html">บทที่ 9</a>, <a href="ch14.html">14</a></li>
+      <li>conditional (ternary) operator <code>? :</code> — <a href="ch14.html">บทที่ 14</a></li>
+      <li>logical negation <code>!</code> — <a href="ch14.html">บทที่ 14</a></li>
+    </ul>
+
+    <h2 id="s05">เงื่อนไขและการวนซ้ำ</h2>
+    <ul class="idx">
+      <li>if / else if / else — <a href="ch09.html">บทที่ 9</a></li>
+      <li>switch-case (ไม่มี fall-through) — <a href="ch16.html">บทที่ 16</a></li>
+      <li>for statement — <a href="ch17.html">บทที่ 17</a></li>
+      <li>while / do-while, <code>continue</code> — <a href="ch18.html">บทที่ 18</a></li>
+      <li>foreach — <a href="ch10.html">บทที่ 10</a></li>
+    </ul>
+
+    <h2 id="s06">Array</h2>
+    <ul class="idx">
+      <li>ประกาศ, zero-based index, <code>Length</code>, foreach — <a href="ch10.html">บทที่ 10</a></li>
+      <li>multidimensional array — <a href="ch19.html">บทที่ 19</a></li>
+      <li>parallel array — <a href="ch12.html">บทที่ 12</a>, <a href="ch32.html">32</a></li>
+      <li><code>Array.Sort/Reverse/Clear/Resize</code>, <code>Split/Join</code> — <a href="ch23.html">บทที่ 23</a></li>
+      <li>Fisher-Yates shuffle — <a href="ch31.html">บทที่ 31</a></li>
+    </ul>
+
+    <h2 id="s07">Method</h2>
+    <ul class="idx">
+      <li>method signature, pseudo-code — <a href="ch28.html">บทที่ 28</a></li>
+      <li>parameter, argument, pass-by-value/reference — <a href="ch29.html">บทที่ 29</a></li>
+      <li>optional parameter, named argument — <a href="ch29.html">บทที่ 29</a>, <a href="ch32.html">32</a>, <a href="ch34.html">34</a>, <a href="ch36.html">36</a></li>
+      <li>return value, "not all code paths return a value" — <a href="ch30.html">บทที่ 30</a></li>
+      <li>overloaded method — <a href="ch08.html">บทที่ 8</a></li>
+    </ul>
+
+    <h2 id="s08">Debugging</h2>
+    <ul class="idx">
+      <li>testing vs debugging vs exception handling — <a href="ch33.html">บทที่ 33</a></li>
+      <li>debugger คืออะไร, call stack unwinding — <a href="ch33.html">บทที่ 33</a>, <a href="ch35.html">35</a></li>
+      <li>breakpoint, conditional breakpoint, logpoint — <a href="ch34.html">บทที่ 34</a></li>
+      <li>Step Over / Step Into / Step Out — <a href="ch34.html">บทที่ 34</a></li>
+      <li>VARIABLES, WATCH, CALL STACK — <a href="ch34.html">บทที่ 34</a></li>
+      <li><code>launch.json</code> (name/type/request/console/preLaunchTask) — <a href="ch34.html">บทที่ 34</a></li>
+      <li>safety check (ตรวจยืนยันผลลัพธ์แยกจากเมธอดหลัก) — <a href="ch37.html">บทที่ 37</a>, <a href="ch38.html">38</a></li>
+    </ul>
+
+    <h2 id="s09">Exception Handling</h2>
+    <ul class="idx">
+      <li>exception คืออะไร, throw/catch แนวคิด — <a href="ch33.html">บทที่ 33</a></li>
+      <li>try-catch-finally, จับหลาย exception — <a href="ch35.html">บทที่ 35</a></li>
+      <li>exception พื้นฐานของ .NET (DivideByZeroException ฯลฯ) — <a href="ch35.html">บทที่ 35</a></li>
+      <li>property ของ exception (Message, StackTrace) — <a href="ch35.html">บทที่ 35</a>, <a href="ch36.html">36</a></li>
+      <li>สร้างและ throw exception เอง — <a href="ch36.html">บทที่ 36</a></li>
+      <li>re-throw (<code>throw;</code> vs <code>throw ex;</code>) — <a href="ch36.html">บทที่ 36</a></li>
+      <li>เลือกชนิด exception ให้เจาะจง (ArgumentOutOfRangeException, InvalidOperationException) — <a href="ch36.html">บทที่ 36</a>, <a href="ch37.html">37</a></li>
+    </ul>
+
+    <h2 id="s10">โปรเจกต์ตัวอย่างในเล่ม</h2>
+    <ul class="idx">
+      <li>คำนวณเกรดนักเรียน (Student Grades) — <a href="ch05.html">บทที่ 5</a>-<a href="ch06.html">6</a></li>
+      <li>Contoso Pets — <a href="ch19.html">บทที่ 19</a>-<a href="ch20.html">20</a></li>
+      <li>ค้นหาสุนัข + เงินบริจาค — <a href="ch26.html">บทที่ 26</a>-<a href="ch27.html">27</a></li>
+      <li>วางแผนเที่ยวสวนสัตว์เลี้ยง — <a href="ch31.html">บทที่ 31</a></li>
+      <li>มินิเกมคอนโซล — <a href="ch32.html">บทที่ 32</a></li>
+      <li>เครื่องคิดเงิน (Cash Register) — <a href="ch37.html">บทที่ 37</a>-<a href="ch38.html">38</a></li>
+    </ul>
+
+    <h2 id="s11">🏆 Trophy (สรุปรวบยอดแต่ละ Part)</h2>
+    <ul class="idx">
+      <li>Trophy Part 1 — <a href="ch06.html">บทที่ 6</a></li>
+      <li>Trophy Part 2 — <a href="ch13.html">บทที่ 13</a></li>
+      <li>Trophy Part 3 — <a href="ch20.html">บทที่ 20</a></li>
+      <li>Trophy Part 4 — <a href="ch27.html">บทที่ 27</a></li>
+      <li>Trophy Part 5 — <a href="ch32.html">บทที่ 32</a></li>
+      <li>Trophy Part 6 — <a href="ch38.html">บทที่ 38</a></li>
+    </ul>
+
+    <div class="pager">
+      <a href="appendix-errors.html"><span class="dir">← ก่อนหน้า</span><span class="ttl">ตาราง Error Code (CSxxxx) รวม</span></a>
+      <a class="next" href="../index.html"><span class="dir">กลับสารบัญ →</span><span class="ttl">Foundational C#</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

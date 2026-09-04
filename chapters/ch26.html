@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 26 · Guided Project: ค้นหา + เงินบริจาค — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="26">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 4 · Work with Variable Data / บทที่ 26</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 4 · โมดูล 6/7 · 🏗️ Guided Project</span>
+      <h1>Guided Project — เพิ่มระบบค้นหาและเงินบริจาคให้ Contoso Pets</h1>
+      <div class="en">Guided Project - Work with Variable Data in C#</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>75–100 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>ฟีเจอร์ค้นหาสุนัขตามลักษณะ + ข้อมูลเงินบริจาคที่จัดรูปแบบสกุลเงิน</b></span>
+        <span>🎯 ความยาก <b>สูง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ใช้ iteration statement รวบรวม input ข้อมูลได้</li>
+        <li>ประมวลผลข้อมูล (data processing) ได้อย่างมีระบบ</li>
+        <li>จัดรูปแบบ output ของข้อมูลได้</li>
+        <li>เลือก data type ที่ถูกต้อง และแปลง data type อย่างปลอดภัย</li>
+        <li>จัดการ array ตัวเลข string และ character รวมถึงเพิ่ม ลบ และเรียงข้อมูลได้</li>
+        <li>แก้ไขและประกอบ string ที่ซับซ้อนจากหลายแหล่งข้อมูล และจัดรูปแบบสำหรับแสดงผลข้ามภูมิภาคได้</li>
+      </ul>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ นี่คือ Guided Project — ต่อยอดจาก Contoso Pets เดิม</span>
+      โมดูลนี้ใช้แอป Contoso Pets เวอร์ชันใหม่ (starter project แยกต่างหากจากบทที่ 19-20) — ข้อมูล
+      ตัวอย่างมีการเปลี่ยนเล็กน้อย (ชื่อเล่น น้ำหนัก) และมีแค่ 2 เมนู: "แสดงข้อมูลสัตว์ทั้งหมด" กับ
+      "แสดงสุนัขที่มีลักษณะตามค้นหา" คุณจะเพิ่มฟีเจอร์ใหม่ 2 อย่าง: <b>ข้อมูลเงินบริจาคแนะนำ</b> และ
+      <b>ระบบค้นหาสุนัข</b>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">26.1 สถานการณ์และสเปก</h2>
+
+    <p>สมมติคุณเป็นนักพัฒนาที่ชอบช่วยเหลือชุมชนท้องถิ่น คุณกับเพื่อนเริ่มธุรกิจที่ช่วยหาบ้านใหม่ให้
+       แมวและสุนัขจรจัดหรือถูกทอดทิ้ง ธุรกิจของคุณเริ่มต้นเล็กๆ มีสัตว์แค่ไม่กี่ตัว แต่ตอนนี้กำลัง
+       เติบโตขึ้น เพื่อนของคุณพัฒนาแอปเริ่มต้นที่รองรับการกรอกและแสดงข้อมูลสัตว์ที่พร้อมให้อุปการะแล้ว
+       พวกเขาขอให้คุณช่วยตรวจสอบการเพิ่มฟีเจอร์ที่ช่วยจับคู่สัตว์ในความดูแลกับคนที่กำลังมองหาสัตว์
+       เลี้ยงตัวใหม่</p>
+
+    <p>ทีมของคุณพบว่าการค้นหาข้อมูลสัตว์เพื่อระบุตัวที่อาจจับคู่ได้ตามลักษณะที่เจ้าของในอนาคตต้องการ
+       เป็นเรื่องสำคัญ นอกจากนี้ ทีมยังต้องการเพิ่มฟีเจอร์ระดมทุน รวมข้อมูลเงินบริจาคที่แนะนำ และ
+       แสดงข้อมูลสัตว์ด้วยจำนวนบรรทัด output ที่น้อยลง</p>
+
+    <h3 id="s01a">สเปกของฟีเจอร์ใหม่</h3>
+    <p><b>ค้นหาลักษณะสุนัข:</b></p>
+    <ul>
+      <li>รวบรวม input คำค้นหาลักษณะของสัตว์เลี้ยง</li>
+      <li>วนผ่าน array ของสัตว์ ระบุตัวที่เป็น "สุนัข"</li>
+      <li>สำหรับสุนัขแต่ละตัว รวมคำอธิบายทางกายภาพและนิสัยเข้าด้วยกันเพื่อใช้ค้นหา</li>
+      <li>ค้นหาคำที่ตรงกันในคำอธิบายที่รวมแล้ว</li>
+      <li>แสดงสุนัขที่มีคำตรงกัน</li>
+    </ul>
+
+    <p><b>ข้อมูลเงินบริจาคแนะนำ:</b></p>
+    <ul>
+      <li>กำหนดตัวแปร string <code>suggestedDonation</code></li>
+      <li>ขยาย array <code>ourAnimals</code> ให้เก็บ <code>suggestedDonation</code> ได้ พร้อมสร้าง
+          ข้อมูลตัวอย่างสำหรับมัน</li>
+      <li>ทำให้ทุกจุดที่ใช้ array <code>ourAnimals</code> รองรับข้อมูล <code>suggestedDonation</code>
+          ที่เพิ่มเข้ามา</li>
+      <li>แสดง <code>suggestedDonation</code> พร้อมสัญลักษณ์สกุลเงินตามภูมิภาค ($, €, ¥, ...)</li>
+    </ul>
+
+    <div class="note tip">
+      <span class="lbl">💡 นี่คือ MVP (Minimum Viable Product)</span>
+      ฟีเจอร์ค้นหาในบทนี้เป็น "MVP" — ต้นแบบพื้นฐานที่ทำงานได้จริง เน้นส่งมอบเร็วและง่าย ไม่ใช่
+      ผลิตภัณฑ์ขั้นสุดท้าย จุดประสงค์คือช่วยทดสอบไอเดียและรวบรวมความต้องการเพิ่มเติมต่อไป — สังเกต
+      ว่าฟีเจอร์ค้นหารับแค่ "คำเดียว" เท่านั้น ยังไม่รองรับหลายคำ (จะไปทำในบทที่ 27 Challenge
+      Project)
+    </div>
+
+    <h3 id="s01b">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch26-contosopets2</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch26-a"><span>เข้าใจสเปกของฟีเจอร์ค้นหาและเงินบริจาคครบถ้วน</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s02">26.2 ทบทวน Starter Code</h2>
+
+    <p>starter code รอบนี้คล้ายกับ Contoso Pets จากบทที่ 19 มาก แต่มีจุดต่าง: ข้อมูลตัวอย่างเปลี่ยน
+       ไปเล็กน้อย (น้ำหนัก d1 เป็น 45 ปอนด์ ไม่ใช่ 65, ชื่อเล่นเปลี่ยนเป็น gus/snow/lion) และเมนูมี
+       แค่ 2 ตัวเลือก:</p>
+
+    <div class="out auto"><pre>
+Welcome to the Contoso PetFriends app. Your main menu options are:
+ 1. List all of our current pet information
+ 2. Display all dogs with a specified characteristic
+
+Enter your selection number (or type Exit to exit the program)</pre></div>
+
+    <p>เมนู 1 ทำงานได้แล้วในโค้ดตั้งต้น เมนู 2 เป็นแค่ placeholder ข้อความ "UNDER CONSTRUCTION" —
+       เป้าหมายของคุณคือ implement เมนู 2 ให้สมบูรณ์ พร้อมเพิ่มข้อมูลเงินบริจาคเข้าไปในเมนู 1 ด้วย</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ nullable type ทบทวนอีกครั้ง</span>
+      โค้ดตั้งต้นมีบรรทัด <code>string? readResult;</code> — เครื่องหมาย <code>?</code> เปลี่ยน
+      variable type ที่ปกติไม่รับค่า null (int, string, bool, ...) ให้รองรับ nullable type ได้
+      แนวทางปฏิบัติที่ดีเสมอเวลาอ่านค่าด้วย <code>Console.ReadLine()</code> คือใช้ nullable string
+      type แบบนี้ เพื่อไม่ให้ compiler แสดง warning ตอน build (ทบทวนจาก <a href="ch18.html">
+      บทที่ 18</a>)
+    </div>
+
+    <p>ทดสอบรัน starter code: เลือกเมนู 1 → เห็นข้อมูลสัตว์ตัวอย่าง 4 ตัวแสดงครบ เลือกเมนู 2 → เห็น
+       ข้อความ "UNDER CONSTRUCTION" พิมพ์ "exit" → โปรแกรมจบการทำงาน</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch26-b"><span>รัน starter code สำเร็จ ทดสอบทั้ง 2 เมนูแล้ว</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">26.3 เพิ่มข้อมูลเงินบริจาคแนะนำ</h2>
+
+    <h3 id="s03a">เพิ่มตัวแปรและขยาย Array</h3>
+    <p>เพิ่มตัวแปร <code>suggestedDonation</code> ต่อจาก <code>animalNickname</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// #1 the ourAnimals array will store the following:
+string animalSpecies = "";
+string animalID = "";
+string animalAge = "";
+string animalPhysicalDescription = "";
+string animalPersonalityDescription = "";
+string animalNickname = "";
+string suggestedDonation = "";</code></pre>
+    </div>
+
+    <p>ขยาย array <code>ourAnimals</code> จากเดิม 6 "คอลัมน์" เป็น 7 คอลัมน์ เพื่อรองรับข้อมูล
+       เงินบริจาค:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// #3 array used to store runtime data, there is no persisted data
+string[,] ourAnimals = new string[maxPets, 7];</code></pre>
+    </div>
+
+    <h3 id="s03b">เพิ่มค่าเงินบริจาคในข้อมูลตัวอย่าง</h3>
+    <p>เติมค่า <code>suggestedDonation</code> ก่อนบรรทัด <code>break;</code> ในแต่ละ
+       <code>case</code>:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Case</th><th>suggestedDonation</th></tr></thead>
+      <tbody>
+        <tr><td>0 (dog — lola)</td><td><code>"85.00"</code></td></tr>
+        <tr><td>1 (dog — gus)</td><td><code>"49.99"</code></td></tr>
+        <tr><td>2 (cat — snow)</td><td><code>"40.00"</code></td></tr>
+        <tr><td>3 (cat — lion)</td><td><code>""</code> (ว่างเปล่า — ยังไม่ทราบ)</td></tr>
+        <tr><td>default</td><td><code>""</code></td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ตัวอย่าง case 0)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">case 0:
+    animalSpecies = "dog";
+    animalID = "d1";
+    animalAge = "2";
+    animalPhysicalDescription = "medium sized cream colored female golden retriever weighing about 45 pounds. housebroken.";
+    animalPersonalityDescription = "loves to have her belly rubbed and likes to chase her tail. gives lots of kisses.";
+    animalNickname = "lola";
+    suggestedDonation = "85.00";
+    break;</code></pre>
+    </div>
+
+    <h3 id="s03c">ตรวจสอบข้อมูลด้วย TryParse()</h3>
+    <p>ตัวแปร <code>suggestedDonation</code> ตั้งใจให้เป็นค่าตัวเลข แต่ถูกเก็บเป็น <code>string</code>
+       ลองพิจารณากรณีในอนาคตที่ต้องตรวจสอบว่า <code>suggestedDonation</code> แทนค่า decimal ได้จริง
+       และแปลงเป็น decimal ได้ เพื่อใช้คำนวณด้านบัญชีต่อไป เพื่อป้องกัน error เวลาผู้ใช้กรอกตัวเลข
+       เป็นตัวอักษร เช่น <code>twenty</code> ต้องใช้ <code>TryParse</code> ตรวจสอบ (ทบทวนจาก
+       <a href="ch22.html">บทที่ 22</a>)</p>
+
+    <p>ประกาศตัวแปร <code>decimalDonation</code> ในกลุ่มตัวแปรสนับสนุนการกรอกข้อมูล:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// #2 variables that support data entry
+int maxPets = 8;
+string? readResult;
+string menuSelection = "";
+decimal decimalDonation = 0.00m;</code></pre>
+    </div>
+
+    <p>ท้าย <code>for</code> loop ที่สร้างข้อมูลตัวอย่าง (หลังกำหนดค่า <code>ourAnimals[i, 5]</code>
+       แล้ว) เพิ่มการตรวจสอบและกำหนดค่า default:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">if (!decimal.TryParse(suggestedDonation, out decimalDonation)){
+    decimalDonation = 45.00m; // if suggestedDonation NOT a number, default to 45.00
+}
+ourAnimals[i, 6] = $"Suggested Donation: {decimalDonation:C2}";</code></pre>
+    </div>
+
+    <p>ถ้าตัวแปร <code>suggestedDonation</code> แปลงเป็น <code>decimal</code> ไม่ได้ (เช่น เป็น
+       empty string) โค้ดกำหนดค่า default <code>decimalDonation = 45.00m;</code> ถ้าแปลงสำเร็จ
+       <code>TryParse</code> กำหนดค่าให้ <code>decimalDonation</code> เอง ไม่ว่าทางไหน
+       <code>decimalDonation</code> ก็เป็นค่า decimal ที่ถูกต้องเสมอ — สังเกตว่าใช้ string
+       interpolation ผสม currency format specifier <code>:C2</code> (ทบทวนจาก
+       <a href="ch24.html">บทที่ 24</a>) จัดรูปแบบผลลัพธ์ให้มีสัญลักษณ์สกุลเงินและทศนิยม 2 ตำแหน่ง
+       เสมอ</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ตำแหน่งของโค้ดสำคัญมาก</span>
+      โค้ดตรวจสอบ TryParse ต้องอยู่<b>ข้างใน</b> <code>for</code> loop ของการสร้างข้อมูลตัวอย่าง
+      (หลัง <code>switch</code> statement จบ แต่ก่อนปีกกาปิดของ <code>for</code>) ไม่ใช่ข้างนอก
+      loop — เพราะต้องคำนวณ <code>decimalDonation</code> ใหม่ทุกครั้งที่วนไปสัตว์ตัวถัดไป ถ้าวางผิด
+      ตำแหน่ง ค่าจะไม่อัปเดตตามสัตว์แต่ละตัว
+    </div>
+
+    <h3 id="s03d">อัปเดตเมนู 1 ให้แสดงคอลัมน์ที่ 7</h3>
+    <p>เมนู 1 ยังวน inner loop แค่ 6 คอลัมน์เดิม (<code>j &lt; 6</code>) ต้องเพิ่มเป็น 7 เพื่อให้
+       แสดง <code>Suggested Donation</code> ด้วย:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">case "1":
+    // list all pet info
+    for (int i = 0; i < maxPets; i++)
+    {
+        if (ourAnimals[i, 0] != "ID #: ")
+        {
+            Console.WriteLine();
+            for (int j = 0; j < 7; j++) // เพิ่มจาก 6 เป็น 7
+            {
+                Console.WriteLine(ourAnimals[i, j]);
+            }
+        }
+    }
+    Console.WriteLine("\n\rPress the Enter key to continue");
+    readResult = Console.ReadLine();
+    break;</code></pre>
+    </div>
+
+    <div class="out"><div class="out-bar">Output (เลือกเมนู 1)</div><pre>
+ID #: d1
+Species: dog
+Age: 2
+Nickname: lola
+Physical description: medium sized cream colored female golden retriever weighing about 45 pounds. housebroken.
+Personality: loves to have her belly rubbed and likes to chase her tail. gives lots of kisses.
+Suggested Donation: $85.00
+
+ID #: d2
+Species: dog
+Age: 9
+Nickname: gus
+Physical description: large reddish-brown male golden retriever weighing about 85 pounds. housebroken.
+Personality: loves to have his ears rubbed when he greets you at the door, or at any time! loves to lean-in and give doggy hugs.
+Suggested Donation: $49.99
+
+ID #: c3
+Species: cat
+Age: 1
+Nickname: snow
+Physical description: small white female weighing about 8 pounds. litter box trained.
+Personality: friendly
+Suggested Donation: $40.00
+
+ID #: c4
+Species: cat
+Age:
+Nickname: lion
+Physical description:
+Personality:
+Suggested Donation: $45.00</pre></div>
+
+    <p>สังเกตสัตว์ตัวสุดท้าย (c4) — <code>suggestedDonation</code> เป็น empty string เพราะไม่ได้
+       ตั้งค่าไว้ในข้อมูลตัวอย่าง <code>TryParse()</code> จึงคืน <code>false</code> และค่า default
+       <code>$45.00</code> ถูกใช้แทน ตรงตามที่ออกแบบไว้</p>
+
+    <div class="quiz" data-q="26-1">
+      <p class="q"><span class="num">Check ★</span> ข้อใดอธิบายจุดประสงค์ของ <code>TryParse()</code>
+        ได้ดีที่สุด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>แยกประโยคออกเป็นคำเก็บใน array</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>ทดสอบการแคสต์ค่าอย่างปลอดภัย</span></li>
+        <li class="opt"><span class="k">C</span><span>หา substring ภายใน string ที่ใหญ่กว่า</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> TryParse() พยายามแปลง (cast) ค่าอย่างปลอดภัย โดยไม่
+        throw exception ถ้าแปลงไม่สำเร็จ — ไม่เกี่ยวกับการแยกคำ (นั่นคือ Split()) หรือการค้นหา
+        substring (นั่นคือ IndexOf()/Contains())</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch26-c"><span>ขยาย array และเพิ่มตัวแปร suggestedDonation สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch26-d"><span>validate ด้วย TryParse() พร้อมค่า default สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch26-e"><span>อัปเดตเมนู 1 ให้แสดงเงินบริจาคครบ 7 คอลัมน์สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">26.4 เพิ่มฟีเจอร์ค้นหาสุนัข</h2>
+
+    <h3 id="s04a">รับ Input คำค้นหาจากผู้ใช้</h3>
+    <p>ลบข้อความ "UNDER CONSTRUCTION" ออกจาก <code>case "2":</code> แล้วเพิ่มโค้ดรับ input:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">case "2":
+    // Display all dogs with a specified characteristic
+    string dogCharacteristic = "";
+
+    while (dogCharacteristic == "")
+    {
+        Console.WriteLine($"\nEnter one desired dog characteristics to search for");
+        readResult = Console.ReadLine();
+        if (readResult != null)
+        {
+            dogCharacteristic = readResult.ToLower().Trim();
+        }
+    }
+    Console.WriteLine("Press the Enter key to continue.");
+    readResult = Console.ReadLine();
+    break;</code></pre>
+    </div>
+
+    <p>จุดสำคัญของโค้ดนี้:</p>
+    <ul>
+      <li>ตัวแปร <code>string dogCharacteristic = "";</code> ถูก scope ไว้แค่ใน
+          <code>case "2":</code> เท่านั้น — เข้าถึงจากนอก case นี้ไม่ได้ (ทบทวน scope จาก
+          <a href="ch15.html">บทที่ 15</a>)</li>
+      <li>หลัง <code>Console.ReadLine()</code> รับ input มาเป็น <code>dogCharacteristic</code>
+          โค้ดตรวจว่าไม่ใช่ null แล้วแปลงเป็นตัวพิมพ์เล็กและตัดช่องว่างรอบข้างด้วย
+          <code>.ToLower().Trim()</code> (ทบทวน Trim จาก <a href="ch18.html">บทที่ 18</a>)</li>
+      <li>ถ้าผู้ใช้กด Enter เฉยๆ (ค่าว่าง) loop จะวนถามซ้ำจนกว่าจะได้ค่าจริง</li>
+    </ul>
+
+    <h3 id="s04b">ระบุว่าสัตว์ตัวไหนเป็นสุนัข</h3>
+    <p>เพิ่มโค้ดวนหาสุนัขไว้ท้าย <code>case "2":</code> ก่อนบรรทัด "Press the Enter key" (ก่อน
+       <code>break;</code>):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// #6 loop through the ourAnimals array to search for matching animals
+for (int i = 0; i < maxPets; i++)
+{
+    if (ourAnimals[i, 1].Contains("dog"))
+    {
+        // #7 Search combined descriptions and report results
+    }
+}</code></pre>
+    </div>
+
+    <p>โค้ดกรองหา "สุนัข" ด้วย <code>ourAnimals[i, 1]</code> ซึ่งเป็นตำแหน่งที่เก็บข้อมูล
+       <code>animalSpecies</code> ถ้า <code>animalSpecies</code> เก็บค่า "dog" ไว้ โค้ดจะเข้าไปทำงาน
+       ข้างในปีกกาของ <code>if</code> ที่จะค้นหาคำอธิบายที่รวมกันแล้วต่อไป</p>
+
+    <h3 id="s04c">รวมคำอธิบายทางกายภาพและนิสัยเข้าด้วยกัน</h3>
+    <p>ทีมพิจารณาแล้วว่ามีคำอธิบาย 2 อย่าง คือ <code>animalPhysicalDescription</code> และ
+       <code>animalPersonalityDescription</code> — ทีมตัดสินใจว่าการรวมคำอธิบายทั้งสองเข้าด้วยกัน
+       เหมาะสมกว่าสำหรับการค้นหา</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ Scope Creep</span>
+      นักพัฒนาบางคนเรียกการเพิ่มข้อกำหนดระหว่างพัฒนาแบบนี้ว่า "scope creep" แม้การรวมคำอธิบายจะไม่ใช่
+      งานหนักมาก แต่ก็ยังเพิ่มเวลาและความซับซ้อนอยู่ดี ด้วยเหตุนี้ คุณควรแจ้งทีมว่าข้อกำหนดที่เพิ่มขึ้น
+      มักทำให้โปรเจกต์เสร็จช้าลง
+    </div>
+
+    <p>ประกาศตัวแปร <code>dogDescription</code> ก่อนโค้ดข้อ #6:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string dogDescription = "";</code></pre>
+    </div>
+
+    <p>เติมค่าให้ <code>dogDescription</code> หลัง comment #7:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">dogDescription = ourAnimals[i, 4] + "\n" + ourAnimals[i, 5];</code></pre>
+    </div>
+
+    <h3 id="s04d">ค้นหาและแสดงผลลัพธ์</h3>
+    <p>เพิ่ม <code>if</code> statement ตรวจว่าเจอคำที่ค้นหาในคำอธิบายที่รวมแล้วหรือไม่:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">if (dogDescription.Contains(dogCharacteristic))
+{
+    Console.WriteLine($"\nOur dog {ourAnimals[i, 3]} is a match!");
+    Console.WriteLine(dogDescription);
+}</code></pre>
+    </div>
+
+    <p>ยังต้องจัดการข้อความ "ไม่พบที่ตรงกัน" ด้วย — เพิ่มตัวแปรติดตามสถานะก่อน comment #6:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">bool noMatchesDog = true;</code></pre>
+    </div>
+
+    <p>ตอนนี้คุณติดตามได้ว่ายังไม่เจอที่ตรงกันเลยด้วยตัวแปรนี้ — ค่า default เป็น <code>true</code>
+       หมายถึง "จริงที่ว่าไม่มีสุนัขตรงกับคำค้นหาเลย" พอเจอสุนัขที่ตรงกัน ก็ "พลิก"
+       <code>noMatchesDog</code> จาก <code>true</code> เป็น <code>false</code></p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">if (dogDescription.Contains(dogCharacteristic))
+{
+    Console.WriteLine($"\nOur dog {ourAnimals[i, 3]} is a match!");
+    Console.WriteLine(dogDescription);
+
+    noMatchesDog = false;
+}</code></pre>
+    </div>
+
+    <p>สุดท้าย เพิ่มโค้ดตัดสินว่าควรพิมพ์ข้อความ "ไม่พบที่ตรงกัน" หรือไม่ — วางไว้ท้าย
+       <code>case "2":</code> ก่อนบรรทัด "Press the Enter key" (ก่อน <code>break;</code>):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">if (noMatchesDog)
+{
+    Console.WriteLine("None of our dogs are a match found for: " + dogCharacteristic);
+}</code></pre>
+    </div>
+
+    <div class="out auto"><div class="out-bar">ทดสอบรัน — ค้นหา "golden" (เจอ 2 ตัว: lola, gus)</div><pre>
+Enter one desired dog characteristics to search for
+golden
+
+Our dog Nickname: lola is a match!
+Physical description: medium sized cream colored female golden retriever weighing about 45 pounds. housebroken.
+Personality: loves to have her belly rubbed and likes to chase her tail. gives lots of kisses.
+
+Our dog Nickname: gus is a match!
+Physical description: large reddish-brown male golden retriever weighing about 85 pounds. housebroken.
+Personality: loves to have his ears rubbed when he greets you at the door, or at any time! loves to lean-in and give doggy hugs.
+Press the Enter key to continue.</pre></div>
+
+    <div class="out auto"><div class="out-bar">ทดสอบรัน — ค้นหา "medium" (เจอ 1 ตัว: lola)</div><pre>
+Enter one desired dog characteristics to search for
+medium
+
+Our dog Nickname: lola is a match!
+Physical description: medium sized cream colored female golden retriever weighing about 45 pounds. housebroken.
+Personality: loves to have her belly rubbed and likes to chase her tail. gives lots of kisses.
+Press the Enter key to continue.</pre></div>
+
+    <div class="out auto"><div class="out-bar">ทดสอบรัน — ค้นหา "scuba" (ไม่เจอ)</div><pre>
+Enter one desired dog characteristics to search for
+scuba
+None of our dogs are a match found for: scuba
+Press the Enter key to continue.</pre></div>
+
+    <div class="note tip">
+      <span class="lbl">💡 ทำไมค้นหาแยกแยะแค่บางส่วน (case-insensitive substring)</span>
+      <code>Contains()</code> (ทบทวนจาก <a href="ch14.html">บทที่ 14</a>) ค้นหาว่ามี substring
+      นั้นอยู่ที่ไหนก็ได้ใน string ที่ใหญ่กว่า ไม่จำเป็นต้องตรงกันทั้งคำ — เพราะ
+      <code>dogCharacteristic</code> ถูก <code>.ToLower()</code> ไว้แล้ว และคำอธิบายในข้อมูล
+      ตัวอย่างก็เป็นตัวพิมพ์เล็กอยู่แล้ว การค้นหาจึงไม่สนตัวพิมพ์ใหญ่-เล็ก (case-insensitive)
+      โดยธรรมชาติ แม้ <code>Contains()</code> เองจะ case-sensitive ก็ตาม — เคล็ดลับคือแปลงทั้งสอง
+      ฝั่งให้เป็นตัวพิมพ์เล็กเหมือนกันก่อนเทียบเสมอ
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch26-f"><span>รับ input คำค้นหาด้วย while loop สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch26-g"><span>กรองเฉพาะสุนัข รวมคำอธิบาย และค้นหาด้วย Contains() สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch26-h"><span>ใช้ noMatchesDog flag แสดงข้อความ "ไม่พบ" ได้ถูกต้อง</span></label></li>
+      <li><label><input type="checkbox" id="ch26-i"><span>ทดสอบค้นหาทั้ง 3 กรณี (เจอ 2, เจอ 1, ไม่เจอ) สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">26.5 🔓 โค้ดฉบับเต็ม (Program.cs)</h2>
+
+    <details class="fold">
+      <summary>🔓 ดู Program.cs ฉบับเต็ม</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button></div>
+          <pre><code class="lang-cs">// #1 the ourAnimals array will store the following:
+string animalSpecies = "";
+string animalID = "";
+string animalAge = "";
+string animalPhysicalDescription = "";
+string animalPersonalityDescription = "";
+string animalNickname = "";
+string suggestedDonation = "";
+
+// #2 variables that support data entry
+int maxPets = 8;
+string? readResult;
+string menuSelection = "";
+decimal decimalDonation = 0.00m;
+
+// #3 array used to store runtime data, there is no persisted data
+string[,] ourAnimals = new string[maxPets, 7];
+
+// #4 create sample data ourAnimals array entries
+for (int i = 0; i < maxPets; i++)
+{
+    switch (i)
+    {
+        case 0:
+            animalSpecies = "dog";
+            animalID = "d1";
+            animalAge = "2";
+            animalPhysicalDescription = "medium sized cream colored female golden retriever weighing about 45 pounds. housebroken.";
+            animalPersonalityDescription = "loves to have her belly rubbed and likes to chase her tail. gives lots of kisses.";
+            animalNickname = "lola";
+            suggestedDonation = "85.00";
+            break;
+
+        case 1:
+            animalSpecies = "dog";
+            animalID = "d2";
+            animalAge = "9";
+            animalPhysicalDescription = "large reddish-brown male golden retriever weighing about 85 pounds. housebroken.";
+            animalPersonalityDescription = "loves to have his ears rubbed when he greets you at the door, or at any time! loves to lean-in and give doggy hugs.";
+            animalNickname = "gus";
+            suggestedDonation = "49.99";
+            break;
+
+        case 2:
+            animalSpecies = "cat";
+            animalID = "c3";
+            animalAge = "1";
+            animalPhysicalDescription = "small white female weighing about 8 pounds. litter box trained.";
+            animalPersonalityDescription = "friendly";
+            animalNickname = "snow";
+            suggestedDonation = "40.00";
+            break;
+
+        case 3:
+            animalSpecies = "cat";
+            animalID = "c4";
+            animalAge = "";
+            animalPhysicalDescription = "";
+            animalPersonalityDescription = "";
+            animalNickname = "lion";
+            suggestedDonation = "";
+            break;
+
+        default:
+            animalSpecies = "";
+            animalID = "";
+            animalAge = "";
+            animalPhysicalDescription = "";
+            animalPersonalityDescription = "";
+            animalNickname = "";
+            suggestedDonation = "";
+            break;
+    }
+    ourAnimals[i, 0] = "ID #: " + animalID;
+    ourAnimals[i, 1] = "Species: " + animalSpecies;
+    ourAnimals[i, 2] = "Age: " + animalAge;
+    ourAnimals[i, 3] = "Nickname: " + animalNickname;
+    ourAnimals[i, 4] = "Physical description: " + animalPhysicalDescription;
+    ourAnimals[i, 5] = "Personality: " + animalPersonalityDescription;
+
+    if (!decimal.TryParse(suggestedDonation, out decimalDonation)){
+        decimalDonation = 45.00m; // if suggestedDonation NOT a number, default to 45.00
+    }
+    ourAnimals[i, 6] = $"Suggested Donation: {decimalDonation:C2}";
+}
+
+// #5 display the top-level menu options
+do
+{
+    Console.Clear();
+
+    Console.WriteLine("Welcome to the Contoso PetFriends app. Your main menu options are:");
+    Console.WriteLine(" 1. List all of our current pet information");
+    Console.WriteLine(" 2. Display all dogs with a specified characteristic");
+    Console.WriteLine();
+    Console.WriteLine("Enter your selection number (or type Exit to exit the program)");
+
+    readResult = Console.ReadLine();
+    if (readResult != null)
+    {
+        menuSelection = readResult.ToLower();
+    }
+
+    switch (menuSelection)
+    {
+        case "1":
+            // list all pet info
+            for (int i = 0; i < maxPets; i++)
+            {
+                if (ourAnimals[i, 0] != "ID #: ")
+                {
+                    Console.WriteLine();
+                    for (int j = 0; j < 7; j++)
+                    {
+                        Console.WriteLine(ourAnimals[i, j]);
+                    }
+                }
+            }
+            Console.WriteLine("\n\rPress the Enter key to continue");
+            readResult = Console.ReadLine();
+            break;
+
+        case "2":
+            // Display all dogs with a specified characteristic
+            string dogCharacteristic = "";
+
+            while (dogCharacteristic == "")
+            {
+                Console.WriteLine($"\nEnter one desired dog characteristics to search for");
+                readResult = Console.ReadLine();
+                if (readResult != null)
+                {
+                    dogCharacteristic = readResult.ToLower().Trim();
+                }
+            }
+
+            string dogDescription = "";
+            bool noMatchesDog = true;
+
+            // #6 loop through the ourAnimals array to search for matching animals
+            for (int i = 0; i < maxPets; i++)
+            {
+                if (ourAnimals[i, 1].Contains("dog"))
+                {
+                    // #7 Search combined descriptions and report results
+                    dogDescription = ourAnimals[i, 4] + "\n" + ourAnimals[i, 5];
+
+                    if (dogDescription.Contains(dogCharacteristic))
+                    {
+                        Console.WriteLine($"\nOur dog {ourAnimals[i, 3]} is a match!");
+                        Console.WriteLine(dogDescription);
+
+                        noMatchesDog = false;
+                    }
+                }
+            }
+
+            if (noMatchesDog)
+            {
+                Console.WriteLine("None of our dogs are a match found for: " + dogCharacteristic);
+            }
+
+            Console.WriteLine("Press the Enter key to continue.");
+            readResult = Console.ReadLine();
+            break;
+
+        default:
+            break;
+    }
+
+} while (menuSelection != "exit");</code></pre>
+        </div>
+        <p>🎉 ยินดีด้วย! คุณเพิ่งเพิ่มฟีเจอร์การค้นหาและข้อมูลเงินบริจาคให้แอป Contoso Pets สำเร็จแล้ว
+           — ทดสอบให้ครบทุกเมนูและทุก edge case (input ว่าง, คำค้นหาไม่เจอ, ข้อมูลเงินบริจาคที่ขาด
+           หายไป) ก่อนถือว่าเสร็จสมบูรณ์</p>
+      </div>
+    </details>
+
+    <!-- ============================================ -->
+    <h2 id="s06">26.6 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>IndexOutOfRangeException ตอนแสดงเมนู 1</td>
+          <td>ลืมขยาย inner loop จาก <code>j &lt; 6</code> เป็น <code>j &lt; 7</code> ทั้งที่ขยาย
+              array เป็น 7 คอลัมน์ไปแล้ว หรือในทางกลับกัน — ต้องปรับทั้งสองจุดให้ตรงกันเสมอ</td>
+        </tr>
+        <tr>
+          <td>ค้นหาสุนัขแล้วไม่เจอผลลัพธ์ที่ควรจะเจอ</td>
+          <td>ลืม <code>.ToLower()</code> ที่ฝั่งใดฝั่งหนึ่ง (input ผู้ใช้ หรือคำอธิบายในข้อมูล) —
+              Contains() เป็น case-sensitive ต้องแปลงทั้งสองฝั่งให้ตัวพิมพ์เดียวกันก่อนเทียบเสมอ</td>
+        </tr>
+        <tr>
+          <td>ค้นหาแมวไม่ได้ ทั้งที่ตั้งใจให้ค้นหาได้ทุกสัตว์</td>
+          <td>ไม่ใช่บั๊ก — สเปกกำหนดให้ค้นหาเฉพาะสุนัขเท่านั้น (เช็ค
+              <code>ourAnimals[i, 1].Contains("dog")</code>) เป็นไปตามที่ทีมออกแบบไว้</td>
+        </tr>
+        <tr>
+          <td>เงินบริจาคของสัตว์ทุกตัวแสดง $45.00 เหมือนกันหมด</td>
+          <td>โค้ด TryParse + ค่า default วางอยู่<b>นอก</b> for loop สร้างข้อมูลตัวอย่าง จึงคำนวณ
+              แค่ครั้งเดียวแล้วใช้ค่าเดิมซ้ำ ต้องย้ายเข้าไปในลำดับที่ถูกต้องข้างในลูป (ทบทวนหัวข้อ
+              26.3c)</td>
+        </tr>
+        <tr>
+          <td>noMatchesDog เป็น false ตลอด ทั้งที่ค้นหาไม่เจอจริง</td>
+          <td>ลืมประกาศ <code>bool noMatchesDog = true;</code> ใหม่ทุกครั้งที่เข้า
+              <code>case "2":</code> (ถ้า scope ผิดจุดอาจค้างค่าจากรอบก่อน) — ตรวจว่าประกาศอยู่
+              ข้างในเมนู 2 ทุกครั้งที่ทำงาน ไม่ใช่ตัวแปรระดับแอปที่ตั้งค่าแค่ครั้งเดียว</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">26.7 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment ของ Microsoft Learn</p>
+
+    <div class="quiz" data-q="26-2">
+      <p class="q"><span class="num">1.</span> โค้ด <code>decimal.TryParse(numberString, out myConvert)</code>
+        เมื่อ <code>numberString</code> เป็นชนิด String — ข้อใดอธิบายชนิดข้อมูลของ
+        <code>myConvert</code> ได้ดีที่สุด เมื่อ <code>TryParse()</code> สำเร็จ?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>string ที่แทนตัวเลข</span></li>
+        <li class="opt"><span class="k">B</span><span>ค่า Boolean</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>decimal</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> <code>myConvert</code> คือ out parameter ที่ชนิดตรงกับ
+        เมธอดที่เรียก — เพราะเรียก <code>decimal.TryParse()</code> ค่าที่ได้จึงเป็น
+        <code>decimal</code> เสมอ ส่วนค่า Boolean คือ<b>ค่าที่เมธอด return กลับมา</b> (ไม่ใช่ค่าใน
+        out parameter) ทบทวนความแตกต่างนี้จาก <a href="ch22.html">บทที่ 22</a></div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">26.8 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เพิ่มสัตว์ตัวอย่างตัวที่ 5 (index 4) เป็นสุนัขชื่อ "max" ที่มีคำอธิบายทางกายภาพว่า
+           "small brown male chihuahua weighing about 8 pounds" และเงินบริจาค "30.00" แล้วทดสอบ
+           ค้นหาคำว่า "chihuahua" ว่าเจอไหม</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (เพิ่ม case 4)</span></div>
+          <pre><code class="lang-cs">case 4:
+    animalSpecies = "dog";
+    animalID = "d5";
+    animalAge = "3";
+    animalPhysicalDescription = "small brown male chihuahua weighing about 8 pounds";
+    animalPersonalityDescription = "energetic and loyal";
+    animalNickname = "max";
+    suggestedDonation = "30.00";
+    break;</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดสั้นๆ ทดสอบว่า <code>decimal.TryParse("abc", out decimal result)</code> คืนค่า
+           อะไร และ <code>result</code> มีค่าเท่าไรหลังจากนั้น</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">bool success = decimal.TryParse("abc", out decimal result);
+Console.WriteLine($"success: {success}, result: {result}");</code></pre></div>
+          <div class="out"><pre>
+success: False, result: 0</pre></div>
+          <p>TryParse คืน <code>false</code> และ <code>result</code> ถูกกำหนดเป็นค่า default ของ
+             decimal คือ <code>0</code> (ไม่ใช่ null หรือค้างค่าเดิม)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงฟีเจอร์ค้นหาให้ค้นหา<b>แมว</b>ได้ด้วย (ไม่ใช่แค่สุนัข) โดยรับ input ชนิดสัตว์
+           ("dog" หรือ "cat") เพิ่มอีกหนึ่งค่าก่อนถามลักษณะที่ต้องการค้นหา</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่แก้ใน case "2":)</span></div>
+          <pre><code class="lang-cs">string speciesToSearch = "";
+while (speciesToSearch != "dog" && speciesToSearch != "cat")
+{
+    Console.WriteLine("Search dogs or cats? (dog/cat)");
+    readResult = Console.ReadLine();
+    if (readResult != null)
+    {
+        speciesToSearch = readResult.ToLower().Trim();
+    }
+}
+
+string dogCharacteristic = "";
+while (dogCharacteristic == "")
+{
+    Console.WriteLine($"\nEnter one desired characteristic to search for");
+    readResult = Console.ReadLine();
+    if (readResult != null)
+    {
+        dogCharacteristic = readResult.ToLower().Trim();
+    }
+}
+
+string dogDescription = "";
+bool noMatchesDog = true;
+
+for (int i = 0; i < maxPets; i++)
+{
+    if (ourAnimals[i, 1].Contains(speciesToSearch))
+    {
+        dogDescription = ourAnimals[i, 4] + "\n" + ourAnimals[i, 5];
+
+        if (dogDescription.Contains(dogCharacteristic))
+        {
+            Console.WriteLine($"\nOur {speciesToSearch} {ourAnimals[i, 3]} is a match!");
+            Console.WriteLine(dogDescription);
+
+            noMatchesDog = false;
+        }
+    }
+}
+
+if (noMatchesDog)
+{
+    Console.WriteLine($"None of our {speciesToSearch}s are a match found for: " + dogCharacteristic);
+}</code></pre></div>
+          <p>เปลี่ยนจากเช็ค <code>.Contains("dog")</code> ตรงๆ เป็นเช็ค
+             <code>.Contains(speciesToSearch)</code> ที่มาจาก input ของผู้ใช้แทน — โครงสร้างที่
+             เหลือเหมือนเดิมทุกอย่าง</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เพิ่มโค้ดคำนวณผลรวมของเงินบริจาคที่แนะนำทั้งหมด (เฉพาะสัตว์ที่มีข้อมูลแล้ว) แล้วแสดงผล
+           เป็นสกุลเงิน — ใช้ในเมนู 1 หลังแสดงข้อมูลสัตว์ทั้งหมด</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (เพิ่มท้าย case "1":)</span></div>
+          <pre><code class="lang-cs">decimal totalDonations = 0m;
+for (int i = 0; i < maxPets; i++)
+{
+    if (ourAnimals[i, 0] != "ID #: ")
+    {
+        string donationText = ourAnimals[i, 6].Replace("Suggested Donation: ", "");
+        decimal.TryParse(donationText, System.Globalization.NumberStyles.Currency, null, out decimal amount);
+        totalDonations += amount;
+    }
+}
+Console.WriteLine($"\nTotal suggested donations: {totalDonations:C2}");</code></pre></div>
+          <p>ใช้ <code>Replace()</code> (ทบทวนจาก <a href="ch25.html">บทที่ 25</a>) ตัด prefix
+             "Suggested Donation: " ออกก่อน แล้วใช้ <code>TryParse()</code> overload ที่รองรับ
+             การ parse string ที่มีสัญลักษณ์สกุลเงินติดมาด้วย (<code>NumberStyles.Currency</code>)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>ปัจจุบันถ้าผู้ใช้ค้นหาคำว่า "medium sized" (มีช่องว่าง) จะยังทำงานถูกต้องไหม? วิเคราะห์
+           โดยไม่ต้องรันจริง แล้วอธิบายเหตุผล จากนั้นทดสอบจริงเพื่อยืนยัน</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ทำงานถูกต้อง — เพราะ <code>Contains()</code> ค้นหา substring ได้ ไม่ว่าจะมีช่องว่าง
+             อยู่ในคำค้นหาหรือไม่ก็ตาม ตราบใดที่ลำดับตัวอักษรตรงกันทุกตัวรวมช่องว่างด้วย คำอธิบายของ
+             lola มีข้อความ "medium sized cream colored..." ซึ่งมี "medium sized" อยู่ต่อเนื่องกัน
+             พอดี จึงยังคงเจอผลลัพธ์เหมือนเดิม — นี่เป็นข้อดีของการค้นหาแบบ substring match ที่ไม่
+             ต้องแยกคำก่อนค้นหาแต่อย่างใด</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>สเปกบอกว่าต้องแสดงเงินบริจาคด้วย "สัญลักษณ์สกุลเงินตามภูมิภาค" — อธิบายว่าโค้ดในบทนี้ทำ
+           ตามข้อกำหนดนี้ได้ยังไงโดยไม่ต้องเขียนโค้ดตรวจสอบภูมิภาคเองเลยแม้แต่บรรทัดเดียว</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>เพราะใช้ format specifier <code>:C2</code> (ทบทวนจาก <a href="ch24.html">บทที่ 24
+             หัวข้อ 24.3a</a>) ซึ่งดึงสัญลักษณ์สกุลเงินจาก <b>culture setting</b> ของเครื่องที่รัน
+             โปรแกรมโดยอัตโนมัติ — ถ้าเครื่องตั้งเป็น en-US จะได้ $ ถ้าตั้งเป็น fr-FR จะได้ € โดย
+             อัตโนมัติ ไม่ต้องเขียน if-else ตรวจสอบภูมิภาคเองเลย นี่คือพลังของการใช้ built-in
+             format specifier แทนการต่อ string เอง</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">📌 สรุปบทที่ 26</h2>
+
+    <p>คุณอัปเดตแอปจับคู่สัตว์เลี้ยงในบทนี้ ให้รองรับฟีเจอร์ค้นหาด้วยคำเดียว ปรับปรุงความอ่านง่ายของ
+       output และเพิ่มเงินบริจาคแนะนำเข้าไปในคำอธิบาย</p>
+
+    <p>ในโมดูลนี้ คุณฝึกความสามารถในการ: ใช้ iteration statement รวบรวม input ข้อมูล, ประมวลผลข้อมูล,
+       จัดรูปแบบ output ของข้อมูล, เลือก data type ที่ถูกต้องและแปลง data type อย่างปลอดภัย, สร้าง
+       array สองมิติของตัวเลขและ string, ค้นหาข้อมูลใน array เพื่อแสดงหรืออัปเดตข้อมูล, และแก้ไข/
+       ประกอบ string ที่ซับซ้อนจากหลายแหล่งข้อมูล พร้อมจัดรูปแบบสำหรับแสดงผลข้ามภูมิภาค</p>
+
+    <p>คุณส่งมอบฟีเจอร์ให้ทีม Contoso Pets ได้แก่: รวบรวม input คำค้นหาลักษณะสัตว์, วนผ่าน array
+       ของสัตว์และระบุ "สุนัข", ค้นหาคำอธิบายของสุนัขแต่ละตัวหาคำที่ตรงกัน, แสดงสุนัขที่มีคำตรงกัน,
+       และแสดงข้อมูลเงินบริจาคแนะนำที่จัดรูปแบบด้วยสกุลเงินท้องถิ่น</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 26</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">แพทเทิร์น</th><th>ใช้เมื่อ</th></tr></thead>
+        <tbody>
+          <tr><td>ขยาย array + สร้าง column ใหม่</td><td>เพิ่มฟิลด์ข้อมูลใหม่ให้ multidimensional array ที่มีอยู่แล้ว</td></tr>
+          <tr><td>TryParse + ค่า default ใน for loop</td><td>validate ข้อมูลตัวอย่างที่อาจว่างเปล่า พร้อม fallback</td></tr>
+          <tr><td><code>{decimal:C2}</code></td><td>แสดงเงินตามสกุลเงินท้องถิ่นอัตโนมัติ ไม่ต้องเขียนเช็คภูมิภาคเอง</td></tr>
+          <tr><td>รวม string หลายฟิลด์ก่อนค้นหา</td><td>ค้นหาคำในหลายฟิลด์พร้อมกันด้วย Contains() ครั้งเดียว</td></tr>
+          <tr><td>bool noMatches = true; ... = false;</td><td>ติดตามว่าเจอผลลัพธ์อย่างน้อยหนึ่งครั้งหรือไม่ ใน loop</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s10">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>MVP (Minimum Viable Product)</td><td>ผลิตภัณฑ์ต้นแบบใช้งานได้ขั้นต่ำ</td><td>ต้นแบบพื้นฐานที่ทำงานได้จริง ใช้ทดสอบไอเดียก่อนพัฒนาเต็มรูปแบบ</td></tr>
+        <tr><td>scope creep</td><td>ขอบเขตงานบาน</td><td>ข้อกำหนดที่เพิ่มเข้ามาระหว่างพัฒนา ทำให้โปรเจกต์ใช้เวลานานขึ้น</td></tr>
+        <tr><td>flag variable</td><td>ตัวแปรธง</td><td>ตัวแปร bool ที่ใช้ติดตามสถานะ (เช่น noMatchesDog)</td></tr>
+        <tr><td>fallback value</td><td>ค่าสำรอง</td><td>ค่า default ที่ใช้เมื่อการแปลง/validate ล้มเหลว</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch25.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 25 · แก้ไขเนื้อหา String</span></a>
+      <a class="next" href="ch27.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 27 · Challenge Project — ค้นหาหลายคำ</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

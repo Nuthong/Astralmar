@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 12 · Guided Project: Arrays + Iteration + Selection — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="12">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 2 · Create and Run Simple Console Apps / บทที่ 12</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 2 · โมดูล 6/8 · 🧩 Guided Project</span>
+      <h1>โปรเจกต์นำทาง: Array + Loop + if ประมวลผลข้อมูลนักเรียน</h1>
+      <div class="en">Guided Project — Develop foreach and if-elseif-else Structures to Process Array Data</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>70–100 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>รีแฟกเตอร์แอปเดิมให้ยืดหยุ่น รองรับนักเรียนกี่คนก็ได้</b></span>
+        <span>🎯 ความยาก <b>ประยุกต์บทที่ 5,6,9,10</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ใช้ <code>foreach</code> วนเข้าถึงข้อมูลใน array ได้อย่างมีประสิทธิภาพ</li>
+        <li>ใช้ <code>if</code> ประเมินเงื่อนไขและแตกสาขาโค้ดได้</li>
+        <li>ผสาน loop ซ้อน loop (nested) กับ if ซ้อน if เข้าด้วยกันแก้โจทย์จริงได้</li>
+      </ul>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 นี่คือแอปตัดเกรดตัวเดิม แต่ยกเครื่องใหม่</span>
+      จำแอปคำนวณเกรดจาก <a href="ch05.html">บทที่ 5</a> ได้ไหม? ตอนนั้นใช้ตัวแปรแยกทีละคน
+      (<code>sophiaSum</code>, <code>nicolasSum</code> ...) พอมีนักเรียนเพิ่ม ต้องเขียนโค้ดใหม่
+      ทุกครั้ง — บทนี้คุณจะรื้อมันด้วย <b>array + foreach + if</b> ให้เพิ่มนักเรียนกี่คนก็ได้
+      โดยแทบไม่ต้องแก้โค้ดเดิมเลย
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">12.1 สถานการณ์: อัปเกรดแอปตัดเกรด</h2>
+
+    <p>การแตกสาขาโค้ดและการวนซ้ำ code block เป็นความสามารถที่จำเป็นมากสำหรับนักพัฒนา ใน C#
+       <code>if</code> ใช้ประเมิน expression และแตกเส้นทางการทำงาน ส่วน code block ของ
+       <code>foreach</code> ใช้วนผ่านทุก element ของ array ได้ พอผสานความสามารถทั้งสองเข้าด้วยกัน
+       จะสร้างแอปที่ทรงพลังและขยายต่อได้ง่ายขึ้นมาก</p>
+
+    <p>สมมติคุณยังเป็นผู้ช่วยครูคนเดิมจากบทที่ 5 ทักษะ C# ของคุณพัฒนาขึ้นมากแล้วนับตั้งแต่ทำ
+       เวอร์ชันแรกของแอปตัดเกรด ครูขอให้อัปเดตแอป โดยเน้นใช้ array, <code>foreach</code>, และ
+       <code>if</code> พร้อมรวมคะแนนพิเศษ (extra credit) เข้าไปในการคำนวณเกรดสุดท้ายด้วย</p>
+
+    <p>จบบทนี้ คุณจะมีประสบการณ์พัฒนาแอปที่ใช้ array, <code>foreach</code>, และ <code>if</code>
+       ร่วมกัน และคุ้นเคยกับการสร้างแอปที่ประมวลผลข้อมูลอย่างมีประสิทธิภาพด้วย nested iteration
+       และ selection statement</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">12.2 เตรียมพร้อม: โจทย์และข้อกำหนด</h2>
+
+    <h3 id="s02a">ภาพรวมโปรเจกต์</h3>
+    <p>ข้อกำหนดของแอปเวอร์ชันใหม่:</p>
+    <ul>
+      <li>เริ่มจากนักเรียน 4 คน แต่ละคนมีคะแนนสอบ 5 ครั้ง (0–100)</li>
+      <li>คะแนนรวมของนักเรียนคือค่าเฉลี่ยของคะแนนสอบ 5 ครั้ง</li>
+      <li><b>คะแนนพิเศษ (extra credit):</b> เก็บไว้ใน array คะแนนของนักเรียนเดียวกัน มีค่า<b>10%
+          ของคะแนนสอบปกติ</b>ตอนคำนวณเกรดสุดท้าย ต้องบวกเข้าไปในผลรวม<b>ก่อน</b>คำนวณเกรด
+          (ยอมรับความคลาดเคลื่อนจากการปัดเศษได้)</li>
+      <li>ต้องตัดเกรดเป็นตัวอักษรอัตโนมัติจากคะแนนสุดท้าย</li>
+      <li>ต้องแสดงชื่อและเกรดที่จัดรูปแบบแล้วของนักเรียนแต่ละคน</li>
+      <li><b>สำคัญที่สุด:</b> ต้องรองรับการเพิ่มนักเรียน/คะแนนใหม่ โดยกระทบโค้ดเดิมให้น้อยที่สุด</li>
+    </ul>
+
+    <p>ตารางตัดเกรดที่ครูกำหนด:</p>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>ช่วงคะแนน</th><th>เกรด</th><th>ช่วงคะแนน</th><th>เกรด</th></tr></thead>
+      <tbody>
+        <tr><td>97–100</td><td>A+</td><td>77–79</td><td>C+</td></tr>
+        <tr><td>93–96</td><td>A</td><td>73–76</td><td>C</td></tr>
+        <tr><td>90–92</td><td>A-</td><td>70–72</td><td>C-</td></tr>
+        <tr><td>87–89</td><td>B+</td><td>67–69</td><td>D+</td></tr>
+        <tr><td>83–86</td><td>B</td><td>63–66</td><td>D</td></tr>
+        <tr><td>80–82</td><td>B-</td><td>60–62</td><td>D-</td></tr>
+        <tr><td colspan="2"></td><td>0–59</td><td>F</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>ผลลัพธ์สุดท้ายที่ต้องได้:</p>
+    <div class="out auto"><div class="out-bar">ผลลัพธ์เป้าหมาย</div><pre>
+Student         Grade
+
+Sophia:         92.2    A-
+Andrew:         89.6    B+
+Emma:           85.6    B
+Logan:          91.2    A-</pre></div>
+
+    <h3 id="s02b">เตรียมโค้ดตั้งต้น</h3>
+    <p>สร้างโปรเจกต์ใหม่ แล้วพิมพ์โค้ด<b>เวอร์ชันเก่า</b>ที่ยังใช้ตัวแปรแยกทีละคน (นี่คือจุดตั้งต้น
+       ที่เราจะรีแฟกเตอร์กันตลอดทั้งบท):</p>
+
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch12-guided</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เวอร์ชันเก่า (จุดตั้งต้น)</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">// initialize variables - graded assignments 
+int currentAssignments = 5;
+
+int sophia1 = 90;
+int sophia2 = 86;
+int sophia3 = 87;
+int sophia4 = 98;
+int sophia5 = 100;
+
+int andrew1 = 92;
+int andrew2 = 89;
+int andrew3 = 81;
+int andrew4 = 96;
+int andrew5 = 90;
+
+int emma1 = 90;
+int emma2 = 85;
+int emma3 = 87;
+int emma4 = 98;
+int emma5 = 68;
+
+int logan1 = 90;
+int logan2 = 95;
+int logan3 = 87;
+int logan4 = 88;
+int logan5 = 96;
+
+int sophiaSum = 0;
+int andrewSum = 0;
+int emmaSum = 0;
+int loganSum = 0;
+
+decimal sophiaScore;
+decimal andrewScore;
+decimal emmaScore;
+decimal loganScore;
+
+sophiaSum = sophia1 + sophia2 + sophia3 + sophia4 + sophia5;
+andrewSum = andrew1 + andrew2 + andrew3 + andrew4 + andrew5;
+emmaSum = emma1 + emma2 + emma3 + emma4 + emma5;
+loganSum = logan1 + logan2 + logan3 + logan4 + logan5;
+
+sophiaScore = (decimal)sophiaSum / currentAssignments;
+andrewScore = (decimal)andrewSum / currentAssignments;
+emmaScore = (decimal)emmaSum / currentAssignments;
+loganScore = (decimal)loganSum / currentAssignments;
+
+Console.WriteLine("Student\t\tGrade\n");
+Console.WriteLine("Sophia:\t\t" + sophiaScore + "\tA-");
+Console.WriteLine("Andrew:\t\t" + andrewScore + "\tB+");
+Console.WriteLine("Emma:\t\t" + emmaScore + "\tB");
+Console.WriteLine("Logan:\t\t" + loganScore + "\tA-");
+
+Console.WriteLine("Press the Enter key to continue");
+Console.ReadLine();</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Student		Grade
+
+Sophia:		92.2	A-
+Andrew:		89.6	B+
+Emma:		85.6	B
+Logan:		91.2	A-
+Press the Enter key to continue</pre></div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ Console.ReadLine() ใหม่ที่ยังไม่เคยเจอ</span>
+      บรรทัดสุดท้ายเรียก <code>Console.ReadLine()</code> ซึ่งรอรับข้อมูลจากผู้ใช้ — ในที่นี้ใช้
+      แค่ "หยุดโปรแกรมไว้ก่อน" ให้คุณอ่านผลลัพธ์ทัน กด <b>Enter</b> ในหน้าต่าง Terminal เพื่อให้
+      โปรแกรมทำงานจบ (จะได้เรียนเรื่อง input จากผู้ใช้แบบเต็มๆ ใน Part 3)
+    </div>
+
+    <p>สังเกตปัญหาของโค้ดชุดนี้: มีตัวแปรแยกทีละคน ทีละวิชา นับได้ 20+ ตัวแปรสำหรับข้อมูลดิบ
+       อย่างเดียว — ถ้าจะเพิ่มนักเรียนคนที่ 5 ต้องพิมพ์โค้ดซ้ำแบบเดิมทั้งชุดอีกรอบ! นี่แหละคือสิ่งที่
+       เราจะแก้ในหัวข้อถัดไป</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch12-a"><span>รันโค้ดเวอร์ชันเก่าได้ผลลัพธ์ตรงตามเป้าหมาย</span></label></li>
+      <li><label><input type="checkbox" id="ch12-b"><span>เข้าใจว่าทำไมโค้ดแบบนี้ขยายยาก (ตัวแปรแยกทีละคน)</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">12.3 ขั้นที่ 1: แปลงเป็น Array และรวมคะแนนด้วย foreach</h2>
+
+    <h3 id="s03a">แปลงตัวแปรคะแนนดิบเป็น Array</h3>
+    <p>แทนที่ตัวแปร <code>sophia1</code>...<code>sophia5</code> ด้วย array เดียว —
+       initialize ค่าตรงตอนประกาศเลย เพราะรู้ค่าล่วงหน้าแล้ว:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int[] sophiaScores = new int[] { 90, 86, 87, 98, 100 };
+int[] andrewScores = new int[] { 92, 89, 81, 96, 90 };
+int[] emmaScores = new int[] { 90, 85, 87, 98, 68 };
+int[] loganScores = new int[] { 90, 95, 87, 88, 96 };</code></pre>
+    </div>
+
+    <p>ลบตัวแปรเดี่ยวๆ ทั้ง 20 ตัว (<code>sophia1</code>...<code>logan5</code>) ทิ้งได้เลย —
+       ไม่ต้องใช้แล้ว</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ทำไม initialize ตรงๆ ถึงเหมาะกับกรณีนี้</span>
+      เมื่อรู้ค่าล่วงหน้าแล้วและไม่น่าจะเปลี่ยนบ่อย (เช่น คะแนนสอบที่ให้ไปแล้ว) การกำหนดค่าตอน
+      ประกาศแบบนี้เหมาะสมกว่า — ถ้าไม่รู้ค่าล่วงหน้า (เช่น รอผู้ใช้กรอก) ต้องประกาศแบบว่างก่อน
+      แล้วค่อยกำหนดทีหลัง
+    </div>
+
+    <h3 id="s03b">สร้าง foreach รวมคะแนนของ Sophia</h3>
+    <p>ตอนนี้ลองโฟกัสแค่ Sophia คนเดียวก่อน (ยังไม่ลบ <code>sophiaSum</code>/<code>sophiaScore</code>)
+       แทนสูตรบวกตรงๆ ด้วย <code>foreach</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int[] sophiaScores = new int[] { 90, 86, 87, 98, 100 };
+int[] andrewScores = new int[] { 92, 89, 81, 96, 90 };
+int[] emmaScores = new int[] { 90, 85, 87, 98, 68 };
+int[] loganScores = new int[] { 90, 95, 87, 88, 96 };
+
+int sophiaSum = 0;
+
+decimal sophiaScore;
+
+foreach (int score in sophiaScores)
+{
+    // add the exam score to the sum
+    sophiaSum += score;
+}
+
+sophiaScore = (decimal)sophiaSum / currentAssignments;
+
+Console.WriteLine("Student\t\tGrade\n");
+Console.WriteLine("Sophia:\t\t" + sophiaScore + "\tA-");
+
+Console.WriteLine("Press the Enter key to continue");
+Console.ReadLine();</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Student		Grade
+
+Sophia:		92.2	A-
+Press the Enter key to continue</pre></div>
+
+    <div class="note tip">
+      <span class="lbl">💡 ทำไมถึงทำแค่คนเดียวก่อน</span>
+      แบบเดียวกับที่บทที่ 5 สอนไว้: แตกปัญหาใหญ่เป็นชิ้นเล็ก แล้วเช็คผลบ่อยๆ พิสูจน์ให้ตัวเองมั่นใจ
+      ว่า pattern ที่คิดไว้ (foreach รวมคะแนน) ใช้ได้กับคนเดียวก่อน ค่อยขยายไปทุกคนทีหลัง
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch12-c"><span>แปลงคะแนนดิบเป็น array ครบทั้ง 4 คน</span></label></li>
+      <li><label><input type="checkbox" id="ch12-d"><span>ใช้ foreach รวมคะแนน Sophia แทนสูตรบวกตรงๆ สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">12.4 ขั้นที่ 2: ลูปซ้อนประมวลผลนักเรียนทุกคน</h2>
+
+    <p>หัวข้อนี้คือหัวใจของการรีแฟกเตอร์ — สร้าง array ชื่อนักเรียน วนด้วย <code>foreach</code>
+       ชั้นนอก แล้วข้างในใช้ <code>if</code> เลือก array คะแนนที่ตรงกับชื่อปัจจุบัน</p>
+
+    <h3 id="s04a">สร้าง Array ชื่อนักเรียน + Loop ชั้นนอก</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// Student names
+string[] studentNames = new string[] { "Sophia", "Andrew", "Emma", "Logan" };
+
+foreach (string name in studentNames)
+{
+    Console.WriteLine($"{name}");
+}</code></pre>
+    </div>
+
+    <p>รันดูก่อน — ควรเห็นชื่อทั้ง 4 คนพิมพ์ออกมา ตามด้วยรายงานคะแนนของ Sophia เหมือนเดิม
+       (เพราะยังไม่ได้ย้ายโค้ดคำนวณเข้าไปในลูปนี้)</p>
+
+    <svg viewBox="0 0 720 190" role="img" aria-label="โครงสร้าง loop ซ้อน loop สำหรับประมวลผลนักเรียนทุกคน" style="margin:18px 0">
+      <g font-family="var(--font-th)" font-size="12">
+        <rect x="16"  y="14" width="688" height="162" rx="12" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="36" y="38" fill="var(--brand-text)" font-weight="700">foreach (name in studentNames) — ลูปนอก · วนทีละ "คน"</text>
+
+        <rect x="36" y="52" width="648" height="110" rx="10" fill="var(--bg-page)" stroke="var(--line)"/>
+        <text x="56" y="76" fill="var(--text)">if/else if เลือก array คะแนนที่ตรงกับชื่อคนนี้ → studentScores</text>
+
+        <rect x="56" y="88" width="608" height="58" rx="9" fill="var(--tip-soft)" stroke="var(--tip)"/>
+        <text x="76" y="110" fill="var(--tip)" font-weight="700">foreach (score in studentScores) — ลูปใน · วนทีละ "คะแนน" ของคนนั้น</text>
+        <text x="76" y="130" fill="var(--text-soft)">รวมผลรวม + ตัดสินว่าเป็นคะแนนสอบหรือคะแนนพิเศษ</text>
+      </g>
+    </svg>
+
+    <h3 id="s04b">ย้ายโค้ดคำนวณเข้าไปในลูปชื่อ</h3>
+    <p>ย้ายโค้ดคำนวณและแสดงผลของ Sophia จากด้านนอก เข้าไปอยู่<b>ข้างใน</b> code block ของ
+       <code>foreach (name in studentNames)</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — ย้ายเข้าไปในลูปชื่อ</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">foreach (string name in studentNames)
+{
+    int sophiaSum = 0;
+    decimal sophiaScore;
+
+    foreach (int score in sophiaScores)
+    {
+        sophiaSum += score;
+    }
+
+    sophiaScore = (decimal)sophiaSum / currentAssignments;
+
+    Console.WriteLine("Student\t\tGrade\n");
+    Console.WriteLine("Sophia:\t\t" + sophiaScore + "\tA-");
+}</code></pre>
+    </div>
+
+    <p>ตอนนี้โค้ดคำนวณ Sophia ทำงาน<b>ซ้ำ 4 รอบ</b> (เพราะอยู่ในลูปที่วน 4 ชื่อ) แต่ยังโชว์แค่
+       Sophia ทุกรอบอยู่ดี — ต้องเพิ่ม <code>if</code> จำกัดว่าให้ทำงานเฉพาะตอนชื่อปัจจุบันคือ
+       Sophia จริงๆ:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">foreach (string name in studentNames)
+{
+    if (name == "Sophia")
+    {
+        int sophiaSum = 0;
+        decimal sophiaScore;
+
+        foreach (int score in sophiaScores)
+        {
+            sophiaSum += score;
+        }
+
+        sophiaScore = (decimal)sophiaSum / currentAssignments;
+
+        Console.WriteLine("Student\t\tGrade\n");
+        Console.WriteLine("Sophia:\t\t" + sophiaScore + "\tA-");
+    }
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Student		Grade
+
+Sophia:		92.2	A-</pre></div>
+
+    <p>ดีขึ้น — แสดงแค่ Sophia ครั้งเดียว ไม่ซ้ำ 4 รอบแล้ว แต่ยังไม่ใช่เป้าหมายสุดท้าย เพราะ
+       ยังต้องพิมพ์ if แยกทีละคนแบบนี้ไปเรื่อยๆ (ยังไม่ยืดหยุ่นพอ) ขั้นถัดไปคือทำให้โค้ดคำนวณ
+       "ใช้ได้กับทุกคน" ไม่ใช่ผูกติดกับ Sophia คนเดียว</p>
+
+    <h3 id="s04c">ใช้ if-elseif เลือก Array คะแนนตามชื่อ</h3>
+    <p>สร้างตัวแปร array กลาง <code>studentScores</code> ที่ "เป็นกลาง" ไม่ผูกกับใครคนใดคนหนึ่ง
+       แล้วใช้ <code>if-elseif</code> กำหนดว่าจะ "เอา array ของใครมาใส่" ตามชื่อปัจจุบัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int[] studentScores = new int[10];
+
+foreach (string name in studentNames)
+{
+    string currentStudent = name;
+
+    if (currentStudent == "Sophia")
+        studentScores = sophiaScores;
+
+    else if (currentStudent == "Andrew")
+        studentScores = andrewScores;
+
+    else if (currentStudent == "Emma")
+        studentScores = emmaScores;
+
+    else if (currentStudent == "Logan")
+        studentScores = loganScores;
+
+    // ... โค้ดคำนวณเดิมของ Sophia อยู่ตรงนี้ (จะแก้ต่อในขั้นถัดไป)
+}</code></pre>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ if โดยไม่มีปีกกาก็ได้ ถ้ามีแค่บรรทัดเดียว</span>
+      สังเกตว่า <code>if (currentStudent == "Sophia") studentScores = sophiaScores;</code>
+      ไม่มี <code>{ }</code> — C# อนุญาตให้ละปีกกาได้ถ้า code block มีแค่ 1 บรรทัด (ทบทวนกับดัก
+      นี้ได้ที่ <a href="ch09.html">บทที่ 9</a>) ในโปรเจกต์จริงหลายทีมนิยมใส่ปีกกาเสมอเพื่อกันบั๊ก
+      แต่ในบทนี้เราตามสไตล์ต้นฉบับ MS Learn ที่ละไว้ได้เพื่อความกระชับ
+    </div>
+
+    <h3 id="s04d">ทำให้ตัวแปรคำนวณ "เป็นกลาง" ไม่ผูกกับ Sophia</h3>
+    <p>เปลี่ยน <code>sophiaSum</code>→<code>sumAssignmentScores</code>,
+       <code>sophiaScore</code>→<code>currentStudentGrade</code>, และเปลี่ยน foreach ชั้นในให้วน
+       <code>studentScores</code> (ตัวแปรกลาง) แทน <code>sophiaScores</code> (ตัวแปรเฉพาะคน):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — ฉบับสมบูรณ์ของขั้นนี้</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int[] sophiaScores = new int[] { 90, 86, 87, 98, 100 };
+int[] andrewScores = new int[] { 92, 89, 81, 96, 90 };
+int[] emmaScores = new int[] { 90, 85, 87, 98, 68 };
+int[] loganScores = new int[] { 90, 95, 87, 88, 96 };
+
+// Student names
+string[] studentNames = new string[] { "Sophia", "Andrew", "Emma", "Logan" };
+
+int[] studentScores = new int[10];
+
+// Write the Report Header to the console
+Console.WriteLine("Student\t\tGrade\n");
+
+foreach (string name in studentNames)
+{
+    string currentStudent = name;
+
+    if (currentStudent == "Sophia")
+        studentScores = sophiaScores;
+
+    else if (currentStudent == "Andrew")
+        studentScores = andrewScores;
+
+    else if (currentStudent == "Emma")
+        studentScores = emmaScores;
+
+    else if (currentStudent == "Logan")
+        studentScores = loganScores;
+
+    // initialize/reset the sum of scored assignments
+    int sumAssignmentScores = 0;
+
+    // initialize/reset the calculated average of exam + extra credit scores
+    decimal currentStudentGrade = 0;
+
+    foreach (int score in studentScores)
+    {
+        sumAssignmentScores += score;
+    }
+
+    currentStudentGrade = (decimal)(sumAssignmentScores) / currentAssignments;
+
+    Console.WriteLine($"{currentStudent}\t\t{currentStudentGrade}\t?");
+}
+
+Console.WriteLine("Press the Enter key to continue");
+Console.ReadLine();</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Student		Grade
+
+Sophia		92.2	?
+Andrew		89.6	?
+Emma		85.6	?
+Logan		91.2	?
+Press the Enter key to continue</pre></div>
+
+    <div class="note ok">
+      <span class="lbl">✅ ก้าวสำคัญ!</span>
+      คราวนี้ตัวเลขทั้ง 4 คนขึ้นครบถูกต้อง! แค่เกรดตัวอักษรยังเป็น <code>?</code> อยู่
+      (จะแก้ในหัวข้อถัดไป) — สังเกตว่าไม่มีตรงไหนในโค้ดคำนวณที่ต้องพิมพ์ชื่อ "Sophia" ตรงๆ อีกแล้ว
+      ยกเว้นแค่ตรง if-elseif ที่เลือก array — นี่คือความยืดหยุ่นที่เราต้องการ
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch12-e"><span>สร้าง studentNames array และ loop นอกสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch12-f"><span>ใช้ if-elseif เลือก array คะแนนตามชื่อได้ถูกต้อง</span></label></li>
+      <li><label><input type="checkbox" id="ch12-g"><span>เปลี่ยนชื่อตัวแปรให้เป็นกลาง ไม่ผูกกับคนใดคนหนึ่ง</span></label></li>
+      <li><label><input type="checkbox" id="ch12-h"><span>ได้ตัวเลขคะแนนถูกต้องครบทั้ง 4 คน</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">12.5 ขั้นที่ 3: ตัดเกรดอัตโนมัติ + คะแนนพิเศษ</h2>
+
+    <h3 id="s05a">สร้าง if-elseif-else ตัดเกรดจากคะแนน</h3>
+    <p>ประกาศตัวแปรเก็บเกรดตัวอักษร แล้วเทียบคะแนนกับตารางตัดเกรดของครู เรียงจากสูงสุดลงมา —
+       เหมือนหลักการที่เรียนใน <a href="ch09.html">บทที่ 9</a>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string currentStudentLetterGrade = "";
+
+// ... (หลัง currentStudentGrade = (decimal)(sumAssignmentScores) / currentAssignments;)
+
+if (currentStudentGrade >= 97)
+    currentStudentLetterGrade = "A+";
+
+else if (currentStudentGrade >= 93)
+    currentStudentLetterGrade = "A";
+
+else if (currentStudentGrade >= 90)
+    currentStudentLetterGrade = "A-";
+
+else if (currentStudentGrade >= 87)
+    currentStudentLetterGrade = "B+";
+
+else if (currentStudentGrade >= 83)
+    currentStudentLetterGrade = "B";
+
+else if (currentStudentGrade >= 80)
+    currentStudentLetterGrade = "B-";
+
+else if (currentStudentGrade >= 77)
+    currentStudentLetterGrade = "C+";
+
+else if (currentStudentGrade >= 73)
+    currentStudentLetterGrade = "C";
+
+else if (currentStudentGrade >= 70)
+    currentStudentLetterGrade = "C-";
+
+else if (currentStudentGrade >= 67)
+    currentStudentLetterGrade = "D+";
+
+else if (currentStudentGrade >= 63)
+    currentStudentLetterGrade = "D";
+
+else if (currentStudentGrade >= 60)
+    currentStudentLetterGrade = "D-";
+
+else
+    currentStudentLetterGrade = "F";</code></pre>
+    </div>
+
+    <p>แก้บรรทัดแสดงผลให้ใช้ <code>currentStudentLetterGrade</code> แทน <code>?</code>:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine($"{currentStudent}\t\t{currentStudentGrade}\t{currentStudentLetterGrade}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Student		Grade
+
+Sophia		92.2	A-
+Andrew		89.6	B+
+Emma		85.6	B
+Logan		91.2	A-
+Press the Enter key to continue</pre></div>
+
+    <p>ตรงกับเป้าหมายที่ตั้งไว้ตอนแรกแล้ว! ถึงเวลาเพิ่มความสามารถสุดท้าย: คะแนนพิเศษ</p>
+
+    <h3 id="s05b">รวมคะแนนพิเศษ (Extra Credit)</h3>
+    <p>ครูให้คะแนนพิเศษของแต่ละคนมา: Sophia (94, 90), Andrew (89), Emma (89, 89, 89), Logan (96)
+       — เพิ่มเข้าไปท้าย array คะแนนเดิม:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int[] sophiaScores = new int[] { 90, 86, 87, 98, 100, 94, 90 };
+int[] andrewScores = new int[] { 92, 89, 81, 96, 90, 89 };
+int[] emmaScores = new int[] { 90, 85, 87, 98, 68, 89, 89, 89 };
+int[] loganScores = new int[] { 90, 95, 87, 88, 96, 96 };</code></pre>
+    </div>
+
+    <p>ปัญหาคือ: <code>foreach</code> ไม่รู้ว่า element ไหนคือ "คะแนนสอบ" (นับเต็ม) กับ "คะแนนพิเศษ"
+       (นับแค่ 10%) ต้องแยกให้ออก — วิธีคือนับลำดับ element ที่กำลังวนอยู่ ถ้าเกินจำนวนวิชาสอบปกติ
+       (5 วิชา) แปลว่าเป็นคะแนนพิเศษ</p>
+
+    <p>เปลี่ยนชื่อ <code>currentAssignments</code> เป็น <code>examAssignments</code> ให้สื่อ
+       ความหมายชัดขึ้น (ตอนนี้มีทั้งคะแนนสอบและคะแนนพิเศษแล้ว) — อย่าลืมเปลี่ยนให้ครบทุกจุดที่ใช้
+       ชื่อนี้ในไฟล์ (ใช้ Find &amp; Replace <code>Ctrl+H</code> ใน VS Code ช่วยได้)</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">// initialize/reset a counter for the number of assignments
+int gradedAssignments = 0;
+
+foreach (int score in studentScores)
+{
+    // increment the assignment counter
+    gradedAssignments += 1;
+
+    if (gradedAssignments <= examAssignments)
+        // add the exam score to the sum
+        sumAssignmentScores += score;
+
+    else
+        // add the extra credit points to the sum - bonus points equal to 10% of an exam score. rounding errors are acceptable
+        sumAssignmentScores += score / 10;
+}</code></pre>
+    </div>
+
+    <svg viewBox="0 0 720 150" role="img" aria-label="ตรรกะแยกคะแนนสอบกับคะแนนพิเศษด้วยตัวนับ" style="margin:18px 0">
+      <g font-family="var(--font-th)" font-size="12">
+        <text x="360" y="18" text-anchor="middle" fill="var(--text-faint)" font-size="12">sophiaScores = { 90, 86, 87, 98, 100, 94, 90 } — examAssignments = 5</text>
+
+        <rect x="16"  y="30" width="336" height="94" rx="10" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="184" y="52" text-anchor="middle" fill="var(--brand-text)" font-weight="700">gradedAssignments 1–5</text>
+        <text x="184" y="76" text-anchor="middle" font-family="var(--font-code)" fill="var(--text)">90, 86, 87, 98, 100</text>
+        <text x="184" y="98" text-anchor="middle" fill="var(--text-soft)">≤ examAssignments → นับเต็ม (+score)</text>
+
+        <rect x="368" y="30" width="336" height="94" rx="10" fill="var(--warn-soft)" stroke="var(--warn)"/>
+        <text x="536" y="52" text-anchor="middle" fill="var(--warn)" font-weight="700">gradedAssignments 6–7</text>
+        <text x="536" y="76" text-anchor="middle" font-family="var(--font-code)" fill="var(--text)">94, 90</text>
+        <text x="536" y="98" text-anchor="middle" fill="var(--text-soft)">&gt; examAssignments → นับ 10% (+score/10)</text>
+      </g>
+    </svg>
+
+    <p>อัปเดตบรรทัดคำนวณเกรดให้ใช้ <code>examAssignments</code> แทน <code>currentAssignments</code>
+       แล้วรันดู:</p>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Student		Grade
+
+Sophia		95.8	A
+Andrew		91.2	A-
+Emma		90.4	A-
+Logan		93	A
+Press the Enter key to continue</pre></div>
+
+    <p>คะแนนพิเศษถูกรวมเข้าไปแล้ว ทุกคนได้เกรดดีขึ้น!</p>
+
+    <h3 id="s05c">ทดสอบความยืดหยุ่น: เพิ่มนักเรียน 4 คน</h3>
+    <p>ตอนนี้มาทดสอบข้อกำหนดสำคัญที่สุด: "ต้องรองรับนักเรียนเพิ่มโดยกระทบโค้ดเดิมน้อยที่สุด"
+       เพิ่ม array คะแนนกับชื่อ 4 คนใหม่:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เพิ่มนักเรียนใหม่</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int[] beckyScores = new int[] { 92, 91, 90, 91, 92, 92, 92 };
+int[] chrisScores = new int[] { 84, 86, 88, 90, 92, 94, 96, 98 };
+int[] ericScores = new int[] { 80, 90, 100, 80, 90, 100, 80, 90 };
+int[] gregorScores = new int[] { 91, 91, 91, 91, 91, 91, 91 };
+
+string[] studentNames = new string[] { "Sophia", "Andrew", "Emma", "Logan", "Becky", "Chris", "Eric", "Gregor" };</code></pre>
+    </div>
+
+    <p>เพิ่ม <code>else if</code> อีก 4 บรรทัดต่อท้ายเชนเดิม พร้อม <code>else</code> ปิดท้ายกัน
+       ไว้ (เผื่อชื่อไม่ตรงกับใครเลย):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">else if (currentStudent == "Becky")
+    studentScores = beckyScores;
+else if (currentStudent == "Chris")
+    studentScores = chrisScores;
+else if (currentStudent == "Eric")
+    studentScores = ericScores;
+else if (currentStudent == "Gregor")
+    studentScores = gregorScores;
+else
+    continue;</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Student		Grade
+
+Sophia		95.8	A
+Andrew		91.2	A-
+Emma		90.4	A-
+Logan		93	A
+Becky		94.8	A
+Chris		93.4	A
+Eric		93.4	A
+Gregor		94.6	A
+Press the Enter key to continue</pre></div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ คีย์เวิร์ดใหม่: continue</span>
+      <code>continue;</code> สั่งให้ข้ามส่วนที่เหลือของรอบปัจจุบันใน loop แล้วกระโดดไปเริ่มรอบถัดไป
+      ทันที ในที่นี้ใช้เป็นเกราะป้องกัน — ถ้าชื่อในลูปไม่ตรงกับใครในเชน <code>if-elseif</code>
+      เลย (พิมพ์ชื่อผิด หรือลืมเพิ่ม array ให้คนใหม่) โค้ดจะข้ามการคำนวณของคนนั้นไปเลย แทนที่จะ
+      พยายามคำนวณด้วย <code>studentScores</code> ตัวเก่าที่ค้างจากรอบก่อนหน้า (ซึ่งจะให้ผลลัพธ์ผิด
+      แบบเงียบๆ) — <code>continue</code> จะได้เรียนละเอียดในโมดูล loop ขั้นสูงต่อไป
+    </div>
+
+    <div class="note ok">
+      <span class="lbl">✅ เสร็จสมบูรณ์!</span>
+      เพิ่มนักเรียน 4 คนโดยแก้แค่ 2 จุด: (1) เพิ่ม array คะแนน + ชื่อ (2) เพิ่ม else if อีก 4 บรรทัด
+      — ไม่ต้องแตะโค้ดคำนวณหรือตัดเกรดเลยแม้แต่บรรทัดเดียว นี่คือพลังของการรวม array +
+      <code>foreach</code> + <code>if</code> เข้าด้วยกัน
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch12-i"><span>สร้าง if-elseif-else ตัดเกรดครบ 13 ระดับ</span></label></li>
+      <li><label><input type="checkbox" id="ch12-j"><span>แยกคะแนนสอบกับคะแนนพิเศษด้วยตัวนับสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch12-k"><span>เพิ่มนักเรียน 4 คนโดยแก้โค้ดแค่ 2 จุดสำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">12.6 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>ทุกคนได้เกรดเหมือนกันหมด</td>
+          <td>ลืมย้ายตัวแปร <code>sumAssignmentScores</code> ให้ reset เป็น 0 ทุกรอบของ loop
+              ชั้นนอก (ต้องประกาศไว้<b>ข้างใน</b> loop ชื่อ ไม่ใช่นอกสุด)</td>
+        </tr>
+        <tr>
+          <td>เปลี่ยนชื่อตัวแปรแล้วโค้ดที่อื่น error</td>
+          <td>เปลี่ยนชื่อไม่ครบทุกจุดที่ใช้ตัวแปรนั้น — ใช้ Find &amp; Replace (Ctrl+H) แทนแก้มือทีละจุด</td>
+        </tr>
+        <tr>
+          <td>คะแนนพิเศษถูกนับเต็ม 100% แทนที่จะเป็น 10%</td>
+          <td>ลืมเช็ค <code>gradedAssignments &lt;= examAssignments</code> ก่อนตัดสินว่าเป็น
+              คะแนนสอบหรือคะแนนพิเศษ</td>
+        </tr>
+        <tr>
+          <td>เพิ่มนักเรียนใหม่แล้วโปรแกรมค้าง/error</td>
+          <td>ลืมเพิ่ม <code>else if</code> ให้ชื่อใหม่ในเชน — ถ้าไม่มี <code>else { continue; }</code>
+              กันไว้ studentScores จะยังเป็นของคนก่อนหน้า ให้ผลลัพธ์ผิดแบบไม่ error ให้เห็น</td>
+        </tr>
+        <tr>
+          <td>เกรดตัวอักษรผิด (เช่น ควรได้ B+ แต่ได้ A-)</td>
+          <td>เรียงลำดับ if-elseif ผิด — ต้องเรียงจากคะแนนสูงสุดลงมาต่ำสุดเสมอ เพราะ C# หยุดที่
+              เงื่อนไขแรกที่ตรง (ทบทวนที่ <a href="ch09.html">บทที่ 9</a>)</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">12.7 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment จริงของบทนี้ใน Microsoft Learn</p>
+
+    <div class="quiz" data-q="12-1">
+      <p class="q"><span class="num">1.</span> นักพัฒนาเขียนแอปใช้ foreach วน array 20 element ต่อมาต้องอัปเดต
+        array ให้มี 40 element และต้องประมวลผลครบทั้ง 40 element ต้องแก้โค้ดยังไง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>สร้าง foreach ตัวที่สองวนส่วนที่เพิ่มมา</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>ไม่ต้องแก้ foreach เลย</span></li>
+        <li class="opt"><span class="k">C</span><span>เอา foreach เดิมไปซ้อนไว้ใน foreach ใหม่ที่วน 2 รอบ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> <code>foreach</code> วนตามขนาดจริงของ array เสมอ
+        (ไม่ผูกติดกับตัวเลขคงที่) เพิ่ม element กี่ตัวก็ยังทำงานถูกต้องโดยไม่ต้องแก้อะไรเลย —
+        นี่คือเหตุผลที่บทนี้ให้เพิ่มนักเรียน 4 คนได้โดยแทบไม่แตะโค้ดคำนวณ</div>
+    </div>
+
+    <div class="quiz" data-q="12-2">
+      <p class="q"><span class="num">2.</span> นักพัฒนาสร้างโครงสร้าง foreach ซ้อนกันเพื่อวนข้อมูลทุก array
+        โดย array แรกเก็บชื่อสถานที่เก็บตัวอย่างน้ำ ส่วน array ที่เหลือเก็บผลตรวจจากแต่ละสถานที่
+        ข้อความใดถูกต้องเกี่ยวกับวิธีประมวลผล array เหล่านี้?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>array ผลตรวจแต่ละอันใช้ loop ชั้นนอกได้ ส่วน loop ชั้นในไว้ตรวจสอบสถานที่</span></li>
+        <li class="opt"><span class="k">B</span><span>ลำดับการประมวลผล array ไม่สำคัญ เพราะยังไงก็ต้องประมวลผลข้อมูลครบทุกอันอยู่ดี</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>loop ชั้นนอกต้องประมวลผล array สถานที่ loop ชั้นในต้องประมวลผล array ผลตรวจ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ตรงกับ pattern ที่ใช้ตลอดบทนี้: loop นอก = "ใคร/ที่ไหน"
+        (studentNames) loop ใน = "ข้อมูลของคนนั้น/ที่นั้น" (studentScores) — สลับกันจะทำให้โครงสร้าง
+        ไม่สมเหตุสมผล เพราะ loop ในต้องรู้ก่อนว่ากำลังประมวลผล "ของใคร" อยู่</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">12.8 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เพิ่มนักเรียนคนที่ 9 ชื่อ "Nina" คะแนนสอบ 88, 90, 85, 92, 87 (ไม่มีคะแนนพิเศษ)
+           เข้าไปในแอปที่ทำเสร็จจากหัวข้อ 12.5 — ต้องแก้กี่จุด?</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>แก้ 3 จุด: (1) เพิ่ม <code>int[] ninaScores = new int[] { 88, 90, 85, 92, 87 };</code>
+             (2) เพิ่ม <code>"Nina"</code> ใน studentNames array (3) เพิ่ม
+             <code>else if (currentStudent == "Nina") studentScores = ninaScores;</code></p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>อธิบายว่าทำไมตัวแปร <code>sumAssignmentScores</code> และ <code>gradedAssignments</code>
+           ต้องถูกประกาศไว้<b>ข้างใน</b> loop ชื่อนักเรียน (ไม่ใช่ประกาศครั้งเดียวข้างนอกสุด)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ถ้าประกาศไว้นอกสุด ค่าจะไม่ถูกรีเซ็ตเป็น 0 ทุกรอบ — คะแนนของนักเรียนคนที่สองจะถูก
+             บวกทับกับผลรวมของคนแรก ทำให้ตัวเลขสะสมผิดเพี้ยนไปเรื่อยๆ ทุกคนถัดไป ต้องประกาศไว้
+             ข้างในเพื่อให้รีเซ็ตใหม่ทุกครั้งที่เริ่มประมวลผลนักเรียนคนใหม่</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้ตัดเกรดผิด (นักเรียนคะแนน 85 ควรได้ B แต่กลับได้ A-) หาสาเหตุ:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">if (currentStudentGrade >= 80)
+    currentStudentLetterGrade = "B-";
+else if (currentStudentGrade >= 83)
+    currentStudentLetterGrade = "B";
+else if (currentStudentGrade >= 90)
+    currentStudentLetterGrade = "A-";</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>เรียงลำดับผิด — ต้องเรียงจากคะแนนสูงสุดไปต่ำสุด (90 → 83 → 80) เพราะ C# หยุดที่
+             เงื่อนไขแรกที่ตรง คะแนน 85 เจอ <code>&gt;= 80</code> เป็นจริงตั้งแต่บรรทัดแรก
+             เลยได้ B- ทั้งที่ควรเป็น B</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ครูเปลี่ยนกฎ: คะแนนพิเศษให้ค่า 20% ของคะแนนสอบแทนที่จะเป็น 10% แก้โค้ดส่วนที่เกี่ยวข้อง</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>หาบรรทัด <code>sumAssignmentScores += score / 10;</code>
+           ในหัวข้อ 12.5</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">else
+    // 20% ของคะแนนสอบ
+    sumAssignmentScores += score / 5;</code></pre></div>
+          <p>หาร 5 แทนหาร 10 เพราะ 1/5 = 20% (ทบทวนเรื่องหาร int จาก
+             <a href="ch04.html">บทที่ 4</a>)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ทำไม <code>else continue;</code> ท้ายเชน if-elseif ถึงสำคัญ? ลองอธิบายว่าจะเกิดอะไรขึ้น
+           ถ้าลืมใส่บรรทัดนี้ แล้ว studentNames มีชื่อที่สะกดผิด เช่น "Sofia" แทน "Sophia"
+           (ตอบเป็นข้อความ ไม่ต้องเขียนโค้ด)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>ถ้าไม่มี <code>else continue;</code> เมื่อชื่อไม่ตรงกับเงื่อนไขไหนเลยในเชน
+             if-elseif ตัวแปร <code>studentScores</code> จะยังเก็บค่าจาก<b>รอบก่อนหน้า</b>
+             (ของนักเรียนคนที่ประมวลผลไปก่อนหน้านี้) ค้างอยู่ — โปรแกรมจะไม่ error แต่จะคำนวณ
+             และแสดงเกรดผิดคนแบบเงียบๆ ซึ่งอันตรายกว่า error ที่เห็นชัดเจนมาก
+             <code>else continue;</code> ป้องกันปัญหานี้โดยข้ามการประมวลผลของชื่อที่ไม่รู้จักไปเลย</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงแอปทั้งหมดจากหัวข้อ 12.5 ให้เพิ่มการนับ "จำนวนนักเรียนที่ได้เกรด A หรือ A-"
+           แล้วพิมพ์สรุปท้ายรายงาน เช่น <code>มีนักเรียนเกรด A/A- ทั้งหมด 5 คน</code>
+           (ใช้ข้อมูล 8 คนจากหัวข้อ 12.5 ตอนท้าย)</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ประกาศตัวนับไว้<b>นอกสุด</b> (ไม่ใช่ในลูปชื่อ เพราะต้องสะสมข้าม
+           ทุกคน) แล้วเพิ่มค่าด้วย if เช็คว่า currentStudentLetterGrade เป็น "A" หรือ "A-"
+           ก่อนจบ loop แต่ละรอบ</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่เพิ่ม)</span></div>
+          <pre><code class="lang-cs">int topGradeCount = 0;  // ประกาศไว้นอกสุด ก่อน foreach ชื่อ
+
+// ... ข้างในลูปชื่อ ต่อจากบรรทัดตัดเกรด ...
+if (currentStudentLetterGrade == "A" || currentStudentLetterGrade == "A-")
+{
+    topGradeCount++;
+}
+
+// ... หลังจบ foreach ชื่อ ก่อน Console.ReadLine() ...
+Console.WriteLine($"\nมีนักเรียนเกรด A/A- ทั้งหมด {topGradeCount} คน");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">📌 สรุปบทที่ 12</h2>
+
+    <p>เป้าหมายของบทนี้คือสร้างแอปที่ใช้ iteration และ selection statement ผสมกันประมวลผลเนื้อหา
+       ใน array เพื่อบรรลุเป้าหมายของแอป ด้วยการรวม <code>foreach</code> และ <code>if</code>
+       เข้าด้วยกันแบบซ้อนกัน คุณสร้างแอปที่ประมวลผล array ชื่อและคะแนนของนักเรียน เพื่อคำนวณและ
+       รายงานเกรด ตรรกะของแอปรองรับการเพิ่มนักเรียนและคะแนนใหม่ได้โดยแก้โค้ดน้อยที่สุด</p>
+
+    <p>การมีความสามารถสร้าง nested iteration statement ที่ประมวลผลข้อมูลใน array และ selection
+       statement ที่แตกเส้นทางการทำงานของโค้ด ช่วยให้คุณสร้างโค้ดที่มีประสิทธิภาพและขยายต่อได้ดีขึ้นมาก</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 12</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">รูปแบบ</th><th>ใช้ทำอะไร</th></tr></thead>
+        <tbody>
+          <tr><td>outer foreach = "ใคร/รายการหลัก"</td><td>วน array ชื่อ/หัวข้อหลัก</td></tr>
+          <tr><td>if-elseif ข้างใน outer loop</td><td>เลือก array ย่อยที่ตรงกับรายการปัจจุบัน</td></tr>
+          <tr><td>inner foreach = "ข้อมูลของรายการนั้น"</td><td>วน array ย่อยที่เพิ่งเลือกมา</td></tr>
+          <tr><td>ตัวแปรสะสมประกาศในลูปนอก</td><td>รีเซ็ตอัตโนมัติทุกรอบของรายการหลัก</td></tr>
+          <tr><td>ตัวนับ + if เทียบ examAssignments</td><td>แยกคะแนนสอบกับคะแนนพิเศษ</td></tr>
+          <tr><td><code>else continue;</code> ท้ายเชน</td><td>กันพลาดกรณีไม่ตรงเงื่อนไขไหนเลย</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s10">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>nested loop</td><td>ลูปซ้อนลูป</td><td>foreach ข้างในอีก foreach หนึ่ง</td></tr>
+        <tr><td>outer loop / inner loop</td><td>ลูปชั้นนอก / ชั้นใน</td><td>ลูปที่ครอบอยู่ / ลูปที่อยู่ข้างใน</td></tr>
+        <tr><td>extra credit</td><td>คะแนนพิเศษ</td><td>คะแนนเสริมที่ให้น้ำหนักน้อยกว่าคะแนนสอบปกติ</td></tr>
+        <tr><td>continue statement</td><td>คำสั่ง continue</td><td>ข้ามส่วนที่เหลือของรอบปัจจุบัน ไปเริ่มรอบถัดไปทันที</td></tr>
+        <tr><td>student-agnostic</td><td>เป็นกลาง ไม่ผูกกับใคร</td><td>ตัวแปร/โค้ดที่ใช้ได้กับข้อมูลใครก็ได้ ไม่ hard-code เฉพาะคน</td></tr>
+        <tr><td>refactor</td><td>รีแฟกเตอร์</td><td>ปรับโครงสร้างโค้ดให้ดีขึ้น โดยผลลัพธ์ยังเหมือนเดิม</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch11.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 11 · Create Readable Code</span></a>
+      <a class="next" href="ch13.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 13 · Challenge Project — Arrays, Iteration, and Selection</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

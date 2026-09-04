@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 24 · Format Strings — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="24">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 4 · Work with Variable Data / บทที่ 24</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 4 · โมดูล 4/7</span>
+      <h1>จัดรูปแบบข้อมูลตัวอักษร-ตัวเลขสำหรับการแสดงผล</h1>
+      <div class="en">Format Alphanumeric Data for Presentation in C#</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>50–65 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>จัดรูปแบบเงิน เปอร์เซ็นต์ ตัวเลข และจัดคอลัมน์ข้อความได้อย่างมืออาชีพ</b></span>
+        <span>🎯 ความยาก <b>กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>รวม string template เข้ากับตัวแปรด้วย composite formatting</li>
+        <li>ใช้ format specifier ต่างๆ แสดงเปอร์เซ็นต์ สกุลเงิน และตัวเลขได้อย่างถูกต้อง</li>
+        <li>ใช้ padding method จัดตำแหน่งค่า string ให้ตรงคอลัมน์ได้</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">24.1 สถานการณ์: จดหมายการตลาดส่วนบุคคล</h2>
+
+    <p>สมมติคุณทำงานในแผนกขายและการตลาด ที่ส่งจดหมายส่วนบุคคลนับพันฉบับให้ลูกค้าเดิมของบริษัทที่เป็น
+       นักลงทุนสถาบัน งานของทีมคุณคือโปรโมทผลิตภัณฑ์การเงินใหม่ให้ลูกค้า จดหมายแต่ละฉบับที่คุณส่งจะ
+       รวมข้อมูลส่วนบุคคลของลูกค้าเข้าไปด้วย จดหมายเปรียบเทียบผลตอบแทนของพอร์ตปัจจุบันของลูกค้ากับ
+       ผลตอบแทนที่คาดการณ์โดยใช้ผลิตภัณฑ์ใหม่ล่าสุด คุณจะรวมและจัดรูปแบบข้อมูลให้ถูกต้องได้ยังไง?</p>
+
+    <p>มองในภาพกว้าง นักพัฒนาซอฟต์แวร์ต้องสนใจ:</p>
+    <ul>
+      <li><b>data input</b> — รวมถึงข้อมูลที่ผู้ใช้พิมพ์จากคีย์บอร์ด ใช้เมาส์ อุปกรณ์ หรือจากระบบ
+          ซอฟต์แวร์อื่นผ่าน network request</li>
+      <li><b>data processing</b> — รวมถึงตรรกะการตัดสินใจ การจัดการข้อมูล และการคำนวณ</li>
+      <li><b>data output</b> — รวมถึงการนำเสนอให้ผู้ใช้ปลายทางผ่านข้อความ command-line, หน้าต่าง,
+          หน้าเว็บ หรือบันทึกข้อมูลที่ประมวลผลแล้วลงไฟล์ แล้วส่งไปยัง network service</li>
+    </ul>
+
+    <p>เพื่อแก้ปัญหาทางธุรกิจใน C# คุณต้องทำงานกับข้อมูลหลายชนิด เช่น string และตัวเลข คุณยังต้อง
+       ทำการดำเนินการต่างๆ กับข้อมูล เช่น การคำนวณ การเปรียบเทียบ หรือการแปลงค่า ในบทนี้ คุณแสดงผล
+       ข้อมูล string และตัวเลขใน C# ด้วยตัวเลือกการจัดรูปแบบต่างๆ คุณยังสร้าง mockup ใบเสร็จและ
+       ข้อความการตลาดส่วนบุคคลด้วยเทคนิคการรวมข้อมูล (data merging)</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">24.2 Composite Formatting vs String Interpolation</h2>
+
+    <p><b>composite formatting</b> ใช้ placeholder ที่มีหมายเลขกำกับอยู่ภายใน string ตอนรันจริง
+       ทุกอย่างข้างในปีกกาจะถูกแทนที่ด้วยค่าที่ส่งเข้ามาตามตำแหน่งของมัน</p>
+
+    <h3 id="s02a">string.Format() — ต้นแบบของ Composite Formatting</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string first = "Hello";
+string second = "World";
+string result = string.Format("{0} {1}!", first, second);
+Console.WriteLine(result);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Hello World!</pre></div>
+
+    <p>มีจุดสำคัญที่ควรสังเกตในโค้ดนี้:</p>
+    <ul>
+      <li>data type และตัวแปรของ data type นั้นๆ มี "helper method" สำเร็จรูปที่ทำให้งานบางอย่าง
+          ง่ายขึ้น</li>
+      <li>literal string <code>"{0} {1}!"</code> คือ template ที่บางส่วนของมันจะถูกแทนที่ตอนรันจริง</li>
+      <li>token <code>{0}</code> ถูกแทนที่ด้วย argument ตัวแรกหลัง string template คือค่าของตัวแปร
+          <code>first</code></li>
+      <li>token <code>{1}</code> ถูกแทนที่ด้วย argument ตัวที่สอง คือค่าของตัวแปร <code>second</code></li>
+    </ul>
+
+    <div class="note tip">
+      <span class="lbl">💡 ทำไมเริ่มนับที่ 0</span>
+      คุณอาจรู้สึกแปลกที่เริ่มนับจาก 0 แต่จริงๆ แล้วนี่เป็นเรื่องปกติมากในงานพัฒนาซอฟต์แวร์ — เมื่อไร
+      ก็ตามที่มีลำดับของ item ที่ระบุด้วยตัวเลขได้ การนับมักเริ่มที่ 0 เสมอ (ทบทวน zero-based
+      indexing ของ array จาก <a href="ch10.html">บทที่ 10</a>)
+    </div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string first = "Hello";
+string second = "World";
+Console.WriteLine("{1} {0}!", first, second);
+Console.WriteLine("{0} {0} {0}!", first, second);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+World Hello!
+Hello Hello Hello!</pre></div>
+
+    <p>สังเกตจากตัวอย่าง: statement แรกจัดเรียง token ในลำดับไหนก็ได้ (<code>{1}</code> มาก่อน
+       <code>{0}</code>) statement ที่สองใช้ token ซ้ำได้ (<code>{0}</code> ปรากฏ 3 ครั้ง) และตัวแปร
+       ตัวที่สอง (<code>second</code>) ไม่ถูกใช้เลยก็ยังรันได้ไม่มี error</p>
+
+    <h3 id="s02b">String Interpolation — เวอร์ชันที่เรียบง่ายกว่า</h3>
+    <p><b>string interpolation</b> เป็นเทคนิคที่ทำให้ composite formatting ง่ายขึ้น แทนที่จะใช้
+       token ที่มีหมายเลขแล้วใส่ค่าตัวอักษรหรือชื่อตัวแปรในลิสต์ argument ของ
+       <code>String.Format()</code> หรือ <code>Console.WriteLine()</code> คุณแค่ใส่ชื่อตัวแปรไว้
+       ข้างในปีกกาได้เลย</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string first = "Hello";
+string second = "World";
+Console.WriteLine($"{first} {second}!");
+Console.WriteLine($"{second} {first}!");
+Console.WriteLine($"{first} {first} {first}!");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Hello World!
+World Hello!
+Hello Hello Hello!</pre></div>
+
+    <p>ต้องเติม directive <code>$</code> ไว้หน้า string เสมอถึงจะทำ interpolation ได้ — คุณคุ้นเคย
+       กับเทคนิคนี้อยู่แล้วตั้งแต่ <a href="ch03.html">บทที่ 3</a> เพราะเป็นวิธีที่ใช้ตลอดทั้งเล่ม</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ควรเลือกใช้แบบไหน</span>
+      ถ้าดูตัวอย่างโค้ดในหนังสือหรือบนอินเทอร์เน็ต คุณมักเห็นทั้ง composite formatting และ string
+      interpolation ถูกใช้ปนกัน แต่โดยทั่วไป ควรเลือกใช้ <b>string interpolation</b> เป็นหลัก
+      เพราะอ่านง่ายกว่า (เห็นชื่อตัวแปรตรงตำแหน่งที่จะแสดงผลเลย ไม่ต้องนับ index) — composite
+      formatting ยังมีประโยชน์อยู่ในบางกรณี เช่น ตอนสร้าง template ที่ต้องใช้ตัวแปรตัวเดียวกันซ้ำ
+      หลายครั้งในตำแหน่งต่างกัน หรือ template ที่จะถูกใช้ซ้ำกับชุดข้อมูลต่างๆ (จะเห็นตัวอย่างในหัวข้อ
+      24.6)
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch24-a"><span>เข้าใจว่า composite formatting กับ string interpolation ทำสิ่งเดียวกัน แค่ syntax ต่างกัน</span></label></li>
+      <li><label><input type="checkbox" id="ch24-b"><span>ใช้ token {0} {1} ซ้ำและสลับลำดับได้</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">24.3 Format Specifier: สกุลเงิน ตัวเลข และเปอร์เซ็นต์</h2>
+
+    <p>composite formatting และ string interpolation ใช้จัดรูปแบบค่าสำหรับแสดงผลตามภาษาและ culture
+       ที่กำหนดได้ด้วย</p>
+
+    <h3 id="s03a">จัดรูปแบบสกุลเงินด้วย :C</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">decimal price = 123.45m;
+int discount = 50;
+Console.WriteLine($"Price: {price:C} (Save {discount:C})");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output (en-US)</div><pre>
+Price: $123.45 (Save $50.00)</pre></div>
+
+    <p>สังเกตว่าเติม <code>:C</code> เข้าไปใน token ในปีกกา จัดรูปแบบตัวเลขเป็นสกุลเงินให้ ไม่ว่าจะ
+       ใช้ <code>int</code> หรือ <code>decimal</code> ก็ตาม</p>
+
+    <h3 id="s03b">Culture ส่งผลต่อการจัดรูปแบบยังไง</h3>
+    <p>ถ้ารันโค้ดเดียวกันนี้บนคอมพิวเตอร์ที่ตั้งค่า Windows Display Language เป็นภาษาฝรั่งเศส
+       (ประเทศฝรั่งเศส) คุณจะเห็นผลลัพธ์แบบนี้แทน:</p>
+    <div class="out auto"><div class="out-bar">Output (fr-FR)</div><pre>
+Price: 123,45 € (Save 50,00 €)</pre></div>
+
+    <p>เหตุผลของผลลัพธ์ "€" ข้างบนคือฟีเจอร์จัดรูปแบบสกุลเงินของ string ขึ้นอยู่กับการตั้งค่า
+       <b>culture</b> ของเครื่องนั้นๆ ในบริบทนี้ คำว่า "culture" หมายถึงประเทศ/ภูมิภาคและภาษาของ
+       ผู้ใช้ปลายทาง <b>culture code</b> คือ string 5 ตัวอักษรที่คอมพิวเตอร์ใช้ระบุตำแหน่งและภาษา
+       ของผู้ใช้ปลายทาง culture code ช่วยรับประกันว่าข้อมูลอย่างวันที่และสกุลเงินจะถูกแสดงผล
+       อย่างถูกต้อง</p>
+
+    <p>ตัวอย่างเช่น:</p>
+    <ul>
+      <li>culture code ของคนพูดภาษาอังกฤษในสหรัฐฯ คือ <code>en-US</code></li>
+      <li>culture code ของคนพูดภาษาฝรั่งเศสในฝรั่งเศส คือ <code>fr-FR</code></li>
+      <li>culture code ของคนพูดภาษาฝรั่งเศสในแคนาดา คือ <code>fr-CA</code></li>
+    </ul>
+
+    <p>culture ส่งผลต่อระบบการเขียน ปฏิทินที่ใช้ ลำดับการเรียง string และการจัดรูปแบบวันที่กับตัวเลข
+       (เช่น การจัดรูปแบบสกุลเงิน) น่าเสียดายที่การทำให้แน่ใจว่าโค้ดของคุณทำงานถูกต้องบนทุกเครื่อง
+       ไม่ว่าประเทศ/ภูมิภาคหรือภาษาของผู้ใช้ปลายทางจะเป็นอะไรนั้นเป็นเรื่องท้าทายมาก กระบวนการนี้
+       เรียกว่า <b>localization</b> (หรือ globalization) การทำ localization ขึ้นอยู่กับหลายปัจจัยที่
+       ไม่ได้กล่าวถึงในบทนี้ แต่พูดง่ายๆ คือ syntax การจัดรูปแบบ string อาจใช้รูปแบบต่างกันไปตาม
+       culture ของผู้ใช้</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 ไม่รู้ culture ของเครื่อง จะได้สัญลักษณ์อะไร</span>
+      ถ้ารันโค้ดในโปรแกรมแก้ไข .NET แบบ "in-browser" (เช่น TryDotNet) คุณจะเห็นสัญลักษณ์
+      <code>¤</code> แทนสัญลักษณ์สกุลเงินของประเทศคุณ — นี่คือสัญลักษณ์ทั่วไปที่ใช้แทน "สกุลเงิน"
+      โดยไม่ระบุประเภทที่แน่นอน เพราะโปรแกรมแก้ไขแบบ in-browser ไม่รู้ตำแหน่งปัจจุบันของคุณ
+    </div>
+
+    <h3 id="s03c">จัดรูปแบบตัวเลขด้วย :N</h3>
+    <p>เวลาทำงานกับข้อมูลตัวเลข คุณอาจต้องการจัดรูปแบบให้อ่านง่ายขึ้น ด้วยการใส่จุลภาคคั่นหลัก
+       (thousands, millions, billions ฯลฯ)</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">decimal measurement = 123456.78912m;
+Console.WriteLine($"Measurement: {measurement:N} units");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output (en-US)</div><pre>
+Measurement: 123,456.79 units</pre></div>
+
+    <p>ค่า default ของ <code>N</code> format specifier แสดงแค่ 2 หลักหลังจุดทศนิยม ถ้าต้องการความ
+       ละเอียดมากขึ้น เติมตัวเลขต่อท้าย specifier ได้ เช่น <code>N4</code> แสดง 4 หลักหลังจุดทศนิยม:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">decimal measurement = 123456.78912m;
+Console.WriteLine($"Measurement: {measurement:N4} units");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output (en-US)</div><pre>
+Measurement: 123,456.7891 units</pre></div>
+
+    <h3 id="s03d">จัดรูปแบบเปอร์เซ็นต์ด้วย :P</h3>
+    <p>ใช้ <code>P</code> format specifier จัดรูปแบบเปอร์เซ็นต์ ปัดเศษ 2 ตำแหน่งทศนิยมเป็นค่า
+       default เติมตัวเลขต่อท้ายเพื่อควบคุมจำนวนหลักหลังจุดทศนิยมที่แสดง</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">decimal tax = .36785m;
+Console.WriteLine($"Tax rate: {tax:P2}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output (en-US)</div><pre>
+Tax rate: 36.79%</pre></div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ :P คูณด้วย 100 ให้อัตโนมัติ</span>
+      สังเกตว่าค่า <code>.36785m</code> (ทศนิยม) กลายเป็น <code>36.79%</code> — <code>:P</code>
+      คูณค่าด้วย 100 และเติมเครื่องหมาย % ให้อัตโนมัติเสมอ ถ้าคุณคำนวณอัตราภาษีมาแล้วเก็บเป็นค่า
+      "0.15" (15%) การใช้ <code>:P</code> ตรงๆ จะได้ผลถูกต้อง แต่ถ้าเผลอเก็บค่าไว้เป็น "15" (คิดว่า
+      15 คือ 15% แล้ว) การใช้ <code>:P</code> จะแสดงผลผิดเป็น "1,500.00%" แทน — ระวังจุดนี้ให้ดี
+    </div>
+
+    <div class="quiz" data-q="24-1">
+      <p class="q"><span class="num">Check ★</span> <code>Console.WriteLine($"Tax rate: {tax:P1}");</code>
+        เมื่อ <code>decimal tax = .12051m;</code> ผลลัพธ์คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>Tax rate: 12.05%</span></li>
+        <li class="opt"><span class="k">B</span><span>Tax rate: 12.10%</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>Tax rate: 12.1%</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> 0.12051 × 100 = 12.051% — <code>P1</code> แสดงแค่ 1 หลัก
+        หลังจุดทศนิยม (ปัดเศษจาก 12.051 เป็น 12.1) ไม่ใช่ 2 หลักแบบ default</div>
+    </div>
+
+    <h3 id="s03e">รวมเทคนิคการจัดรูปแบบเข้าด้วยกัน</h3>
+    <p>ตัวแปร string เก็บ string ที่สร้างด้วยเทคนิคการจัดรูปแบบได้เหมือนกัน ตัวอย่างนี้จัดรูปแบบ
+       ค่า decimal และผลการคำนวณ decimal แล้วเก็บไว้ใน string ชื่อ <code>yourDiscount</code> ด้วย
+       composite formatting:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">decimal price = 67.55m;
+decimal salePrice = 59.99m;
+
+string yourDiscount = String.Format("You saved {0:C2} off the regular {1:C2} price. ", (price - salePrice), price);
+
+Console.WriteLine(yourDiscount);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output (en-US)</div><pre>
+You saved $7.56 off the regular $67.55 price. </pre></div>
+
+    <p>ต่อ string ที่จัดรูปแบบแล้วหลายอันเข้าด้วยกันได้ ต่อยอดจากโค้ดข้างบน โดยแทรก
+       <code>yourDiscount += $"A discount of {(price - salePrice)/price:P2}!";</code> เข้าไปก่อน
+       บรรทัด <code>Console.WriteLine()</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">decimal price = 67.55m;
+decimal salePrice = 59.99m;
+
+string yourDiscount = String.Format("You saved {0:C2} off the regular {1:C2} price. ", (price - salePrice), price);
+
+yourDiscount += $"A discount of {((price - salePrice)/price):P2}!";
+Console.WriteLine(yourDiscount);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output (en-US)</div><pre>
+You saved $7.56 off the regular $67.55 price. A discount of 11.19%!</pre></div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ไม่ต้องใช้ String.Format() คู่กับ interpolation</span>
+      สังเกตว่าบรรทัดที่เพิ่มเข้ามาใช้ string interpolation (<code>$"..."</code>) ตรงๆ ไม่ต้องพึ่ง
+      <code>String.Format()</code> เลย — สองเทคนิคนี้ผสมกันในโค้ดชิ้นเดียวได้ตามสะดวก
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch24-c"><span>ใช้ :C, :N, :P ได้ครบทั้ง 3 specifier</span></label></li>
+      <li><label><input type="checkbox" id="ch24-d"><span>เข้าใจว่า culture ส่งผลต่อการจัดรูปแบบยังไง</span></label></li>
+      <li><label><input type="checkbox" id="ch24-e"><span>ระวังกับดักเรื่อง :P คูณ 100 อัตโนมัติได้</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">24.4 ตัวอย่าง: พิมพ์ใบเสร็จ</h2>
+
+    <p>คุณต้องเขียนโค้ดพิมพ์ใบเสร็จให้ลูกค้าที่ซื้อหุ้นในผลิตภัณฑ์การลงทุน หุ้นถูกซื้ออัตโนมัติเมื่อ
+       สิ้นปีตามชุดของการหักเงินจากบัญชีเงินเดือน ดังนั้นจำนวนหุ้นที่ซื้อมักมีเศษทศนิยม การพิมพ์
+       ใบเสร็จจึงต้องรวมข้อมูลหลายชนิด ทั้งค่าที่มีเศษ สกุลเงิน และเปอร์เซ็นต์ ให้ถูกต้องแม่นยำ</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int invoiceNumber = 1201;
+decimal productShares = 25.4568m;
+decimal subtotal = 2750.00m;
+decimal taxPercentage = .15825m;
+decimal total = 3185.19m;
+
+Console.WriteLine($"Invoice Number: {invoiceNumber}");
+Console.WriteLine($"   Shares: {productShares:N3} Product");
+Console.WriteLine($"     Sub Total: {subtotal:C}");
+Console.WriteLine($"           Tax: {taxPercentage:P2}");
+Console.WriteLine($"     Total Billed: {total:C}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output (en-US)</div><pre>
+Invoice Number: 1201
+   Shares: 25.457 Product
+     Sub Total: $2,750.00
+           Tax: 15.83%
+     Total Billed: $3,185.19</pre></div>
+
+    <p>เพราะเก็บสัดส่วนหุ้นเป็นทศนิยมละเอียดถึง 1 ในหมื่น (0.0001) แต่แสดงผลแค่ 3 หลักหลังจุดทศนิยม
+       (0.001) จึงใช้ <code>:N3</code> แทน <code>:N</code> เฉยๆ (ซึ่ง default จะแสดงแค่ 2 หลัก) —
+       ตัวเลขที่คุณเติมต่อท้าย format specifier มักคุมความละเอียดที่ต้องการแสดงเสมอ ไม่ว่าจะเป็น
+       <code>:N</code>, <code>:P</code>, หรือ <code>:C</code> ก็ตาม</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch24-f"><span>รันโค้ดพิมพ์ใบเสร็จสำเร็จ ได้ผลลัพธ์ครบทั้ง 5 บรรทัด</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">24.5 Padding และ Alignment</h2>
+
+    <p>เมธอด <code>string.Format()</code> ที่คุณเห็นในหัวข้อ 24.2 อาจดูแปลกสักหน่อย เพราะคีย์เวิร์ด
+       ที่แทน data type กลับมีเมธอดให้เรียกได้เหมือนที่คุณเรียกเมธอดบน <code>Console</code> class —
+       ความจริงคือ <code>string</code> data type มีเมธอดสำเร็จรูปแบบนี้อีกหลายตัวที่ใช้กับ string
+       literal หรือตัวแปรชนิด string ตัวไหนก็ได้</p>
+
+    <p>นี่คือรายการหมวดหมู่ของ built-in method เหล่านี้คร่าวๆ เพื่อให้เห็นภาพว่ามีอะไรทำได้บ้าง:</p>
+    <ul>
+      <li>เมธอดที่เติมช่องว่างเพื่อจัดรูปแบบ (<code>PadLeft()</code>, <code>PadRight()</code>)</li>
+      <li>เมธอดที่เปรียบเทียบ string สองอัน หรือช่วยในการเปรียบเทียบ (<code>Trim()</code>,
+          <code>TrimStart()</code>, <code>TrimEnd()</code>, <code>GetHashCode()</code>, property
+          <code>Length</code>)</li>
+      <li>เมธอดที่ช่วยตรวจสอบว่าข้างใน string มีอะไรอยู่ หรือแม้แต่ดึงบางส่วนของ string ออกมา
+          (<code>Contains()</code>, <code>StartsWith()</code>, <code>EndsWith()</code>,
+          <code>Substring()</code>)</li>
+      <li>เมธอดที่เปลี่ยนเนื้อหาของ string ด้วยการแทนที่ แทรก หรือลบบางส่วน (<code>Replace()</code>,
+          <code>Insert()</code>, <code>Remove()</code>)</li>
+      <li>เมธอดที่แปลง string เป็น array ของ string หรือ char (<code>Split()</code>,
+          <code>ToCharArray()</code>)</li>
+    </ul>
+
+    <div class="note tip">
+      <span class="lbl">💡 หลายเมธอดนี้เจอมาแล้วในบทก่อนๆ</span>
+      <code>Contains()</code>, <code>Substring()</code>, <code>Split()</code>, และ
+      <code>ToCharArray()</code> คุณเจอมาแล้วใน <a href="ch14.html">บทที่ 14</a> และ
+      <a href="ch23.html">บทที่ 23</a> — บทนี้เน้นที่ <code>PadLeft()</code> และ
+      <code>PadRight()</code> ซึ่งยังไม่เคยแนะนำมาก่อน
+    </div>
+
+    <h3 id="s05a">เติมช่องว่างซ้าย-ขวาด้วย PadLeft() และ PadRight()</h3>
+    <p><code>PadLeft()</code> เติมช่องว่างที่ด้านซ้ายของ string จนกว่าจำนวนตัวอักษรทั้งหมดจะเท่ากับ
+       argument ที่คุณส่งให้มัน</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string input = "Pad this";
+Console.WriteLine(input.PadLeft(12));</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output ("Pad this" มี 8 ตัวอักษร → เติม 4 ช่องว่างซ้าย)</div><pre>
+    Pad this</pre></div>
+
+    <p>ใช้ <code>PadRight()</code> เติมช่องว่างหรืออักขระที่ด้านขวาแทน — ผลลัพธ์จะไม่เห็นความต่าง
+       ด้วยตาเปล่าตอนพิมพ์ (เพราะช่องว่างอยู่ท้ายบรรทัด) แต่มันมีอยู่จริง</p>
+
+    <h3 id="s05b">Overloaded Method — เติมอักขระอื่นแทนช่องว่างได้</h3>
+    <p>ใน C# <b>overloaded method</b> คือเวอร์ชันอื่นของเมธอดตัวเดียวกันที่รับ argument ต่างกันหรือ
+       เพิ่มเติม ปรับพฤติกรรมของเมธอดเล็กน้อย เหมือนกับเวอร์ชัน overload ของ <code>PadLeft()</code>
+       — คุณเรียกเวอร์ชัน overload ที่สองได้ โดยส่งอักขระที่ต้องการใช้แทนช่องว่างเข้าไป:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string input = "Pad this";
+Console.WriteLine(input.PadLeft(12, '-'));
+Console.WriteLine(input.PadRight(12, '-'));</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+----Pad this
+Pad this----</pre></div>
+
+    <div class="quiz" data-q="24-2">
+      <p class="q"><span class="num">Check ★</span> กำหนด <code>string myWords = "Learning C#";</code>
+        คำอธิบายข้อไหนตรงกับผลลัพธ์ของ <code>Console.WriteLine(myWords.PadLeft(12));</code> ที่สุด?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>เติมช่องว่าง 1 ช่องที่หน้า string</span></li>
+        <li class="opt"><span class="k">B</span><span>เติมช่องว่าง 4 ช่องที่หน้า string</span></li>
+        <li class="opt"><span class="k">C</span><span>เติมช่องว่าง 12 ช่องที่หน้า string</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> "Learning C#" มี 11 ตัวอักษร (นับรวมช่องว่างและ #) —
+        PadLeft(12) เติมให้ครบ 12 ตัวอักษรทั้งหมด จึงเติมแค่ 1 ช่องว่างเท่านั้น ไม่ใช่ 12 ช่องว่าง
+        ตรงๆ (12 คือความยาว<b>รวม</b>ที่ต้องการ ไม่ใช่จำนวนช่องว่างที่จะเติม)</div>
+    </div>
+
+    <h3 id="s05c">สถานการณ์จริง: ส่งข้อมูลให้ระบบ Mainframe รุ่นเก่า</h3>
+    <p>สมมติคุณทำงานให้บริษัทประมวลผลการชำระเงินที่ยังรองรับระบบ mainframe รุ่นเก่าอยู่ ระบบเหล่านี้
+       มักต้องการให้ข้อมูลถูกป้อนในคอลัมน์ที่กำหนดตายตัว เช่น เก็บ Payment ID ในคอลัมน์ 1 ถึง 6
+       ชื่อผู้รับเงินในคอลัมน์ 7 ถึง 30 และจำนวนเงินในคอลัมน์ 31 ถึง 40 — และสำคัญคือ จำนวนเงินต้อง
+       ชิดขวา (right-aligned)</p>
+
+    <p>คุณถูกขอให้สร้างแอปแปลงข้อมูลจากฐานข้อมูลเชิงสัมพันธ์ให้เป็นรูปแบบไฟล์ระบบเก่า เพื่อยืนยันว่า
+       การเชื่อมต่อทำงานถูกต้อง ขั้นแรกคือยืนยันรูปแบบไฟล์โดยให้ตัวอย่าง output แก่ผู้ดูแลระบบเก่า</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string paymentId = "769C";
+string payeeName = "Mr. Stephen Ortega";
+string paymentAmount = "$5,000.00";
+
+var formattedLine = paymentId.PadRight(6);
+formattedLine += payeeName.PadRight(24);
+formattedLine += paymentAmount.PadLeft(10);
+
+Console.WriteLine("1234567890123456789012345678901234567890");
+Console.WriteLine(formattedLine);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+1234567890123456789012345678901234567890
+769C  Mr. Stephen Ortega       $5,000.00</pre></div>
+
+    <p>สังเกต 3 จุดสำคัญ:</p>
+    <ul>
+      <li><code>paymentId.PadRight(6)</code> — Payment ID <code>"769C"</code> มี 4 ตัวอักษร เติม
+          ช่องว่าง 2 ช่องด้านขวาให้ครบคอลัมน์ 1-6</li>
+      <li><code>payeeName.PadRight(24)</code> — ชื่อผู้รับเงินเติมช่องว่างด้านขวาให้ครบ 24 ตัวอักษร
+          (คอลัมน์ 7-30)</li>
+      <li><code>paymentAmount.PadLeft(10)</code> — จำนวนเงินใช้ <code>PadLeft()</code> แทน (ไม่ใช่
+          <code>PadRight()</code>) เพราะโจทย์กำหนดให้ต้อง<b>ชิดขวา</b></li>
+      <li>ใช้ <code>+=</code> ต่อ string เข้ากับตัวแปร <code>formattedLine</code> ทีละส่วน — เทียบ
+          เท่ากับ <code>formattedLine = formattedLine + payeeName.PadRight(24);</code></li>
+    </ul>
+
+    <p>บรรทัดตัวเลข <code>1234567890...</code> ที่พิมพ์ไว้ด้านบนช่วยให้นับคอลัมน์ตรงตามที่ต้องการได้
+       ง่ายขึ้น เป็นเทคนิคที่มีประโยชน์เวลาต้องยืนยันความถูกต้องของ fixed-width format กับทีมอื่น</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch24-g"><span>ใช้ PadLeft() และ PadRight() ทั้งแบบ default (ช่องว่าง) และ overload (อักขระกำหนดเอง) สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch24-h"><span>สร้างข้อความจัดคอลัมน์แบบ fixed-width สำเร็จ ตรงตามตัวอย่าง mainframe</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">24.6 ท้าทาย: จดหมายการตลาดส่วนบุคคล</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl h">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>ทีมเขียนคำโฆษณาตัดสินใจใช้ข้อความการตลาดตัวอย่างนี้ (ใช้ข้อมูลบัญชีลูกค้าสมมติ) — เขียนโค้ด
+           ที่รวมและจัดรูปแบบเนื้อหาให้ตรงกับ output เป้าหมายด้านล่างนี้เป๊ะๆ (ระวังเรื่องช่องว่าง
+           ให้ดี):</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">ข้อมูลตั้งต้น (ห้ามลบโค้ดที่ให้มา)</span></div>
+          <pre><code class="lang-cs">string customerName = "Ms. Barros";
+
+string currentProduct = "Magic Yield";
+int currentShares = 2975000;
+decimal currentReturn = 0.1275m;
+decimal currentProfit = 55000000.0m;
+
+string newProduct = "Glorious Future";
+decimal newReturn = 0.13125m;
+decimal newProfit = 63000000.0m;
+
+// Your logic here
+
+Console.WriteLine("Here's a quick comparison:\n");
+
+string comparisonMessage = "";
+
+// Your logic here
+
+Console.WriteLine(comparisonMessage);</code></pre>
+        </div>
+        <p>ผลลัพธ์ที่ต้องได้:</p>
+        <div class="out auto"><pre>
+Dear Ms. Barros,
+As a customer of our Magic Yield offering we are excited to tell you about a new financial product that would dramatically increase your return.
+
+Currently, you own 2,975,000.00 shares at a return of 12.75%.
+
+Our new product, Glorious Future offers a return of 13.13%.  Given your current volume, your potential profit would be $63,000,000.00.
+
+Here's a quick comparison:
+
+Magic Yield         12.75%   $55,000,000.00      
+Glorious Future     13.13%   $63,000,000.00  </pre></div>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>ย่อหน้าแรกใช้ string interpolation ธรรมดา ส่วนตารางเปรียบเทียบด้านล่างต้องสร้างทีละ
+             บรรทัดด้วยการต่อ string (<code>+=</code>) ผสม <code>String.Format()</code> กับ
+             format specifier (<code>:P</code>, <code>:C</code>) และ <code>PadRight()</code> —
+             สังเกตว่าจำนวนหุ้น <code>currentShares</code> เป็น <code>int</code> แต่ต้องแสดงเป็น
+             <code>2,975,000.00</code> (มีทศนิยม 2 ตำแหน่ง) ทั้งที่เป็นจำนวนเต็ม — format
+             specifier ตัวไหนทำแบบนั้นได้?</p>
+        </div>
+      </details>
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย (เฉลยทางการจาก Microsoft Learn)</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">string customerName = "Ms. Barros";
+
+string currentProduct = "Magic Yield";
+int currentShares = 2975000;
+decimal currentReturn = 0.1275m;
+decimal currentProfit = 55000000.0m;
+
+string newProduct = "Glorious Future";
+decimal newReturn = 0.13125m;
+decimal newProfit = 63000000.0m;
+
+Console.WriteLine($"Dear {customerName},");
+Console.WriteLine($"As a customer of our {currentProduct} offering we are excited to tell you about a new financial product that would dramatically increase your return.\n");
+Console.WriteLine($"Currently, you own {currentShares:N} shares at a return of {currentReturn:P}.\n");
+Console.WriteLine($"Our new product, {newProduct} offers a return of {newReturn:P}.  Given your current volume, your potential profit would be {newProfit:C}.\n");
+
+Console.WriteLine("Here's a quick comparison:\n");
+
+string comparisonMessage = "";
+
+comparisonMessage = currentProduct.PadRight(20);
+comparisonMessage += String.Format("{0:P}", currentReturn).PadRight(10);
+comparisonMessage += String.Format("{0:C}", currentProfit).PadRight(20);
+
+comparisonMessage += "\n";
+comparisonMessage += newProduct.PadRight(20);
+comparisonMessage += String.Format("{0:P}", newReturn).PadRight(10);
+comparisonMessage += String.Format("{0:C}", newProfit).PadRight(20);
+
+Console.WriteLine(comparisonMessage);</code></pre>
+        </div>
+        <div class="out"><div class="out-bar">Output</div><pre>
+Dear Ms. Barros,
+As a customer of our Magic Yield offering we are excited to tell you about a new financial product that would dramatically increase your return.
+
+Currently, you own 2,975,000.00 shares at a return of 12.75%.
+
+Our new product, Glorious Future offers a return of 13.13%.  Given your current volume, your potential profit would be $63,000,000.00.
+
+Here's a quick comparison:
+
+Magic Yield         12.75%   $55,000,000.00      
+Glorious Future     13.13%   $63,000,000.00  </pre></div>
+        <p>นี่เป็น<i>เพียงหนึ่งในหลายวิธี</i>ที่แก้โจทย์นี้ได้ — ขึ้นอยู่กับว่าคุณเลือก implement
+           ตรรกะยังไง ขอแค่ใช้เทคนิคที่เรียนในบทนี้ (จัดรูปแบบ string, เติม padding ฯลฯ) และผลลัพธ์
+           ตรงกับที่โจทย์กำหนดก็ถือว่าสำเร็จแล้ว</p>
+        <p>สังเกตว่า <code>currentShares</code> เป็น <code>int</code> แต่ใช้แค่ <code>:N</code>
+           เฉยๆ (ไม่ใช่ <code>:N0</code>) ก็ยังแสดงทศนิยม 2 ตำแหน่งเป็น <code>2,975,000.00</code>
+           ได้ เพราะ <code>:N</code> แสดง 2 ตำแหน่งทศนิยมเป็นค่า default เสมอ ไม่ว่า data type
+           ต้นฉบับจะเป็นจำนวนเต็มหรือไม่ก็ตาม (ทบทวนหัวข้อ 24.3c)</p>
+        <p>ส่วนตารางเปรียบเทียบ สร้างทีละส่วนด้วยการต่อ string (<code>+=</code>) — แต่ละแถวประกอบ
+           ด้วย 3 ส่วน: ชื่อผลิตภัณฑ์ (<code>PadRight(20)</code>), เปอร์เซ็นต์ผลตอบแทน
+           (<code>PadRight(10)</code>), และกำไร (<code>PadRight(20)</code>) — สังเกตว่าทุกส่วนใช้
+           <code>PadRight()</code> ไม่มี <code>PadLeft()</code> เลย เพราะโจทย์นี้ไม่ได้กำหนดให้
+           ชิดขวาแบบตัวอย่าง mainframe ในหัวข้อก่อน</p>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch24-i"><span>แก้โจทย์ท้าทายสำเร็จ ได้ผลลัพธ์ตรงตามที่กำหนดทุกตัวอักษร (รวมช่องว่าง)</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s07">24.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>:P แสดงผล 1,500.00% ทั้งที่ต้องการ 15%</td>
+          <td>ค่าที่เก็บไว้เป็น 15 (คิดว่าคือ 15% แล้ว) แต่ :P คูณด้วย 100 ให้อัตโนมัติเสมอ — ต้อง
+              เก็บอัตราส่วนเป็นทศนิยม 0-1 (เช่น 0.15) ก่อนใช้ :P เสมอ</td>
+        </tr>
+        <tr>
+          <td>ผลลัพธ์สกุลเงินแสดงสัญลักษณ์ที่ไม่คาดคิด (เช่น € แทน $)</td>
+          <td>ไม่ใช่บั๊ก — ขึ้นอยู่กับ culture setting ของเครื่องที่รันโค้ด ถ้าต้องการบังคับ culture
+              เฉพาะ ต้องตั้งค่า CultureInfo เองอย่างชัดเจน (ทบทวนจาก <a href="ch22.html">บทที่
+              22</a> เรื่องการตั้งค่า en-US)</td>
+        </tr>
+        <tr>
+          <td>PadLeft(n) ไม่เติมช่องว่างเลย ทั้งที่คาดว่าจะเติม</td>
+          <td>ถ้า string เดิมยาวเท่ากับหรือมากกว่า n อยู่แล้ว PadLeft()/PadRight() จะไม่ทำอะไรเลย
+              (คืนค่าเดิมกลับมาโดยไม่ตัดทอนหรือ error) — n คือความยาว<b>รวม</b>เป้าหมาย ไม่ใช่
+              จำนวนอักขระที่จะเติมเพิ่ม</td>
+        </tr>
+        <tr>
+          <td>ใช้ PadRight() แต่มองไม่เห็นผลต่างในผลลัพธ์</td>
+          <td>ไม่ใช่บั๊ก — ช่องว่างที่เติมด้านขวาอยู่ท้ายบรรทัด มองด้วยตาเปล่าจากหน้าจอไม่เห็น แต่มี
+              อยู่จริง (ลองใช้ PadRight(n, '-') ชั่วคราวเพื่อยืนยัน)</td>
+        </tr>
+        <tr>
+          <td>ลืมว่า string.Format() กับ Console.WriteLine() composite formatting ใช้ syntax token เดียวกัน</td>
+          <td>ทั้งคู่รับ template string ตามด้วย argument list แบบเดียวกัน — สลับใช้แทนกันได้ตาม
+              ต้องการ (String.Format() คืนค่า string ให้เก็บไว้ใช้ต่อ ส่วน Console.WriteLine()
+              พิมพ์ออกจอทันที)</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">24.8 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment ของ Microsoft Learn</p>
+
+    <div class="quiz" data-q="24-3">
+      <p class="q"><span class="num">1.</span> โค้ด <code>Console.WriteLine("C110".PadLeft(6, '0'));</code>
+        ผลลัพธ์ที่คาดว่าจะได้คือข้อใด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>C11000</span></li>
+        <li class="opt"><span class="k">B</span><span>C110000000</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>00C110</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> "C110" มี 4 ตัวอักษร PadLeft(6, '0') เติม '0' ที่<b>ด้าน
+        ซ้าย</b>จนครบความยาวรวม 6 ตัวอักษร ได้ "00C110" — ไม่ใช่เติมด้านขวา (นั่นคือพฤติกรรมของ
+        PadRight)</div>
+    </div>
+
+    <div class="quiz" data-q="24-4">
+      <p class="q"><span class="num">2.</span> format specifier ไหนแสดงค่า decimal ในรูปแบบ
+        <code>12,345.67</code> สำหรับผู้ชม en-US?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>0:C</span></li>
+        <li class="opt"><span class="k">B</span><span>0:H</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>0:N2</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> N2 จัดรูปแบบตัวเลขพร้อมจุลภาคคั่นหลักและทศนิยม 2 ตำแหน่ง
+        พอดี — C จะเติมสัญลักษณ์สกุลเงินซึ่งไม่ตรงกับผลลัพธ์ที่ต้องการ ส่วน H ไม่ใช่ format
+        specifier ที่มีอยู่จริงใน C#</div>
+    </div>
+
+    <div class="quiz" data-q="24-5">
+      <p class="q"><span class="num">3.</span> ต้องใช้อักขระตัวไหนเป็น directive เพื่อทำ string
+        interpolation?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>$</span></li>
+        <li class="opt"><span class="k">B</span><span>@</span></li>
+        <li class="opt"><span class="k">C</span><span>%</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> <code>$</code> คือ directive ของ string interpolation
+        — <code>@</code> เป็น directive ของ verbatim string literal (ทบทวนจาก
+        <a href="ch03.html">บทที่ 3</a>) ซึ่งเป็นคนละเรื่องกัน</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">24.9 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ประกาศ <code>decimal salary = 55000m;</code> แล้วพิมพ์ออกมาในรูปแบบสกุลเงิน (:C)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">decimal salary = 55000m;
+Console.WriteLine($"Salary: {salary:C}");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ใช้ <code>PadRight()</code> จัดคำว่า "ID" ให้กว้าง 10 ตัวอักษร ต่อด้วยคำว่า "Name" ให้กว้าง
+           15 ตัวอักษร แล้วพิมพ์เป็นบรรทัดหัวตาราง</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string header = "ID".PadRight(10) + "Name".PadRight(15);
+Console.WriteLine(header);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ทำนายผลลัพธ์ของโค้ดนี้ก่อนรันจริง แล้วเทียบว่าตรงไหม:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+        <pre><code class="lang-cs">decimal rate = 1.5m;
+Console.WriteLine($"Rate: {rate:P0}");</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">ผลลัพธ์จริง</span>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">decimal rate = 1.5m;
+Console.WriteLine($"Rate: {rate:P0}");</code></pre></div>
+          <div class="out"><pre>
+Rate: 150%</pre></div>
+          <p>1.5 × 100 = 150% — P0 แสดง 0 หลักหลังจุดทศนิยม (จำนวนเต็มพอดี) เป็นตัวอย่างที่ดีว่า
+             :P คูณ 100 เสมอไม่ว่าค่าตั้งต้นจะมากกว่า 1 หรือไม่ก็ตาม (กับดักจากหัวข้อ 24.3d
+             ในอีกรูปแบบหนึ่ง)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ใช้ composite formatting (<code>string.Format()</code>) สร้างข้อความ
+           <code>"3 + 4 = 7"</code> จากตัวแปร <code>int a = 3, b = 4;</code> โดยใช้ token
+           <code>{0}</code> และ <code>{1}</code> เท่านั้น (ห้ามใช้ string interpolation)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int a = 3, b = 4;
+string result = string.Format("{0} + {1} = {2}", a, b, a + b);
+Console.WriteLine(result);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p>สร้างตารางราคาสินค้า 3 รายการ (ชื่อ, ราคา) โดยจัดคอลัมน์ชื่อให้กว้าง 15 ตัวอักษร (ชิดซ้าย)
+           และคอลัมน์ราคาให้กว้าง 10 ตัวอักษร (ชิดขวา แสดงเป็นสกุลเงิน) ใช้ข้อมูล:
+           ("Apple", 1.5m), ("Bread", 3.25m), ("Milk", 2.99m)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string[] names = ["Apple", "Bread", "Milk"];
+decimal[] prices = [1.5m, 3.25m, 2.99m];
+
+for (int i = 0; i < names.Length; i++)
+{
+    string line = names[i].PadRight(15);
+    line += String.Format("{0:C}", prices[i]).PadLeft(10);
+    Console.WriteLine(line);
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงเฉลยท้าทาย (หัวข้อ 24.6) ให้รองรับผลิตภัณฑ์ที่ 3 ชื่อ <code>"Steady Growth"</code>
+           ผลตอบแทน <code>0.095m</code> กำไร <code>40000000.0m</code> เพิ่มเป็นแถวที่ 3 ในตาราง
+           เปรียบเทียบ โดยยังคงจัดคอลัมน์ให้ตรงกันกับ 2 แถวเดิม</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนตารางเปรียบเทียบ)</span></div>
+          <pre><code class="lang-cs">string thirdProduct = "Steady Growth";
+decimal thirdReturn = 0.095m;
+decimal thirdProfit = 40000000.0m;
+
+string comparisonMessage = "";
+
+comparisonMessage = currentProduct.PadRight(20);
+comparisonMessage += String.Format("{0:P}", currentReturn).PadRight(10);
+comparisonMessage += String.Format("{0:C}", currentProfit).PadRight(20);
+
+comparisonMessage += "\n";
+comparisonMessage += newProduct.PadRight(20);
+comparisonMessage += String.Format("{0:P}", newReturn).PadRight(10);
+comparisonMessage += String.Format("{0:C}", newProfit).PadRight(20);
+
+comparisonMessage += "\n";
+comparisonMessage += thirdProduct.PadRight(20);
+comparisonMessage += String.Format("{0:P}", thirdReturn).PadRight(10);
+comparisonMessage += String.Format("{0:C}", thirdProfit).PadRight(20);
+
+Console.WriteLine(comparisonMessage);</code></pre></div>
+          <p>เพิ่มแถวที่ 3 ด้วยแพทเทิร์นเดียวกับ 2 แถวแรกทุกประการ (PadRight 20/10/20 เท่ากัน)
+             เพราะใช้ความกว้างคอลัมน์เดิม ตารางจึงยังคงจัดตรงกันสวยงาม</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 24</h2>
+
+    <p>บริษัทของคุณต้องสร้างข้อความการตลาดส่วนบุคคลเพื่อโปรโมทผลิตภัณฑ์การเงินใหม่ให้ลูกค้า ด้วย C#
+       คุณเขียนโค้ดที่รวมข้อมูล string และตัวเลขเกี่ยวกับลูกค้าปัจจุบันของคุณได้สำเร็จ</p>
+
+    <p>คุณฝึกใช้เทคนิคต่างๆ ในการรวม string template เข้ากับตัวแปร ทั้ง composite formatting และ
+       string interpolation format specifier ต่างๆ ช่วยให้คุณจัดรูปแบบตัวเลขจำนวนมาก สกุลเงิน และ
+       เปอร์เซ็นต์ได้อย่างถูกต้อง built-in method บนตัวแปรชนิด string ช่วยให้คุณเติม padding จัด
+       ตำแหน่งข้อมูลชิดซ้ายและชิดขวาได้</p>
+
+    <p>ลองจินตนาการดูว่าจะต้องทำงานเพิ่มขึ้นแค่ไหน ถ้าไม่มีเครื่องมือและเทคนิคจัดรูปแบบ string และ
+       ตัวเลขที่หลากหลายใน C# แบบนี้ คุณอาจต้องพยายามใช้ string concatenation ทุกที่ ซึ่งอาจทำให้
+       ดูแลรักษาหรืออัปเดตโค้ดได้ยากขึ้นมาก</p>
+
+    <p>เทคนิคและเครื่องมือจัดรูปแบบ string และข้อมูลตัวเลขมีการใช้งานได้กว้างขวางมาก เช่น คุณใช้
+       เทคนิคเหล่านี้แสดงข้อมูลบนหน้าจอ และจัดรูปแบบข้อมูลเพื่อส่งต่อระหว่างระบบที่ต่างกันได้</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 24</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">Syntax</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>string.Format("{0} {1}", a, b)</code></td><td>composite formatting — token ตามตำแหน่ง</td></tr>
+          <tr><td><code>$"{a} {b}"</code></td><td>string interpolation — แนะนำให้ใช้เป็นหลัก</td></tr>
+          <tr><td><code>{value:C}</code></td><td>สกุลเงิน ตาม culture ของเครื่อง</td></tr>
+          <tr><td><code>{value:N}</code> / <code>{value:N2}</code></td><td>ตัวเลขมีจุลภาคคั่นหลัก + ทศนิยม (default 2 ตำแหน่ง)</td></tr>
+          <tr><td><code>{value:P}</code> / <code>{value:P2}</code></td><td>เปอร์เซ็นต์ (คูณ 100 อัตโนมัติ + %)</td></tr>
+          <tr><td><code>str.PadLeft(n)</code></td><td>เติมช่องว่างซ้ายให้ยาวรวม n (ใช้ทำ right-align)</td></tr>
+          <tr><td><code>str.PadRight(n)</code></td><td>เติมช่องว่างขวาให้ยาวรวม n (ใช้ทำ left-align)</td></tr>
+          <tr><td><code>str.PadLeft(n, ch)</code></td><td>overload — เติมอักขระ ch แทนช่องว่าง</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>composite formatting</td><td>การจัดรูปแบบผสม</td><td>ใช้ token {0} {1} ในสตริง template พร้อม argument list</td></tr>
+        <tr><td>format specifier</td><td>ตัวระบุรูปแบบ</td><td>รหัสหลัง : ในปีกกา บอกวิธีจัดรูปแบบ (C, N, P)</td></tr>
+        <tr><td>culture / culture code</td><td>วัฒนธรรม / รหัสวัฒนธรรม</td><td>รหัส 5 ตัวอักษรระบุประเทศ+ภาษาของผู้ใช้ ส่งผลต่อรูปแบบวันที่/เงิน</td></tr>
+        <tr><td>localization</td><td>การประยุกต์ตามท้องถิ่น</td><td>กระบวนการทำให้แอปแสดงผลถูกต้องตามหลาย culture</td></tr>
+        <tr><td>padding</td><td>การเติมช่องว่าง</td><td>เติมอักขระ (มักเป็นช่องว่าง) ให้ string ยาวถึงความยาวที่กำหนด</td></tr>
+        <tr><td>overloaded method</td><td>เมธอดหลายรูปแบบ</td><td>เมธอดชื่อเดียวกัน หลายเวอร์ชันที่รับพารามิเตอร์ต่างกัน</td></tr>
+        <tr><td>fixed-width format</td><td>รูปแบบความกว้างคงที่</td><td>ข้อมูลที่แต่ละฟิลด์อยู่ในตำแหน่งคอลัมน์ตายตัวเสมอ</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch23.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 23 · Array Helper Methods</span></a>
+      <a class="next" href="ch25.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 25 · Modify the Content of Strings</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

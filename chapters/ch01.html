@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 1 · Write Your First C# Code — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="1">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 1 · Write Your First Code / บทที่ 1</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 1 · โมดูล 1/7</span>
+      <h1>เขียนโค้ด C# บรรทัดแรกของคุณ</h1>
+      <div class="en">Write Your First C# Code</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>45–60 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>รันโปรแกรม C# ได้จริง เข้าใจไวยากรณ์พื้นฐาน</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>เขียนโค้ด C# บรรทัดแรกของคุณเองได้</li>
+        <li>ใช้ 2 เทคนิคในการพิมพ์ข้อความออกคอนโซล — <code>Console.WriteLine()</code> และ <code>Console.Write()</code></li>
+        <li>วินิจฉัย error message เมื่อพิมพ์โค้ดผิด และรู้วิธีแก้</li>
+        <li>ระบุองค์ประกอบไวยากรณ์ C# ได้ เช่น operator, class, method</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">1.1 ทำไมต้องเริ่มที่ "Hello World"</h2>
+
+    <p>ภาษา C# ใช้สร้างแอปพลิเคชันได้หลากหลายมาก เช่น:</p>
+    <ul>
+      <li>แอปธุรกิจสำหรับเก็บ วิเคราะห์ และประมวลผลข้อมูล</li>
+      <li>เว็บแอปพลิเคชันแบบไดนามิกที่เข้าถึงผ่านเบราว์เซอร์</li>
+      <li>เกม ทั้งแบบ 2D และ 3D</li>
+      <li>แอปด้านการเงินและวิทยาศาสตร์</li>
+      <li>แอปบนคลาวด์</li>
+      <li>แอปมือถือ</li>
+    </ul>
+
+    <p>แต่คำถามคือ จะเริ่มเขียนแอปพลิเคชันได้ยังไง? แอปทุกตัวประกอบขึ้นจากโค้ดหลายบรรทัดที่ทำงาน
+       ร่วมกัน วิธีที่ดีที่สุดในการเรียนเขียนโปรแกรมคือการ<b>ลงมือเขียนโค้ดจริง</b> — พิมพ์เอง ไม่ใช่แค่อ่านผ่านตา
+       เพราะการพิมพ์เองจะช่วยให้จำและเข้าใจได้ลึกกว่าการอ่านเฉยๆ มาก</p>
+
+    <div class="note tip">
+      <span class="lbl">💡 หลักการเรียนของเล่มนี้</span>
+      ทุกตัวอย่างโค้ดในหนังสือควร<b>พิมพ์ตามเอง</b> อย่างน้อยครั้งแรก แม้จะมีปุ่ม Copy ให้ก็ตาม
+      การพิมพ์เองจะฝึกให้มือคุณคุ้นกับไวยากรณ์ และทำให้เจอ error จริงที่สอนอะไรได้มากกว่าการก็อปวาง
+    </div>
+
+    <p>เมื่อจบบทนี้ คุณจะเขียนโค้ด C# เพื่อพิมพ์ข้อความออกทาง <b>standard output</b> ของคอนโซล
+       (เช่นหน้าต่าง Terminal) ได้ — โค้ดไม่กี่บรรทัดนี้จะเป็นครั้งแรกที่คุณได้เห็นไวยากรณ์ของ C#
+       และจะให้ข้อมูลเชิงลึกที่มีค่ามากทีเดียว</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">1.2 ลงมือ: พิมพ์โค้ดแรกของคุณ</h2>
+
+    <p>ในแบบฝึกหัดแรกนี้ คุณจะใช้ C# พิมพ์ประโยคในตำนานของโปรแกรมเมอร์ ออกทางคอนโซล</p>
+
+    <h3 id="s02a">เตรียมโปรเจกต์</h3>
+    <p>เปิด PowerShell แล้วสร้างโปรเจกต์ใหม่สำหรับบทนี้โดยเฉพาะ:</p>
+
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">PowerShell</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch01-hello
+cd ch01-hello</code></pre>
+    </div>
+    <div class="out auto"><div class="out-bar">คำสั่งนี้ไม่มีผลลัพธ์แสดงบนคอนโซล แค่สร้างโฟลเดอร์และไฟล์เท่านั้น</div><pre> </pre></div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ทางเลือกอื่น</span>
+      ถ้ายังไม่อยากติดตั้ง .NET บนเครื่อง สามารถใช้
+      <a href="https://microsoftlearning.github.io/c-sharp-minor" target="_blank" rel="noopener">C# Code Editor ของ Microsoft</a>
+      ที่รันในเบราว์เซอร์แทนได้ (ต้องมีอินเทอร์เน็ต) — แต่แนะนำให้ใช้ dotnet บนเครื่องตามบทที่ 0
+      เพื่อได้ประสบการณ์ตรงกับที่จะใช้จริงในบทถัดๆ ไป
+    </div>
+
+    <h3 id="s02b">เขียนโค้ดแรก</h3>
+    <p>เปิดไฟล์ <code>Program.cs</code> ในโฟลเดอร์ <code>ch01-hello</code> ด้วย Notepad
+       ลบเนื้อหาเดิมทั้งหมด แล้วพิมพ์โค้ดนี้ <b>ให้เหมือนต้นฉบับทุกตัวอักษร</b>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Hello World!");</code></pre>
+    </div>
+
+    <p>บันทึกไฟล์ แล้วกลับไปที่ PowerShell รันคำสั่ง:</p>
+
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">PowerShell</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code>dotnet run</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Hello World!</pre></div>
+
+    <p><code>dotnet run</code> ทำสองงานให้เสร็จในคำสั่งเดียว: <b>คอมไพล์</b>โค้ดของคุณให้เป็นรูปแบบที่เครื่องรันได้
+       แล้ว<b>รัน</b>โปรแกรมที่คอมไพล์เสร็จนั้นทันที</p>
+
+    <h3 id="s02c">ถ้าเจอ error ต้องทำยังไง</h3>
+    <p>การเขียนโค้ด C# คือ <i>งานที่ต้องแม่นยำ</i> พิมพ์ผิดแม้แค่ตัวเดียวก็จะได้ error message ทันที ลองดูตัวอย่าง</p>
+
+    <p>ถ้าพิมพ์ <code>console</code> เป็นตัวพิมพ์เล็กแทนที่จะเป็น <code>Console</code>:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">console.WriteLine("Hello World!");</code></pre>
+    </div>
+    <div class="out err auto"><div class="out-bar">Output</div><pre>
+Error summary:
+  CS0103: The name 'console' does not exist in the current context</pre></div>
+
+    <p>C# เป็นภาษาที่ <b>คำนึงถึงตัวพิมพ์เล็ก-ใหญ่ (case-sensitive)</b> คอมไพเลอร์มองคำว่า
+       <code>console</code> กับ <code>Console</code> ต่างกันเหมือนคำว่า "แมว" กับ "หมา"</p>
+
+    <p>อีกตัวอย่าง ถ้าใช้เครื่องหมายคำพูดเดี่ยว <code>'</code> แทนคู่ <code>"</code>:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Console.WriteLine('Hello World!');</code></pre>
+    </div>
+    <div class="out err auto"><div class="out-bar">Output</div><pre>
+Error summary:
+  CS1012: Too many characters in character literal</pre></div>
+
+    <div class="note tip">
+      <span class="lbl">💡 error ไม่ใช่เรื่องถาวร</span>
+      แค่หามันเจอ แก้ แล้วรันใหม่ ถ้าเจอ error ให้ดูให้ละเอียดทีละตัวอักษรว่าพิมพ์ตรงกับต้นฉบับหรือไม่
+      ตัว editor ที่ดีจะขีดเส้นใต้สีแดงใต้จุดที่มีปัญหาให้ล่วงหน้าก่อนรันด้วยซ้ำ
+    </div>
+
+    <h3 id="s02d">ลองพิมพ์ข้อความใหม่</h3>
+    <p>คอมเมนต์บรรทัดเดิมด้วยเครื่องหมายทับคู่ <code>//</code> (สั่งให้คอมไพเลอร์ข้ามบรรทัดนั้น)
+       แล้วเพิ่มโค้ดใหม่ตามนี้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// Console.WriteLine("Hello World!");
+
+Console.Write("Congratulations!");
+Console.Write(" ");
+Console.Write("You wrote your first lines of code.");</code></pre>
+    </div>
+
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">PowerShell</span>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code>dotnet run</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Congratulations! You wrote your first lines of code.</pre></div>
+
+    <h3 id="s02e">ความต่างระหว่าง Console.Write กับ Console.WriteLine</h3>
+    <p>โค้ด 3 บรรทัดที่เพิ่งเพิ่มไป แสดงความต่างระหว่างเมธอด
+       <code>Console.WriteLine()</code> กับ <code>Console.Write()</code>:</p>
+
+    <ul>
+      <li><code>Console.WriteLine()</code> พิมพ์ข้อความออกคอนโซล แล้ว<b>ขึ้นบรรทัดใหม่</b>ต่อท้ายทันที
+          (เหมือนกดปุ่ม Enter)</li>
+      <li><code>Console.Write()</code> พิมพ์ข้อความออกคอนโซล<b>โดยไม่ขึ้นบรรทัดใหม่</b> —
+          การเรียก <code>Console.Write()</code> ครั้งถัดไปจึงพิมพ์ต่อในบรรทัดเดิม</li>
+    </ul>
+
+    <p>ลองอัปเดตโค้ดเพื่อเห็นความต่างชัดๆ:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("Congratulations!");
+Console.Write("You wrote your first lines of code.");</code></pre>
+    </div>
+
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">PowerShell</span>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code>dotnet run</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Congratulations!
+You wrote your first lines of code.</pre></div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch1-a"><span>สร้างโปรเจกต์ <code>ch01-hello</code> และรัน Hello World! สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch1-b"><span>ลองพิมพ์ผิดจนเจอ error CS0103 และ CS1012 ด้วยตัวเอง</span></label></li>
+      <li><label><input type="checkbox" id="ch1-c"><span>ทดลอง Console.Write() 3 ครั้งติดกัน แล้วดูว่าออกมาบรรทัดเดียว</span></label></li>
+      <li><label><input type="checkbox" id="ch1-d"><span>สลับมาใช้ WriteLine + Write แล้วเห็นความต่างชัดเจน</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">1.3 ผ่าโค้ดทีละชิ้น</h2>
+
+    <p>มาถอยกลับมาคิดกันว่า "ภาษาโปรแกรม" คืออะไร และโค้ดของคุณสื่อสารคำสั่งกับคอมพิวเตอร์ได้ยังไง</p>
+
+    <h3 id="s03a">ภาษาโปรแกรมคืออะไร</h3>
+    <p>ภาษาโปรแกรมอย่าง C# ให้คุณเขียนคำสั่งที่ต้องการให้คอมพิวเตอร์ทำ แต่ละภาษามีไวยากรณ์ของตัวเอง
+       แต่พอเรียนภาษาแรกแล้วไปลองภาษาที่สอง คุณจะพบว่าแนวคิดหลักๆ คล้ายกันมาก
+       หน้าที่ของภาษาโปรแกรมคือให้มนุษย์สื่อสารความต้องการออกมาในรูปแบบที่มนุษย์อ่านเข้าใจได้
+       คำสั่งที่คุณเขียนเรียกว่า <b>ซอร์สโค้ด (source code)</b> หรือเรียกสั้นๆ ว่า "โค้ด"</p>
+
+    <p>ตอนนี้นักพัฒนาแก้ไขโค้ดได้ แต่คอมพิวเตอร์ยังไม่เข้าใจโค้ดนั้น — โค้ดต้องถูก <b>คอมไพล์</b>
+       ให้เป็นรูปแบบที่คอมพิวเตอร์เข้าใจก่อน</p>
+
+    <h3 id="s03b">คอมไพล์คืออะไร</h3>
+    <p>โปรแกรมพิเศษที่เรียกว่า <b>คอมไพเลอร์ (compiler)</b> จะแปลงซอร์สโค้ดของคุณให้เป็นรูปแบบที่
+       หน่วยประมวลผลกลาง (CPU) ของคอมพิวเตอร์รันได้ ตอนที่คุณกด <code>dotnet run</code> เมื่อกี้
+       โค้ดถูกคอมไพล์ก่อน แล้วค่อยถูกรัน</p>
+
+    <p>ทำไมโค้ดต้องถูกคอมไพล์? แม้ภาษาโปรแกรมส่วนใหญ่จะดูลึกลับตอนแรก แต่จริงๆ แล้วมันยัง
+       "อ่านง่ายกว่า" ภาษาที่คอมพิวเตอร์<i>ชอบ</i>มาก CPU เข้าใจคำสั่งที่แสดงผลด้วยการเปิด-ปิด
+       สวิตช์เล็กๆ นับพันนับล้านตัว คอมไพเลอร์คือสะพานเชื่อมสองโลกนี้ โดยแปลคำสั่งที่มนุษย์อ่านออก
+       ให้กลายเป็นชุดคำสั่งที่คอมพิวเตอร์เข้าใจ</p>
+
+    <h3 id="s03c">ไวยากรณ์ (syntax) คืออะไร</h3>
+    <p>กฎการเขียนโค้ด C# เรียกว่า <b>ไวยากรณ์ (syntax)</b> เหมือนภาษามนุษย์ที่มีกฎเรื่องเครื่องหมายวรรคตอน
+       และโครงสร้างประโยค ภาษาโปรแกรมก็มีกฎเช่นกัน กฎเหล่านี้กำหนดคำสงวน (keyword) และ operator
+       ของ C# รวมถึงวิธีประกอบมันเข้าด้วยกันเป็นโปรแกรม</p>
+
+    <p>ตอนพิมพ์โค้ด คุณอาจสังเกตว่าสีของคำและสัญลักษณ์ต่างๆ เปลี่ยนไป — เรียกว่า
+       <b>syntax highlighting</b> ช่วยให้มองเห็นจุดที่พิมพ์ผิดกฎไวยากรณ์ได้ง่ายขึ้น</p>
+
+    <h3 id="s03d">โค้ดของคุณทำงานยังไง</h3>
+    <p>มาโฟกัสที่บรรทัดนี้ที่คุณเพิ่งเขียน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">Console.WriteLine("Hello World!");</code></pre>
+    </div>
+
+    <svg viewBox="0 0 720 250" role="img" aria-label="แผนภาพองค์ประกอบไวยากรณ์ของบรรทัดโค้ด Console.WriteLine" style="margin:20px 0">
+      <rect x="0" y="14" width="720" height="60" rx="10" fill="var(--code-bg)"/>
+      <text x="156" y="52" font-family="var(--font-code)" font-size="21" font-weight="700"
+            fill="var(--t-type)">Console</text>
+      <text x="240" y="52" font-family="var(--font-code)" font-size="21" font-weight="700"
+            fill="#8a92b3">.</text>
+      <text x="252" y="52" font-family="var(--font-code)" font-size="21" font-weight="700"
+            fill="var(--t-meth)">WriteLine</text>
+      <text x="360" y="52" font-family="var(--font-code)" font-size="21" font-weight="700"
+            fill="#8a92b3">(</text>
+      <text x="372" y="52" font-family="var(--font-code)" font-size="21" font-weight="700"
+            fill="var(--t-str)">"Hello World!"</text>
+      <text x="540" y="52" font-family="var(--font-code)" font-size="21" font-weight="700"
+            fill="#8a92b3">)</text>
+      <text x="552" y="52" font-family="var(--font-code)" font-size="21" font-weight="700"
+            fill="#8a92b3">;</text>
+
+      <g font-family="var(--font-th)" font-size="12.5">
+        <rect x="12"  y="100" width="216" height="60" rx="9" fill="var(--bg-soft)" stroke="var(--line)"/>
+        <circle cx="30" cy="118" r="6" fill="var(--t-type)" stroke="var(--code-line)"/>
+        <text x="44" y="122" fill="var(--text)" font-weight="700">Console = คลาส (class)</text>
+        <text x="30" y="142" fill="var(--text-soft)">"เจ้าของ" เมธอด WriteLine</text>
+
+        <rect x="252" y="100" width="216" height="60" rx="9" fill="var(--bg-soft)" stroke="var(--line)"/>
+        <circle cx="270" cy="118" r="6" fill="#8a92b3" stroke="var(--code-line)"/>
+        <text x="284" y="122" fill="var(--text)" font-weight="700">. = ตัวเชื่อมเข้าถึงสมาชิก</text>
+        <text x="270" y="142" fill="var(--text-soft)">member access operator</text>
+
+        <rect x="492" y="100" width="216" height="60" rx="9" fill="var(--bg-soft)" stroke="var(--line)"/>
+        <circle cx="510" cy="118" r="6" fill="var(--t-meth)" stroke="var(--code-line)"/>
+        <text x="524" y="122" fill="var(--text)" font-weight="700">WriteLine = เมธอด (method)</text>
+        <text x="510" y="142" fill="var(--text-soft)">งานคือพิมพ์ข้อความ+ขึ้นบรรทัดใหม่</text>
+
+        <rect x="12"  y="176" width="216" height="60" rx="9" fill="var(--bg-soft)" stroke="var(--line)"/>
+        <circle cx="30" cy="194" r="6" fill="#8a92b3" stroke="var(--code-line)"/>
+        <text x="44" y="198" fill="var(--text)" font-weight="700">( ) = ตัวเรียกใช้เมธอด</text>
+        <text x="30" y="218" fill="var(--text-soft)">method invocation operator</text>
+
+        <rect x="252" y="176" width="216" height="60" rx="9" fill="var(--bg-soft)" stroke="var(--line)"/>
+        <circle cx="270" cy="194" r="6" fill="var(--t-str)" stroke="var(--code-line)"/>
+        <text x="284" y="198" fill="var(--text)" font-weight="700">"..." = ค่าคงที่สตริง</text>
+        <text x="270" y="218" fill="var(--text-soft)">literal string / อาร์กิวเมนต์</text>
+
+        <rect x="492" y="176" width="216" height="60" rx="9" fill="var(--bg-soft)" stroke="var(--line)"/>
+        <circle cx="510" cy="194" r="6" fill="#8a92b3" stroke="var(--code-line)"/>
+        <text x="524" y="198" fill="var(--text)" font-weight="700">; = ตัวจบคำสั่ง</text>
+        <text x="510" y="218" fill="var(--text-soft)">end of statement operator</text>
+      </g>
+    </svg>
+
+    <p>เมื่อรัน คุณเห็นข้อความ <code>Hello World!</code> ถูกพิมพ์ออกคอนโซล เมื่อวลีถูกล้อมด้วย
+       เครื่องหมายคำพูดคู่ในโค้ด C# มันถูกเรียกว่า <b>literal string</b> — พูดง่ายๆ คือคุณต้องการ
+       ให้ตัวอักษร <code>H</code>, <code>e</code>, <code>l</code>, <code>l</code>, <code>o</code>
+       ไปจนจบ ถูกส่งออกไปตามตัวอักษรทุกประการ (ตามตัวอักษร = "literal")</p>
+
+    <p><code>Console</code> เรียกว่า <b>คลาส (class)</b> คลาส "เป็นเจ้าของ" เมธอดต่างๆ
+       หรือพูดอีกแบบคือเมธอดอาศัยอยู่ภายในคลาส การจะเรียกใช้เมธอด คุณต้องรู้ว่ามันอยู่คลาสไหน
+       ตอนนี้ให้คิดว่าคลาสคือวิธีแทนวัตถุหนึ่งชิ้น ในกรณีนี้ เมธอดทั้งหมดที่ทำงานกับคอนโซลเอาต์พุต
+       ถูกนิยามอยู่ภายในคลาส <code>Console</code></p>
+
+    <p>มีจุด (หรือมหัพภาค) คั่นระหว่างชื่อคลาส <code>Console</code> กับชื่อเมธอด <code>WriteLine()</code>
+       จุดนี้คือ <b>ตัวเชื่อมเข้าถึงสมาชิก (member access operator)</b> พูดอีกแบบ จุดคือวิธีที่คุณ
+       "นำทาง" จากคลาสไปยังหนึ่งในเมธอดของมัน</p>
+
+    <p><code>WriteLine()</code> เรียกว่า <b>เมธอด (method)</b> — สังเกตเมธอดได้เสมอเพราะมันมีวงเล็บต่อท้าย
+       แต่ละเมธอดมีหน้าที่เดียว งานของเมธอด <code>WriteLine()</code> คือเขียนข้อมูลหนึ่งบรรทัดออกคอนโซล
+       ข้อมูลที่จะพิมพ์ถูกส่งเข้าไปทางระหว่างวงเล็บเปิด-ปิด เรียกว่า <b>พารามิเตอร์ขาเข้า (input parameter)</b>
+       บางเมธอดต้องการพารามิเตอร์ขาเข้า บางเมธอดไม่ต้อง แต่ถ้าจะเรียกใช้เมธอด คุณต้องใส่วงเล็บ
+       ต่อท้ายชื่อเมธอดเสมอ — วงเล็บนี้เรียกว่า <b>ตัวเรียกใช้เมธอด (method invocation operator)</b></p>
+
+    <p>สุดท้าย เครื่องหมายเซมิโคลอนคือ <b>ตัวจบคำสั่ง (end of statement operator)</b>
+       <b>ข้อความสั่ง (statement)</b> คือคำสั่งที่สมบูรณ์หนึ่งชุดใน C# เซมิโคลอนบอกคอมไพเลอร์ว่า
+       คุณพิมพ์คำสั่งจบแล้ว</p>
+
+    <p>อย่าเพิ่งกังวลถ้ายังจำแนวคิดและศัพท์เหล่านี้ไม่ได้หมด สิ่งที่ต้องจำตอนนี้คือ ถ้าจะพิมพ์ข้อความ
+       ออกคอนโซล:</p>
+    <ul>
+      <li>ใช้ <code>Console.WriteLine("ข้อความของคุณ");</code></li>
+      <li>ขึ้นต้นด้วยตัวพิมพ์ใหญ่ที่ <code>Console</code>, <code>Write</code>, และ <code>Line</code></li>
+      <li>ใช้เครื่องหมายวรรคตอนให้ถูกต้อง เพราะมันมีบทบาทพิเศษใน C#</li>
+      <li>ถ้าพิมพ์ผิด แค่หาให้เจอ แก้ แล้วรันใหม่</li>
+    </ul>
+
+    <div class="note tip">
+      <span class="lbl">💡 เคล็ดลับ</span>
+      ลองทำ cheat sheet ของตัวเองไว้ จนกว่าจะจำคำสั่งสำคัญๆ ได้ขึ้นใจ
+    </div>
+
+    <h3 id="s03e">ลำดับการทำงาน (flow of execution)</h3>
+    <p>สิ่งสำคัญที่ต้องเข้าใจคือ<b>ลำดับการทำงาน</b> — โค้ดของคุณถูกรันทีละคำสั่ง เรียงจากบนลงล่าง
+       จนกว่าจะไม่มีคำสั่งเหลือให้รัน บางคำสั่งต้องให้ CPU รอก่อนจะทำงานต่อได้ บางคำสั่งใช้เปลี่ยน
+       ลำดับการทำงานได้ (จะได้เรียนในบทหลังๆ เรื่อง if/else และ loop)</p>
+
+    <!-- ============================================ -->
+    <h2 id="s04">1.4 ท้าทาย: แสดงผล 2 บรรทัด</h2>
+
+    <p>โจทย์ท้าทายแบบนี้จะปรากฏในแทบทุกโมดูล เพื่อตอกย้ำสิ่งที่เรียนมาและสร้างความมั่นใจก่อนไปต่อ</p>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl m">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>ลบโค้ดเดิมทั้งหมดใน <code>Program.cs</code> แล้วเขียนโค้ดใหม่ให้ได้ผลลัพธ์ตรงนี้เป๊ะ:</p>
+        <div class="out auto"><div class="out-bar">ผลลัพธ์ที่ต้องได้</div><pre>
+This is the first line.
+This is the second line.</pre></div>
+        <p>คุณเพิ่งเรียนวิธีแสดงข้อความด้วยโค้ดบรรทัดเดียว (<code>WriteLine</code>) และวิธีแสดง
+           ข้อความด้วยหลายบรรทัด (<code>Write</code> ต่อกันหลายครั้ง) — ในโจทย์นี้ให้ใช้ทั้งสองเทคนิค
+           จะใช้เทคนิคไหนกับบรรทัดไหน หรือจะแบ่งข้อความบรรทัดใดบรรทัดหนึ่งเป็นกี่ชิ้นก็ได้ตามใจคุณ
+           ขอแค่ผลลัพธ์สุดท้ายตรงตามที่กำหนด</p>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p><b>คำใบ้ 1:</b> คุณต้องใช้ <code>Console.WriteLine()</code> อย่างน้อย 1 ครั้ง
+             และ <code>Console.Write()</code> อย่างน้อย 1 ครั้งในโค้ดชุดนี้</p>
+          <p><b>คำใบ้ 2:</b> <code>WriteLine()</code> ขึ้นบรรทัดใหม่ให้อัตโนมัติ ส่วน
+             <code>Write()</code> ไม่ขึ้น — เลือกใช้ให้ตรงกับจุดที่ต้องการขึ้นบรรทัดใหม่</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s05">1.5 เฉลยและวิเคราะห์</h2>
+
+    <p>ต่อไปนี้คือ<b>หนึ่งในหลายวิธี</b>ที่แก้โจทย์นี้ได้ ไม่ใช่คำตอบเดียวที่ถูก:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เฉลยตัวอย่าง</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("This is the first line.");
+
+Console.Write("This is ");
+Console.Write("the second ");
+Console.Write("line.");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+This is the first line.
+This is the second line.</pre></div>
+
+    <p>นี่เป็น<i>เพียงหนึ่ง</i>ในหลายวิธีที่ให้ผลลัพธ์เดียวกันได้ แต่ไม่ว่าจะเขียนยังไง คุณควรได้ใช้ทั้ง
+       <code>Console.WriteLine()</code> และ <code>Console.Write(String)</code> เพื่อให้ได้ผลลัพธ์ตามโจทย์</p>
+
+    <div class="note ok">
+      <span class="lbl">✅ ถ้าทำสำเร็จ</span> ยินดีด้วย! ไปต่อ Knowledge Check ได้เลย
+    </div>
+    <div class="note warn">
+      <span class="lbl">⚠️ ถ้ายังติดปัญหา</span>
+      กลับไปทบทวนหัวข้อ 1.2 และ 1.3 อีกครั้งก่อนไปต่อ — พื้นฐานตรงนี้จะถูกใช้ซ้ำตลอดทั้งเล่ม
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">1.6 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <p>รวมความผิดพลาดที่มือใหม่มักทำบ่อยที่สุดตอนพิมพ์บรรทัดโค้ดแรกๆ — ทั้งหมดนี้ทำให้โค้ด
+       คอมไพล์ไม่ผ่าน:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">พิมพ์ผิดแบบนี้</th><th style="width:20%">error ที่จะเจอ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>console.WriteLine(...)</code><br><small>c เล็กแทนที่จะเป็น C ใหญ่</small></td>
+          <td><code>CS0103</code></td>
+          <td>C# case-sensitive — <code>console</code> ≠ <code>Console</code> แก้โดยพิมพ์ตัวพิมพ์ใหญ่ให้ถูก</td>
+        </tr>
+        <tr>
+          <td><code>Console.writeline(...)</code><br><small>w, l เล็ก</small></td>
+          <td><code>CS0117</code>-ทำนอง</td>
+          <td>ชื่อเมธอดต้องตรงตัวพิมพ์ใหญ่-เล็กเป๊ะ: <code>WriteLine</code></td>
+        </tr>
+        <tr>
+          <td><code>Console.WriteLine('Hi!')</code><br><small>ใช้ single quote</small></td>
+          <td><code>CS1012</code></td>
+          <td>เครื่องหมายคำพูดเดี่ยวใช้กับ <code>char</code> ตัวเดียวเท่านั้น สตริงต้องใช้คู่ <code>"…"</code></td>
+        </tr>
+        <tr>
+          <td><code>Console,WriteLine(...)</code><br><small>ใช้จุลภาคแทนจุด</small></td>
+          <td>syntax error</td>
+          <td><code>.</code> คือตัวเชื่อมเข้าถึงสมาชิก จะสลับเป็น <code>,</code> ไม่ได้</td>
+        </tr>
+        <tr>
+          <td><code>Console.WriteLine("Hi!")</code><br><small>ไม่มี <code>;</code> ท้ายบรรทัด</small></td>
+          <td><code>CS1002</code></td>
+          <td>ทุกคำสั่งต้องปิดท้ายด้วยเซมิโคลอนเสมอ</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ อ่าน error message ยังไง</span>
+      รูปแบบคือ <code>CSxxxx: คำอธิบาย</code> — เลข <code>CSxxxx</code> คือรหัส error ของคอมไพเลอร์ C#
+      บางครั้งคำอธิบายอาจดูอ้อมค้อมไปหน่อย (เช่น CS1012 ที่จริงคือ "ลืมใช้ double quote")
+      ให้อ่านเป็น "เบาะแส" มากกว่าคำตอบสำเร็จรูป แล้วดูโค้ดตรงตำแหน่งที่ error ชี้
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">1.7 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Module Assessment จริงของบทนี้ใน Microsoft Learn</p>
+
+    <div class="quiz" data-q="1-1">
+      <p class="q"><span class="num">1.</span> Console.Write กับ Console.WriteLine ต่างกันยังไง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>Console.Write พิมพ์ผลลัพธ์แล้วขึ้นบรรทัดใหม่</span></li>
+        <li class="opt"><span class="k">B</span><span>Console.WriteLine พิมพ์ผลลัพธ์แล้วขึ้นบรรทัดใหม่ (พิมพ์ผลลัพธ์บนบรรทัดใหม่)</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>Console.WriteLine เติมการขึ้นบรรทัดใหม่ต่อท้ายผลลัพธ์</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> WriteLine เพิ่ม "line feed" ต่อท้ายข้อความที่พิมพ์
+        ทำให้การเรียกครั้งถัดไปเริ่มบรรทัดใหม่ ส่วน Write ไม่เพิ่มอะไรต่อท้าย จึงพิมพ์ต่อในบรรทัดเดิม
+        (ข้อ A และ B สลับบทบาทกันจากความจริง)</div>
+    </div>
+
+    <div class="quiz" data-q="1-2">
+      <p class="q"><span class="num">2.</span> หน้าที่หลักของคอมไพเลอร์คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ตรวจหาคำผิด (spelling) ในโค้ดเป็นหลัก</span></li>
+        <li class="opt"><span class="k">B</span><span>รันโค้ดของคุณเป็นหลัก</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>แปลงโค้ดของคุณให้เป็นรูปแบบที่เครื่องรันได้ (executable) เป็นหลัก</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> คอมไพเลอร์แปลซอร์สโค้ดที่มนุษย์อ่านออก ให้เป็นรูปแบบที่ CPU
+        ประมวลผลได้ — ส่วนการ "รัน" เป็นหน้าที่ของ runtime ไม่ใช่คอมไพเลอร์โดยตรง
+        และการตรวจคำผิดเป็นเพียงผลพลอยได้จากการตรวจไวยากรณ์ ไม่ใช่หน้าที่หลัก</div>
+    </div>
+
+    <div class="quiz" data-q="1-3">
+      <p class="q"><span class="num">3.</span> ข้อใด<b>ถูกต้อง</b>เกี่ยวกับภาษา C#?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>C# ไม่สนใจตัวพิมพ์เล็ก-ใหญ่ (case insensitive)</span></li>
+        <li class="opt"><span class="k">B</span><span>Console เป็นเมธอด และ WriteLine() เป็นคลาส</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>ใช้เครื่องหมายคำพูดคู่เพื่อสร้างค่าคงที่แบบสตริง (literal string)</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> literal string ต้องล้อมด้วย double-quote เสมอ
+        ข้อ A ผิด เพราะ C# เป็น case-<b>sensitive</b> (สนใจตัวพิมพ์เล็ก-ใหญ่)
+        ข้อ B สลับบทบาทกัน — ที่จริง Console คือคลาส และ WriteLine() คือเมธอด</div>
+    </div>
+
+    <div class="quiz" data-q="1-4">
+      <p class="q"><span class="num">4.</span> โค้ดบรรทัดนี้ผิดตรงไหน?
+        <code>Console.WriteLine("What is wrong with me?")</code></p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ตัว L ใน WriteLine ควรเป็นตัวพิมพ์เล็ก</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>ขาดเครื่องหมายเซมิโคลอนท้ายบรรทัด</span></li>
+        <li class="opt"><span class="k">C</span><span>สตริงควรใช้เครื่องหมายคำพูดเดี่ยว</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> สังเกตว่าท้ายบรรทัดไม่มี <code>;</code> — ทุกคำสั่งใน C#
+        ต้องปิดท้ายด้วยเซมิโคลอน ข้อ A ผิดเพราะ WriteLine สะกดถูกอยู่แล้ว (ตัว L ต้องใหญ่)
+        ข้อ C ผิดเพราะ double-quote ที่ใช้อยู่ถูกต้องแล้ว</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">1.8 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียนโปรแกรมพิมพ์ชื่อของคุณเองออกทางคอนโซล ด้วย <code>Console.WriteLine()</code> หนึ่งบรรทัด</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Console.WriteLine("สมชาย ใจดี");</code></pre></div>
+          <p>เปลี่ยน <code>"สมชาย ใจดี"</code> เป็นชื่อของคุณเองได้เลย</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียนโปรแกรมให้ได้ผลลัพธ์ตรงนี้ (3 บรรทัด) โดยใช้ <code>Console.WriteLine()</code> 3 ครั้ง:</p>
+        <div class="out auto"><pre>
+วันที่ 1: เริ่มเรียน C#
+วันที่ 2: เข้าใจ WriteLine
+วันที่ 3: เขียนโปรแกรมเองได้</pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Console.WriteLine("วันที่ 1: เริ่มเรียน C#");
+Console.WriteLine("วันที่ 2: เข้าใจ WriteLine");
+Console.WriteLine("วันที่ 3: เขียนโปรแกรมเองได้");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้คอมไพล์ไม่ผ่าน หาจุดผิดและแก้ให้ถูก:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">console.WriteLine('สวัสดี C#')</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>มีจุดผิด 3 จุด: (1) <code>console</code> ต้องเป็น <code>Console</code> ตัวใหญ่
+             (2) ต้องใช้ <code>"…"</code> ไม่ใช่ <code>'…'</code> (3) ขาดเซมิโคลอนท้ายบรรทัด</p>
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ถูก)</span></div>
+          <pre><code class="lang-cs">Console.WriteLine("สวัสดี C#");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดผสม <code>Console.Write()</code> และ <code>Console.WriteLine()</code>
+           ให้ได้ผลลัพธ์ตรงนี้เป๊ะ (สังเกตว่าบรรทัด 2 มาจากการพิมพ์ต่อกัน 2 ครั้ง):</p>
+        <div class="out auto"><pre>
+ยินดีต้อนรับ
+ชื่อ: ปาล์ม อายุ: 20</pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>บรรทัดแรกใช้ WriteLine ได้เลย บรรทัดสองต้องใช้ Write สองครั้งแล้วปิดท้ายด้วย WriteLine
+           (หรือ Write ตามด้วยการขึ้นบรรทัดวิธีอื่น) ลองคิดว่าใครควรขึ้นบรรทัดใหม่ ใครไม่ควร</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Console.WriteLine("ยินดีต้อนรับ");
+Console.Write("ชื่อ: ปาล์ม ");
+Console.WriteLine("อายุ: 20");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้มี error <b>2 จุด</b> หาให้ครบและแก้ทั้งหมด:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">Console.WriteLine("บรรทัดที่หนึ่ง");
+Console.write("บรรทัดที่สอง")</code></pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>อ่านทีละบรรทัด บรรทัดที่ 2 ผิดที่ชื่อเมธอด และผิดที่ตัวจบคำสั่ง</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>จุดที่ 1: <code>write</code> ต้องเป็น <code>Write</code> (W ใหญ่) —
+             จุดที่ 2: ขาดเซมิโคลอนท้ายบรรทัดที่สอง</p>
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ถูก)</span></div>
+          <pre><code class="lang-cs">Console.WriteLine("บรรทัดที่หนึ่ง");
+Console.Write("บรรทัดที่สอง");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>เขียนโปรแกรมพิมพ์กรอบข้อความแบบ ASCII art ให้ตรงตามนี้<b>เป๊ะทุกตัวอักษร</b>
+           (รวมช่องว่างและเครื่องหมาย) — ข้อนี้ฝึกความละเอียดแม่นยำแบบเดียวกับที่ MS Learn เน้นในบทนี้:</p>
+        <div class="out auto"><pre>
++------------------+
+|  Hello, C# World  |
++------------------+</pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ใช้ <code>Console.WriteLine()</code> 3 ครั้ง แต่ละครั้งพิมพ์หนึ่งบรรทัดเป๊ะ
+           นับจำนวนเครื่องหมาย <code>-</code> และช่องว่างให้ตรง</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Console.WriteLine("+------------------+");
+Console.WriteLine("|  Hello, C# World  |");
+Console.WriteLine("+------------------+");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">📌 สรุปบทที่ 1</h2>
+
+    <p>เป้าหมายของบทนี้คือให้คุณเขียนโค้ดพิมพ์ข้อความง่ายๆ ออกคอนโซล พร้อมทำความคุ้นเคยกับ
+       ไวยากรณ์ C# คุณได้เขียนโค้ดบรรทัดแรกของตัวเอง เรียนรู้ 2 เทคนิคในการแสดง literal string
+       ออกคอนโซล รู้ว่าต้องมองหาอะไรเมื่อเจอ error และระบุองค์ประกอบไวยากรณ์อย่างคลาสกับเมธอดได้
+       คุณเพิ่งก้าวแรกสู่การสร้างแอปพลิเคชันที่ซับซ้อนขึ้นแล้ว</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 1</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">ไวยากรณ์</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>Console.WriteLine("...");</code></td><td>พิมพ์ข้อความ + ขึ้นบรรทัดใหม่</td></tr>
+          <tr><td><code>Console.Write("...");</code></td><td>พิมพ์ข้อความ ไม่ขึ้นบรรทัดใหม่</td></tr>
+          <tr><td><code>// ข้อความ</code></td><td>คอมเมนต์ 1 บรรทัด (คอมไพเลอร์ข้าม)</td></tr>
+          <tr><td><code>"..."</code></td><td>literal string ต้องใช้ double-quote เท่านั้น</td></tr>
+          <tr><td><code>;</code></td><td>ปิดท้ายทุกคำสั่งเสมอ</td></tr>
+          <tr><td>Console, Write, Line</td><td>ต้องขึ้นต้นด้วยตัวพิมพ์ใหญ่เสมอ — C# case-sensitive</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 เส้นทางสู่ใบรับรองฟรี</span>
+      Microsoft และ freeCodeCamp.org มอบใบรับรอง <b>Foundational C#</b> ฟรีเมื่อเรียนจบ
+      ทุกโมดูลในหลักสูตรนี้ — บทนี้คือก้าวแรกที่คุณเพิ่งเริ่มไปแล้ว ดูภาพรวมทั้งเส้นทางได้ที่
+      <a href="../chapters/ch00.html">บทที่ 0 หัวข้อ 0.3</a>
+    </div>
+
+    <h3 id="s10">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:22%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>class</td><td>คลาส</td><td>ตัวแทนวัตถุที่เป็นเจ้าของเมธอดต่างๆ เช่น Console</td></tr>
+        <tr><td>method</td><td>เมธอด</td><td>ชุดคำสั่งที่ทำงานเฉพาะอย่าง เรียกใช้ด้วยวงเล็บ เช่น WriteLine()</td></tr>
+        <tr><td>literal string</td><td>ค่าคงที่แบบสตริง</td><td>ข้อความที่ล้อมด้วย double-quote ให้แสดงตามตัวอักษรเป๊ะ</td></tr>
+        <tr><td>statement</td><td>ข้อความสั่ง / คำสั่ง</td><td>คำสั่งที่สมบูรณ์หนึ่งชุด จบด้วยเซมิโคลอน</td></tr>
+        <tr><td>argument / parameter</td><td>อาร์กิวเมนต์ / พารามิเตอร์</td><td>ค่าที่ส่งเข้าไปในเมธอดผ่านวงเล็บ</td></tr>
+        <tr><td>member access operator</td><td>ตัวเชื่อมเข้าถึงสมาชิก</td><td>เครื่องหมายจุด <code>.</code> ที่เชื่อมคลาสกับเมธอด</td></tr>
+        <tr><td>method invocation operator</td><td>ตัวเรียกใช้เมธอด</td><td>วงเล็บ <code>()</code> ที่ใช้เรียกเมธอด</td></tr>
+        <tr><td>end of statement operator</td><td>ตัวจบคำสั่ง</td><td>เครื่องหมายเซมิโคลอน <code>;</code></td></tr>
+        <tr><td>compiler</td><td>คอมไพเลอร์</td><td>โปรแกรมที่แปลซอร์สโค้ดเป็นรูปแบบที่เครื่องรันได้</td></tr>
+        <tr><td>syntax</td><td>ไวยากรณ์</td><td>กฎการเขียนโค้ดของภาษา</td></tr>
+        <tr><td>case-sensitive</td><td>คำนึงตัวพิมพ์เล็ก-ใหญ่</td><td>ตัวพิมพ์เล็ก-ใหญ่ต่างกันมีผลต่างกัน</td></tr>
+        <tr><td>code comment</td><td>คอมเมนต์</td><td>ข้อความที่ขึ้นต้นด้วย // ให้คอมไพเลอร์ข้ามไม่ทำงาน</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch00.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 0 · ก่อนเริ่มต้น</span></a>
+      <a class="next" href="ch02.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 2 · Store and Retrieve Data Using Literal and Variable Values</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

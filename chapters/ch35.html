@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 35 · Implement Exception Handling — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="35">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 6 · Debug Console Applications / บทที่ 35</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 6 · โมดูล 3/6</span>
+      <h1>จัดการ Exception ด้วย try-catch-finally</h1>
+      <div class="en">Implement Exception Handling in C# Console Applications</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>75–95 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เขียน try-catch-finally จับ exception เฉพาะชนิดได้จริง อ่าน property ของ exception ได้</b></span>
+        <span>🎯 ความยาก <b>กลาง (ลงมือจริงเยอะ)</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>อธิบายหมวดหมู่พื้นฐานของ exception และรู้จัก system exception ที่พบบ่อยได้</li>
+        <li>ใช้เครื่องมือจัดการ exception ของ C# (try, catch, finally) ได้อย่างถูกต้อง</li>
+        <li>เขียน try-catch pattern จับ exception เฉพาะชนิดในสถานการณ์ต่างๆ ได้</li>
+      </ul>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 ต่อยอดจากบทที่ 33</span>
+      บทที่ 33 ปูพื้นฐานทฤษฎีว่า exception คืออะไร throw/catch คืออะไร — บทนี้คือบทที่คุณจะได้
+      เขียนโค้ด <code>try-catch-finally</code> จริงเป็นครั้งแรก ต้องมี VS Code + C# extension
+      พร้อมใช้งาน (ทบทวนบทที่ 7 และ 34)
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">35.1 สถานการณ์ที่ต้องใช้ Exception Handling</h2>
+
+    <p>ข้อผิดพลาดตอน runtime ในแอป C# ถูกจัดการด้วยกลไกที่เรียกว่า <b>exception</b> — exception
+       ให้วิธีจัดการปัญหาที่เป็นระบบ สม่ำเสมอ และตรวจสอบชนิดได้ ทั้งสำหรับปัญหาระดับระบบและ
+       ระดับแอปพลิเคชัน exception ถูกสร้างโดย .NET runtime เองหรือโดยโค้ดในแอปก็ได้</p>
+
+    <p>สถานการณ์เขียนโปรแกรมที่มักต้องใช้ exception handling ได้แก่:</p>
+
+    <ul>
+      <li><b>รับ input จากผู้ใช้</b> — เช่น ค่าที่กรอกมาผิดรูปแบบหรือเกินขอบเขต</li>
+      <li><b>ประมวลผลข้อมูลและคำนวณ</b> — เช่น หารด้วยศูนย์ cast ผิดชนิด กำหนดค่าที่เกินขอบเขต</li>
+      <li><b>อ่าน/เขียนไฟล์</b> — เช่น ไฟล์ไม่มีอยู่จริง ไม่มีสิทธิ์เข้าถึง หรือไฟล์ถูกโปรแกรมอื่น
+          ใช้งานอยู่</li>
+      <li><b>ทำงานกับฐานข้อมูล</b> — เช่น การเชื่อมต่อหลุด syntax ผิดใน SQL หรือละเมิด constraint</li>
+      <li><b>สื่อสารผ่านเครือข่าย</b> — เช่น การเชื่อมต่อหลุด timeout หรือเซิร์ฟเวอร์ปลายทางตอบ
+          error กลับมา</li>
+      <li><b>ทรัพยากรภายนอกอื่นๆ</b> — เช่น Web Service, REST API หรือไลบรารีของผู้อื่น</li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s02">35.2 ลงมือ: try-catch พื้นฐานตัวแรก</h2>
+
+    <h3 id="s02a">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch35-exceptions</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <p>คำสั่งของ exception handling ใน C# คือ <code>try</code>, <code>catch</code> และ
+       <code>finally</code> แต่ละคำสั่งมี code block ของตัวเอง และทำหน้าที่ต่างกัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">โครงสร้าง</span></div>
+      <pre><code class="lang-cs">try
+{
+   // try code block - โค้ดที่อาจก่อ exception
+}
+catch
+{
+   // catch code block - โค้ดจัดการ exception
+}
+finally
+{
+   // finally code block - โค้ดเก็บกวาดทรัพยากร
+}</code></pre>
+    </div>
+
+    <p><code>try</code> block คือโค้ดที่ "อาจ" ก่อ exception ถ้าโค้ดใน <code>try</code> ก่อ
+       exception ขึ้นจริง <code>catch</code> block ที่ตรงกันจะจัดการมัน — จะจัดการ (handle)
+       บันทึก (log) หรือเพิกเฉย (ignore) ก็ได้ ส่วน <code>finally</code> block จะรันเสมอไม่ว่า
+       จะเกิด exception หรือไม่ก็ตาม มักใช้เก็บกวาดทรัพยากรที่จองไว้ใน <code>try</code></p>
+
+    <p>ลองพิมพ์โค้ดนี้ลงใน <code>Program.cs</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">double float1 = 3000.0;
+double float2 = 0.0;
+int number1 = 3000;
+int number2 = 0;
+
+Console.WriteLine(float1 / float2);
+Console.WriteLine(number1 / number2);
+Console.WriteLine("Exit program");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+∞
+Unhandled exception. System.DivideByZeroException: Attempted to divide by zero.
+   at Program.&lt;Main&gt;$(String[] args) in Program.cs:line 6</pre></div>
+
+    <p>สังเกตว่าหาร <code>double</code> ด้วยศูนย์ไม่เกิด exception เลย — ได้ผลลัพธ์เป็น
+       <code>∞</code> (infinity) ตามกฎ IEEE 754 แต่หาร <code>int</code> ด้วยศูนย์เกิด
+       <code>DivideByZeroException</code> ทันที และทำให้แอปปิดตัวก่อนจะพิมพ์
+       <code>"Exit program"</code> ด้วยซ้ำ — <b>ไม่ได้แปลว่าควรใช้ double แทน int เสมอ</b> แค่
+       ต้องใช้ชนิดข้อมูลที่เหมาะสมกับงาน แล้วเขียน exception handling ดักปัญหาที่อาจเกิดขึ้น</p>
+
+    <p>ล้อมสองบรรทัดคำนวณด้วย <code>try</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">double float1 = 3000.0;
+double float2 = 0.0;
+int number1 = 3000;
+int number2 = 0;
+
+try
+{
+    Console.WriteLine(float1 / float2);
+    Console.WriteLine(number1 / number2);
+}
+
+Console.WriteLine("Exit program");</code></pre>
+    </div>
+
+    <p>โค้ดนี้จะขึ้นเส้นหยักสีแดงใต้วงเล็บปิดของ <code>try</code> — เพราะไวยากรณ์ C# บังคับว่า
+       ต้องมี <code>catch</code> หรือ <code>finally</code> ตามหลัง <code>try</code> เสมอ ใส่
+       <code>catch</code> block เข้าไป:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">double float1 = 3000.0;
+double float2 = 0.0;
+int number1 = 3000;
+int number2 = 0;
+
+try
+{
+    Console.WriteLine(float1 / float2);
+    Console.WriteLine(number1 / number2);
+}
+catch
+{
+    Console.WriteLine("An exception has been caught");
+}
+
+Console.WriteLine("Exit program");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+∞
+An exception has been caught
+Exit program</pre></div>
+
+    <p>แม้ exception จะยังเกิดขึ้นอยู่ แต่ตอนนี้แอปทำงานจนจบได้แล้ว — exception handling ทำให้
+       ควบคุมการทำงานของโค้ดได้เมื่อเกิด exception และช่วยให้โค้ดเสถียรและให้ผลลัพธ์ตามที่คาดหวัง</p>
+
+    <div class="quiz" data-q="35-1">
+      <p class="q"><span class="num">Check ★</span> code block ใดที่ "ต้อง" รันเสมอไม่ว่าจะเกิด exception หรือไม่?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>try</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>catch</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>finally</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> <code>try</code> คือโค้ดที่อาจก่อปัญหา
+        <code>catch</code> รันเฉพาะตอนเกิด exception เท่านั้น ส่วน <code>finally</code> รันเสมอ
+        ไม่ว่าผลจะเป็นอย่างไร มักใช้เก็บกวาดทรัพยากร</div>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s03">35.3 กระบวนการค้นหา catch: Call Stack Unwinding</h2>
+
+    <p>เวลาเกิด exception .NET runtime จะค้นหา <code>catch</code> ที่ใกล้ที่สุดที่จัดการ
+       exception นั้นได้ เริ่มจาก method ที่ทำให้เกิด exception ก่อน ถ้าโค้ดนั้นไม่ได้อยู่ใน
+       <code>try</code> block หรืออยู่แต่ <code>catch</code> จัดการไม่ได้ runtime จะค้นหาต่อไป
+       ยัง method ที่เรียก method ปัจจุบันมา ไล่ขึ้นไปเรื่อยๆ จนกว่าจะเจอ <code>catch</code> ที่
+       จัดการได้ — ถ้าไม่เจอเลยตลอดทาง runtime จะปิดแอปและแสดง error ให้ผู้ใช้เห็น</p>
+
+    <p>ก่อนถ่ายโอนการทำงานไปยัง <code>catch</code> block runtime จะรัน <code>finally</code>
+       block ทุกอันที่เกี่ยวข้องกับ <code>try</code> ที่เจอระหว่างทางค้นหาก่อนเสมอ (เรียงจาก
+       ใกล้จุดเกิด exception ที่สุดก่อน) ลองดูตัวอย่าง <code>try-finally</code> ที่ซ้อนอยู่ใน
+       <code>try-catch</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง</span></div>
+      <pre><code class="lang-cs">try
+{
+    // ขั้น 1: เริ่มทำงาน
+    try
+    {
+        // ขั้น 2: เกิด exception ตรงนี้
+    }
+    finally
+    {
+        // ขั้น 4: ระบบรัน finally ของ try ที่เกิด exception ก่อน
+    }
+}
+catch // ขั้น 3: ระบบเจอ catch ที่จัดการ exception ได้
+{
+    // ขั้น 5: ระบบส่งการทำงานไปที่บรรทัดแรกของ catch นี้
+}</code></pre>
+    </div>
+
+    <p>สังเกตลำดับ: exception เกิดใน <code>try</code> ชั้นใน (ขั้น 2) → runtime เจอ
+       <code>catch</code> ของ <code>try</code> ชั้นนอก (ขั้น 3) → ก่อนจะกระโดดไปที่
+       <code>catch</code> จริงๆ ต้องรัน <code>finally</code> ของ <code>try</code> ชั้นในก่อน
+       (ขั้น 4) → แล้วค่อยเข้า <code>catch</code> (ขั้น 5) ในตัวอย่างนี้ทุกอย่างอยู่ใน method
+       เดียว แต่ในความเป็นจริง <code>try-catch</code> และ <code>try-finally</code> อาจกระจาย
+       อยู่คนละ method ที่เรียกต่อกันเป็นทอดๆ ก็ได้</p>
+
+    <h3 id="s03a">Call Stack คืออะไร</h3>
+    <p>ลองนึกภาพ <b>call stack</b> เหมือนหอคอยบล็อกไม้ — เริ่มจากบล็อกเดียว ทุกครั้งที่วางบล็อก
+       เพิ่ม จะวางทับบนบล็อกเดิม ตอนแอปเริ่มรันในตัว debugger จุดเริ่มต้นแอป (top-level
+       statements ซึ่ง VS Code เรียกว่า method <code>Main</code>) คือบล็อกชั้นแรกของหอคอย
+       ทุกครั้งที่ method หนึ่งเรียก method อื่น method ใหม่จะถูกวางซ้อนบนสุด พอโค้ดออกจาก
+       method นั้น มันจะถูกเอาออกจาก stack</p>
+
+    <p><b>call stack unwinding</b> คือกระบวนการที่ .NET runtime ใช้ตอนเจอ error — เหมือนตอน
+       ต้องถอดบล็อกออกจากหอคอย เริ่มจากบล็อกบนสุดไล่ถอดลงมาทีละชั้นจนกว่าจะถึงชั้นที่ต้องการ —
+       runtime ก็ถอด call layer ออกจาก stack ไล่จากบนสุดจนกว่าจะเจอ method ที่มี
+       <code>catch</code> จัดการ exception นั้นได้</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch35-a"><span>เข้าใจว่า try/catch/finally แต่ละอันทำหน้าที่อะไร</span></label></li>
+      <li><label><input type="checkbox" id="ch35-b"><span>อธิบายกระบวนการ call stack unwinding ได้</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">35.4 Exception ที่พบบ่อยจาก .NET Runtime</h2>
+
+    <p>exception ถูกสร้างโดย .NET runtime หรือโดยโค้ดในโปรแกรม ชนิดของ exception ขึ้นอยู่กับ
+       โค้ดที่ทำให้เกิด exception นั้น ต่อไปนี้คือ exception พื้นฐานที่ runtime โยนเมื่อการทำงาน
+       ระดับล่างสุดล้มเหลว:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:28%">Exception</th><th>เกิดเมื่อ</th></tr></thead>
+      <tbody>
+        <tr><td><code>ArrayTypeMismatchException</code></td><td>พยายามเก็บ element ผิดชนิดลงใน array</td></tr>
+        <tr><td><code>DivideByZeroException</code></td><td>พยายามหารค่า integer ด้วยศูนย์</td></tr>
+        <tr><td><code>FormatException</code></td><td>รูปแบบของ argument ไม่ถูกต้อง</td></tr>
+        <tr><td><code>IndexOutOfRangeException</code></td><td>เข้าถึง index ของ array/collection ที่อยู่นอกขอบเขต</td></tr>
+        <tr><td><code>InvalidCastException</code></td><td>การแปลงชนิด (explicit conversion) ล้มเหลวตอน runtime</td></tr>
+        <tr><td><code>NullReferenceException</code></td><td>พยายามเข้าถึง member ของ object ที่เป็น null</td></tr>
+        <tr><td><code>OverflowException</code></td><td>การคำนวณใน checked context ได้ผลลัพธ์เกินขอบเขตชนิดข้อมูล</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>ตัวอย่างโค้ดที่ทำให้เกิดแต่ละ exception:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">DivideByZeroException</span></div>
+      <pre><code class="lang-cs">int number1 = 3000;
+int number2 = 0;
+Console.WriteLine(number1 / number2); // เกิด DivideByZeroException</code></pre>
+    </div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">FormatException</span></div>
+      <pre><code class="lang-cs">string userValue = "two";
+int valueEntered = int.Parse(userValue); // เกิด FormatException</code></pre>
+    </div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">IndexOutOfRangeException</span></div>
+      <pre><code class="lang-cs">int[] values1 = { 3, 6, 9, 12, 15, 18, 21 };
+int[] values2 = new int[6];
+values2[values1.Length - 1] = values1[values1.Length - 1]; // เกิน bound ของ values2</code></pre>
+    </div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">NullReferenceException</span></div>
+      <pre><code class="lang-cs">string? lowCaseString = null;
+Console.WriteLine(lowCaseString.ToUpper()); // เกิด NullReferenceException</code></pre>
+    </div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">OverflowException</span></div>
+      <pre><code class="lang-cs">decimal x = 400;
+byte i;
+checked
+{
+    i = (byte)x; // เกิด OverflowException เพราะ byte เก็บได้แค่ 0-255
+}</code></pre>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ checked context คืออะไร</span>
+      ปกติการแปลงชนิด integral (เช่น <code>int</code> เป็น <code>byte</code>) จะ "ตัดปัดค่า
+      ทิ้งเงียบๆ" โดยไม่แจ้งเตือน (unchecked context) แต่ถ้าล้อมด้วย <code>checked { }</code>
+      การแปลงที่เกินขอบเขตจะโยน <code>OverflowException</code> แทน ช่วยดักจับข้อผิดพลาดที่
+      อาจถูกมองข้ามได้
+    </div>
+
+    <div class="quiz" data-q="35-2">
+      <p class="q"><span class="num">Check ★</span> โค้ด <code>string? s = null; s.ToUpper();</code> จะเกิด exception ชนิดใด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>FormatException</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>NullReferenceException</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>InvalidCastException</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> การเรียก method บน object ที่เป็น <code>null</code>
+        (ในที่นี้คือเรียก <code>.ToUpper()</code> บน string ที่เป็น null) ทำให้เกิด
+        <code>NullReferenceException</code> เสมอ</div>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s05">35.5 ลงมือ: จับ Exception เจาะจงชนิด + อ่าน Property</h2>
+
+    <p>exception ทุกตัวคือ instance ของคลาสที่สืบทอดมาจาก <code>System.Exception</code> — คลาส
+       ลูกส่วนใหญ่ไม่ได้เพิ่มอะไรใหม่ แค่สืบทอดจาก <code>Exception</code> เฉยๆ ดังนั้นรู้จัก
+       property ของคลาส <code>Exception</code> ก็เข้าใจ exception ส่วนใหญ่ได้แล้ว:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:22%">Property</th><th>ใช้ทำอะไร</th></tr></thead>
+      <tbody>
+        <tr><td><code>Message</code></td><td>รายละเอียดของสาเหตุ exception (ใช้บ่อยที่สุด)</td></tr>
+        <tr><td><code>StackTrace</code></td><td>ลำดับการเรียก method + บรรทัดที่เกิดปัญหา ใช้หาต้นตอ</td></tr>
+        <tr><td><code>InnerException</code></td><td>เก็บ exception ก่อนหน้าไว้เป็นชุด ถ้าเกิดซ้อนกัน</td></tr>
+        <tr><td><code>Source</code></td><td>ชื่อแอปหรือ object ที่ทำให้เกิด error</td></tr>
+        <tr><td><code>Data</code></td><td>เก็บข้อมูลเสริมแบบ key-value</td></tr>
+        <tr><td><code>HResult</code></td><td>รหัสตัวเลขที่ผูกกับ exception ชนิดนั้นๆ</td></tr>
+        <tr><td><code>HelpLink</code></td><td>URL ไปหน้าช่วยเหลือเกี่ยวกับ exception นี้</td></tr>
+        <tr><td><code>TargetSite</code></td><td>method ที่เป็นต้นตอ throw exception นี้</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>ลองอัปเดตโค้ดให้เรียก method ที่เรียกต่อกันเป็นทอด:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">try
+{
+    Process1();
+}
+catch
+{
+    Console.WriteLine("An exception has occurred");
+}
+
+Console.WriteLine("Exit program");
+
+static void Process1()
+{
+    WriteMessage();
+}
+
+static void WriteMessage()
+{
+    double float1 = 3000.0;
+    double float2 = 0.0;
+    int number1 = 3000;
+    int number2 = 0;
+
+    Console.WriteLine(float1 / float2);
+    Console.WriteLine(number1 / number2);
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+∞
+An exception has occurred
+Exit program</pre></div>
+
+    <p><code>WriteMessage()</code> ถูกเรียกจาก <code>Process1()</code> ซึ่งถูกเรียกจาก
+       top-level statements — exception เกิดขึ้นในระดับที่ลึกกว่า <code>try-catch</code> ถึง
+       สอง method แต่ก็ยังถูกจัดการได้ เพราะ call stack unwinding ไล่ค้นหาขึ้นไปเรื่อยๆ ตามที่
+       อธิบายในหัวข้อก่อน</p>
+
+    <p>ปรับ <code>Process1</code> ให้จับ exception เองแทน แล้วอ่านค่า <code>Message</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ปรับ Process1)</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">static void Process1()
+{
+    try
+    {
+        WriteMessage();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Exception caught in Process1: {ex.Message}");
+    }
+}</code></pre>
+    </div>
+
+    <p><code>catch (Exception ex)</code> จับ <code>Exception</code> เก็บไว้ในตัวแปรชื่อ
+       <code>ex</code> แล้วใช้ <code>ex.Message</code> แสดง error ออกทางคอนโซล แม้
+       <code>catch</code> เฉยๆ (ไม่ระบุชนิด) จะเขียนได้ แต่<b>ไม่แนะนำ</b> เพราะจะจับทุกชนิด
+       exception ปนกันหมด แยกแยะไม่ออก — ควรจับเฉพาะ exception ที่โค้ดของคุณรู้วิธีแก้ไขจริงๆ
+       เท่านั้น และระบุชนิดให้เจาะจงที่สุดเท่าที่ทำได้</p>
+
+    <p>เปลี่ยนเป็นจับเฉพาะ <code>DivideByZeroException</code>:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">static void Process1()
+{
+    try
+    {
+        WriteMessage();
+    }
+    catch (DivideByZeroException ex)
+    {
+        Console.WriteLine($"Exception caught in Process1: {ex.Message}");
+    }
+}</code></pre>
+    </div>
+
+    <p>ผลลัพธ์เหมือนเดิม แต่ตอนนี้ <code>Process1</code> จะจับ<b>เฉพาะ</b>ชนิดที่มันเตรียมรับมือ
+       ไว้เท่านั้น ลองแก้ <code>WriteMessage</code> ให้เกิด exception คนละชนิด:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">static void WriteMessage()
+{
+    double float1 = 3000.0;
+    double float2 = 0.0;
+    int number1 = 3000;
+    byte smallNumber;
+
+    Console.WriteLine(float1 / float2);
+    checked
+    {
+        smallNumber = (byte)number1; // number1 = 3000 เกินขอบเขต byte (0-255)
+    }
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+∞
+An exception has occurred
+Exit program</pre></div>
+
+    <p>คราวนี้ <code>catch (DivideByZeroException ex)</code> ใน <code>Process1</code> จับ
+       <code>OverflowException</code> ไม่ได้ (คนละชนิดกัน) exception จึงไหลต่อขึ้นไปให้
+       <code>catch</code> ทั่วไปที่ top-level statements จัดการแทน — นี่คือพฤติกรรมที่ต้องการ:
+       จับเฉพาะ exception ที่โค้ดพร้อมรับมือจริงๆ เท่านั้น</p>
+
+    <div class="quiz" data-q="35-3">
+      <p class="q"><span class="num">Check ★</span> ทำไมควรจับ exception แบบเจาะจงชนิด (เช่น <code>DivideByZeroException</code>) แทนที่จะใช้ <code>catch (Exception ex)</code> ทั่วไปเสมอ?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เพราะ catch ทั่วไปทำให้โปรแกรมช้าลง</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>เพื่อจับเฉพาะ exception ที่โค้ดรู้วิธีแก้ไขจริงๆ ไม่ปนกับชนิดอื่นที่ไม่ได้เตรียมรับมือ</span></li>
+        <li class="opt"><span class="k">C</span><span>เพราะ catch ทั่วไปใช้กับ int ไม่ได้</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> การระบุชนิดเจาะจงช่วยไม่ให้โค้ด "กลืน" exception
+        ชนิดอื่นที่มันไม่รู้วิธีแก้ไปโดยไม่ตั้งใจ — exception ที่ไม่เกี่ยวข้องควรไหลต่อไปให้
+        catch ระดับที่เหมาะสมกว่าจัดการแทน</div>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">35.6 จับหลาย Exception พร้อมกันในบล็อกเดียว</h2>
+
+    <p>ถ้าเกิด exception ตัวแรกในบล็อกแล้ว บรรทัดถัดไปที่อาจก่อ exception ตัวที่สอง<b>จะไม่ถูก
+       รันเลย</b> การทำงานกระโดดไป <code>catch</code> ทันทีที่เจอ exception ตัวแรก — ถ้าอยากให้
+       แต่ละบรรทัดเสี่ยงถูกจัดการแยกกัน ต้องแยก <code>try-catch</code> ของตัวเองให้แต่ละส่วน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">static void WriteMessage()
+{
+    double float1 = 3000.0;
+    double float2 = 0.0;
+    int number1 = 3000;
+    int number2 = 0;
+    byte smallNumber;
+
+    try
+    {
+        Console.WriteLine(float1 / float2);
+        Console.WriteLine(number1 / number2);
+    }
+    catch (DivideByZeroException ex)
+    {
+        Console.WriteLine($"Exception caught in WriteMessage: {ex.Message}");
+    }
+
+    checked
+    {
+        try
+        {
+            smallNumber = (byte)number1;
+        }
+        catch (OverflowException ex)
+        {
+            Console.WriteLine($"Exception caught in WriteMessage: {ex.Message}");
+        }
+    }
+}</code></pre>
+    </div>
+
+    <p>แต่ไม่ใช่ทุกสถานการณ์ที่ควรทำแบบนี้ — ถ้างานส่วนที่สองต้องพึ่งผลลัพธ์จากส่วนแรกที่ทำ
+       สำเร็จ (เช่น ขั้นตอนที่ 2 ของกระบวนการต้องใช้ผลจากขั้นตอนที่ 1) การปล่อยให้โค้ดทำงานต่อ
+       ทั้งที่ขั้นแรกล้มเหลวอาจทำให้เกิดปัญหาซ้อนปัญหา บางครั้งควรแจ้งผู้ใช้ตรงๆ ว่าขั้นตอนแรก
+       ล้มเหลว แล้วไม่พยายามทำขั้นตอนที่เหลือต่อเลยจะดีกว่า</p>
+
+    <p>อีกสถานการณ์คือข้อมูลหลายชุดที่อาจก่อ exception <b>คนละชนิดกัน</b> ในลูปเดียว — ใช้หลาย
+       <code>catch</code> เรียงจากเจาะจงไปหากว้างได้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] inputValues = new string[] { "three", "9999999999", "0", "2" };
+
+foreach (string inputValue in inputValues)
+{
+    int numValue = 0;
+    try
+    {
+        numValue = int.Parse(inputValue);
+        Console.WriteLine($"แปลงสำเร็จ: {numValue}");
+    }
+    catch (FormatException)
+    {
+        Console.WriteLine("รูปแบบไม่ถูกต้อง กรุณากรอกตัวเลข");
+    }
+    catch (OverflowException)
+    {
+        Console.WriteLine("ตัวเลขที่กรอกใหญ่หรือเล็กเกินไป");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+รูปแบบไม่ถูกต้อง กรุณากรอกตัวเลข
+ตัวเลขที่กรอกใหญ่หรือเล็กเกินไป
+แปลงสำเร็จ: 0
+แปลงสำเร็จ: 2</pre></div>
+
+    <p><code>catch</code> แต่ละอันจับคนละชนิด: "three" ไม่ใช่ตัวเลขเลย → <code>FormatException</code>
+       "9999999999" เป็นตัวเลขแต่ใหญ่เกิน <code>int</code> รับได้ → <code>OverflowException</code>
+       ส่วน "0" กับ "2" แปลงสำเร็จปกติ สังเกตว่า <code>catch (Exception ex)</code> ทั่วไปต้อง
+       อยู่<b>ล่างสุดเสมอ</b> — ถ้าสลับให้ catch ทั่วไปอยู่บนสุด โค้ดจะ<b>คอมไพล์ไม่ผ่าน</b>
+       เพราะ catch ที่เจาะจงกว่าจะกลายเป็น "unreachable" (ไปไม่ถึงเพราะโดนดักไปก่อนแล้ว)</p>
+
+    <!-- ============================================ -->
+    <h2 id="s07">35.7 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>เขียน <code>catch (Exception ex)</code> ไว้บล็อกเดียวจับทุกอย่าง</td>
+          <td>ใช้ได้เป็น "ตาข่ายรองรับ" ชั้นนอกสุด แต่ควรมี catch เจาะจงชนิดก่อนเสมอสำหรับ
+              exception ที่รู้วิธีแก้ไขจริง ไม่งั้นจะแยกไม่ออกว่าเกิดปัญหาอะไรกันแน่</td>
+        </tr>
+        <tr>
+          <td>คอมไพล์ error "a previous catch clause already catches all exceptions"</td>
+          <td>เรียง <code>catch</code> ทั่วไป (<code>catch (Exception ex)</code>) ไว้บนสุด
+              ต้องย้ายไปไว้ล่างสุดเสมอ — catch เจาะจงชนิดต้องมาก่อน catch กว้างๆ</td>
+        </tr>
+        <tr>
+          <td>โค้ดหลัง exception ตัวแรกใน try block ไม่ถูกรันเลย</td>
+          <td>พฤติกรรมปกติ — พอเกิด exception การทำงานกระโดดไป catch ทันที ถ้าอยากให้แต่ละ
+              บรรทัดเสี่ยงถูกจัดการแยกกัน ต้องแยก try-catch ของตัวเอง (ดูหัวข้อ 35.6)</td>
+        </tr>
+        <tr>
+          <td>catch จับ exception ไว้เฉยๆ ไม่ทำอะไรเลย (empty catch)</td>
+          <td>อันตราย — ทำให้ปัญหาจริงถูกซ่อนเงียบๆ อย่างน้อยควรพิมพ์หรือบันทึก
+              <code>ex.Message</code> ไว้เสมอ เพื่อให้รู้ว่าเกิดอะไรขึ้น</td>
+        </tr>
+        <tr>
+          <td>ใช้ double หวังเลี่ยง DivideByZeroException ไปเลยทุกที่</td>
+          <td>double หารศูนย์ได้ผล infinity/NaN ไม่ throw จริง แต่ไม่ได้แปลว่าควรเปลี่ยน
+              ชนิดข้อมูลทุกจุดเพื่อหนี exception — เลือกชนิดข้อมูลตามความเหมาะสมของงาน แล้ว
+              จัดการ exception ให้ถูกวิธีแทน</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">35.8 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Microsoft Learn (Check your knowledge ของแต่ละ unit)</p>
+
+    <div class="quiz" data-q="35-4">
+      <p class="q"><span class="num">1.</span> ข้อใดคือคำสั่งของ C# ที่ใช้ทำ exception handling?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>try</code>, <code>catch</code>, และ <code>finally</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>try</code>, <code>catch</code>, <code>finally</code> และ <code>throw</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>try</code>, <code>catch</code> และ <code>throw</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> <code>throw</code> ใช้สร้าง exception object เอง
+        (เรียนละเอียดในบทที่ 36) ส่วนสามคำสั่งหลักของการ "จัดการ" exception คือ try/catch/finally</div>
+    </div>
+
+    <div class="quiz" data-q="35-5">
+      <p class="q"><span class="num">2.</span> เมื่อไหร่ที่ <code>ArrayTypeMismatchException</code> จะเกิดขึ้น?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>เมื่อพยายามหารค่า integral ด้วยศูนย์</span></li>
+        <li class="opt"><span class="k">B</span><span>เมื่อเข้าถึง index ของ array นอกขอบเขต</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>เมื่อพยายามเก็บค่าชนิดหนึ่งลงใน array ของอีกชนิดหนึ่ง</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> เช่น พยายามเก็บตัวเลขลงใน array ที่ประกาศเป็น string
+        ผ่านการ cast แบบ object array</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">35.9 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียน try-catch ล้อมโค้ดต่อไปนี้ ให้พิมพ์ <code>"เกิดข้อผิดพลาด: " + ex.Message</code>
+           แทนที่จะปล่อยให้แอปพัง</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+        <pre><code class="lang-cs">int[] scores = { 80, 90, 75 };
+Console.WriteLine(scores[5]);</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int[] scores = { 80, 90, 75 };
+try
+{
+    Console.WriteLine(scores[5]);
+}
+catch (Exception ex)
+{
+    Console.WriteLine("เกิดข้อผิดพลาด: " + ex.Message);
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ปรับเฉลยข้อ 1 ให้จับเฉพาะ <code>IndexOutOfRangeException</code> แทน <code>Exception</code>
+           ทั่วไป</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">try
+{
+    Console.WriteLine(scores[5]);
+}
+catch (IndexOutOfRangeException ex)
+{
+    Console.WriteLine("เกิดข้อผิดพลาด: " + ex.Message);
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p><b>Try-Catch Challenge</b> (โจทย์ต้นฉบับจาก Microsoft Learn) — จากโค้ดนี้ ปรับเฉพาะ
+           method <code>Process1</code> ให้จับ exception ที่เกิดใน <code>WriteMessage</code>
+           แล้วพิมพ์ <code>"Exception caught in Process1"</code> ห้ามแก้โค้ดนอก
+           <code>Process1</code></p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+        <pre><code class="lang-cs">try
+{
+    Process1();
+}
+catch
+{
+    Console.WriteLine("An exception has occurred");
+}
+
+Console.WriteLine("Exit program");
+
+static void Process1()
+{
+    WriteMessage();
+}
+
+static void WriteMessage()
+{
+    double float1 = 3000.0;
+    double float2 = 0.0;
+    int number1 = 3000;
+    int number2 = 0;
+
+    Console.WriteLine(float1 / float2);
+    Console.WriteLine(number1 / number2);
+}</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่แก้)</span></div>
+          <pre><code class="lang-cs">static void Process1()
+{
+    try
+    {
+        WriteMessage();
+    }
+    catch
+    {
+        Console.WriteLine("Exception caught in Process1");
+    }
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl h">ยาก</span></div>
+      <div class="ex-body">
+        <p><b>Catch Specific Exceptions Challenge</b> (โจทย์ต้นฉบับจาก Microsoft Learn) — เติม
+           argument ให้แต่ละ <code>catch</code> เพื่อให้ error message แสดงรายละเอียดจาก
+           <code>ex.Message</code> ครบทุกจุด</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+        <pre><code class="lang-cs">try
+{
+    int num1 = int.MaxValue;
+    int num2 = int.MaxValue;
+    int result = num1 + num2;
+    Console.WriteLine("Result: " + result);
+
+    string str = null;
+    int length = str.Length;
+    Console.WriteLine("String Length: " + length);
+
+    int[] numbers = new int[5];
+    numbers[5] = 10;
+    Console.WriteLine("Number at index 5: " + numbers[5]);
+
+    int num3 = 10;
+    int num4 = 0;
+    int result2 = num3 / num4;
+    Console.WriteLine("Result: " + result2);
+}
+catch (OverflowException)
+{
+    Console.WriteLine("Error: The number is too large to be represented as an integer.");
+}
+catch (NullReferenceException)
+{
+    Console.WriteLine("Error: The reference is null.");
+}
+catch (IndexOutOfRangeException)
+{
+    Console.WriteLine("Error: Index out of range.");
+}
+catch (DivideByZeroException)
+{
+    Console.WriteLine("Error: Cannot divide by zero.");
+}
+
+Console.WriteLine("Exiting program.");</code></pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ใส่ <code>(ExceptionType ex)</code> แทน <code>(ExceptionType)</code>
+           เฉยๆ แล้วต่อ <code>+ ex.Message</code> เข้ากับข้อความเดิม</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วน catch ทั้งหมด)</span></div>
+          <pre><code class="lang-cs">catch (OverflowException ex)
+{
+    Console.WriteLine("Error: The number is too large to be represented as an integer." + ex.Message);
+}
+catch (NullReferenceException ex)
+{
+    Console.WriteLine("Error: The reference is null." + ex.Message);
+}
+catch (IndexOutOfRangeException ex)
+{
+    Console.WriteLine("Error: Index out of range." + ex.Message);
+}
+catch (DivideByZeroException ex)
+{
+    Console.WriteLine("Error: Cannot divide by zero." + ex.Message);
+}</code></pre></div>
+          <p>สังเกตว่า try block มีถึง 4 จุดที่อาจก่อ exception แต่โค้ดจะหยุดที่จุด<b>แรก</b>
+             ที่เจอเสมอ (บวก int.MaxValue สองค่าเกินขอบเขต → OverflowException ทันที) จุดที่
+             เหลือจะไม่ถูกรันเลยในการรันครั้งเดียว — ต้องรันซ้ำหลายครั้งแก้ทีละจุดถึงจะเห็น
+             ผลลัพธ์ทั้ง 4 บรรทัดครบตามที่โจทย์ต้องการ</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s10">📌 สรุปบทที่ 35</h2>
+
+    <p>บทนี้พาคุณลงมือเขียน exception handling จริงด้วย <code>try</code>, <code>catch</code>
+       และ <code>finally</code> คุณเห็นว่า .NET runtime ค้นหา <code>catch</code> ที่เหมาะสม
+       อย่างไรผ่านกระบวนการ call stack unwinding รู้จัก exception พื้นฐานที่ runtime โยนบ่อยที่สุด
+       (DivideByZeroException, NullReferenceException, IndexOutOfRangeException ฯลฯ) และฝึก
+       จับ exception แบบเจาะจงชนิดพร้อมอ่าน property อย่าง <code>Message</code> เพื่อรายงาน
+       ปัญหาให้ผู้ใช้เห็น</p>
+
+    <p>หลักการสำคัญที่สุดคือ: จับเฉพาะ exception ที่โค้ดรู้วิธีแก้ไขจริง เรียง catch จากเจาะจง
+       ไปหากว้างเสมอ และอย่าปล่อยให้ catch block ว่างเปล่าซ่อนปัญหาไว้เงียบๆ บทถัดไปคุณจะได้
+       เรียนรู้อีกฝั่งหนึ่งของเหรียญ — การ<b>สร้างและโยน</b> exception ของคุณเองด้วย <code>throw</code></p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 35</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:32%">รายการ</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>try { } catch { }</code></td><td>ลองรันโค้ดที่อาจพัง แล้วดักจัดการถ้าพังจริง</td></tr>
+          <tr><td><code>catch (T ex) { }</code></td><td>จับเฉพาะ exception ชนิด T เก็บไว้ในตัวแปร ex</td></tr>
+          <tr><td><code>finally { }</code></td><td>รันเสมอไม่ว่าจะเกิด exception หรือไม่ ใช้เก็บกวาดทรัพยากร</td></tr>
+          <tr><td><code>ex.Message</code></td><td>ข้อความอธิบายสาเหตุของ exception</td></tr>
+          <tr><td>เรียง catch เจาะจง → กว้าง</td><td>catch (Exception ex) ทั่วไปต้องอยู่ล่างสุดเสมอ</td></tr>
+          <tr><td>call stack unwinding</td><td>runtime ไล่หา catch ที่เหมาะสมขึ้นไปตาม call stack</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s11">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>try block</td><td>บล็อกทดลอง</td><td>โค้ดที่อาจก่อ exception</td></tr>
+        <tr><td>catch block</td><td>บล็อกดักจับ</td><td>โค้ดจัดการ exception ที่เกิดขึ้น</td></tr>
+        <tr><td>finally block</td><td>บล็อกท้ายสุด</td><td>โค้ดที่รันเสมอ ไม่ว่าจะเกิด exception หรือไม่</td></tr>
+        <tr><td>call stack unwinding</td><td>การคลี่ call stack</td><td>กระบวนการไล่หา catch ที่เหมาะสมขึ้นไปตามลำดับการเรียก method</td></tr>
+        <tr><td>checked context</td><td>บริบทตรวจสอบ</td><td>บล็อกที่การแปลงชนิดเกินขอบเขตจะ throw OverflowException แทนตัดปัดเงียบๆ</td></tr>
+        <tr><td>exception property</td><td>คุณสมบัติของ exception</td><td>ข้อมูลในตัว exception object เช่น Message, StackTrace</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch34.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 34 · เครื่องมือ Debug ของ Visual Studio Code</span></a>
+      <a class="next" href="ch36.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 36 · สร้างและโยน Exception ของคุณเอง</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

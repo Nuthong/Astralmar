@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 10 · Arrays and foreach — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="10">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 2 · Create and Run Simple Console Apps / บทที่ 10</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 2 · โมดูล 4/8</span>
+      <h1>เก็บและวนซ้ำลำดับข้อมูลด้วย Array และ foreach</h1>
+      <div class="en">Store and Iterate Through Sequences of Data Using Arrays and the foreach Statement</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>55–75 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เก็บข้อมูลหลายค่าในตัวแปรเดียว และวนอ่านทีละค่าได้</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น–กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>สร้างและกำหนดค่าเริ่มต้นให้ array ใหม่ได้</li>
+        <li>กำหนดและเรียกคืนค่าของ element ใน array ได้</li>
+        <li>วนซ้ำทุก element ของ array ด้วย <code>foreach</code> ได้</li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">10.1 ทำไมต้องมี Array</h2>
+
+    <p>Array ของ C# ให้คุณเก็บลำดับของค่าไว้ในโครงสร้างข้อมูลเดียว พูดง่ายๆ คือตัวแปรตัวเดียว
+       ที่เก็บค่าได้หลายค่า พอมีตัวแปรเดียวที่เก็บค่าทั้งหมดแล้ว คุณเรียงลำดับ กลับลำดับ วนดูค่า
+       แต่ละค่าทีละตัวได้</p>
+
+    <p>สมมติคุณทำงานแผนกความปลอดภัยของบริษัทที่จับคู่ผู้ขายออนไลน์กับผู้ลงโฆษณาแบบจ่ายค่าคอมมิชชัน
+       คุณถูกขอให้เขียนโค้ด C# วนดู Order ID ของคำสั่งซื้อที่เข้ามา เพื่อตรวจหาคำสั่งซื้อที่อาจ
+       เป็นการฉ้อโกง — ต้องใช้ array ทำงานนี้</p>
+
+    <p>ในบทนี้คุณจะสร้างและกำหนดค่าเริ่มต้นให้ array กำหนด/เรียกคืนค่าจาก element ผ่าน index
+       และสร้าง loop วนทำงานกับทุก element ในนั้น</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">10.2 ลงมือ: พื้นฐาน Array</h2>
+
+    <h3 id="s02a">Array คืออะไร</h3>
+    <p><b>array</b> คือกลุ่มข้อมูลแต่ละชิ้นที่เข้าถึงได้ผ่านชื่อตัวแปรเดียว เข้าถึงแต่ละ element
+       ด้วย index ตัวเลขที่เริ่มนับจาก 0 (zero-based) array ให้คุณรวมค่าข้อมูลที่มีจุดประสงค์
+       หรือคุณลักษณะร่วมกันไว้ภายใต้ชื่อตัวแปรเดียว ทำให้ประมวลผลง่ายขึ้น</p>
+
+    <h3 id="s02b">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch10-arrays</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <h3 id="s02c">ประกาศ Array ใหม่</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[] fraudulentOrderIDs = new string[3];</code></pre>
+    </div>
+
+    <p>ตัวดำเนินการ <code>new</code> สร้าง instance ของ array ในหน่วยความจำที่เก็บค่า string
+       ได้ 3 ค่า วงเล็บเหลี่ยมชุดแรก <code>[]</code> แค่บอกคอมไพเลอร์ว่าตัวแปร
+       <code>fraudulentOrderIDs</code> เป็น array ส่วนวงเล็บเหลี่ยมชุดที่สอง <code>[3]</code>
+       บอกจำนวน element ที่ array นี้เก็บได้</p>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ไม่ใช่แค่ string</span>
+      ตัวอย่างนี้ใช้ string เพื่อลดความซับซ้อนตอนเริ่มต้น แต่จริงๆ สร้าง array ของชนิดข้อมูลไหนก็ได้
+      ทั้ง primitive อย่าง int, bool หรือชนิดซับซ้อนกว่าอย่าง class ก็ได้
+    </div>
+
+    <h3 id="s02d">กำหนดค่าให้ Element</h3>
+    <p>ตอนนี้ array มี 3 ช่องแต่ยังว่างเปล่า เข้าถึง element ด้วย index ตัวเลขเริ่มจาก 0
+       ในวงเล็บเหลี่ยม แล้วกำหนดค่าด้วย <code>=</code> เหมือนตัวแปรปกติ:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[] fraudulentOrderIDs = new string[3];
+
+fraudulentOrderIDs[0] = "A123";
+fraudulentOrderIDs[1] = "B456";
+fraudulentOrderIDs[2] = "C789";</code></pre>
+    </div>
+
+    <svg viewBox="0 0 620 130" role="img" aria-label="โครงสร้าง array แบบ zero-based index" style="margin:18px 0">
+      <g font-family="var(--font-th)" font-size="12.5">
+        <text x="10" y="16" fill="var(--text-faint)" font-size="12">fraudulentOrderIDs</text>
+        <rect x="10"  y="26" width="180" height="70" rx="9" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="100" y="50" text-anchor="middle" font-family="var(--font-code)" font-weight="700" fill="var(--brand-text)">"A123"</text>
+        <text x="100" y="78" text-anchor="middle" fill="var(--text-soft)">index [0]</text>
+
+        <rect x="210" y="26" width="180" height="70" rx="9" fill="var(--tip-soft)" stroke="var(--tip)"/>
+        <text x="300" y="50" text-anchor="middle" font-family="var(--font-code)" font-weight="700" fill="var(--tip)">"B456"</text>
+        <text x="300" y="78" text-anchor="middle" fill="var(--text-soft)">index [1]</text>
+
+        <rect x="410" y="26" width="180" height="70" rx="9" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text x="500" y="50" text-anchor="middle" font-family="var(--font-code)" font-weight="700" fill="var(--ok)">"C789"</text>
+        <text x="500" y="78" text-anchor="middle" fill="var(--text-soft)">index [2]</text>
+
+        <text x="300" y="118" text-anchor="middle" fill="var(--text-faint)" font-size="12">
+          ประกาศไว้ว่าเก็บได้ 3 ช่อง (new string[3]) แต่ index เริ่มนับจาก 0 เสมอ
+        </text>
+      </g>
+    </svg>
+
+    <h3 id="s02e">ลองใช้ Index ที่เกินขอบเขต</h3>
+    <p>เรื่องที่มือใหม่มักลืม: array ที่ประกาศไว้ 3 ช่อง เข้าถึงได้แค่ index <code>0</code>,
+       <code>1</code>, <code>2</code> เท่านั้น — index <code>3</code> ไม่มีอยู่จริง! ลองดูว่า
+       เกิดอะไรขึ้น:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+      <pre><code class="lang-cs">fraudulentOrderIDs[3] = "D000";</code></pre>
+    </div>
+    <div class="out err auto"><div class="out-bar">Output (ตอนรัน dotnet run)</div><pre>
+Unhandled exception. System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at Program.&lt;Main&gt;$(String[] args) in ...\Program.cs:line 6</pre></div>
+
+    <p>สังเกตว่านี่คือ <b>runtime exception</b> ไม่ใช่ compile error — โค้ด build ผ่านปกติ แต่พัง
+       ตอนรันจริง คอมเมนต์บรรทัดนี้ทิ้งไปก่อน (<code>// fraudulentOrderIDs[3] = "D000";</code>)</p>
+
+    <h3 id="s02f">เรียกคืนค่าจาก Element</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] fraudulentOrderIDs = new string[3];
+
+fraudulentOrderIDs[0] = "A123";
+fraudulentOrderIDs[1] = "B456";
+fraudulentOrderIDs[2] = "C789";
+// fraudulentOrderIDs[3] = "D000";
+
+Console.WriteLine($"First: {fraudulentOrderIDs[0]}");
+Console.WriteLine($"Second: {fraudulentOrderIDs[1]}");
+Console.WriteLine($"Third: {fraudulentOrderIDs[2]}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+First: A123
+Second: B456
+Third: C789</pre></div>
+
+    <h3 id="s02g">กำหนดค่าใหม่ให้ Element</h3>
+    <p>element ของ array ก็เหมือนตัวแปรทั่วไป กำหนด/เรียกคืน/กำหนดค่าใหม่ได้:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เพิ่มท้าย</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">fraudulentOrderIDs[0] = "F000";
+
+Console.WriteLine($"Reassign First: {fraudulentOrderIDs[0]}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output รวม</div><pre>
+First: A123
+Second: B456
+Third: C789
+Reassign First: F000</pre></div>
+
+    <h3 id="s02h">Initialize Array ในบรรทัดเดียว</h3>
+    <p>เหมือนตัวแปรทั่วไป array ก็ initialize ในบรรทัดเดียวได้ ใช้ <b>collection expression
+       syntax</b> (C# 12 ขึ้นไป รองรับใน .NET 10):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[] fraudulentOrderIDs = [ "A123", "B456", "C789" ];</code></pre>
+    </div>
+
+    <p>คุณอาจเห็นไวยากรณ์เก่ากว่าที่ใช้ปีกกา <code>{}</code> ก็ได้:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — ไวยากรณ์เก่า (ก็ยังถูกต้อง)</span></div>
+      <pre><code class="lang-cs">string[] fraudulentOrderIDs = { "A123", "B456", "C789" };</code></pre>
+    </div>
+
+    <div class="note">
+      <span class="lbl">ℹ️ ทั้งสองแบบถูกต้อง</span>
+      คุณอาจเห็นทั้งสองรูปแบบผสมกันในหลักสูตรนี้และในโค้ดจริงทั่วไป — เลือกใช้แบบไหนก็ได้
+      แต่ควรใช้ให้สม่ำเสมอในโปรเจกต์เดียวกัน
+    </div>
+
+    <h3 id="s02i">Property Length ของ Array</h3>
+    <p>บางครั้งคุณไม่รู้ล่วงหน้าว่า array มีกี่ element ใช้ property <code>Length</code>
+       หาขนาดได้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] fraudulentOrderIDs = [ "A123", "B456", "C789" ];
+
+Console.WriteLine($"There are {fraudulentOrderIDs.Length} fraudulent orders to process.");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+There are 3 fraudulent orders to process.</pre></div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ Length ไม่ใช่ zero-based</span>
+      <code>Length</code> คืนจำนวน element จริง (3 ช่อง = <code>Length</code> เท่ากับ 3) ต่างจาก
+      index ที่นับจาก 0 — index สูงสุดที่ใช้ได้เสมอคือ <code>Length - 1</code>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch10-a"><span>ประกาศและกำหนดค่า array แบบทีละ index สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch10-b"><span>เจอ IndexOutOfRangeException ด้วยตัวเอง</span></label></li>
+      <li><label><input type="checkbox" id="ch10-c"><span>ลอง initialize ทั้งสองแบบ ([...] และ {...})</span></label></li>
+      <li><label><input type="checkbox" id="ch10-d"><span>ใช้ .Length หาขนาด array สำเร็จ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">10.3 ลงมือ: ใช้ foreach วนซ้ำ Array</h2>
+
+    <p>สมมติคุณทำงานให้บริษัทผลิตสินค้า ต้องนับสต็อกสินค้าพร้อมส่งในโกดัง ต้องรายงานทั้งจำนวนรวม
+       และจำนวนในแต่ละถังเก็บ พร้อมยอดสะสม (running total) เพื่อใช้ตรวจสอบย้อนหลัง</p>
+
+    <h3 id="s03a">วนลูปผ่าน Array ด้วย foreach</h3>
+    <p><code>foreach</code> เป็นวิธีง่ายและสะอาดที่สุดในการวนดูทุก element ของ array —
+       ประมวลผลตามลำดับ index จากน้อยไปมาก เริ่มที่ 0 จนถึง <code>Length - 1</code> ใช้ตัวแปร
+       ชั่วคราวเก็บค่า element ปัจจุบันในแต่ละรอบ:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] names = { "Rowena", "Robin", "Bao" };
+foreach (string name in names)
+{
+    Console.WriteLine(name);
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Rowena
+Robin
+Bao</pre></div>
+
+    <p>ทุกครั้งที่ .NET runtime วนไปยัง element ถัดไปของ <code>names</code> ค่านั้นจะถูกกำหนดให้
+       ตัวแปรชั่วคราว <code>name</code> เพื่อให้เข้าถึงได้ง่ายใน code block</p>
+
+    <h3 id="s03b">สร้างและ Initialize Array แบบ int</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">int[] inventory = { 200, 450, 700, 175, 250 };</code></pre>
+    </div>
+
+    <h3 id="s03c">เพิ่ม foreach วนอ่าน</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">foreach (int items in inventory)
+{
+
+}</code></pre>
+    </div>
+
+    <h3 id="s03d">รวมยอดทุก Element</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int[] inventory = { 200, 450, 700, 175, 250 };
+int sum = 0;
+foreach (int items in inventory)
+{
+    sum += items;
+}
+
+Console.WriteLine($"We have {sum} items in inventory.");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+We have 1775 items in inventory.</pre></div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ ประกาศ sum ไว้นอก foreach เสมอ</span>
+      ถ้าประกาศ <code>int sum = 0;</code> ไว้<b>ข้างใน</b> code block ของ <code>foreach</code>
+      มันจะถูกรีเซ็ตเป็น 0 ใหม่ทุกรอบ ทำให้ยอดสะสมไม่ทำงาน — ต้องประกาศไว้<b>ก่อน</b>
+      <code>foreach</code> เริ่ม
+    </div>
+
+    <h3 id="s03e">แสดงยอดสะสมพร้อมหมายเลขถัง</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int[] inventory = { 200, 450, 700, 175, 250 };
+int sum = 0;
+int bin = 0;
+foreach (int items in inventory)
+{
+    sum += items;
+    bin++;
+    Console.WriteLine($"Bin {bin} = {items} items (Running total: {sum})");
+}
+Console.WriteLine($"We have {sum} items in inventory.");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Bin 1 = 200 items (Running total: 200)
+Bin 2 = 450 items (Running total: 650)
+Bin 3 = 700 items (Running total: 1350)
+Bin 4 = 175 items (Running total: 1525)
+Bin 5 = 250 items (Running total: 1775)
+We have 1775 items in inventory.</pre></div>
+
+    <p>ใช้ <code>bin++</code> เพิ่มค่าทีละ 1 ทุกรอบ — เป็นทางลัดของ <code>bin = bin + 1;</code>
+       (ทบทวนได้ที่ <a href="ch04.html">บทที่ 4</a>)</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch10-e"><span>วนอ่าน array ด้วย foreach สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch10-f"><span>สร้างยอดสะสม (running total) ได้ถูกต้อง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">10.4 ท้าทาย: หา Order ID ต้องสงสัย</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl m">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>ทีมของคุณพบแพทเทิร์นว่า Order ID ที่ขึ้นต้นด้วยตัวอักษร "B" มีอัตราฉ้อโกงสูงกว่าปกติ
+           25 เท่า ให้เขียนโค้ดพิมพ์ Order ID ที่ขึ้นต้นด้วย "B" ออกมา จากอาร์เรย์นี้:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">ข้อมูลตั้งต้น</span></div>
+        <pre><code class="lang-cs">B123
+C234
+A345
+C15
+B177
+G3003
+C235
+B179</code></pre></div>
+        <p>ใช้ <code>foreach</code> วนดูทุก element ใช้เมธอด <code>String.StartsWith()</code>
+           เช็คว่าขึ้นต้นด้วย "B" หรือไม่:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่างการใช้ StartsWith()</span></div>
+        <pre><code class="lang-cs">string name = "Bob";
+if (name.StartsWith("B"))
+{
+    Console.WriteLine("The name starts with 'B'!");
+}</code></pre></div>
+        <div class="out auto"><div class="out-bar">ผลลัพธ์ที่ต้องได้</div><pre>
+B123
+B177
+B179</pre></div>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>โครงสร้างคือ: ประกาศ array ของ string → <code>foreach</code> วนดูทุกตัว → ข้างใน
+             ใช้ <code>if</code> เช็ค <code>StartsWith("B")</code> → ถ้าจริงค่อยพิมพ์</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s05">10.5 เฉลยและวิเคราะห์</h2>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เฉลยตัวอย่าง</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string[] orderIDs = { "B123", "C234", "A345", "C15", "B177", "G3003", "C235", "B179" };
+
+foreach (string orderID in orderIDs)
+{
+    if (orderID.StartsWith("B"))
+    {
+        Console.WriteLine(orderID);
+    }
+}</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+B123
+B177
+B179</pre></div>
+
+    <p>โค้ดนี้ผสมสิ่งที่เรียนมาจากสองบทเข้าด้วยกัน: <code>foreach</code> จากบทนี้ วนดูทุก element
+       และ <code>if</code> จาก<a href="ch09.html">บทที่ 9</a> คัดกรองเฉพาะที่ตรงเงื่อนไข —
+       เป็นรูปแบบที่จะพบบ่อยมากในแอปจริง (วนดูข้อมูล + คัดกรองตามเงื่อนไข)</p>
+
+    <!-- ============================================ -->
+    <h2 id="s06">10.6 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>IndexOutOfRangeException</code></td>
+          <td>เข้าถึง index ที่ไม่มีอยู่จริง — array ขนาด N ใช้ index ได้แค่ 0 ถึง N-1 เท่านั้น</td>
+        </tr>
+        <tr>
+          <td>ลืมว่า index เริ่มจาก 0</td>
+          <td>element ตัวที่ "สาม" อยู่ที่ index <code>2</code> ไม่ใช่ <code>3</code></td>
+        </tr>
+        <tr>
+          <td>ตัวแปรสะสม (sum) รีเซ็ตทุกรอบ</td>
+          <td>ประกาศตัวแปรไว้<b>ข้างใน</b> code block ของ foreach โดยไม่ตั้งใจ — ต้องประกาศไว้
+              นอก foreach เสมอ ถ้าต้องการให้ค่าคงอยู่ข้ามรอบ</td>
+        </tr>
+        <tr>
+          <td>สับสน .Length กับ index สูงสุด</td>
+          <td><code>Length</code> คือจำนวน element (ไม่ zero-based) แต่ index สูงสุดที่ใช้ได้คือ
+              <code>Length - 1</code> เสมอ</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">10.7 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Microsoft Learn (2 ข้อฝังในเนื้อหา + 3 ข้อ Module Assessment)</p>
+
+    <div class="quiz" data-q="10-1">
+      <p class="q"><span class="num">1.</span> array คืออะไร?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ตัวแปรชนิด string</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>กลุ่มข้อมูลแต่ละชิ้นที่เข้าถึงได้ผ่านชื่อตัวแปรเดียว</span></li>
+        <li class="opt"><span class="k">C</span><span>.NET Class Library</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> array เก็บได้ทุกชนิดข้อมูล ไม่ใช่แค่ string (ข้อ A แคบเกินไป)</div>
+    </div>
+
+    <div class="quiz" data-q="10-2">
+      <p class="q"><span class="num">2.</span> ข้อใดสร้างและกำหนดค่าเริ่มต้นให้ array ได้ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>string[] myarray = new string[3]; myarray = "test1"; myarray = "test2"; myarray = "test3";</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>string[] myarray = string[3]; myarray[0] = test1; ...</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>int[] myarray = new int[3]; myarray[0] = 1; myarray[1] = 2; myarray[2] = 3;</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ใช้ index ในวงเล็บเหลี่ยมกำหนดค่าแต่ละช่องถูกต้อง
+        ข้อ A ไม่มี index เลย (พยายามกำหนดค่าให้ตัวแปร array ทั้งก้อนเป็น string ซึ่งผิดชนิด)
+        ข้อ B ขาด <code>new</code> และค่า string ไม่ได้ใส่เครื่องหมายคำพูด</div>
+    </div>
+
+    <div class="quiz" data-q="10-3">
+      <p class="q"><span class="num">3.</span> วิธีใดใช้เข้าถึง element ตัวที่สามของ array ได้ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>myArray[3]</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>myArray[2]</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>myArray{3}</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> index เริ่มนับจาก 0 element ตัวที่สามจึงอยู่ที่ index 2
+        ข้อ A จะได้ตัวที่สี่ (ถ้ามี) หรือ error ถ้าไม่มี ข้อ C ใช้ปีกกาผิดประเภทวงเล็บ</div>
+    </div>
+
+    <div class="quiz" data-q="10-4">
+      <p class="q"><span class="num">4.</span> ข้อใดสร้าง int array ขนาด 3 ช่องได้ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>int[] myArray = new int[3];</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>int[] myArray = new int[2];</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>int myArray = new int[3];</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ข้อ B ได้แค่ 2 ช่อง ข้อ C ขาด <code>[]</code> หลัง
+        ชื่อชนิดข้อมูลตอนประกาศตัวแปร (ผิดชนิด ไม่ใช่ array)</div>
+    </div>
+
+    <div class="quiz" data-q="10-5">
+      <p class="q"><span class="num">5.</span> foreach statement ข้อใดถูกไวยากรณ์?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>foreach (int value in values)</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>foreach (int value of values)</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>foreach (int value with values)</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> C# ใช้คีย์เวิร์ด <code>in</code> — <code>of</code>
+        เป็นไวยากรณ์ของ JavaScript ไม่ใช่ C#</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">10.8 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>สร้าง array ของ int เก็บคะแนนสอบ 5 วิชา: 85, 90, 78, 92, 88 แล้ว foreach พิมพ์
+           ทีละค่าออกมา</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int[] scores = { 85, 90, 78, 92, 88 };
+foreach (int score in scores)
+{
+    Console.WriteLine(score);
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ต่อจากข้อ 1 คำนวณคะแนนเฉลี่ยด้วย foreach (บวกสะสมแล้วหารด้วย .Length)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int[] scores = { 85, 90, 78, 92, 88 };
+int sum = 0;
+foreach (int score in scores)
+{
+    sum += score;
+}
+decimal average = (decimal)sum / scores.Length;
+Console.WriteLine($"เฉลี่ย: {average}");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>โค้ดนี้ error ตอนรัน หาสาเหตุและแก้ไข:</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ผิด)</span></div>
+        <pre><code class="lang-cs">int[] numbers = { 10, 20, 30 };
+Console.WriteLine(numbers[3]);</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p><code>IndexOutOfRangeException</code> — array มี 3 ช่อง (index 0,1,2) แต่พยายาม
+             เข้าถึง index 3 ที่ไม่มีอยู่จริง แก้เป็น <code>numbers[2]</code> ถ้าต้องการค่าสุดท้าย</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>สร้าง array ของชื่อผลไม้ 6 ชนิด ใช้ foreach นับว่ามีกี่ชนิดที่ชื่อยาวเกิน 5 ตัวอักษร
+           (ใช้ property <code>.Length</code> ของ string เทียบ — คนละตัวกับ .Length ของ array)</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p><code>string</code> ก็มี property <code>.Length</code>
+           เหมือนกัน แต่หมายถึงจำนวนตัวอักษร ไม่ใช่จำนวน element</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string[] fruits = { "apple", "banana", "kiwi", "pineapple", "fig", "mango" };
+int count = 0;
+foreach (string fruit in fruits)
+{
+    if (fruit.Length > 5)
+    {
+        count++;
+    }
+}
+Console.WriteLine($"มี {count} ชนิดที่ชื่อยาวเกิน 5 ตัวอักษร");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงโจทย์ 10.4 ให้หา Order ID ที่ขึ้นต้นด้วย "C" <b>และ</b>ยาวเกิน 4 ตัวอักษร
+           (จากข้อมูลเดิม ควรได้แค่ <code>C234</code> กับ <code>C235</code> เพราะ C15 สั้นไป)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string[] orderIDs = { "B123", "C234", "A345", "C15", "B177", "G3003", "C235", "B179" };
+
+foreach (string orderID in orderIDs)
+{
+    if (orderID.StartsWith("C") && orderID.Length > 4)
+    {
+        Console.WriteLine(orderID);
+    }
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>สร้าง array เก็บอุณหภูมิ 7 วัน (เลือกค่าเอง เป็น int) ใช้ foreach หาว่าวันไหนร้อนที่สุด
+           (ค่าสูงสุด) โดย<b>ห้ามใช้เมธอดสำเร็จรูป</b>อย่าง <code>Array.Max()</code> หรือ
+           <code>Math.Max()</code> — ต้องเทียบค่าด้วย if เอง แล้วพิมพ์ทั้งค่าและลำดับวันที่
+           (1-7) ที่ร้อนที่สุด</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ตั้งตัวแปร "ค่าสูงสุดเท่าที่เจอ" ไว้ก่อนเริ่ม foreach (ใช้ค่าช่องแรก
+           เป็นค่าเริ่มต้น) แล้วอัปเดตทุกครั้งที่เจอค่าที่มากกว่า พร้อมนับลำดับวันไปด้วย
+           (คล้ายตัวแปร bin ในหัวข้อ 10.3)</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int[] temps = { 31, 34, 29, 36, 33, 30, 35 };
+int day = 0;
+int hottestDay = 0;
+int hottestTemp = temps[0];
+
+foreach (int temp in temps)
+{
+    day++;
+    if (temp > hottestTemp)
+    {
+        hottestTemp = temp;
+        hottestDay = day;
+    }
+}
+
+Console.WriteLine($"วันที่ร้อนที่สุดคือวันที่ {hottestDay} ({hottestTemp} องศา)");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">📌 สรุปบทที่ 10</h2>
+
+    <p>เป้าหมายของบทนี้คือทำงานกับลำดับ Order ID แบบเป็นโปรแกรม เพื่อหาคำสั่งซื้อที่อาจฉ้อโกง
+       คุณสร้าง array ของ Order ID แล้ววนดูทุก element เพื่อหาคุณลักษณะร่วมที่บ่งชี้การฉ้อโกง
+       array ช่วยให้เก็บแต่ละ Order ID เป็น element ของตัวแปรเดียว เข้าถึงแต่ละ element ด้วย
+       index ตัวเลขเริ่มจาก 0 กำหนด/เรียกคืนค่าได้ และวนดูค่าทุกตัวเพื่อตรวจสอบหรือแสดงผลได้
+       ลองนึกภาพว่าจะยากแค่ไหนถ้าไม่มีโครงสร้างแบบ array — คุณต้องรู้ล่วงหน้าว่าจะมีข้อมูลกี่ชิ้น
+       แล้วสร้างตัวแปรแยกทีละตัว ซึ่งเปราะบางมาก</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 10</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:38%">ไวยากรณ์</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>ชนิด[] ชื่อ = new ชนิด[n];</code></td><td>ประกาศ array ว่าง ขนาด n</td></tr>
+          <tr><td><code>ชื่อ[i] = ค่า;</code></td><td>กำหนดค่าให้ element ที่ index i</td></tr>
+          <tr><td><code>ชนิด[] ชื่อ = [ a, b, c ];</code></td><td>ประกาศ+initialize (C# 12 ขึ้นไป)</td></tr>
+          <tr><td><code>ชนิด[] ชื่อ = { a, b, c };</code></td><td>ประกาศ+initialize (ไวยากรณ์เก่า)</td></tr>
+          <tr><td><code>ชื่อ.Length</code></td><td>จำนวน element ทั้งหมด (ไม่ zero-based)</td></tr>
+          <tr><td><code>foreach (ชนิด v in ชื่อ) { }</code></td><td>วนอ่านทุก element ทีละตัว</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s10">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>array</td><td>อาร์เรย์</td><td>โครงสร้างเก็บค่าหลายค่าในตัวแปรเดียว</td></tr>
+        <tr><td>element</td><td>สมาชิก / ช่อง</td><td>ค่าแต่ละค่าใน array</td></tr>
+        <tr><td>index</td><td>ดัชนี</td><td>ตำแหน่งของ element เริ่มนับจาก 0</td></tr>
+        <tr><td>zero-based</td><td>เริ่มนับจากศูนย์</td><td>ระบบนับที่ index แรกคือ 0 ไม่ใช่ 1</td></tr>
+        <tr><td>Length</td><td>ความยาว</td><td>property บอกจำนวน element ทั้งหมด</td></tr>
+        <tr><td>foreach statement</td><td>คำสั่ง foreach</td><td>วนอ่านทุก element ของ array ทีละตัว</td></tr>
+        <tr><td>IndexOutOfRangeException</td><td>ข้อยกเว้นดัชนีเกินขอบเขต</td><td>runtime error จากการเข้าถึง index ที่ไม่มีอยู่</td></tr>
+        <tr><td>running total</td><td>ยอดสะสม</td><td>ผลรวมที่อัปเดตต่อเนื่องระหว่างวนลูป</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch09.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 9 · Add Decision Logic</span></a>
+      <a class="next" href="ch11.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 11 · Create Readable Code</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

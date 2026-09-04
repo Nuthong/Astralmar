@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 14 · Evaluate Boolean Expressions — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="14">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 3 · Add Logic to Console Apps / บทที่ 14</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 3 · โมดูล 1/7</span>
+      <h1>ประเมิน Boolean Expression เพื่อตัดสินใจ</h1>
+      <div class="en">Evaluate Boolean Expressions to Make Decisions</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>55–75 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เขียนเงื่อนไขซับซ้อนได้แม่นยำและกระชับขึ้น</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น–กลาง</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>ใช้ตัวดำเนินการสร้าง Boolean expression ทดสอบการเปรียบเทียบและความเท่ากันได้</li>
+        <li>ใช้เมธอดสำเร็จรูปของคลาส string ประเมินสตริงได้แม่นยำขึ้น</li>
+        <li>ใช้ตัวดำเนินการนิเสธ (negation) ทดสอบเงื่อนไขตรงข้ามได้</li>
+        <li>ใช้ตัวดำเนินการเงื่อนไข (conditional operator) ประเมินแบบ inline ได้</li>
+      </ul>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 ทำไมเพิ่งมาเจาะลึกตอนนี้</span>
+      คุณใช้ <code>==</code>, <code>&gt;</code>, <code>&&</code>, <code>||</code> มาตั้งแต่
+      <a href="ch09.html">บทที่ 9</a> แล้ว แต่ยังไม่เคยเรียนอย่างเป็นทางการว่ามีตัวดำเนินการอะไร
+      อีกบ้าง และมีข้อควรระวังอะไรบ้าง (โดยเฉพาะเรื่องเทียบ string) — บทนี้คือหลักสูตรเต็มเรื่อง
+      Boolean expression โดยเฉพาะ ตามที่สัญญาไว้ในบทที่ 9
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">14.1 ทำไมต้องรู้จัก Boolean Expression ให้ลึกซึ้ง</h2>
+
+    <p>ตรรกะการตัดสินใจตั้งอยู่บน expression ที่เรียกว่า Boolean expression ซึ่งประเมินได้เป็น
+       "true" หรือ "false" นักพัฒนาใช้ตัวดำเนินการหลากหลายชนิดสร้าง Boolean expression ให้ตรงกับ
+       ความต้องการ พอ expression ถูกประเมินแล้ว การทำงานของโค้ดจะแตกสาขาตามผลลัพธ์ C# รองรับ
+       ตัวดำเนินการหลากหลาย (เช่น equality, comparison, Boolean operator) แต่ละแบบมีจุดประสงค์
+       เฉพาะตัวตอนสร้างตรรกะการตัดสินใจ</p>
+
+    <p>สมมติคุณถูกเลือกให้ทำงานกับชุดแอป C# หลายตัวที่ใช้ประมวลผลข้อมูลลูกค้าและอินพุตจากผู้ใช้
+       แต่ละแอปต้องมีตรรกะการตัดสินใจที่ตอบโจทย์ข้อกำหนดและกฎธุรกิจที่ต่างกันไป เช่น แอปประมวลผล
+       คำสั่งซื้ออาจต้องเช็คสถานะลูกค้าก่อนดำเนินการ เพื่อเตรียมตัวสำหรับงานนี้ คุณจะฝึกฝนด้วย
+       กิจกรรมที่ใช้ Boolean expression และตัวดำเนินการของ C#</p>
+
+    <p>ในบทนี้ คุณจะเรียนเรื่อง Boolean expression และใช้ตัวดำเนินการหลายแบบประเมิน expression
+       เพื่อทดสอบความเท่ากัน ความไม่เท่ากัน และการเปรียบเทียบ คุณจะได้เรียนใช้ตัวดำเนินการเงื่อนไข
+       (conditional operator) ซึ่งเป็นเวอร์ชัน inline พิเศษของ <code>if</code> ที่ให้ผลแบบ
+       "อย่างใดอย่างหนึ่ง"</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">14.2 ลงมือ: ความเท่ากัน ไม่เท่ากัน และการเปรียบเทียบ</h2>
+
+    <h3 id="s02a">Expression คืออะไร</h3>
+    <p><b>expression</b> คือการรวมกันของค่า (literal หรือตัวแปร) ตัวดำเนินการ และเมธอด ที่คืนค่า
+       เดียวออกมา ส่วน <b>statement</b> คือคำสั่งสมบูรณ์หนึ่งชุดใน C# ซึ่งประกอบด้วย expression
+       ตั้งแต่หนึ่งตัวขึ้นไป เช่น <code>if</code> statement นี้มี expression เดียวที่คืนค่าเดียว:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง</span></div>
+      <pre><code class="lang-cs">if (myName == "Luiz")</code></pre>
+    </div>
+
+    <p>expression บางตัวคืนตัวเลขหรือ string แต่เวลาใช้ในเงื่อนไข <code>if</code> จะเป็น
+       expression ที่คืนค่า <code>true</code> หรือ <code>false</code> เท่านั้น — เรียกว่า
+       <b>Boolean expression</b> Boolean expression สำคัญมาก เพราะโค้ดใช้มันตัดสินว่าจะรัน
+       code block ไหน</p>
+
+    <h3 id="s02b">เตรียมโปรเจกต์</h3>
+    <div class="code joined">
+      <div class="code-bar"><span class="dot"></span><span class="name">Terminal</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code>dotnet new console -o ch14-boolean</code></pre>
+    </div>
+    <div class="out auto"><pre> </pre></div>
+
+    <h3 id="s02c">ตัวดำเนินการความเท่ากัน (==) และไม่เท่ากัน (!=)</h3>
+    <p>ตัวดำเนินการความเท่ากัน <code>==</code> คืนค่า <code>true</code> ถ้าค่าทั้งสองข้างเท่ากัน
+       ตัวดำเนินการความไม่เท่ากัน <code>!=</code> คืนค่า <code>true</code> ถ้าค่าทั้งสองข้าง
+       <b>ไม่</b>เท่ากัน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("a" == "a");
+Console.WriteLine("a" == "A");
+Console.WriteLine(1 == 2);
+
+string myValue = "a";
+Console.WriteLine(myValue == "a");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+True
+False
+False
+True</pre></div>
+
+    <h3 id="s02d">ปรับปรุงการเทียบ String ให้แม่นยำขึ้น</h3>
+    <p>คุณอาจแปลกใจว่า <code>"a" == "A"</code> ได้ <code>false</code> — เพราะเทียบ string
+       คำนึงตัวพิมพ์เล็ก-ใหญ่ด้วย และถ้ามีช่องว่างเกินมา เช่น <code>"a" == "a "</code>
+       ก็จะได้ <code>false</code> เช่นกัน</p>
+
+    <p>บางกรณีช่องว่างหน้า-หลังหรือตัวพิมพ์ต่างกันอาจยอมรับได้ ถ้าต้องการให้จับคู่แบบไม่เป๊ะ
+       เกินไป ต้อง "massage" ข้อมูลก่อน (ทำความสะอาดก่อนเทียบ) ตัวอย่างเช่น ถามผู้ใช้ว่า
+       "ต้องการทำต่อไหม (Y/N)?" ผู้ใช้อาจพิมพ์ <code>y</code> หรือ <code>Y</code> ก็ได้
+       คุณอยากให้โค้ดตีความทั้งสองแบบเหมือนกัน แม้ <code>y</code> จะไม่เท่ากับ <code>Y</code>
+       ตรงๆ ก็ตาม</p>
+
+    <p>ก่อนเทียบ string สองค่า โดยเฉพาะถ้ามาจากผู้ใช้ ควร:</p>
+    <ul>
+      <li>ทำให้ทั้งสองค่าเป็นตัวพิมพ์ใหญ่หรือเล็กทั้งหมด ด้วย <code>ToUpper()</code> หรือ
+          <code>ToLower()</code></li>
+      <li>ตัดช่องว่างหน้า-หลังทิ้ง ด้วย <code>Trim()</code></li>
+    </ul>
+
+    <svg viewBox="0 0 720 130" role="img" aria-label="ขั้นตอน massage ข้อมูล string ก่อนเทียบ" style="margin:18px 0">
+      <defs>
+        <marker id="ar14" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="var(--text-faint)"/>
+        </marker>
+      </defs>
+      <g font-family="var(--font-th)" font-size="12.5">
+        <rect x="10"  y="20" width="180" height="90" rx="10" fill="var(--bg-soft)" stroke="var(--line)"/>
+        <text x="100" y="46" text-anchor="middle" font-weight="700" fill="var(--text)">" a"</text>
+        <text x="100" y="68" text-anchor="middle" fill="var(--text-soft)">ค่าดิบจากผู้ใช้</text>
+        <text x="100" y="86" text-anchor="middle" fill="var(--text-soft)">มีช่องว่างปน</text>
+
+        <line x1="196" y1="65" x2="228" y2="65" stroke="var(--text-faint)" marker-end="url(#ar14)"/>
+        <rect x="234" y="20" width="180" height="90" rx="10" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="324" y="46" text-anchor="middle" font-family="var(--font-code)" font-weight="700" fill="var(--brand-text)">.Trim()</text>
+        <text x="324" y="68" text-anchor="middle" fill="var(--text-soft)">ตัดช่องว่าง</text>
+        <text x="324" y="86" text-anchor="middle" fill="var(--text-soft)">หน้า-หลังทิ้ง</text>
+
+        <line x1="420" y1="65" x2="452" y2="65" stroke="var(--text-faint)" marker-end="url(#ar14)"/>
+        <rect x="458" y="20" width="180" height="90" rx="10" fill="var(--warn-soft)" stroke="var(--warn)"/>
+        <text x="548" y="46" text-anchor="middle" font-family="var(--font-code)" font-weight="700" fill="var(--warn)">.ToLower()</text>
+        <text x="548" y="68" text-anchor="middle" fill="var(--text-soft)">แปลงเป็น</text>
+        <text x="548" y="86" text-anchor="middle" fill="var(--text-soft)">ตัวพิมพ์เล็กหมด</text>
+      </g>
+    </svg>
+
+    <p>ปรับปรุงการเทียบ string ได้โดย chain สองเมธอดนี้เข้าด้วยกันทั้งสองฝั่ง:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string value1 = " a";
+string value2 = "A ";
+Console.WriteLine(value1.Trim().ToLower() == value2.Trim().ToLower());</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+True</pre></div>
+
+    <h3 id="s02e">ตัวดำเนินการความไม่เท่ากัน (!=)</h3>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine("a" != "a");
+Console.WriteLine("a" != "A");
+Console.WriteLine(1 != 2);
+
+string myValue = "a";
+Console.WriteLine(myValue != "a");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+False
+True
+True
+False</pre></div>
+
+    <p>ตามคาด ผลลัพธ์เมื่อใช้ตัวดำเนินการความไม่เท่ากัน จะตรงข้ามกับตอนใช้ความเท่ากัน — โค้ดของคุณ
+       ก็จะแตกสาขาไปในทางตรงข้ามเช่นกัน ซึ่งบางครั้งก็เป็นสิ่งที่คุณต้องการพอดี</p>
+
+    <h3 id="s02f">ตัวดำเนินการเปรียบเทียบ</h3>
+    <p>เวลาทำงานกับข้อมูลตัวเลข อาจอยากรู้ว่าค่าหนึ่งมากกว่าหรือน้อยกว่าอีกค่าหนึ่ง ใช้ตัวดำเนินการ
+       เหล่านี้:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:16%">ตัวดำเนินการ</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td><code>&gt;</code></td><td>มากกว่า</td></tr>
+        <tr><td><code>&lt;</code></td><td>น้อยกว่า</td></tr>
+        <tr><td><code>&gt;=</code></td><td>มากกว่าหรือเท่ากับ</td></tr>
+        <tr><td><code>&lt;=</code></td><td>น้อยกว่าหรือเท่ากับ</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">Console.WriteLine(1 > 2);
+Console.WriteLine(1 < 2);
+Console.WriteLine(1 >= 1);
+Console.WriteLine(1 <= 1);</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+False
+True
+True
+True</pre></div>
+
+    <h3 id="s02g">เมธอดที่คืนค่า Boolean</h3>
+    <p>บางเมธอดคืนค่า <code>bool</code> (<code>true</code>/<code>false</code>) เมธอดของคลาส
+       <code>string</code> หลายตัวคืน bool รวมถึง <code>Contains()</code>,
+       <code>StartsWith()</code>, และ <code>EndsWith()</code> (ทบทวน StartsWith ได้ที่
+       <a href="ch10.html">บทที่ 10</a>):</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string pangram = "The quick brown fox jumps over the lazy dog.";
+Console.WriteLine(pangram.Contains("fox"));
+Console.WriteLine(pangram.Contains("cow"));</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+True
+False</pre></div>
+
+    <h3 id="s02h">การนิเสธเชิงตรรกะ (Logical Negation)</h3>
+    <p><b>logical negation</b> คือตัวดำเนินการนิเสธ (unary) <code>!</code> บางคนเรียกว่า
+       "not operator" เวลาวาง <code>!</code> ไว้หน้า conditional expression มันบังคับให้โค้ดกลับ
+       ผลการประเมิน — ถ้า operand เป็น <code>false</code> จะได้ <code>true</code> ถ้า operand
+       เป็น <code>true</code> จะได้ <code>false</code></p>
+
+    <p>สองบรรทัดนี้ให้ผลลัพธ์เหมือนกัน บรรทัดที่สองกระชับกว่า:</p>
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">// สองบรรทัดนี้ให้ผลลัพธ์เดียวกัน
+Console.WriteLine(pangram.Contains("fox") == false);
+Console.WriteLine(!pangram.Contains("fox"));</code></pre>
+    </div>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">string pangram = "The quick brown fox jumps over the lazy dog.";
+Console.WriteLine(!pangram.Contains("fox"));
+Console.WriteLine(!pangram.Contains("cow"));</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+False
+True</pre></div>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ อย่าสับสน != กับ !</span>
+      ตัวดำเนินการความไม่เท่ากัน <code>!=</code> มีเครื่องหมาย <code>!</code> อยู่ แต่<b>ไม่ใช่</b>
+      logical negation — <code>!=</code> คืน <code>true</code> ถ้า operand<b>สองตัว</b>ไม่เท่ากัน
+      ส่วน <code>!</code> กลับผลของ expression<b>ตัวเดียว</b> สำหรับ built-in type แล้ว
+      <code>x != y</code> ให้ผลเหมือนกับ <code>!(x == y)</code> ทุกประการ (เป็นตัวอย่างการใช้
+      logical negation) แต่ทั้งสองไม่ใช่ตัวดำเนินการตัวเดียวกัน
+      <div class="code" style="margin-top:12px">
+        <div class="code-bar"><span class="dot"></span><span class="name">ตัวอย่าง</span></div>
+        <pre><code class="lang-cs">int a = 7;
+int b = 6;
+Console.WriteLine(a != b); // output: True
+string s1 = "Hello";
+string s2 = "Hello";
+Console.WriteLine(s1 != s2); // output: False</code></pre>
+      </div>
+    </div>
+
+    <div class="quiz" data-q="14-1">
+      <p class="q"><span class="num">Check ★</span> ข้อใดคือรายการตัวดำเนินการเปรียบเทียบที่ถูกต้องครบถ้วน?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>==</code>, <code>~=</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>==</code>, <code>&lt;&gt;</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code></span></li>
+        <li class="opt" data-correct><span class="k">C</span><span><code>==</code>, <code>!=</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> <code>~=</code> และ <code>&lt;&gt;</code> ไม่ใช่ตัวดำเนินการ
+        ของ C# (บางภาษาอย่าง SQL/VB ใช้ <code>&lt;&gt;</code> แทนความไม่เท่ากัน แต่ C# ใช้
+        <code>!=</code> เท่านั้น)</div>
+    </div>
+
+    <div class="quiz" data-q="14-2">
+      <p class="q"><span class="num">Check ★</span> โค้ดข้อใดใช้ logical negation?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>Console.WriteLine(myValue != true);</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>Console.WriteLine(!myValue);</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>Console.WriteLine(myValue == false);</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> มีแค่ <code>!</code> วางหน้า operand เท่านั้นที่เป็น
+        logical negation operator จริงๆ ข้อ A ใช้ inequality operator ข้อ C ใช้ equality
+        operator เทียบกับ false — ทั้งสองให้ผลคล้ายกันในทางปฏิบัติ แต่ไม่ใช่ "ตัวดำเนินการนิเสธ"
+        ตามนิยาม</div>
+    </div>
+
+    <div class="quiz" data-q="14-3">
+      <p class="q"><span class="num">Check ★</span> แอปมีตัวแปร string ชื่อ <code>myValue1</code> กับ
+        <code>myValue2</code> ผู้ใช้กรอกค่า <code>"Y "</code> และ <code>" y"</code> ตามลำดับ
+        ข้อใดคืน <code>false</code>?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>(myValue1 != myValue2)</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>(myValue1.Trim().ToLower() != myValue2.Trim().ToLower())</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>(myValue1.Trim().ToLower() == myValue2.Trim().ToLower())</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> "Y " กับ " y" ต่างกันทั้งตัวพิมพ์และตำแหน่งช่องว่าง
+        ข้อ A เทียบดิบๆ จึงได้ true (ไม่เท่ากันจริง) ข้อ C หลัง massage แล้วทั้งคู่เป็น "y"
+        เหมือนกัน เทียบด้วย == จึงได้ true ส่วนข้อ B หลัง massage แล้วเท่ากัน เทียบด้วย !=
+        (ไม่เท่ากัน) จึงได้ <b>false</b> — นี่คือคำตอบที่โจทย์ถาม</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch14-a"><span>ทดสอบ == และ != กับทั้ง string และ int สำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch14-b"><span>ใช้ Trim().ToLower() แก้ปัญหาเทียบ string ไม่ตรงกัน</span></label></li>
+      <li><label><input type="checkbox" id="ch14-c"><span>แยกความต่างระหว่าง != กับ ! ได้ชัดเจน</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s03">14.3 ลงมือ: ตัวดำเนินการเงื่อนไข (?:)</h2>
+
+    <p>สมมติต้องเช็คเร็วๆ ว่าคำสั่งซื้อของลูกค้าเข้าเงื่อนไขรับส่วนลดโปรโมชันไหม รายละเอียดคือ
+       ถ้ายอดซื้อมากกว่า 1000 ยูโร ได้ส่วนลด 100 ยูโร ถ้ายอดซื้อ 1000 ยูโรหรือน้อยกว่า ได้ส่วนลด
+       50 ยูโร</p>
+
+    <p>จะใช้ <code>if...elseif...else</code> ก็ได้ แต่ใช้ <b>conditional operator</b> อาจเป็น
+       ทางเลือกที่ดีกว่า เพราะรูปแบบกระชับกว่า ประหยัดบรรทัด และอาจสื่อเจตนาชัดเจนกว่าด้วย</p>
+
+    <h3 id="s03a">Conditional Operator คืออะไร</h3>
+    <p><b>conditional operator</b> <code>?:</code> ประเมิน Boolean expression แล้วคืนผลลัพธ์
+       หนึ่งในสองแบบ ตามว่า expression เป็น true หรือ false — มักถูกเรียกว่า
+       <b>ternary conditional operator</b> รูปแบบพื้นฐาน:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">รูปแบบ</span></div>
+      <pre><code class="lang-cs">&lt;ประเมินเงื่อนไขนี้&gt; ? &lt;ถ้าจริง คืนค่านี้&gt; : &lt;ถ้าเท็จ คืนค่านี้&gt;</code></pre>
+    </div>
+
+    <svg viewBox="0 0 720 160" role="img" aria-label="โครงสร้างตัวดำเนินการเงื่อนไข ternary" style="margin:18px 0">
+      <defs>
+        <marker id="ar14b" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="var(--text-faint)"/>
+        </marker>
+      </defs>
+      <g font-family="var(--font-th)" font-size="12.5">
+        <rect x="270" y="10" width="180" height="46" rx="9" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="360" y="38" text-anchor="middle" font-family="var(--font-code)" font-weight="700" fill="var(--brand-text)">saleAmount &gt; 1000 ?</text>
+
+        <line x1="330" y1="56" x2="180" y2="90" stroke="var(--text-faint)" marker-end="url(#ar14b)"/>
+        <text x="220" y="78" fill="var(--text-soft)">true</text>
+        <rect x="20" y="90" width="220" height="56" rx="9" fill="var(--ok-soft)" stroke="var(--ok)"/>
+        <text x="130" y="122" text-anchor="middle" font-family="var(--font-code)" fill="var(--ok)" font-weight="700">100</text>
+
+        <line x1="390" y1="56" x2="540" y2="90" stroke="var(--text-faint)" marker-end="url(#ar14b)"/>
+        <text x="500" y="78" fill="var(--text-soft)">false</text>
+        <rect x="460" y="90" width="220" height="56" rx="9" fill="var(--warn-soft)" stroke="var(--warn)"/>
+        <text x="570" y="122" text-anchor="middle" font-family="var(--font-code)" fill="var(--warn)" font-weight="700">50</text>
+      </g>
+    </svg>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int saleAmount = 1001;
+int discount = saleAmount > 1000 ? 100 : 50;
+Console.WriteLine($"Discount: {discount}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Discount: 100</pre></div>
+
+    <h3 id="s03b">ใช้ Conditional Operator แบบ Inline</h3>
+    <p>ตัดตัวแปรกลาง <code>discount</code> ทิ้งได้เลย ย่อโค้ดให้กระชับขึ้นอีก:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button>
+        <button class="run" data-act="run" type="button">▶ Run</button></div>
+      <pre><code class="lang-cs">int saleAmount = 1001;
+Console.WriteLine($"Discount: {(saleAmount > 1000 ? 100 : 50)}");</code></pre>
+    </div>
+    <div class="out"><div class="out-bar">Output</div><pre>
+Discount: 100</pre></div>
+
+    <p>สังเกตว่าต้องล้อม conditional operator ทั้งชุดด้วยวงเล็บ <code>()</code> เพื่อให้ runtime
+       เข้าใจเจตนาว่าต้องการแสดง<i>ผลลัพธ์ของเงื่อนไข</i> ไม่ใช่แค่ผลของ
+       <code>saleAmount &gt; 1000</code> เฉยๆ</p>
+
+    <div class="note warn">
+      <span class="lbl">⚠️ กระชับไม่ได้แปลว่าอ่านง่ายเสมอไป</span>
+      ตัวอย่างข้างบนแม้จะกระชับและแสดงว่าทำอะไรได้บ้าง แต่ก็อ่านยากขึ้นเล็กน้อย การรวมบรรทัดโค้ด
+      เข้าด้วยกันไม่ใช่ความคิดที่ดีเสมอไป โดยเฉพาะถ้ากระทบความอ่านง่ายของโค้ด (ทบทวนหลักการนี้ได้
+      ที่ <a href="ch11.html">บทที่ 11</a>) — นี่เป็นการตัดสินใจที่ค่อนข้างเป็นดุลยพินิจส่วนตัว
+    </div>
+
+    <div class="quiz" data-q="14-4">
+      <p class="q"><span class="num">Check ★</span> โค้ดข้อใดใช้ conditional operator ได้ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>int bonus = amount &gt;= 100 ? 10 : 5;</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>int bonus = amount &gt;= 100 : 10 ? 5;</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>int bonus = amount &gt;= 100 ? 10, 5;</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ต้องเป็นรูปแบบ <code>เงื่อนไข ? ค่าจริง : ค่าเท็จ</code>
+        ข้อ B สลับตำแหน่ง <code>?</code> กับ <code>:</code> ผิด ข้อ C ใช้จุลภาคแทนโคลอนผิดไวยากรณ์</div>
+    </div>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch14-d"><span>เขียน conditional operator แบบมีตัวแปรกลางสำเร็จ</span></label></li>
+      <li><label><input type="checkbox" id="ch14-e"><span>เขียนแบบ inline พร้อมวงเล็บครอบถูกต้อง</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s04">14.4 ท้าทายที่ 1: จำลองเหรียญหัว-ก้อย</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl m">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>สร้างโค้ดจำลองการ "โยนเหรียญ" แสดงผลเป็น <code>heads</code> หรือ <code>tails</code>
+           ข้อกำหนด:</p>
+        <ol>
+          <li>ใช้คลาส <code>Random</code> สุ่มค่าออกมา (พิจารณาช่วงตัวเลขที่ต้องการให้ดี)</li>
+          <li>ใช้ conditional operator ตัดสินว่าจะแสดง <code>heads</code> หรือ <code>tails</code>
+              จากค่าที่สุ่มได้ — ต้องมีโอกาสออก heads/tails เท่ากันที่ 50%</li>
+          <li>โค้ดควรอ่านง่าย แต่ใช้บรรทัดให้น้อยที่สุด — ทำให้จบได้ใน<b>3 บรรทัด</b></li>
+        </ol>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>ทบทวน overload ของ <code>Random.Next()</code> จาก <a href="ch08.html">บทที่ 8</a>
+             — overload ที่รับพารามิเตอร์เดียวคืนค่าตั้งแต่ 0 ถึง<i>ต่ำกว่า</i>ค่านั้น (exclusive)
+             ต้องการค่าแค่ 2 แบบ (0 กับ 1) ควรส่งอะไรเป็นพารามิเตอร์?</p>
+        </div>
+      </details>
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">Random coin = new Random();
+int flip = coin.Next(0, 2);
+Console.WriteLine((flip == 0) ? "heads" : "tails");</code></pre>
+        </div>
+        <div class="out auto"><div class="out-bar">Output (สุ่มทุกครั้ง)</div><pre>
+heads</pre></div>
+        <p>นี่เป็น<i>เพียงหนึ่ง</i>ในหลายวิธีที่แก้โจทย์นี้ได้ — ตัดตัวแปรกลาง <code>flip</code>
+           ทิ้งได้เหมือนกัน ด้วยการเรียก <code>Next()</code> ไว้ข้างในตัว Boolean expression เลย:</p>
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs — เวอร์ชันย่อกว่า</span>
+            <button data-act="copy" type="button">Copy</button></div>
+          <pre><code class="lang-cs">Random coin = new Random();
+Console.WriteLine((coin.Next(0, 2) == 0) ? "heads" : "tails");</code></pre>
+        </div>
+        <p>แต่โค้ดแบบนี้แน่นเกินไปหน่อย อาจทำให้เข้าใจยากขึ้นว่ากำลังทำอะไรอยู่</p>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch14-f"><span>เขียนโค้ดจำลองเหรียญได้สำเร็จใน 3 บรรทัด</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">14.5 ท้าทายที่ 2: ตรรกะสิทธิ์การเข้าถึง</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">โจทย์</span><span class="lvl h">ตามต้นฉบับ MS Learn</span></div>
+      <div class="ex-body">
+        <p>เริ่มจากโค้ดนี้ (ต้องใช้ตัวแปรทั้งสองในคำตอบ):</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs — บังคับใช้</span></div>
+        <pre><code class="lang-cs">string permission = "Admin|Manager";
+int level = 55;</code></pre></div>
+        <p>ใช้เมธอด <code>Contains()</code> เช็คว่า <code>permission</code> มีคำว่า
+           <code>"Admin"</code> หรือ <code>"Manager"</code> อยู่หรือไม่ (เช่น
+           <code>permission.Contains("Admin")</code> จะได้ <code>true</code>) กฎธุรกิจ:</p>
+        <ul>
+          <li>เป็น Admin และ level มากกว่า 55 → <code>Welcome, Super Admin user.</code></li>
+          <li>เป็น Admin และ level น้อยกว่าหรือเท่ากับ 55 → <code>Welcome, Admin user.</code></li>
+          <li>เป็น Manager และ level มากกว่าหรือเท่ากับ 20 → <code>Contact an Admin for access.</code></li>
+          <li>เป็น Manager และ level น้อยกว่า 20 → <code>You do not have sufficient privileges.</code></li>
+          <li>ไม่ใช่ทั้ง Admin และ Manager → <code>You do not have sufficient privileges.</code></li>
+        </ul>
+        <p>ทดสอบด้วยค่าตั้งต้น (permission="Admin|Manager", level=55) ควรได้:</p>
+        <div class="out auto"><div class="out-bar">ผลลัพธ์ที่ต้องได้จากค่าตั้งต้น</div><pre>
+Welcome, Admin user.</pre></div>
+        <p>จากนั้นลองเปลี่ยนค่า <code>permission</code>/<code>level</code> แล้วรันซ้ำ เพื่อ
+           ทดสอบให้ครบทุกกฎ</p>
+      </div>
+      <details class="fold"><summary>💡 ขอคำใบ้</summary>
+        <div class="fold-body">
+          <p>โครงสร้างนี้เหมาะกับ <code>if</code> ซ้อน <code>if</code> (nested) แบบเดียวกับที่
+             เรียนใน <a href="ch09.html">บทที่ 9</a> — เช็คบทบาท (Admin/Manager) ที่ชั้นนอกก่อน
+             แล้วเช็ค level ที่ชั้นในของแต่ละบทบาท</p>
+        </div>
+      </details>
+    </div>
+
+    <details class="fold">
+      <summary>🔓 ดูเฉลย</summary>
+      <div class="fold-body">
+        <div class="code">
+          <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+            <button data-act="copy" type="button">Copy</button>
+            <button class="run" data-act="run" type="button">▶ Run</button></div>
+          <pre><code class="lang-cs">string permission = "Admin|Manager";
+int level = 53;
+
+if (permission.Contains("Admin"))
+{
+    if (level > 55)
+    {
+        Console.WriteLine("Welcome, Super Admin user.");
+    }
+    else
+    {
+        Console.WriteLine("Welcome, Admin user.");
+    }
+}
+else if (permission.Contains("Manager"))
+{
+    if (level >= 20)
+    {
+        Console.WriteLine("Contact an Admin for access.");
+    }
+    else
+    {
+        Console.WriteLine("You do not have sufficient privileges.");
+    }
+}
+else
+{
+    Console.WriteLine("You do not have sufficient privileges.");
+}</code></pre>
+        </div>
+        <div class="out"><div class="out-bar">Output (level=53)</div><pre>
+Welcome, Admin user.</pre></div>
+        <p>นี่เป็น<i>เพียงหนึ่ง</i>ในหลายวิธีที่แก้โจทย์นี้ได้ บางกรณีใช้ Boolean expression
+           ต่างออกไปก็ได้ผลลัพธ์เดียวกัน สังเกตว่าเช็คบทบาท "Admin" ก่อน "Manager" เสมอ — เพราะ
+           <code>permission</code> ในตัวอย่างมีทั้งสองคำปนกัน (<code>"Admin|Manager"</code>)
+           ลำดับการเช็คจึงมีผลว่ากฎไหนจะถูกใช้ก่อน (เหมือนหลักการเรียง if-elseif จากบทที่ 9)</p>
+      </div>
+    </details>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch14-g"><span>ทดสอบครบทั้ง 5 กฎธุรกิจด้วยการเปลี่ยนค่าตัวแปรหลายรอบ</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s06">14.6 ⚠️ กับดักที่พบบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>เทียบ string จากผู้ใช้แล้วไม่ตรงทั้งที่ "ดูเหมือน" จะตรง</td>
+          <td>มีช่องว่างหรือตัวพิมพ์เล็ก-ใหญ่ต่างกันแอบแฝงอยู่ — ใช้
+              <code>.Trim().ToLower()</code> ทั้งสองฝั่งก่อนเทียบเสมอเมื่อรับข้อมูลจากผู้ใช้</td>
+        </tr>
+        <tr>
+          <td>สับสน <code>!=</code> กับ <code>!</code></td>
+          <td><code>!=</code> เทียบสองค่า · <code>!</code> กลับผลของ expression เดียว — คนละหน้าที่กัน</td>
+        </tr>
+        <tr>
+          <td>ใช้ conditional operator แบบ inline ใน string interpolation แล้ว error</td>
+          <td>ลืมล้อมด้วยวงเล็บ <code>()</code> — ต้องเขียน <code>{(เงื่อนไข ? a : b)}</code>
+              เสมอ ไม่ใช่ <code>{เงื่อนไข ? a : b}</code></td>
+        </tr>
+        <tr>
+          <td>conditional operator ซ้อนกันหลายชั้นจนอ่านไม่ออก</td>
+          <td>แม้จะทำได้ (เช่น <code>a ? b : c ? d : e</code>) แต่ผิดหลักความอ่านง่ายจากบทที่ 11
+              — ถ้าเงื่อนไขซับซ้อนเกิน 1 ชั้น ควรกลับไปใช้ if-elseif-else แทน</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">14.7 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Microsoft Learn (4 ข้อฝังในเนื้อหา + 2 ข้อ Module Assessment)</p>
+
+    <div class="quiz" data-q="14-5">
+      <p class="q"><span class="num">1.</span> โค้ดบรรทัดใดใช้ logical negation?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>Console.WriteLine(!value);</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>Console.WriteLine(value != false);</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>Console.WriteLine(a != b);</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> มีแค่ <code>!</code> วางหน้าตัวแปรเท่านั้นที่เป็น
+        logical negation operator โดยตรง ข้อ B และ C ใช้ตัวดำเนินการความไม่เท่ากัน (<code>!=</code>)
+        ซึ่งเป็นคนละตัวดำเนินการกัน</div>
+    </div>
+
+    <div class="quiz" data-q="14-6">
+      <p class="q"><span class="num">2.</span> โค้ดบรรทัดใดใช้ conditional operator ได้ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>int value = amount &gt;= 10 ? 10 : 20;</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>int value = amount &gt;= 10 : 10 ? 20;</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>int value = amount &gt;= 10 ? 10| 20;</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ต้องเรียง <code>เงื่อนไข ? true-value : false-value</code>
+        เท่านั้น ข้อ B สลับตำแหน่งสัญลักษณ์ผิด ข้อ C ใช้ <code>|</code> แทน <code>:</code> ผิดไวยากรณ์</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">14.8 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดเทียบตัวเลขสองตัว <code>int a = 15, b = 20;</code> พิมพ์ผลของ <code>==</code>,
+           <code>!=</code>, <code>&gt;</code>, <code>&lt;</code> ทั้ง 4 แบบ</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int a = 15, b = 20;
+Console.WriteLine(a == b);
+Console.WriteLine(a != b);
+Console.WriteLine(a > b);
+Console.WriteLine(a < b);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ใช้ conditional operator เขียนโค้ดตรวจว่าตัวเลข <code>int n = 17;</code> เป็นเลขคู่หรือ
+           เลขคี่ พิมพ์ผลลัพธ์เป็น "คู่" หรือ "คี่"</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>ใช้ <code>%</code> เช็คหารด้วย 2 เหลือเศษ (ทบทวนที่
+           <a href="ch04.html">บทที่ 4</a>)</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">int n = 17;
+Console.WriteLine(n % 2 == 0 ? "คู่" : "คี่");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>ผู้ใช้กรอกคำตอบ <code>string answer = " YES ";</code> เขียนโค้ดเช็คว่าตรงกับ
+           <code>"yes"</code> หรือไม่ (ไม่สนตัวพิมพ์เล็ก-ใหญ่ ไม่สนช่องว่างหน้า-หลัง) พิมพ์ผล
+           true/false</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string answer = " YES ";
+Console.WriteLine(answer.Trim().ToLower() == "yes");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>เขียนโค้ดใช้ <code>!</code> (logical negation) ตรวจว่าอีเมล
+           <code>string email = "somchai@example.com";</code> <b>ไม่มี</b>เครื่องหมาย
+           <code>@</code> อยู่หรือไม่ (ควรได้ <code>false</code> เพราะอีเมลนี้มี @ อยู่จริง)</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">string email = "somchai@example.com";
+Console.WriteLine(!email.Contains("@"));</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>ดัดแปลงโจทย์ 14.5 (ตรรกะสิทธิ์) ให้เพิ่มบทบาทใหม่ "Guest" — ถ้า permission มีคำว่า
+           "Guest" ให้แสดง <code>"Read-only access."</code> เสมอ ไม่ต้องเช็ค level เลย
+           (ทดสอบด้วย <code>permission = "Guest";</code>)</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>เพิ่ม <code>else if (permission.Contains("Guest"))</code>
+           ก่อนบรรทัด <code>else</code> สุดท้ายของเฉลยเดิม</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs (ส่วนที่เพิ่ม)</span></div>
+          <pre><code class="lang-cs">else if (permission.Contains("Guest"))
+{
+    Console.WriteLine("Read-only access.");
+}
+else
+{
+    Console.WriteLine("You do not have sufficient privileges.");
+}</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 6</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>เขียนโปรแกรมจำลอง "ทอยลูกเต๋า 3 ครั้ง" (1-6 แต่ละครั้ง) แล้วใช้ conditional operator
+           อย่างเดียว (ห้ามใช้ if/else if/else เลย) พิมพ์ว่าแต้มรวมเป็น "สูง" (≥12) หรือ "ต่ำ"
+           (&lt;12) ในบรรทัดเดียว — ใบ้: ต้องซ้อน conditional operator ไว้ในตัว
+           string interpolation</p>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>เก็บผลรวมไว้ในตัวแปรก่อน แล้วค่อยใช้ conditional operator
+           ประเมินแค่ครั้งเดียวตอนพิมพ์ผล จะอ่านง่ายกว่าใส่นิพจน์การทอยเข้าไปในตัวมันเองตรงๆ</p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Random dice = new Random();
+int total = dice.Next(1, 7) + dice.Next(1, 7) + dice.Next(1, 7);
+Console.WriteLine($"แต้มรวม {total}: {(total >= 12 ? "สูง" : "ต่ำ")}");</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s09">📌 สรุปบทที่ 14</h2>
+
+    <p>เป้าหมายของบทนี้คือพัฒนา decision statement สำหรับสถานการณ์ต่างๆ ด้วย Boolean expression
+       และตัวดำเนินการของ C# คุณเขียนโค้ดประเมินความเท่ากัน เปรียบเทียบว่าค่าหนึ่งมากกว่าหรือ
+       น้อยกว่า (หรือเท่ากับ) อีกค่าหนึ่ง คุณเทียบ string โดย massage ข้อมูลก่อน เพื่อลดปัญหาเรื่อง
+       ตัวพิมพ์และช่องว่างที่อาจรบกวนผลลัพธ์ คุณใช้ logical negation กลับค่าเพื่อเปรียบเทียบ และ
+       ใช้ผลลัพธ์จากเมธอดใน Boolean expression ได้ สุดท้าย คุณใช้ conditional operator ประเมิน
+       เงื่อนไขแบบกระชับและคืนผลลัพธ์ได้</p>
+
+    <p>ถ้าไม่มีตัวดำเนินการและเทคนิคชุดนี้ครบ คุณจะสร้าง decision statement ได้จำกัดมาก เพราะ
+       ตรรกะธุรกิจทุกอย่างต้องอาศัย Boolean expression — คุณเพิ่งเพิ่มเครื่องมือที่มีค่ามากเข้าไป
+       ในกล่องเครื่องมือเขียนโปรแกรมของคุณแล้ว</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 14</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:32%">ไวยากรณ์</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>==</code> / <code>!=</code></td><td>เท่ากับ / ไม่เท่ากับ</td></tr>
+          <tr><td><code>&gt; &lt; &gt;= &lt;=</code></td><td>เปรียบเทียบมาก/น้อยกว่า</td></tr>
+          <tr><td><code>.Trim().ToLower()</code></td><td>massage string ก่อนเทียบ</td></tr>
+          <tr><td><code>!expression</code></td><td>logical negation — กลับค่า true/false</td></tr>
+          <tr><td><code>str.Contains()/.StartsWith()/.EndsWith()</code></td><td>เมธอดคืนค่า bool ของ string</td></tr>
+          <tr><td><code>เงื่อนไข ? จริง : เท็จ</code></td><td>conditional (ternary) operator</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s10">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>expression</td><td>นิพจน์</td><td>ค่า/ตัวดำเนินการ/เมธอด ที่รวมกันแล้วคืนค่าเดียว</td></tr>
+        <tr><td>equality / inequality operator</td><td>ตัวดำเนินการเท่ากับ/ไม่เท่ากับ</td><td><code>==</code> / <code>!=</code></td></tr>
+        <tr><td>comparison operator</td><td>ตัวดำเนินการเปรียบเทียบ</td><td><code>&gt; &lt; &gt;= &lt;=</code></td></tr>
+        <tr><td>massaging data</td><td>การปรับแต่งข้อมูล</td><td>ทำความสะอาดข้อมูลก่อนเปรียบเทียบ เช่น Trim/ToLower</td></tr>
+        <tr><td>logical negation</td><td>การนิเสธเชิงตรรกะ</td><td>ตัวดำเนินการ ! กลับค่า true/false</td></tr>
+        <tr><td>conditional operator</td><td>ตัวดำเนินการเงื่อนไข</td><td><code>?:</code> — เวอร์ชัน inline ของ if-else</td></tr>
+        <tr><td>ternary</td><td>ไตรภาค</td><td>รับ 3 ส่วนเข้าคำนวณ (เงื่อนไข, ค่าจริง, ค่าเท็จ)</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch13.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 13 · Challenge Project — Arrays, Iteration, Selection</span></a>
+      <a class="next" href="ch15.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 15 · Control Variable Scope Using Code Blocks</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

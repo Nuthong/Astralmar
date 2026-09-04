@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>คู่มือสอบ + ข้อสอบจำลอง — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="39">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 7 · ข้อสอบรับใบรับรอง</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 7 · 🎓 Certification Exam</span>
+      <h1>คู่มือสอบ + ข้อสอบจำลอง</h1>
+      <div class="en">Foundational C# with Microsoft Certification — Exam Guide</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>45–60 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>เข้าใจรูปแบบข้อสอบจริง + ทบทวนภาพรวมทั้งเล่ม + ลองข้อสอบจำลอง 30 ข้อ</b></span>
+        <span>🎯 ความยาก <b>ทบทวนรวบยอด</b></span>
+      </div>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 ถึงจุดนี้แล้ว คุณพร้อมแล้วจริงๆ</span>
+      ถ้าคุณอ่านและฝึกทำแบบฝึกหัดมาครบทั้ง 6 Part (บทที่ 1-38) คุณมีความรู้ครบตามที่ใบรับรองนี้
+      ต้องการแล้ว — บทนี้ไม่ใช่เนื้อหาใหม่ แต่เป็นคู่มือสอบจริงพร้อมข้อสอบจำลองให้ลองทำก่อน
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">เกี่ยวกับใบรับรองนี้</h2>
+
+    <p><b>Foundational C# with Microsoft Certification</b> เป็นใบรับรองฟรีที่ Microsoft ร่วมมือ
+       กับ <b>freeCodeCamp</b> เปิดให้ทุกคนทั่วโลกสอบได้โดยไม่มีค่าใช้จ่าย ประกอบด้วยสองส่วน:</p>
+
+    <ul>
+      <li><b>คอร์สเรียน</b> — เนื้อหาการฝึกอบรมจาก Microsoft Learn ประมาณ 35 ชั่วโมง แบ่งเป็น
+          6 Learning Path (ตรงกับ Part 1-6 ของหนังสือเล่มนี้) แต่ละบทเรียนมีลิงก์ไปยังโมดูล
+          Microsoft Learn ที่ต้องทำเป็นการบ้าน พร้อมคำถามเช็คความเข้าใจ</li>
+      <li><b>ข้อสอบออนไลน์</b> — จัดสอบผ่านแพลตฟอร์มของ freeCodeCamp เมื่อผ่านแล้วจะได้ใบรับรอง
+          ที่ verify ได้จริง นำไปใส่ Resume, LinkedIn หรือ CV ได้</li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s02">ก่อนสอบต้องทำอะไรบ้าง</h2>
+
+    <ol>
+      <li>ทำโมดูล Microsoft Learn ทั้ง 6 Learning Path ให้ครบ (เนื้อหาตรงกับ Part 1-6 ของ
+          หนังสือเล่มนี้ทุกประการ) — ระบบของ freeCodeCamp จะเชื่อมกับ transcript ของ Microsoft
+          Learn อัตโนมัติ เพื่อยืนยันว่าคุณทำครบจริง</li>
+      <li>เซ็นรับรอง <b>Academic Honesty Pledge</b> ของ freeCodeCamp (คำมั่นว่าจะทำข้อสอบด้วย
+          ตัวเอง ไม่ทุจริต)</li>
+      <li>เตรียมเวลาว่างต่อเนื่องอย่างน้อย 1 ชั่วโมงเต็ม — <b>ข้อสำคัญมาก</b>: เมื่อเริ่มสอบแล้ว
+          จะ<b>ออกจากหน้าสอบไม่ได้</b> ถ้าออกกลางคันจะเสียความคืบหน้าทั้งหมดและต้องเริ่มใหม่</li>
+    </ol>
+
+    <!-- ============================================ -->
+    <h2 id="s03">รูปแบบข้อสอบจริง</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">รายละเอียด</th><th>ข้อมูล</th></tr></thead>
+      <tbody>
+        <tr><td>จำนวนข้อ</td><td>80 ข้อ แบบปรนัย (multiple-choice)</td></tr>
+        <tr><td>เวลา</td><td>จับเวลาไว้ แต่ไม่มีขีดจำกัดเวลาตายตัว (ทำได้เกิน 1 ชั่วโมง) —
+            แต่ห้ามออกจากหน้าสอบระหว่างทำเด็ดขาด</td></tr>
+        <tr><td>แพลตฟอร์ม</td><td>เว็บไซต์ freeCodeCamp</td></tr>
+        <tr><td>เนื้อหาที่ครอบคลุม</td><td>6 ทักษะ: สร้างแอปแรก, เขียนแอปพื้นฐาน, สร้าง method,
+            เพิ่ม logic, จัดการข้อมูลตัวแปร, debug แอป — ตรงกับ Part 1-6 ของหนังสือเล่มนี้เป๊ะ</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s04">เทคนิคการทำข้อสอบ</h2>
+
+    <ul>
+      <li><b>อ่านโจทย์และตัวเลือกให้ละเอียด</b> — ข้อสอบเป็น multiple-choice ที่บางข้ออาจมี
+          ตัวเลือกใกล้เคียงกันมาก (เช่น <code>!=</code> กับ <code>!</code>, catch เจาะจงชนิดกับ
+          catch ทั่วไป) ต้องอ่านให้รอบคอบ</li>
+      <li><b>อย่าเร่งรีบตอนเตรียมตัว</b> — เข้าใจให้ลึกสำคัญกว่าทำเร็ว แม้แต่คนที่มีพื้นฐาน C#
+          มาก่อนก็ยังพบว่าเนื้อหาบางส่วน (โดยเฉพาะเรื่อง debugging) มีอะไรใหม่ให้เรียนรู้เสมอ</li>
+      <li><b>ทบทวน Part 6 (Debugging) เป็นพิเศษ</b> — เป็น Part ที่มักถูกมองข้ามเพราะอยู่ท้ายเล่ม
+          แต่มีสัดส่วนในข้อสอบเท่าๆ กับ Part อื่น</li>
+      <li><b>เตรียมพื้นที่เงียบและเวลาว่างจริงๆ</b> ก่อนเริ่มสอบ เพราะออกกลางคันไม่ได้</li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">ทบทวนภาพรวมแต่ละ Part</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:8%">Part</th><th style="width:26%">หัวข้อหลัก</th><th>แนวคิดที่ต้องแม่นที่สุด</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Write Your First Code</td>
+            <td>Console.WriteLine/Write, ชนิดข้อมูลพื้นฐาน, string interpolation,
+                ตัวดำเนินการเลข — ทบทวนที่<a href="ch06.html">🏆 Trophy Part 1</a></td></tr>
+        <tr><td>2</td><td>Console Applications</td>
+            <td>method จาก .NET class library, if/else if/else, array + foreach, การเขียน
+                โค้ดอ่านง่าย — ทบทวนที่<a href="ch13.html">🏆 Trophy Part 2</a></td></tr>
+        <tr><td>3</td><td>Add Logic</td>
+            <td>Boolean expression, scope, switch-case, for, do-while/while — ทบทวนที่
+                <a href="ch20.html">🏆 Trophy Part 3</a></td></tr>
+        <tr><td>4</td><td>Variable Data</td>
+            <td>value/reference type, casting/conversion, array helper method, composite
+                formatting, string method — ทบทวนที่<a href="ch27.html">🏆 Trophy Part 4</a></td></tr>
+        <tr><td>5</td><td>Create Methods</td>
+            <td>method signature, parameter (pass-by-value/reference, optional/named
+                argument), return value — ทบทวนที่<a href="ch32.html">🏆 Trophy Part 5</a></td></tr>
+        <tr><td>6</td><td>Debug Applications</td>
+            <td>testing vs debugging vs exception handling, breakpoint/step, try-catch-finally,
+                throw/re-throw — ทบทวนที่<a href="ch38.html">🏆 Trophy Part 6</a></td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>ถ้าจำอะไรไม่ได้ในตารางนี้ ให้กลับไปอ่าน Cheat Sheet ท้ายบทของ Part นั้นๆ ก่อน แล้วค่อย
+       กลับมาลองข้อสอบจำลองด้านล่าง</p>
+
+    <!-- ============================================ -->
+    <h2 id="s06">📝 ข้อสอบจำลอง (30 ข้อ)</h2>
+    <p>ข้อสอบจำลองชุดนี้ครอบคลุมทั้ง 6 Part สัดส่วนเท่าๆ กัน (Part ละ 5 ข้อ) เรียงตามลำดับ Part
+       — ลองทำให้ครบก่อนเปิดเฉลย ตั้งเวลาตัวเองสัก 20-25 นาทีให้ใกล้เคียงบรรยากาศจริง</p>
+
+    <h3 id="s06a">Part 1 · Write Your First Code</h3>
+
+    <div class="quiz" data-q="exam-01">
+      <p class="q"><span class="num">1.</span> เมธอดใดพิมพ์ข้อความออกคอนโซลแล้ว<b>ไม่</b>ขึ้นบรรทัดใหม่ต่อท้าย?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>Console.WriteLine()</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>Console.Write()</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>Console.Print()</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนบทที่ 1</div>
+    </div>
+
+    <div class="quiz" data-q="exam-02">
+      <p class="q"><span class="num">2.</span> ชนิดข้อมูลใดเหมาะกับการเก็บเงิน (ต้องการความแม่นยำสูงกับทศนิยม)?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>double</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>decimal</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>float</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนบทที่ 2</div>
+    </div>
+
+    <div class="quiz" data-q="exam-03">
+      <p class="q"><span class="num">3.</span> string interpolation เขียนขึ้นต้นด้วยสัญลักษณ์ใด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>@</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>$</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>#</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนบทที่ 3</div>
+    </div>
+
+    <div class="quiz" data-q="exam-04">
+      <p class="q"><span class="num">4.</span> ผลลัพธ์ของ <code>7 / 2</code> เมื่อทั้งสองค่าเป็น <code>int</code> คือเท่าไหร่?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>3.5</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>3</span></li>
+        <li class="opt"><span class="k">C</span><span>4</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> integer division ตัดเศษทศนิยมทิ้ง — ทบทวนบทที่ 4</div>
+    </div>
+
+    <div class="quiz" data-q="exam-05">
+      <p class="q"><span class="num">5.</span> Guided Project ของ Part 1 (คำนวณเกรดนักเรียน) ฝึกเรื่องใดเป็นหลัก?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>ผสมผสาน variable, การคำนวณ, และ string formatting เข้าด้วยกันในโปรเจกต์เดียว</span></li>
+        <li class="opt"><span class="k">B</span><span>การเขียน class และ object</span></li>
+        <li class="opt"><span class="k">C</span><span>การเชื่อมต่อฐานข้อมูล</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 5-6</div>
+    </div>
+
+    <h3 id="s06b">Part 2 · Console Applications</h3>
+
+    <div class="quiz" data-q="exam-06">
+      <p class="q"><span class="num">6.</span> array ใน C# เริ่มนับ index จากเลขอะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>0</span></li>
+        <li class="opt"><span class="k">B</span><span>1</span></li>
+        <li class="opt"><span class="k">C</span><span>-1</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 10</div>
+    </div>
+
+    <div class="quiz" data-q="exam-07">
+      <p class="q"><span class="num">7.</span> เข้าถึง index ที่เกินขอบเขตของ array จะเกิด exception ชนิดใด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>NullReferenceException</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>IndexOutOfRangeException</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>FormatException</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนบทที่ 10</div>
+    </div>
+
+    <div class="quiz" data-q="exam-08">
+      <p class="q"><span class="num">8.</span> ข้อใดคือชื่อตัวแปรแบบ camelCase ที่ถูกต้อง?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>Total_Score</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>totalScore</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>TOTALSCORE</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนบทที่ 11</div>
+    </div>
+
+    <div class="quiz" data-q="exam-09">
+      <p class="q"><span class="num">9.</span> เมธอด static ของ .NET class library ที่เรียกใช้ได้โดยไม่ต้องสร้าง object ก่อน เรียกว่าอะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>stateless method</span></li>
+        <li class="opt"><span class="k">B</span><span>stateful method</span></li>
+        <li class="opt"><span class="k">C</span><span>abstract method</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 8</div>
+    </div>
+
+    <div class="quiz" data-q="exam-10">
+      <p class="q"><span class="num">10.</span> Challenge Project ของ Part 2 ต่างจาก Guided Project อย่างไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>ไม่มีคำแนะนำทีละขั้นอย่างเป็นทางการ ต้องออกแบบเองมากกว่า</span></li>
+        <li class="opt"><span class="k">B</span><span>ใช้ภาษาอื่นแทน C#</span></li>
+        <li class="opt"><span class="k">C</span><span>ไม่มีการให้คะแนน</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 13</div>
+    </div>
+
+    <h3 id="s06c">Part 3 · Add Logic</h3>
+
+    <div class="quiz" data-q="exam-11">
+      <p class="q"><span class="num">11.</span> ตัวดำเนินการเงื่อนไข (conditional/ternary operator) เขียนในรูปแบบใด?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>เงื่อนไข ? จริง : เท็จ</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>เงื่อนไข : จริง ? เท็จ</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>if(เงื่อนไข){จริง}{เท็จ}</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 14</div>
+    </div>
+
+    <div class="quiz" data-q="exam-12">
+      <p class="q"><span class="num">12.</span> ตัวแปรที่ประกาศข้างใน code block ของ if จะมี scope แค่ไหน?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>ใช้ได้เฉพาะภายใน block นั้นเท่านั้น</span></li>
+        <li class="opt"><span class="k">B</span><span>ใช้ได้ทั้งไฟล์</span></li>
+        <li class="opt"><span class="k">C</span><span>ใช้ได้เฉพาะใน method อื่นที่เรียกมา</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 15</div>
+    </div>
+
+    <div class="quiz" data-q="exam-13">
+      <p class="q"><span class="num">13.</span> switch-case ใน C# ต่างจาก C/Java ตรงไหน?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>ไม่มี fall-through อัตโนมัติ ไม่ต้องใส่ break เพื่อกันตกหล่น</span></li>
+        <li class="opt"><span class="k">B</span><span>ใช้ได้กับ string ไม่ได้</span></li>
+        <li class="opt"><span class="k">C</span><span>ต้องมี default เสมอ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 16</div>
+    </div>
+
+    <div class="quiz" data-q="exam-14">
+      <p class="q"><span class="num">14.</span> for statement มีกี่ส่วนหลัก?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>2 (เงื่อนไข, การทำงาน)</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>3 (initializer, condition, iterator)</span></li>
+        <li class="opt"><span class="k">C</span><span>4</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนบทที่ 17</div>
+    </div>
+
+    <div class="quiz" data-q="exam-15">
+      <p class="q"><span class="num">15.</span> do-while ต่างจาก while ตรงไหน?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>do-while รัน code block อย่างน้อยหนึ่งครั้งก่อนเช็คเงื่อนไข</span></li>
+        <li class="opt"><span class="k">B</span><span>do-while ใช้กับ array เท่านั้น</span></li>
+        <li class="opt"><span class="k">C</span><span>ไม่มีความต่างกันเลย</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 18</div>
+    </div>
+
+    <h3 id="s06d">Part 4 · Variable Data</h3>
+
+    <div class="quiz" data-q="exam-16">
+      <p class="q"><span class="num">16.</span> array เป็น value type หรือ reference type?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>reference type — แก้ไขข้างใน method กระทบตัวต้นฉบับด้วย</span></li>
+        <li class="opt"><span class="k">B</span><span>value type — copy ค่าไปให้เสมอ</span></li>
+        <li class="opt"><span class="k">C</span><span>ไม่จัดอยู่ในทั้งสองประเภท</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 21</div>
+    </div>
+
+    <div class="quiz" data-q="exam-17">
+      <p class="q"><span class="num">17.</span> เมธอดใดแปลง string เป็นตัวเลขโดยไม่ throw exception ถ้าแปลงไม่ได้?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span><code>int.Parse()</code></span></li>
+        <li class="opt" data-correct><span class="k">B</span><span><code>int.TryParse()</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>Convert.ToInt32()</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ทบทวนบทที่ 22</div>
+    </div>
+
+    <div class="quiz" data-q="exam-18">
+      <p class="q"><span class="num">18.</span> เมธอดใดของ array ใช้เรียงลำดับข้อมูล?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>Array.Sort()</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>Array.Reverse()</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>Array.Clear()</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 23</div>
+    </div>
+
+    <div class="quiz" data-q="exam-19">
+      <p class="q"><span class="num">19.</span> composite format specifier <code>:C</code> ใช้จัดรูปแบบอะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>สกุลเงิน (currency)</span></li>
+        <li class="opt"><span class="k">B</span><span>เปอร์เซ็นต์</span></li>
+        <li class="opt"><span class="k">C</span><span>วันที่</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 24</div>
+    </div>
+
+    <div class="quiz" data-q="exam-20">
+      <p class="q"><span class="num">20.</span> เมธอดใดของ string ใช้หาตำแหน่งของ substring?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>IndexOf()</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>Length</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>ToUpper()</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 25</div>
+    </div>
+
+    <h3 id="s06e">Part 5 · Create Methods</h3>
+
+    <div class="quiz" data-q="exam-21">
+      <p class="q"><span class="num">21.</span> optional parameter ต้องอยู่ตำแหน่งไหนใน method signature?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>ต้องมาหลัง required parameter เสมอ</span></li>
+        <li class="opt"><span class="k">B</span><span>ต้องมาก่อน required parameter เสมอ</span></li>
+        <li class="opt"><span class="k">C</span><span>ตำแหน่งไหนก็ได้</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 29</div>
+    </div>
+
+    <div class="quiz" data-q="exam-22">
+      <p class="q"><span class="num">22.</span> named argument ช่วยเรื่องอะไรตอนเรียก method?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>ระบุชัดว่า argument แต่ละตัวตรงกับ parameter ไหน อ่านง่ายขึ้น</span></li>
+        <li class="opt"><span class="k">B</span><span>ทำให้ method ทำงานเร็วขึ้น</span></li>
+        <li class="opt"><span class="k">C</span><span>ลด parameter ที่ต้องใช้</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 29</div>
+    </div>
+
+    <div class="quiz" data-q="exam-23">
+      <p class="q"><span class="num">23.</span> compile error "not all code paths return a value" เกิดจากอะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>method มี return type ไม่ใช่ void แต่บางเส้นทางในโค้ดไม่มี return</span></li>
+        <li class="opt"><span class="k">B</span><span>ลืมใส่เซมิโคลอน</span></li>
+        <li class="opt"><span class="k">C</span><span>เรียก method ก่อนนิยาม</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 30</div>
+    </div>
+
+    <div class="quiz" data-q="exam-24">
+      <p class="q"><span class="num">24.</span> pass-by-value หมายความว่าอย่างไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>method ได้รับ "สำเนา" ของค่า แก้ไขข้างในไม่กระทบตัวแปรต้นฉบับ</span></li>
+        <li class="opt"><span class="k">B</span><span>method ได้รับตัวแปรต้นฉบับโดยตรง แก้ไขข้างในกระทบต้นฉบับเสมอ</span></li>
+        <li class="opt"><span class="k">C</span><span>ใช้ได้กับ array เท่านั้น</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 29</div>
+    </div>
+
+    <div class="quiz" data-q="exam-25">
+      <p class="q"><span class="num">25.</span> Fisher-Yates algorithm ใช้ทำอะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>สับเปลี่ยน (shuffle) array แบบสุ่มไม่ bias</span></li>
+        <li class="opt"><span class="k">B</span><span>เรียงลำดับ array</span></li>
+        <li class="opt"><span class="k">C</span><span>ค้นหาค่าใน array</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 31</div>
+    </div>
+
+    <h3 id="s06f">Part 6 · Debug Applications</h3>
+
+    <div class="quiz" data-q="exam-26">
+      <p class="q"><span class="num">26.</span> ข้อผิดพลาดที่เกิดตอน build (เช่น syntax ผิด) เรียกว่าอะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>error — ไม่ใช่ exception เพราะไม่ได้เกิดตอน runtime</span></li>
+        <li class="opt"><span class="k">B</span><span>exception เหมือนกัน</span></li>
+        <li class="opt"><span class="k">C</span><span>warning เสมอ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 33</div>
+    </div>
+
+    <div class="quiz" data-q="exam-27">
+      <p class="q"><span class="num">27.</span> ปุ่มใดบน Debug toolbar ใช้ "ข้าม" การดูรายละเอียดข้างใน method ที่เรียก?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>Step Over</span></li>
+        <li class="opt"><span class="k">B</span><span>Step Into</span></li>
+        <li class="opt"><span class="k">C</span><span>Step Out</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 34</div>
+    </div>
+
+    <div class="quiz" data-q="exam-28">
+      <p class="q"><span class="num">28.</span> code block ใดของ try-catch-finally ที่รันเสมอไม่ว่าจะเกิด exception หรือไม่?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span><code>finally</code></span></li>
+        <li class="opt"><span class="k">B</span><span><code>try</code></span></li>
+        <li class="opt"><span class="k">C</span><span><code>catch</code></span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 35</div>
+    </div>
+
+    <div class="quiz" data-q="exam-29">
+      <p class="q"><span class="num">29.</span> เมื่อมีหลาย catch ต่อกัน ลำดับที่ถูกต้องคือ?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>เจาะจงชนิดที่สุดก่อน แล้วค่อยกว้างขึ้นเรื่อยๆ (Exception ทั่วไปอยู่ล่างสุด)</span></li>
+        <li class="opt"><span class="k">B</span><span>กว้างที่สุดก่อนเสมอ</span></li>
+        <li class="opt"><span class="k">C</span><span>ลำดับไม่มีผลอะไร</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 35</div>
+    </div>
+
+    <div class="quiz" data-q="exam-30">
+      <p class="q"><span class="num">30.</span> throw; (ไม่มี operand) ใน catch block ทำอะไร?</p>
+      <ul class="opts">
+        <li class="opt" data-correct><span class="k">A</span><span>re-throw exception object เดิม รักษา StackTrace เดิมไว้</span></li>
+        <li class="opt"><span class="k">B</span><span>สร้าง exception ใหม่ทุกครั้ง</span></li>
+        <li class="opt"><span class="k">C</span><span>ทำให้ compile error เสมอ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ A.</b> ทบทวนบทที่ 36</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">📌 ก่อนไปสอบจริง</h2>
+
+    <p>ถ้าทำข้อสอบจำลองชุดนี้ได้เกิน 80% ขึ้นไป และรู้สึกมั่นใจกับ Cheat Sheet ของแต่ละ Part
+       แล้ว คุณพร้อมไปสอบจริงบน freeCodeCamp ได้เลย ขอให้โชคดีกับการสอบ — จำไว้ว่า:</p>
+
+    <ul>
+      <li>เตรียมเวลาว่างต่อเนื่องอย่างน้อย 1 ชั่วโมง ห้ามออกจากหน้าสอบระหว่างทำ</li>
+      <li>อ่านทุกคำถามและตัวเลือกอย่างละเอียด ไม่ต้องรีบ</li>
+      <li>ถ้าไม่ผ่านรอบแรกก็ไม่เป็นไร กลับมาทบทวนจุดที่พลาดแล้วลองใหม่ได้</li>
+    </ul>
+
+    <p>ขอบคุณที่อ่านหนังสือเล่มนี้จนจบ Part 1-7 — หวังว่าจะเป็นก้าวแรกที่ดีสู่เส้นทางเขียนโปรแกรม
+       C# ของคุณ ดูภาคผนวกต่อได้เลยถ้าอยากได้ cheat sheet และศัพท์รวมทั้งเล่มไว้อ้างอิงในอนาคต</p>
+
+    <div class="pager">
+      <a href="ch38.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 38 · Challenge Project — Debug แอปให้สมบูรณ์</span></a>
+      <a class="next" href="../index.html"><span class="dir">กลับสารบัญ →</span><span class="ttl">ภาคผนวก · Cheat Sheet รวม / ศัพท์ / ดัชนี</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บทที่ 33 · Review Debugging &amp; Exception Handling — Foundational C#</title>
+<link rel="stylesheet" href="../assets/book.css">
+</head>
+<body data-ch="33">
+
+<div class="readbar"></div>
+
+<header class="topbar">
+  <a class="home" href="../index.html">📘 <span>Foundational C#</span></a>
+  <span class="crumb">/ Part 6 · Debug Console Applications / บทที่ 33</span>
+  <span class="spacer"></span>
+  <span class="crumb">ทำแล้ว <b data-ch-pct>0%</b></span>
+  <button class="btn-ico" data-act="theme" type="button">☾</button>
+  <button class="btn-ico" onclick="window.print()" title="พิมพ์ / บันทึกเป็น PDF" type="button">🖨</button>
+</header>
+
+<div class="layout">
+
+  <aside class="sidenav">
+    <h4>ในบทนี้</h4>
+    <nav class="auto-toc"></nav>
+  </aside>
+
+  <main class="page">
+
+    <div class="ch-head">
+      <span class="ch-kicker">Part 6 · โมดูล 1/6</span>
+      <h1>ทบทวนหลักการ Debug โค้ดและการจัดการ Exception</h1>
+      <div class="en">Review the Principles of Code Debugging and Exception Handling</div>
+      <div class="ch-meta">
+        <span>⏱ ใช้เวลา <b>30–40 นาที</b></span>
+        <span>📦 ผลลัพธ์ <b>แยกแยะ testing/debugging/exception handling ได้ + เข้าใจหลักการ debugger และ throw/catch</b></span>
+        <span>🎯 ความยาก <b>เริ่มต้น (เน้นทฤษฎี ยังไม่ลงมือ debug จริง)</b></span>
+      </div>
+    </div>
+
+    <div class="goals">
+      <h3>🎯 จบบทนี้คุณจะ...</h3>
+      <ul>
+        <li>อธิบายความรับผิดชอบของนักพัฒนาต่อ testing, debugging และ exception handling ได้</li>
+        <li>อธิบายกระบวนการ debug โค้ดด้วย debugger และประโยชน์หลักที่ debugger มอบให้ได้</li>
+        <li>อธิบายว่า exception คืออะไร และแนวคิดเบื้องหลังการ throw/catch exception ได้</li>
+      </ul>
+    </div>
+
+    <div class="note tip">
+      <span class="lbl">💡 จุดเปลี่ยนของเล่มนี้</span>
+      ตั้งแต่บทที่ 1 คุณโฟกัสที่การ "เขียนโค้ดให้ทำงานถูกต้อง" มาตลอด — Part 6 เปลี่ยนโหมดมา
+      โฟกัสที่ "จะทำยังไงเมื่อโค้ดทำงาน<b>ไม่</b>ถูกต้อง" แทน บทนี้เป็นบทปูพื้นฐานทฤษฎีล้วนๆ
+      (ยังไม่มีแล็บลงมือ debug จริง) — เครื่องมือ debugger ของ VS Code ตัวจริงจะได้ลองในบทที่ 34
+      ส่วนการเขียน try-catch จริงจะได้ลงมือในบทที่ 35-36
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s01">33.1 ทำไม "แก้บั๊ก" ไม่ใช่เรื่องเดียวกันไปหมด</h2>
+
+    <p>นักพัฒนาทุกคนต้องผ่านสามกระบวนการที่มักถูกปนกันจนดูเหมือนเป็นเรื่องเดียวกัน คือ
+       <b>testing</b> (การทดสอบ), <b>debugging</b> (การดีบัก) และ <b>exception handling</b>
+       (การจัดการข้อยกเว้น) ทั้งสามอย่างเกี่ยวข้องกัน แต่ไม่ใช่สิ่งเดียวกัน และแต่ละอย่างก็มี
+       ขอบเขตความรับผิดชอบต่างกัน บทนี้จะแยกให้ชัดว่าอันไหนคืออะไร ก่อนไปลงมือใช้เครื่องมือ
+       debugger จริงในบทถัดไป</p>
+
+    <p>ข้อควรรู้ที่สำคัญก่อนอื่น: ข้อผิดพลาดที่เกิดตอน<b>คอมไพล์/build</b> (เช่น ลืมเซมิโคลอน
+       พิมพ์ชื่อตัวแปรผิด) เรียกว่า <b>error</b> ธรรมดา — ไม่นับเป็นส่วนหนึ่งของกระบวนการ
+       exception handling คำว่า <b>exception</b> ในหนังสือเล่มนี้หมายถึงเฉพาะข้อผิดพลาดที่เกิด
+       ตอนแอปพลิเคชัน<b>กำลังรัน (runtime)</b> เท่านั้น ความแตกต่างนี้สำคัญมาก เพราะการแก้ error
+       ตอน build (เช่นแก้ syntax ผิด) ไม่ถือว่าเป็น "debugging" ตามความหมายที่จะใช้ตลอด Part นี้</p>
+
+    <!-- ============================================ -->
+    <h2 id="s02">33.2 Testing, Debugging, Exception Handling ต่างกันอย่างไร</h2>
+
+    <h3 id="s02a">การทดสอบ (Testing) — หน้าที่ของนักพัฒนา</h3>
+    <p>การพัฒนาซอฟต์แวร์เกี่ยวข้องกับการทดสอบจำนวนมาก จนกลายเป็นสายงานเฉพาะทาง (software
+       tester) และมีแนวทางพัฒนาที่ยึดการทดสอบเป็นศูนย์กลาง เช่น test-driven development
+       การทดสอบแบ่งกว้างๆ ได้เป็นสองหมวด:</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:30%">หมวด</th><th>ตัวอย่างชนิดย่อย</th></tr></thead>
+      <tbody>
+        <tr><td><b>Functional</b> — ทดสอบว่าทำงานตรงตามฟังก์ชันที่ออกแบบไว้</td>
+            <td>unit testing · integration testing · system testing · acceptance testing</td></tr>
+        <tr><td><b>Nonfunctional</b> — ทดสอบด้านอื่นนอกเหนือจากฟังก์ชันการทำงาน</td>
+            <td>security testing · performance testing · usability testing · compatibility testing</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>นักพัฒนาส่วนใหญ่ไม่ได้มองตัวเองเป็น "tester" แต่ก็ยังมีหน้าที่ทดสอบระดับหนึ่งอยู่เสมอ
+       ก่อนส่งงานต่อ — โดยมากจะอยู่ในระดับ unit testing (ทดสอบหน่วยเล็กๆ ของโค้ดที่ตัวเองเขียน)</p>
+
+    <h3 id="s02b">การดีบัก (Debugging) — ไม่ใช่แค่แก้ syntax</h3>
+    <p><b>debugging</b> คือกระบวนการที่นักพัฒนาใช้ "หาสาเหตุ" และ "แก้ไข" ปัญหาในโค้ด ปัญหานั้น
+       อาจเกี่ยวกับ logic ของโค้ดหรือเกี่ยวกับ exception ก็ได้ คำว่า debugging มักสงวนไว้สำหรับ
+       ปัญหาตอน runtime ที่หาสาเหตุได้ไม่ง่าย — การแก้ syntax error ทั่วไป เช่น ลืม
+       <code>;</code> ท้ายบรรทัด จึงไม่นับว่าเป็นการ debug ตามปกติ</p>
+
+    <p>ลองดูโค้ดตัวอย่างนี้:</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span>
+        <button data-act="copy" type="button">Copy</button></div>
+      <pre><code class="lang-cs">string[] students = new string[] {"Sophia", "Nicolas", "Zahirah", "Jeong"};
+
+int studentCount = students.Length;
+
+Console.WriteLine("ชื่อสุดท้ายคือ: " + students[studentCount]);</code></pre>
+    </div>
+
+    <p>โค้ดนี้ตั้งใจจะ: ประกาศ array ชื่อ <code>students</code> เก็บชื่อนักเรียน, ประกาศตัวแปร
+       <code>studentCount</code> ด้วยค่าจาก <code>Length</code>, แล้วพิมพ์ชื่อนักเรียนคนสุดท้าย
+       ออกทางคอนโซล มองผ่านๆ ดูเหมือนไม่มีอะไรผิด แต่โค้ดนี้จะเกิด <b>exception</b> ตอนรันบรรทัด
+       สุดท้าย เพราะ array นับ index จาก 0 — ชื่อสุดท้ายจริงๆ อยู่ที่
+       <code>students[studentCount - 1]</code> ไม่ใช่ <code>students[studentCount]</code>
+       (ทบทวน zero-based index ได้ที่ <a href="ch10.html">บทที่ 10</a>)</p>
+
+    <p>ในตัวอย่างง่ายๆ แบบนี้คุณอาจสังเกตเห็นปัญหาได้ทันที แต่ในโค้ดที่ซับซ้อนกว่านี้มาก การหา
+       ต้นตอปัญหาไม่ใช่เรื่องง่ายเสมอไป — นั่นคือเหตุผลที่ต้องมีเครื่องมือและวิธีการที่เป็นระบบ
+       เข้ามาช่วย ซึ่งจะพูดถึงในหัวข้อถัดไป</p>
+
+    <h3 id="s02c">การจัดการ Exception (Exception Handling) — เผื่อไว้ตอน runtime</h3>
+    <p>ถ้าแอปพลิเคชันสร้าง exception ขึ้นมา และ exception นั้นไม่ถูกจัดการในโค้ด แอปจะแสดง
+       ข้อผิดพลาดแล้ว<b>ปิดตัวเอง</b> การจัดการ exception เป็นความรับผิดชอบของนักพัฒนาโดยตรง
+       C# มีวิธีให้ "ลอง (try)" รันโค้ดที่รู้ว่าอาจเกิด exception ได้ และ "ดัก (catch)"
+       exception ที่เกิดขึ้นจริง — รายละเอียดเต็มเรื่อง <code>try-catch</code> จะอยู่ใน
+       <a href="ch35.html">บทที่ 35</a></p>
+
+    <div class="quiz" data-q="33-1">
+      <p class="q"><span class="num">Check ★</span> ข้อผิดพลาดแบบไหนที่เรียกว่า "exception" ตามนิยามในบทนี้?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>ลืมพิมพ์เซมิโคลอน <code>;</code> ท้ายบรรทัด</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>โค้ดเข้าถึง index ของ array ที่ไม่มีอยู่จริงตอนแอปกำลังรัน</span></li>
+        <li class="opt"><span class="k">C</span><span>พิมพ์ชื่อ method ผิดจนคอมไพล์ไม่ผ่าน</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ข้อ A และ C เป็น error ที่เกิดตอน build/compile
+        ไม่ใช่ exception ส่วนข้อ B เกิดขึ้นระหว่างแอป<b>กำลังรัน</b> จึงเข้านิยาม exception</div>
+    </div>
+
+    <div class="quiz" data-q="33-2">
+      <p class="q"><span class="num">Check ★</span> ใครมีหน้าที่รับผิดชอบการทดสอบซอฟต์แวร์?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>นักพัฒนาเท่านั้น</span></li>
+        <li class="opt"><span class="k">B</span><span>software tester เท่านั้น</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>ทั้งนักพัฒนาและ tester — นักพัฒนายังต้องทำ unit testing ระดับหนึ่งเสมอ</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> แม้ tester มืออาชีพจะรับผิดชอบการทดสอบส่วนใหญ่ในทีมใหญ่
+        แต่นักพัฒนาก็ยังมีหน้าที่ทดสอบงานของตัวเองระดับ unit testing ก่อนส่งต่อเสมอ</div>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s03">33.3 Debugger คืออะไร ทำไมดีกว่าอ่านโค้ดเอง</h2>
+
+    <p>เจอบั๊กแล้วอยากแก้เร็วๆ เป็นเรื่องธรรมชาติ วิธี "มือสมัครเล่น" ที่มักถูกลองก่อนมีสามแบบ:</p>
+
+    <ul>
+      <li>อ่านโค้ดซ้ำไปซ้ำมา หวังว่ารอบนี้จะเห็นปัญหา</li>
+      <li>แปะ <code>Console.WriteLine("here")</code> ไล่เป็นจุดๆ เพื่อดูว่าโค้ดวิ่งมาถึงไหน</li>
+      <li>รันแอปซ้ำด้วยข้อมูลชุดต่างๆ แล้วเดาจากที่เห็นว่าอะไรทำงาน อะไรไม่ทำงาน</li>
+    </ul>
+
+    <p>วิธีเหล่านี้อาจได้ผลบ้างในกรณีง่ายๆ แต่ไม่ scale เมื่อบั๊กซับซ้อนขึ้น วิธีที่ได้รับการ
+       ยอมรับว่าได้ผลที่สุดคือการใช้ <b>debugger</b></p>
+
+    <p><b>debugger</b> คือเครื่องมือซอฟต์แวร์ที่ใช้สังเกตและควบคุม "การไหลของการทำงาน"
+       ของโปรแกรมด้วยวิธีที่เป็นระบบ ช่วยแยกหาสาเหตุของบั๊กและช่วยแก้ไขได้ debugger เชื่อมต่อ
+       กับโค้ดได้สองแบบ: (1) โฮสต์โปรแกรมของคุณไว้ในโปรเซสของตัวมันเอง หรือ (2) รันเป็นโปรเซส
+       แยกต่างหากที่ "แนบ" (attach) เข้ากับโปรแกรมที่กำลังรันอยู่แล้ว debugger มีทั้งแบบ
+       command line และแบบมี GUI — Visual Studio Code มี debugger ผนวกอยู่ในตัว UI เลย
+       (จะได้ลองใช้จริงในบทที่ 34)</p>
+
+    <p>ทุก debugger มีฟีเจอร์หลักที่สำคัญที่สุดสองอย่างเหมือนกัน:</p>
+
+    <ul>
+      <li><b>ควบคุมการทำงาน (control execution)</b> — pause โปรแกรมและรันทีละบรรทัดได้
+          ทำให้เห็นว่าโค้ดส่วนไหนถูกรันจริง และมันส่งผลต่อสถานะโปรแกรมอย่างไร</li>
+      <li><b>สังเกตสถานะ (observe state)</b> — ดูค่าของตัวแปรและพารามิเตอร์ ณ จุดใดก็ได้
+          ระหว่างการรัน</li>
+    </ul>
+
+    <p>การใช้ debugger เก่งเป็นทักษะสำคัญที่นักพัฒนามักมองข้าม การใช้ debugger อย่างมี
+       ประสิทธิภาพช่วยให้ตามหาบั๊กได้เร็วขึ้น และยังช่วยให้เข้าใจว่าโปรแกรมทำงานอย่างไรจริงๆ
+       ด้วย ไม่ใช่แค่ตอนมีบั๊กเท่านั้น</p>
+
+    <div class="quiz" data-q="33-3">
+      <p class="q"><span class="num">Check ★</span> ข้อใดอธิบาย "debugger" ได้ถูกต้องที่สุด?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>โปรแกรมที่เขียนโค้ดให้อัตโนมัติตามที่ผู้ใช้สั่ง</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>เครื่องมือซอฟต์แวร์ที่สังเกตและควบคุมการไหลของการทำงานของโปรแกรม</span></li>
+        <li class="opt"><span class="k">C</span><span>เครื่องมือที่ช่วยเขียนโค้ดให้เร็วขึ้นด้วย autocomplete</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> debugger ไม่ได้เขียนหรือแก้โค้ดให้อัตโนมัติ
+        แต่ช่วยให้คุณ "เห็น" และ "ควบคุม" การทำงานของโปรแกรมแบบละเอียดขึ้น</div>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s04">33.4 Exception คืออะไร: แนวคิด throw และ catch</h2>
+
+    <p>นิยามที่เป็นทางการของ exception ใน C#: ข้อผิดพลาดตอน runtime ถูกส่งผ่านโปรแกรมด้วยกลไก
+       ที่เรียกว่า <b>exception</b> — exception ถูก "<b>throw</b>" (โยน) โดยโค้ดที่เจอปัญหา
+       และถูก "<b>catch</b>" (ดัก) โดยโค้ดที่สามารถแก้ไขปัญหานั้นได้ exception อาจถูกโยนโดย
+       .NET runtime เองหรือโดยโค้ดในโปรแกรมก็ได้ และแทนด้วยคลาสที่สืบทอดมาจากคลาส
+       <code>Exception</code> — แต่ละคลาสจะระบุชนิดของ exception และมี property เก็บ
+       รายละเอียดของปัญหานั้นไว้</p>
+
+    <p>ไม่ต้องเข้าใจเรื่องคลาสแบบลึกซึ้งก็ใช้ exception ได้ — ลองมองว่า exception คือ "ตัวแปร
+       พิเศษ" ที่มีความสามารถเพิ่มเติม: สร้าง exception ได้หลายชนิด และเข้าถึงเนื้อหาข้างในของ
+       มันได้เหมือนตัวแปรทั่วไป</p>
+
+    <p>สรุปเป็นภาษาคน: เมื่อโค้ดของคุณเจอปัญหาตอนรัน .NET runtime (หรือโค้ดของคุณเอง) จะ
+       "โยน" exception ออกมา ถ้ามี <code>catch</code> ดักไว้ โค้ดในนั้นจะอ่านรายละเอียดจาก
+       exception แล้วดำเนินการแก้ไขสถานการณ์ได้ แต่ถ้า<b>ไม่มี</b> catch ดักไว้เลย
+       (<b>unhandled exception</b>) แอปจะแสดงข้อผิดพลาดแล้วปิดตัวลงทันที</p>
+
+    <svg viewBox="0 0 720 130" role="img" aria-label="ขั้นตอนการ throw และ catch exception" style="margin:18px 0">
+      <defs>
+        <marker id="ar33" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="var(--text-faint)"/>
+        </marker>
+      </defs>
+      <g font-family="var(--font-th)" font-size="12.5">
+        <rect x="10"  y="20" width="200" height="90" rx="10" fill="var(--bg-soft)" stroke="var(--line)"/>
+        <text x="110" y="52" text-anchor="middle" font-weight="700" fill="var(--text)">โค้ดกำลังรัน</text>
+        <text x="110" y="74" text-anchor="middle" fill="var(--text-soft)">แล้วเจอปัญหา</text>
+        <text x="110" y="92" text-anchor="middle" fill="var(--text-soft)">ที่คาดไม่ถึง</text>
+
+        <line x1="216" y1="65" x2="248" y2="65" stroke="var(--text-faint)" marker-end="url(#ar33)"/>
+        <rect x="254" y="20" width="200" height="90" rx="10" fill="var(--brand-soft)" stroke="var(--brand)"/>
+        <text x="354" y="52" text-anchor="middle" font-family="var(--font-code)" font-weight="700" fill="var(--brand-text)">throw</text>
+        <text x="354" y="74" text-anchor="middle" fill="var(--text-soft)">.NET / โค้ด สร้าง</text>
+        <text x="354" y="92" text-anchor="middle" fill="var(--text-soft)">exception object</text>
+
+        <line x1="460" y1="65" x2="492" y2="65" stroke="var(--text-faint)" marker-end="url(#ar33)"/>
+        <rect x="498" y="20" width="212" height="90" rx="10" fill="var(--warn-soft)" stroke="var(--warn)"/>
+        <text x="604" y="52" text-anchor="middle" font-family="var(--font-code)" font-weight="700" fill="var(--warn)">catch</text>
+        <text x="604" y="74" text-anchor="middle" fill="var(--text-soft)">โค้ดดักไว้ อ่านรายละเอียด</text>
+        <text x="604" y="92" text-anchor="middle" fill="var(--text-soft)">แล้วแก้ไขสถานการณ์</text>
+      </g>
+    </svg>
+
+    <p>ถ้าไม่มีกล่อง "catch" ดักไว้ตรงปลายทาง — คือไม่มีใครรับ exception นั้นเลย — แอปจะพัง
+       และปิดตัวลงทันทีแทน นี่คือเหตุผลที่ Part นี้ทั้ง Part มีอยู่: เพื่อให้คุณเขียนโค้ดที่
+       "ดัก" ปัญหาไว้ก่อนที่มันจะทำให้แอปทั้งตัวล่ม</p>
+
+    <ul class="checklist">
+      <li><label><input type="checkbox" id="ch33-a"><span>แยกความแตกต่างระหว่าง testing, debugging และ exception handling ได้</span></label></li>
+      <li><label><input type="checkbox" id="ch33-b"><span>อธิบายได้ว่า debugger ช่วยควบคุมและสังเกตโปรแกรมอย่างไร</span></label></li>
+      <li><label><input type="checkbox" id="ch33-c"><span>อธิบายแนวคิด throw/catch และผลของ unhandled exception ได้</span></label></li>
+    </ul>
+
+    <!-- ============================================ -->
+    <h2 id="s05">33.5 ⚠️ กับดักที่พบบ่อย / เข้าใจผิดบ่อย</h2>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:34%">ความเข้าใจผิด</th><th>ความจริง</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>แก้ลืมเซมิโคลอนแล้วนับว่า "กำลัง debug"</td>
+          <td>นั่นคือการแก้ syntax error ตอน build — คำว่า debugging สงวนไว้สำหรับปัญหาตอน
+              runtime ที่หาสาเหตุได้ไม่ง่าย</td>
+        </tr>
+        <tr>
+          <td>คิดว่า "รันได้ไม่มี error สีแดง" แปลว่าเทสผ่านแล้ว</td>
+          <td>build/run ผ่านไม่ได้แปลว่า logic ถูกต้อง — ต้องตรวจผลลัพธ์เทียบกับที่ควรจะเป็นด้วย
+              (นี่คืองานของ testing จริงๆ)</td>
+        </tr>
+        <tr>
+          <td>คิดว่าแปะ <code>Console.WriteLine("here")</code> หลายจุดคือวิธี debug ที่ดีที่สุด</td>
+          <td>ใช้ได้ในกรณีง่ายๆ แต่ไม่ scale ต้องคอยลบทิ้งภายหลัง และไม่เห็นค่าตัวแปรแบบละเอียด
+              เท่า debugger</td>
+        </tr>
+        <tr>
+          <td>คิดว่า error ตอน build กับ exception ตอน runtime เป็นเรื่องเดียวกัน</td>
+          <td>error ตอน build (เช่น syntax ผิด) ไม่ใช่ exception — exception เกิดเฉพาะตอนแอป
+              กำลังรันเท่านั้น</td>
+        </tr>
+        <tr>
+          <td>คิดว่าทุก exception ต้อง catch เสมอไม่งั้นผิด</td>
+          <td>การ catch เป็นทางเลือกที่ควรทำเมื่อ "แก้ไขสถานการณ์ได้จริง" — ถ้าไม่ catch
+              .NET runtime จะปล่อยให้แอปปิดตัวเอง (unhandled) ซึ่งบางครั้งก็เป็นพฤติกรรมที่
+              ยอมรับได้สำหรับข้อผิดพลาดร้ายแรงจริงๆ</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s06">33.6 ❓ Knowledge Check</h2>
+    <p>คำถามชุดนี้แปลจาก Microsoft Learn (Check your knowledge ของแต่ละ unit)</p>
+
+    <div class="quiz" data-q="33-5">
+      <p class="q"><span class="num">1.</span> ถ้าเกิด exception แล้วไม่มีการจัดการ (unhandled) จะเกิดอะไรขึ้น?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>โค้ดรันต่อไปตามปกติเหมือนไม่มีอะไรเกิดขึ้น</span></li>
+        <li class="opt" data-correct><span class="k">B</span><span>แอปพลิเคชันแสดงข้อผิดพลาดแล้วปิดตัว</span></li>
+        <li class="opt"><span class="k">C</span><span>ระบบจะแสดง syntax error ให้ผู้ใช้เห็นแทน</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ B.</b> ถ้าไม่มี <code>catch</code> ดักไว้เลย exception ที่ถูก
+        throw จะไม่ถูกจัดการ ทำให้แอปพลิเคชันแสดงข้อผิดพลาดและปิดตัวลง</div>
+    </div>
+
+    <div class="quiz" data-q="33-6">
+      <p class="q"><span class="num">2.</span> วิธีใดคือแนวทางที่ดีที่สุดในการหาสาเหตุที่แท้จริง (root cause) ของบั๊ก?</p>
+      <ul class="opts">
+        <li class="opt"><span class="k">A</span><span>รันแอปซ้ำด้วยข้อมูลชุดต่างๆ ไปเรื่อยๆ แล้วเดา</span></li>
+        <li class="opt"><span class="k">B</span><span>แปะ <code>Console.WriteLine("here")</code> ไล่ทีละจุดในโค้ด</span></li>
+        <li class="opt" data-correct><span class="k">C</span><span>ใช้ debugger สังเกตและควบคุมการทำงานของโปรแกรม</span></li>
+      </ul>
+      <div class="why"><b>เฉลย: ข้อ C.</b> ทั้งข้อ A และ B เป็นวิธีที่ใช้ได้ในสถานการณ์ง่ายๆ
+        แต่ไม่แม่นยำและไม่ scale เท่าการใช้ debugger ซึ่งให้คุณเห็นสถานะจริงของโปรแกรม
+        ณ จุดใดก็ได้</div>
+    </div>
+
+    <div class="quiz-score"></div>
+
+    <!-- ============================================ -->
+    <h2 id="s07">33.7 ✍️ แบบฝึกหัดท้ายบท</h2>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 1</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>โค้ดต่อไปนี้ตั้งใจพิมพ์ผลไม้ชิ้นสุดท้ายในรายการ แต่จะเกิด exception ตอนรัน — หา
+           สาเหตุและแก้ไข</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+        <pre><code class="lang-cs">string[] fruits = new string[] {"มะม่วง", "กล้วย", "ส้ม"};
+int count = fruits.Length;
+Console.WriteLine("ผลไม้ชิ้นสุดท้าย: " + fruits[count]);</code></pre></div>
+      </div>
+      <details class="fold"><summary>💡 คำใบ้</summary>
+        <div class="fold-body"><p>array นับ index จาก 0 — ชิ้นสุดท้ายไม่ได้อยู่ที่ index
+           เท่ากับ <code>Length</code></p></div>
+      </details>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+          <pre><code class="lang-cs">Console.WriteLine("ผลไม้ชิ้นสุดท้าย: " + fruits[count - 1]);</code></pre></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 2</span><span class="lvl e">ง่าย</span></div>
+      <div class="ex-body">
+        <p>จำแนกสถานการณ์ทดสอบต่อไปนี้ว่าเป็น Functional หรือ Nonfunctional testing:</p>
+        <p>(1) เช็คว่าปุ่ม "เข้าสู่ระบบ" พาไปหน้าถัดไปถูกต้อง &nbsp;
+           (2) เช็คว่าหน้าเว็บโหลดเสร็จภายใน 2 วินาที &nbsp;
+           (3) เช็คว่าแอปใช้งานได้ทั้งบน Windows และ macOS &nbsp;
+           (4) เช็คว่าเมธอดคำนวณส่วนลดคืนค่าถูกต้อง</p>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>(1) Functional — ทดสอบว่าฟังก์ชันทำงานถูกต้อง<br>
+             (2) Nonfunctional (performance testing)<br>
+             (3) Nonfunctional (compatibility testing)<br>
+             (4) Functional — ทดสอบ logic ของเมธอด</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 3</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>โค้ดต่อไปนี้จะเกิด exception ตอนรัน — บอกว่าเกิดจากอะไร และถ้าไม่มีการจัดการ
+           (unhandled) จะเกิดอะไรขึ้นกับแอป</p>
+        <div class="code"><div class="code-bar"><span class="dot"></span><span class="name">Program.cs</span></div>
+        <pre><code class="lang-cs">int total = 100;
+int people = 0;
+Console.WriteLine("เฉลี่ยคนละ: " + (total / people));</code></pre></div>
+      </div>
+      <details class="fold"><summary>ดูเฉลย</summary>
+        <div class="fold-body">
+          <p>เกิดจากการหารด้วยศูนย์ (<code>people</code> มีค่า 0) ซึ่งเป็นการดำเนินการที่
+             ไม่มีผลลัพธ์ทางคณิตศาสตร์ที่ถูกต้อง .NET runtime จะ throw exception ออกมาตอนรัน
+             บรรทัดนี้ ถ้าไม่มี <code>catch</code> ดักไว้เลย แอปจะแสดงข้อผิดพลาดแล้วปิดตัวลง
+             ทันที (รายละเอียดเรื่อง try-catch จริงจะได้เรียนในบทที่ 35)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 4</span><span class="lvl m">กลาง</span></div>
+      <div class="ex-body">
+        <p>อธิบายด้วยคำพูดตัวเอง (2-3 ประโยค) ว่าทำไมการใช้ debugger ถึงดีกว่าการแปะ
+           <code>Console.WriteLine("here")</code> ไล่ทีละจุดในโค้ด</p>
+      </div>
+      <details class="fold"><summary>ดูแนวคำตอบ</summary>
+        <div class="fold-body">
+          <p>แนวคำตอบตัวอย่าง: debugger ให้คุณ pause โปรแกรม ณ จุดใดก็ได้ แล้วดูค่าจริงของ
+             ตัวแปรทุกตัวพร้อมกัน โดยไม่ต้องแก้โค้ดเพิ่มหรือคอยลบทิ้งภายหลัง ต่างจากการแปะ
+             <code>Console.WriteLine</code> ที่บอกได้แค่ว่า "โค้ดวิ่งมาถึงจุดนี้หรือยัง"
+             แต่ไม่เห็นภาพรวมของสถานะโปรแกรมทั้งหมดในเวลาเดียวกัน และยิ่งบั๊กซับซ้อนขึ้น
+             ก็ยิ่งต้องแปะเพิ่มเรื่อยๆ จนโค้ดรก</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ex">
+      <div class="ex-head"><span class="no">ข้อ 5</span><span class="lvl h">ท้าทาย</span></div>
+      <div class="ex-body">
+        <p>แอปคำนวณดอกเบี้ยธนาคารง่ายๆ รับเงินต้นและอัตราดอกเบี้ยจากผู้ใช้ แล้วคำนวณดอกเบี้ย
+           รวมออกมา ระบุว่าสถานการณ์ต่อไปนี้ควรใช้ "debugger หา logic ที่ผิด" หรือ "เขียน
+           exception handling ดักไว้" — พร้อมเหตุผลสั้นๆ:</p>
+        <p>(1) สูตรคำนวณดอกเบี้ยให้ผลลัพธ์ผิดทุกครั้งที่เงินต้นเป็นทศนิยม &nbsp;
+           (2) ผู้ใช้พิมพ์ตัวอักษรแทนตัวเลขตอนกรอกเงินต้น</p>
+      </div>
+      <details class="fold"><summary>ดูแนวคำตอบ</summary>
+        <div class="fold-body">
+          <p>(1) ควรใช้ <b>debugger</b> — นี่คือปัญหา logic ในสูตรคำนวณของเราเอง ต้อง step
+             ผ่านโค้ดทีละบรรทัดเพื่อดูว่าค่าทศนิยมถูกคำนวณหรือแปลงผิดตรงไหน<br>
+             (2) ควรใช้ <b>exception handling</b> — นี่คือข้อผิดพลาดที่มาจาก "ข้อมูลนำเข้าจาก
+             ผู้ใช้" ตอน runtime ซึ่งเราควบคุมไม่ได้ล่วงหน้า ต้องเขียนโค้ดดักไว้ (try-catch)
+             เพื่อแจ้งเตือนผู้ใช้อย่างสุภาพแทนที่จะปล่อยให้แอปพัง</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ============================================ -->
+    <h2 id="s08">📌 สรุปบทที่ 33</h2>
+
+    <p>บทนี้ปูพื้นฐานสามแนวคิดที่นักพัฒนา C# ต้องเจอตลอดอาชีพ: <b>testing</b> ตรวจสอบว่าโค้ด
+       ทำงานถูกต้องตามที่ออกแบบไว้ (ทั้งเชิงฟังก์ชันและไม่ใช่ฟังก์ชัน) <b>debugging</b> คือ
+       กระบวนการหาสาเหตุและแก้ไขปัญหาที่เกิดตอน runtime ซึ่งใช้ <b>debugger</b> เป็นเครื่องมือ
+       หลักในการควบคุมและสังเกตการทำงานของโปรแกรม และ <b>exception handling</b> คือการเตรียม
+       รับมือข้อผิดพลาดที่เกิดตอนแอปกำลังรัน ด้วยกลไก throw/catch</p>
+
+    <p>ทั้งสามแนวคิดนี้เกี่ยวข้องกันแต่ไม่ใช่สิ่งเดียวกัน และเป็นความรับผิดชอบของนักพัฒนา
+       โดยตรงทั้งหมด บทถัดไปคุณจะได้ลงมือใช้เครื่องมือ debugger จริงของ Visual Studio Code
+       ก่อนที่จะไปเขียน try-catch จัดการ exception จริงในบทที่ 35-36</p>
+
+    <div class="cheat">
+      <h3>Cheat Sheet — บทที่ 33</h3>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:32%">แนวคิด</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td>Testing</td><td>ตรวจสอบว่าโค้ดทำงานถูกต้อง — แบ่งเป็น functional/nonfunctional</td></tr>
+          <tr><td>Debugging</td><td>หาสาเหตุ + แก้ปัญหาโค้ดตอน runtime (ไม่ใช่แค่แก้ syntax)</td></tr>
+          <tr><td>Debugger</td><td>เครื่องมือควบคุม + สังเกตการทำงานโปรแกรมแบบ step-by-step</td></tr>
+          <tr><td>Exception</td><td>ข้อผิดพลาดตอน runtime แทนด้วยคลาสที่สืบทอดจาก <code>Exception</code></td></tr>
+          <tr><td><code>throw</code></td><td>โค้ด/.NET runtime "โยน" exception ออกมาเมื่อเจอปัญหา</td></tr>
+          <tr><td><code>catch</code></td><td>โค้ด "ดัก" exception ไว้เพื่อแก้ไขสถานการณ์</td></tr>
+          <tr><td>Unhandled exception</td><td>exception ที่ไม่มี catch ดักไว้ → แอปปิดตัว</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <h3 id="s09">🔤 ศัพท์ประจำบท</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:26%">English</th><th style="width:24%">ไทย</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>testing</td><td>การทดสอบ</td><td>ตรวจสอบว่าโค้ดทำงานถูกต้องตามที่ออกแบบไว้</td></tr>
+        <tr><td>debugging</td><td>การดีบัก</td><td>กระบวนการหาสาเหตุและแก้ปัญหาในโค้ดตอน runtime</td></tr>
+        <tr><td>exception handling</td><td>การจัดการข้อยกเว้น</td><td>กระบวนการรับมือ error ที่เกิดตอนแอปกำลังรัน</td></tr>
+        <tr><td>debugger</td><td>ดีบักเกอร์</td><td>เครื่องมือควบคุม/สังเกตการทำงานของโปรแกรม</td></tr>
+        <tr><td>throw</td><td>โยน (exception)</td><td>การสร้างและส่ง exception ออกมาเมื่อเจอปัญหา</td></tr>
+        <tr><td>catch</td><td>ดัก / จับ (exception)</td><td>การรับมือ exception ที่ถูกโยนมา เพื่อแก้ไขสถานการณ์</td></tr>
+        <tr><td>unhandled exception</td><td>ข้อยกเว้นที่ไม่ถูกจัดการ</td><td>exception ที่ไม่มี catch ดักไว้ ทำให้แอปปิดตัว</td></tr>
+        <tr><td>functional testing</td><td>การทดสอบเชิงฟังก์ชัน</td><td>ทดสอบว่าโค้ดทำงานตรงตามฟังก์ชันที่ออกแบบไว้</td></tr>
+        <tr><td>nonfunctional testing</td><td>การทดสอบเชิงไม่ใช่ฟังก์ชัน</td><td>ทดสอบด้านอื่น เช่น performance, security, usability</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="pager">
+      <a href="ch32.html"><span class="dir">← บทก่อนหน้า</span><span class="ttl">บทที่ 32 · Challenge Project — สร้างมินิเกม</span></a>
+      <a class="next" href="ch34.html"><span class="dir">บทถัดไป →</span><span class="ttl">บทที่ 34 · เครื่องมือ Debug ของ Visual Studio Code</span></a>
+    </div>
+
+  </main>
+</div>
+
+<script src="../assets/book.js"></script>
+</body>
+</html>
